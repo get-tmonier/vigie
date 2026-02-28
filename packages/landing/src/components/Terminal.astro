@@ -1,0 +1,119 @@
+---
+---
+
+<div
+  style="background: #0B1A2E; border: 1px solid rgba(196, 154, 43, 0.2); border-radius: 12px; overflow: hidden; max-width: 680px; margin: 0 auto; box-shadow: 0 24px 64px rgba(0,0,0,0.4);"
+>
+  <!-- Window chrome -->
+  <div
+    style="background: rgba(29, 53, 87, 0.6); padding: 0.75rem 1rem; display: flex; gap: 0.5rem; align-items: center; border-bottom: 1px solid rgba(196, 154, 43, 0.1);"
+  >
+    <span
+      style="width: 12px; height: 12px; background: #FF5F57; border-radius: 50%; display: inline-block;"
+    ></span>
+    <span
+      style="width: 12px; height: 12px; background: #FFBD2E; border-radius: 50%; display: inline-block;"
+    ></span>
+    <span
+      style="width: 12px; height: 12px; background: #28C840; border-radius: 50%; display: inline-block;"
+    ></span>
+    <span
+      style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: rgba(139,156,175,0.5); margin-left: 0.5rem;"
+      >zsh — ~/projects/my-app</span
+    >
+  </div>
+
+  <!-- Terminal content -->
+  <div class="terminal-body" style="padding: 1.5rem 1.75rem; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; line-height: 1.9; overflow-x: auto;">
+    <!-- Command -->
+    <div style="color: rgba(139,156,175,0.45);"># describe what you want built</div>
+    <div>
+      <span style="color: #C49A2B;">$</span>
+      <span style="color: #E0BC5A;"> tmonier run "add OAuth2 login flow"</span>
+    </div>
+    <!-- Output lines -->
+    <div style="color: #8B9CAF;">
+      <span style="color: rgba(196,154,43,0.6);">▸</span> drafting technical spec…
+    </div>
+    <div style="color: #8B9CAF;">
+      <span style="color: rgba(196,154,43,0.6);">▸</span> mapping tradeoffs, boundaries, contracts
+    </div>
+    <!-- Blank line -->
+    <div style="height: 0.5rem;"></div>
+    <!-- Spec approval -->
+    <div style="color: #FFBD2E;">
+      <span style="color: rgba(196,154,43,0.6);">▸</span> spec ready — waiting for your approval
+    </div>
+    <div>
+      <span style="color: #28C840;">▸ ✓</span>
+      <span style="color: #8B9CAF;"> approved — decomposing into 3 parallel tasks</span>
+    </div>
+    <!-- Blank line -->
+    <div style="height: 0.5rem;"></div>
+    <!-- Parallel agents -->
+    <div style="color: rgba(139,156,175,0.45);"># 3 agents launch in parallel</div>
+    <div style="color: #8B9CAF;">
+      <span style="color: rgba(196,154,43,0.6);">▸</span> agent-1 → <span style="color: #E0BC5A;">worktree/auth</span> — OAuth2 provider
+    </div>
+    <div style="color: #8B9CAF;">
+      <span style="color: rgba(196,154,43,0.6);">▸</span> agent-2 → <span style="color: #E0BC5A;">worktree/gateway</span> — API gateway routes
+    </div>
+    <div style="color: #8B9CAF;">
+      <span style="color: rgba(196,154,43,0.6);">▸</span> agent-3 → <span style="color: #E0BC5A;">worktree/tests</span> — integration tests
+    </div>
+    <!-- Blank line -->
+    <div style="height: 0.5rem;"></div>
+    <!-- Cross-agent check -->
+    <div style="color: #FFBD2E;">
+      <span style="color: rgba(196,154,43,0.6);">▸</span> ⚠ agent-2 modified auth.ts — conflict with agent-1's contract
+    </div>
+    <div style="color: #8B9CAF;">
+      <span style="color: rgba(196,154,43,0.6);">▸</span> awaiting your decision…
+    </div>
+    <div>
+      <span style="color: #28C840;">▸ ✓</span>
+      <span style="color: #8B9CAF;"> resolved — agent-2 aligned to agent-1's interface</span>
+    </div>
+    <!-- Blank line -->
+    <div style="height: 0.5rem;"></div>
+    <!-- Merge -->
+    <div style="color: rgba(139,156,175,0.45);"># all agents done — review</div>
+    <div style="color: #8B9CAF;">
+      <span style="color: rgba(196,154,43,0.6);">▸</span> 3 worktrees → 1 unified diff (847 lines)
+    </div>
+    <div style="color: #8B9CAF;">
+      <span style="color: rgba(196,154,43,0.6);">▸</span> architectural consistency: <span style="color: #28C840;">pass</span>
+    </div>
+    <div>
+      <span style="color: #28C840;">▸ ✓</span>
+      <span style="color: #8B9CAF;"> merged to main — feature complete</span>
+    </div>
+    <!-- Cursor -->
+    <div style="margin-top: 0.5rem;">
+      <span style="color: #C49A2B;">$</span>
+      <span
+        style="display: inline-block; width: 8px; height: 1.1em; background: #C49A2B; margin-left: 4px; vertical-align: text-bottom; animation: blink 1.2s step-end infinite;"
+      ></span>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .terminal-body {
+      font-size: 0.65rem !important;
+      padding: 1rem 1.25rem !important;
+      line-height: 1.75 !important;
+    }
+  }
+</style>

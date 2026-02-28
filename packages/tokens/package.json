@@ -1,0 +1,10 @@
+{
+  "name": "@tmonier/tokens",
+  "version": "0.0.1",
+  "private": true,
+  "exports": {
+    "./tailwind.css": "./tailwind.css",
+    "./tokens.css": "./tokens.css",
+    ".": "./index.ts"
+  }
+}
