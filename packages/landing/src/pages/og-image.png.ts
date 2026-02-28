@@ -224,7 +224,7 @@ function buildTree(): VNode {
               textTransform: 'uppercase',
               color: 'rgba(139,156,175,0.5)',
             },
-            children: 'The SWE Companion',
+            children: 'You hold the helm.',
           }),
         ],
       }),
@@ -240,7 +240,7 @@ function buildTree(): VNode {
               color: CREAM,
               lineHeight: 1.0,
             },
-            children: 'You steer.',
+            children: 'Ship 10x faster.',
           }),
           h('div', {
             style: {
@@ -250,7 +250,7 @@ function buildTree(): VNode {
               color: CREAM,
               lineHeight: 1.0,
             },
-            children: 'We ship.',
+            children: 'Break nothing.',
           }),
         ],
       }),
@@ -266,7 +266,7 @@ function buildTree(): VNode {
           marginBottom: '48px',
         },
         children:
-          'A local-first SWE companion. N agents in parallel worktrees — you approve every decision.',
+          'You design. The AI agents crew executes. Nothing merges without your signal.',
       }),
       // Pills
       h('div', {
