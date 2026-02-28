@@ -90,7 +90,7 @@ const svg = await satori(
                     textTransform: 'uppercase',
                     color: 'rgba(139,156,175,0.5)',
                   },
-                  children: 'The SWE Companion',
+                  children: 'You hold the helm.',
                 },
               },
             ],
@@ -112,8 +112,8 @@ const svg = await satori(
               marginBottom: '28px',
             },
             children: [
-              { type: 'span', props: { children: 'You steer.' } },
-              { type: 'span', props: { children: 'We ship.' } },
+              { type: 'span', props: { children: 'Ship 10x faster.' } },
+              { type: 'span', props: { children: 'Break nothing.' } },
             ],
           },
         },
@@ -130,8 +130,7 @@ const svg = await satori(
               maxWidth: '560px',
               marginBottom: '48px',
             },
-            children:
-              'A local-first SWE companion. N agents in parallel worktrees — you approve every decision.',
+            children: 'You design. The AI agents crew executes. Nothing merges without your signal.',
           },
         },
         // Pills
