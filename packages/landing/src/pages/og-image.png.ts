@@ -274,7 +274,7 @@ function buildTree(): VNode {
         children: [
           'Local-first',
           'Human-in-the-loop',
-          'Ticket → Production',
+          'Spec → Production',
           'BYOA — zero markup',
         ].map(pill),
       }),
