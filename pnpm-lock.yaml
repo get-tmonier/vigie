@@ -22,6 +22,18 @@ importers:
       '@astrojs/cloudflare':
         specifier: ^12.6.12
         version: 12.6.12(astro@5.18.0(jiti@2.6.1)(lightningcss@1.31.1)(rollup@4.59.0)(typescript@5.9.3)(yaml@2.8.2))(jiti@2.6.1)(lightningcss@1.31.1)(yaml@2.8.2)
+      '@fontsource/jetbrains-mono':
+        specifier: 5.2.8
+        version: 5.2.8
+      '@fontsource/source-serif-4':
+        specifier: 5.2.9
+        version: 5.2.9
+      '@fontsource/vollkorn':
+        specifier: 5.2.10
+        version: 5.2.10
+      '@fontsource/vollkorn-sc':
+        specifier: 5.2.8
+        version: 5.2.8
       '@tailwindcss/vite':
         specifier: 4.2.1
         version: 4.2.1(vite@6.4.1(jiti@2.6.1)(lightningcss@1.31.1)(yaml@2.8.2))
@@ -44,6 +56,9 @@ importers:
       satori:
         specifier: 0.19.2
         version: 0.19.2
+      sharp:
+        specifier: 0.34.5
+        version: 0.34.5
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -761,6 +776,18 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
+
+  '@fontsource/jetbrains-mono@5.2.8':
+    resolution: {integrity: sha512-6w8/SG4kqvIMu7xd7wt6x3idn1Qux3p9N62s6G3rfldOUYHpWcc2FKrqf+Vo44jRvqWj2oAtTHrZXEP23oSKwQ==}
+
+  '@fontsource/source-serif-4@5.2.9':
+    resolution: {integrity: sha512-er/Pym9emsEVJNf947umJ4kXarXfsiN6CN7kTYinefKRaHLwiquiiHOZvKvxWgkV8JMCf3pV3g0NcsPFpVCH9w==}
+
+  '@fontsource/vollkorn-sc@5.2.8':
+    resolution: {integrity: sha512-WSSG0PWybgj6amn9lj0aeg3yKXWskBlgsLMiMRiobmFGE262mJRrg4p7bnH8RYPphl8Pu7A4Kwbtk5l2E4U67A==}
+
+  '@fontsource/vollkorn@5.2.10':
+    resolution: {integrity: sha512-gSlz1yYmGkpSnfchXwbdkCnGFGnV2lKhA0Wc87kF95kA5ziOGLHCriQvDKZhExVC4/heeB6MdmVdyIW/e9Ab6A==}
 
   '@img/colour@1.0.0':
     resolution: {integrity: sha512-A5P/LfWGFSl6nsckYtjw9da+19jB8hkJ6ACTGcDfEJ0aE+l2n2El7dsVM7UVHZQ9s2lmYMWlrS21YLy2IR1LUw==}
@@ -3439,6 +3466,14 @@ snapshots:
 
   '@esbuild/win32-x64@0.27.3':
     optional: true
+
+  '@fontsource/jetbrains-mono@5.2.8': {}
+
+  '@fontsource/source-serif-4@5.2.9': {}
+
+  '@fontsource/vollkorn-sc@5.2.8': {}
+
+  '@fontsource/vollkorn@5.2.10': {}
 
   '@img/colour@1.0.0': {}
 
