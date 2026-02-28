@@ -34,3 +34,5 @@ pnpm --filter @tmonier/landing dev      # dev server for landing only
 
 ## Rules
 - **Never `git push` directly** — always ask before pushing to any remote.
+- **Conventional Commits** — all commit messages must follow the [Conventional Commits](https://www.conventionalcommits.org/) spec: `type(scope): description` (e.g. `feat(landing): add hero section`, `fix(tokens): correct color value`).
+- **No co-author attribution** — never add `Co-Authored-By` or any Claude/AI mention in commit messages.
