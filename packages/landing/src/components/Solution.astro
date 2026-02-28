@@ -1,0 +1,93 @@
+---
+const features = [
+  {
+    num: '01',
+    label: 'Agent orchestration',
+    title: 'N agents. N worktrees. One feature.',
+    description:
+      '5 agents ship a feature in 20 minutes. Tmonier fans out to N isolated git worktrees simultaneously — each agent working on a different slice of the spec. You watch every one in real time from a single dashboard. No context collisions, no shared state, no bottleneck.',
+  },
+  {
+    num: '02',
+    label: 'Human-in-the-loop',
+    title: 'Nothing ships without your signal.',
+    description:
+      'The agent stops at every architectural decision. You review one unified diff — not 5 individual ones. Approve the spec before code is written. Approve the merge before anything lands. No auto-merge, no auto-deploy. The agent never moves forward without you.',
+  },
+  {
+    num: '03',
+    label: 'Cross-agent visibility',
+    title: 'The full picture. No blind spots.',
+    description:
+      'When N agents work in parallel, you need to see everything: which agent changed what, where changes overlap, what the combined diff looks like. Tmonier surfaces conflicts, shows you the full picture, and ensures nothing is hidden in a worktree you forgot to check.',
+  },
+  {
+    num: '04',
+    label: 'Ticket-to-spec pipeline',
+    title: 'From ticket to shipping in one flow.',
+    description:
+      'Import a ticket from Jira, Azure DevOps, or Linear. Tmonier turns it into a technical spec, decomposes it into parallel agent tasks, and keeps your board in sync as agents ship. No context switching between tools. Available on the Solo plan.',
+  },
+];
+---
+
+<section style="background: #0B1A2E; padding: 5rem 2.5rem;">
+  <div style="max-width: 1200px; margin: 0 auto;">
+    <div style="margin-bottom: 3rem;">
+      <h2
+        style="font-family: 'Vollkorn SC', serif; font-weight: 700; font-size: clamp(1.6rem, 3vw, 2.2rem); color: #C49A2B; margin: 0 0 1rem; line-height: 1.2;"
+      >
+        Speed and safety. Not speed or safety.
+      </h2>
+      <p
+        style="font-family: 'Source Serif 4', serif; font-size: 1.05rem; color: #8B9CAF; line-height: 1.75; max-width: 560px; margin: 0;"
+      >
+        The only tool that gives you N-agent parallelism with structured human governance. Your crew ships at full speed. Your instruments keep everything safe.
+      </p>
+    </div>
+
+    <div
+      style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;"
+      class="feature-grid"
+    >
+      {
+        features.map((f) => (
+          <div
+            style="background: rgba(29, 53, 87, 0.35); border: 1px solid rgba(196, 154, 43, 0.15); border-radius: 8px; padding: 2rem;"
+          >
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <span
+                style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #C49A2B; opacity: 0.6;"
+              >
+                {f.num}
+              </span>
+              <span
+                style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: rgba(196,154,43,0.5); text-transform: uppercase; letter-spacing: 1.5px;"
+              >
+                {f.label}
+              </span>
+            </div>
+            <h3
+              style="font-family: 'Vollkorn', serif; font-weight: 600; font-size: 1.15rem; color: #C49A2B; margin: 0 0 0.75rem; line-height: 1.3;"
+            >
+              {f.title}
+            </h3>
+            <p
+              style="font-family: 'Source Serif 4', serif; font-size: 0.95rem; color: #8B9CAF; line-height: 1.7; margin: 0;"
+            >
+              {f.description}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  @media (max-width: 768px) {
+    .feature-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>

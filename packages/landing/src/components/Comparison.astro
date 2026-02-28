@@ -1,0 +1,101 @@
+---
+const rows = [
+  {
+    aspect: 'Parallelism',
+    tmonier: 'N agents, N worktrees, one spec',
+    others: '1 agent at a time',
+  },
+  {
+    aspect: 'Cross-agent awareness',
+    tmonier: 'Conflict detection, contract validation',
+    others: 'Agents work in isolation',
+  },
+  {
+    aspect: 'Review surface',
+    tmonier: 'Unified diff view',
+    others: 'Review each agent separately',
+  },
+  {
+    aspect: 'Human checkpoints',
+    tmonier: 'Structured, at every key decision',
+    others: 'Binary approve/reject',
+  },
+  {
+    aspect: 'Tracker integration',
+    tmonier: 'Ticket-to-spec: Jira, ADO, Linear (Solo)',
+    others: 'GitHub only, no tracker sync',
+  },
+  {
+    aspect: 'Where code lives',
+    tmonier: 'Always on your machine',
+    others: 'Often uploaded to cloud',
+  },
+  {
+    aspect: 'Enterprise privacy',
+    tmonier: 'Zero-trust local architecture',
+    others: 'Code leaves your network',
+  },
+  {
+    aspect: 'Target user',
+    tmonier: 'Senior SWEs who care about quality',
+    others: 'All developers',
+  },
+];
+---
+
+<section style="background: #0B1A2E; padding: 5rem 2.5rem;">
+  <div style="max-width: 1200px; margin: 0 auto;">
+    <h2
+      style="font-family: 'Vollkorn SC', serif; font-weight: 700; font-size: clamp(1.6rem, 3vw, 2.2rem); color: #C49A2B; margin: 0 0 2.5rem; line-height: 1.2;"
+    >
+      Built for engineers, not prompt writers
+    </h2>
+
+    <div style="overflow-x: auto;">
+      <table
+        style="width: 100%; border-collapse: collapse; font-family: 'Source Serif 4', serif; font-size: 0.92rem;"
+      >
+        <thead>
+          <tr style="border-bottom: 1px solid rgba(196, 154, 43, 0.3);">
+            <th
+              style="text-align: left; padding: 0.9rem 1.2rem; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600; color: rgba(139,156,175,0.6); text-transform: uppercase; letter-spacing: 1.5px; width: 30%;"
+            >
+              Aspect
+            </th>
+            <th
+              style="text-align: left; padding: 0.9rem 1.2rem; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600; color: #C49A2B; text-transform: uppercase; letter-spacing: 1.5px; width: 35%;"
+            >
+              Tmonier
+            </th>
+            <th
+              style="text-align: left; padding: 0.9rem 1.2rem; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600; color: rgba(139,156,175,0.4); text-transform: uppercase; letter-spacing: 1.5px; width: 35%;"
+            >
+              Everyone else
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((row, i) => (
+              <tr
+                style={`border-bottom: 1px solid rgba(255,255,255,0.04); ${i % 2 === 0 ? 'background: rgba(255,255,255,0.015);' : ''}`}
+              >
+                <td
+                  style="padding: 1rem 1.2rem; color: rgba(139,156,175,0.7); font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;"
+                >
+                  {row.aspect}
+                </td>
+                <td style="padding: 1rem 1.2rem; color: #E0BC5A;">
+                  {row.tmonier}
+                </td>
+                <td style="padding: 1rem 1.2rem; color: rgba(139,156,175,0.5);">
+                  {row.others}
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

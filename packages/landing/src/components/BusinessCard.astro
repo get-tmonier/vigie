@@ -1,0 +1,105 @@
+---
+---
+
+<section style="background: #F5F0E8; padding: 5rem 2.5rem;">
+  <div style="max-width: 1200px; margin: 0 auto;">
+    <h2
+      style="font-family: 'Vollkorn', serif; font-weight: 700; font-size: clamp(1.4rem, 2.5vw, 1.9rem); color: #0B1A2E; margin: 0 0 2.5rem;"
+    >
+      The founder
+    </h2>
+
+    <div
+      style="display: flex; gap: 1.5rem; flex-wrap: wrap;"
+      class="biz-grid"
+    >
+      <!-- Front -->
+      <div
+        style="background: #0B1A2E; border-radius: 8px; padding: 36px 28px; aspect-ratio: 1.6; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 24px rgba(11,26,46,0.15); flex: 1; min-width: 260px; max-width: 360px;"
+      >
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <svg viewBox="0 0 512 512" width="28" height="28">
+            <defs>
+              <linearGradient id="biz-brass" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#D4AA3C"></stop>
+                <stop offset="45%" stop-color="#C49A2B"></stop>
+                <stop offset="100%" stop-color="#A67C1A"></stop>
+              </linearGradient>
+            </defs>
+            <circle cx="256" cy="256" r="220" fill="none" stroke="url(#biz-brass)" stroke-width="20"></circle>
+            <circle cx="256" cy="256" r="120" fill="none" stroke="url(#biz-brass)" stroke-width="16"></circle>
+            <rect x="249" y="50" width="14" height="94" rx="2" fill="url(#biz-brass)"></rect>
+            <rect x="249" y="368" width="14" height="94" rx="2" fill="url(#biz-brass)"></rect>
+            <rect x="368" y="249" width="94" height="14" rx="2" fill="url(#biz-brass)"></rect>
+            <rect x="50" y="249" width="94" height="14" rx="2" fill="url(#biz-brass)"></rect>
+            <rect x="249" y="50" width="14" height="140" rx="2" fill="url(#biz-brass)" transform="rotate(45, 256, 256)"></rect>
+            <rect x="249" y="50" width="14" height="140" rx="2" fill="url(#biz-brass)" transform="rotate(-45, 256, 256)"></rect>
+            <rect x="249" y="322" width="14" height="140" rx="2" fill="url(#biz-brass)" transform="rotate(45, 256, 256)"></rect>
+            <rect x="249" y="322" width="14" height="140" rx="2" fill="url(#biz-brass)" transform="rotate(-45, 256, 256)"></rect>
+            <circle cx="256" cy="256" r="50" fill="#0B1A2E"></circle>
+            <circle cx="256" cy="256" r="30" fill="url(#biz-brass)"></circle>
+            <circle cx="256" cy="256" r="18" fill="#0B1A2E"></circle>
+            <circle cx="256" cy="256" r="8" fill="url(#biz-brass)"></circle>
+          </svg>
+          <span
+            style="font-family: 'Vollkorn SC', serif; font-weight: 700; font-size: 18px; letter-spacing: 3px; color: #C49A2B;"
+          >
+            Tmonier
+          </span>
+        </div>
+        <div
+          style="font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 3px; color: #8B9CAF; text-transform: uppercase;"
+        >
+          You steer &middot; We ship
+        </div>
+      </div>
+
+      <!-- Back -->
+      <div
+        style="background: #fff; border-radius: 8px; padding: 36px 28px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 24px rgba(11,26,46,0.1); border: 1px solid #E8E0D0; flex: 2; min-width: 300px; max-width: 560px;"
+      >
+        <div>
+          <div
+            style="font-family: 'Vollkorn SC', serif; font-weight: 700; font-size: 15px; color: #0B1A2E;"
+          >
+            Damien Meur
+          </div>
+          <div
+            style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #8B9CAF; margin-top: 4px; letter-spacing: 1px;"
+          >
+            Founder &amp; Lead Engineer
+          </div>
+          <p
+            style="font-family: 'Source Serif 4', serif; font-size: 0.88rem; color: #1D3557; line-height: 1.75; margin: 1.25rem 0 0;"
+          >
+            Senior software engineer working across TypeScript ecosystems, from React/Next.js frontends to Node.js backends. I focus on building scalable systems with strong architectural foundations, type safety, and long-term maintainability.
+          </p>
+          <p
+            style="font-family: 'Source Serif 4', serif; font-size: 0.88rem; color: #1D3557; line-height: 1.75; margin: 0.75rem 0 0;"
+          >
+            Deeply interested in AI-assisted development, I explore how LLMs and modern tooling can augment senior engineers — accelerating delivery without compromising code quality or engineering standards.
+          </p>
+        </div>
+        <div
+          style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #1D3557; line-height: 2; margin-top: 1.5rem;"
+        >
+          damien.meur@tmonier.com<br />
+          tmonier.com
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  @media (max-width: 640px) {
+    .biz-grid {
+      flex-direction: column;
+    }
+    .biz-grid > div {
+      max-width: 100% !important;
+      aspect-ratio: auto !important;
+      min-height: 160px;
+    }
+  }
+</style>

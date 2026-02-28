@@ -1,0 +1,303 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Waitlist from '../components/Waitlist.astro';
+import Footer from '../components/Footer.astro';
+
+const categories = [
+  {
+    title: 'Getting started',
+    items: [
+      {
+        question: 'What is Tmonier?',
+        answer:
+          'Tmonier is a local-first SWE companion that orchestrates your AI coding sessions. It wraps your existing AI CLI — starting with Claude Code — to launch parallel agents, monitor context quality in real time, maintain a living project memory called agent.md, and give you human-in-the-loop checkpoints before critical changes. Think of it as the orchestration layer between you and your AI tools.',
+      },
+      {
+        question: 'How does Tmonier work with my existing AI tools?',
+        answer:
+          "Tmonier doesn't replace your AI coding tools — it wraps them. It manages the session lifecycle: starting sessions, monitoring context drift, triggering smart resets when quality degrades, and maintaining project memory across sessions. At launch, Tmonier works with Claude Code. Next up is OpenCode — which supports Copilot licenses since January 2026 — followed by Codex CLI, Aider, Cline, and more.",
+      },
+      {
+        question: 'What does "local-first" mean?',
+        answer:
+          "Local-first means your code never leaves your machine. Tmonier runs as a local daemon on your workstation — it observes session metadata (token counts, context window usage, file-change patterns) but never reads, copies, or transmits your source code. Your AI tool's own privacy policy governs what it sends to its API; Tmonier adds no additional exposure.",
+      },
+      {
+        question: 'What are the system requirements?',
+        answer:
+          'Tmonier runs on macOS and Linux. Windows users can run it through WSL. You need Git installed (for worktree support) and Claude Code as your AI CLI — with OpenCode (Copilot license), Codex, Aider, Cline and more on the roadmap. The local daemon is lightweight and runs in the background with minimal CPU and memory overhead.',
+      },
+      {
+        question: 'How do I install Tmonier?',
+        answer:
+          "Tmonier is currently in private beta. Join the waitlist to secure your spot — you'll receive install instructions and a CLI setup guide as soon as the beta opens. Installation is a single command, and you'll be orchestrating agents within minutes.",
+      },
+      {
+        question: 'Which AI tools does Tmonier support?',
+        answer:
+          'At launch, Tmonier works with Claude Code. Next on the roadmap is OpenCode, which supports Copilot licenses since January 2026 — meaning Copilot subscribers will be covered too. After that: Codex CLI, Aider, Cline, Amp, and any CLI that exposes an OpenAI-compatible API, including Ollama for fully local models. The architecture is CLI-agnostic by design: if your tool has a CLI, Tmonier will be able to wrap it.',
+      },
+    ],
+  },
+  {
+    title: 'Features',
+    items: [
+      {
+        question: 'What is context drift?',
+        answer:
+          "Context drift is when your AI assistant gradually loses track of your project's architecture, conventions, and decisions during a long coding session. It typically starts around message 30\u201350, when earlier context falls out of the effective window. Tmonier monitors drift indicators in real time and alerts you before quality degrades \u2014 so you can reset at the right moment instead of discovering broken output after the fact.",
+      },
+      {
+        question: 'What is agent.md?',
+        answer:
+          "agent.md is a living document that captures your project's architectural decisions, coding patterns, and conventions. Tmonier auto-updates it as you work, but you can edit it anytime. When a session resets, agent.md is fed back into the new context \u2014 so your AI assistant picks up right where it left off, with full knowledge of your project's rules and history.",
+      },
+      {
+        question: 'What are human-in-the-loop checkpoints?',
+        answer:
+          'Checkpoints are approval gates that pause the AI workflow at critical moments \u2014 before file changes are applied, before a context reset, or before switching modes. You review what the AI proposes, approve or reject it, and stay in control. No changes happen without your explicit sign-off.',
+      },
+      {
+        question: 'How do parallel worktrees work?',
+        answer:
+          "Each agent runs in its own Git worktree \u2014 an isolated copy of your repository that shares the same .git history but has its own working directory and branch. This means five agents can edit the same codebase simultaneously without overwriting each other. When they're done, Tmonier shows you a unified diff of all changes so you can review conflicts and merge everything in one step.",
+      },
+      {
+        question: 'What happens when two agents change the same file?',
+        answer:
+          'Tmonier detects cross-agent conflicts in real time. If two agents modify overlapping regions of the same file, Tmonier flags the conflict in your dashboard before any merge happens. You see exactly what each agent changed, why they diverged, and you decide how to resolve it. Nothing merges automatically \u2014 you stay in control.',
+      },
+      {
+        question: 'What is the spec-first workflow?',
+        answer:
+          'Instead of jumping straight into code, Tmonier first generates a technical spec from your description \u2014 covering tradeoffs, service boundaries, and contracts between components. It then decomposes the spec into parallel tasks, one per agent. You review and approve the plan before any code is written. This prevents agents from making conflicting architectural decisions and catches misunderstandings before they become code.',
+      },
+      {
+        question: 'Can I use Tmonier with a single agent?',
+        answer:
+          "Absolutely. Tmonier works just as well with one agent as with ten. You still get spec-first planning, human-in-the-loop checkpoints, context drift detection, and architectural memory \u2014 all of which improve a single agent's output quality. Parallelism is an option, not a requirement.",
+      },
+      {
+        question: 'What is "adaptive agent config"?',
+        answer:
+          'Available on the Solo plan and above, adaptive agent config learns from your coding sessions over time. It observes which custom prompts, toolkits, and guardrails lead to better outcomes \u2014 fewer rejected diffs, fewer checkpoint overrides, less drift \u2014 and gradually refines your agent configuration. Think of it as your agents getting better at working the way you prefer, session after session.',
+      },
+    ],
+  },
+  {
+    title: 'Pricing & plans',
+    items: [
+      {
+        question: 'What does BYOA (Bring Your Own AI) mean?',
+        answer:
+          "It means Tmonier never marks up your AI tokens. You use your own subscription to Claude (or any supported AI provider as we add integrations) and pay them directly at their standard rates. Tmonier only charges for the orchestration layer itself. There's no hidden per-token fee and no vendor lock-in.",
+      },
+      {
+        question: 'Is the Free plan really free?',
+        answer:
+          'Yes, forever. The Free plan includes all core features: spec-first workflow, up to 3 parallel agents, unified diff view, cross-agent conflict detection, and human-in-the-loop checkpoints. No credit card required, no trial period, no feature gates that push you to upgrade.',
+      },
+      {
+        question: 'What does the Team plan add?',
+        answer:
+          'The Team plan adds everything needed for collaborative AI-assisted development: a team dashboard with agent activity and diffs across the team, shared architectural memory with team-wide constraints enforced on every agent, and cross-team agent governance to standardize checkpoints, review flows, and merge policies. It\u2019s designed for teams that want consistent AI workflows across the group.',
+      },
+      {
+        question: 'What counts as a "parallel agent"?',
+        answer:
+          "A parallel agent is one concurrent AI session running in its own worktree during a single orchestration run. The Free plan supports up to 3 running at the same time, and Solo supports 10. There's no daily or monthly cap \u2014 it's about how many agents can work in parallel at any given moment, not how many you run over time.",
+      },
+      {
+        question: 'Can I switch plans or cancel anytime?',
+        answer:
+          'Yes, all plans are month-to-month with no lock-in. You can upgrade, downgrade, or cancel at any time from your account settings. If you cancel a paid plan, you keep access through the end of your billing period, then drop down to the Free tier \u2014 no data is lost.',
+      },
+      {
+        question: 'Why is there no per-token pricing?',
+        answer:
+          "Because Tmonier is an orchestration layer, not an AI provider. You already pay for your AI tokens through Claude (and soon other providers). Adding a per-token fee on top would create misaligned incentives \u2014 we'd profit when your agents use more tokens, even if that's wasteful. Instead, we charge a flat fee for orchestration and actively help you spend less on tokens through smart model hints and efficient session management.",
+      },
+    ],
+  },
+  {
+    title: 'Privacy & security',
+    items: [
+      {
+        question: 'Is Tmonier GDPR compliant?',
+        answer:
+          'Yes, all plans are GDPR compliant. Tmonier processes minimal personal data (account email and session metadata) and stores it in EU-based infrastructure. Enterprise customers get a Data Processing Agreement (DPA) and SOC 2 Type II certification for additional assurance.',
+      },
+      {
+        question: 'Can I self-host Tmonier?',
+        answer:
+          'Yes, on the Enterprise plan. You deploy Tmonier on your own infrastructure \u2014 your servers, your network, your rules. Self-hosting gives you full control over data residency, access policies, and integration with internal systems. Contact us for architecture guidance and deployment support.',
+      },
+      {
+        question: 'Does Tmonier access my source code?',
+        answer:
+          "No. Tmonier observes session metadata only \u2014 things like token counts, context window utilisation, file-change patterns, and session duration. It never reads, parses, or stores your source code. The agent.md file is maintained locally on your machine and is only shared with your AI tool's context window, never with Tmonier's servers.",
+      },
+      {
+        question: 'What data does Tmonier collect exactly?',
+        answer:
+          'Tmonier collects session metadata only: token counts, context window utilisation percentages, session durations, file-change counts (not contents), checkpoint approval/rejection events, and agent configuration choices. On paid plans, this metadata powers features like the token usage dashboard and adaptive config. It never includes file contents, diffs, prompts, or AI responses.',
+      },
+      {
+        question: 'Can I use Tmonier fully offline?',
+        answer:
+          'Not entirely. The local daemon connects to the Tmonier backend to power the real-time dashboard \u2014 agent output is streamed so you can monitor progress, but it\u2019s never read or persisted on our servers. It\u2019s purely a coordination channel for the live dashboard view. Your AI tools also make their own network calls to their respective APIs. For a fully air-gapped setup, the Enterprise self-hosted plan lets you run the entire Tmonier backend on your own infrastructure.',
+      },
+      {
+        question: 'Does Tmonier work with local models like Ollama?',
+        answer:
+          'Ollama support is on our roadmap. Once available, you\u2019ll be able to run fully private AI coding sessions where your code, prompts, and model responses never leave your machine. Tmonier\u2019s architecture is designed to wrap any CLI that exposes an OpenAI-compatible API, making local models a natural fit.',
+      },
+    ],
+  },
+  {
+    title: 'Comparison & workflow',
+    items: [
+      {
+        question: 'How is Tmonier different from running multiple terminal tabs?',
+        answer:
+          "Terminal tabs give you parallelism but zero coordination. You get no conflict detection when agents edit overlapping files, no unified diff to review everything at once, no architectural memory to keep agents consistent, and no checkpoints to approve changes before they're applied. Tmonier turns unstructured parallel chaos into a governed workflow where you steer the architecture while agents do the building.",
+      },
+      {
+        question: 'Does Tmonier replace my IDE or terminal?',
+        answer:
+          "No. Tmonier is additive \u2014 it runs alongside your existing tools. You keep using VS Code, Neovim, your terminal, and your AI CLIs exactly as before. Tmonier adds the orchestration layer on top: starting agents, managing worktrees, surfacing conflicts, and giving you a single dashboard to monitor everything. It doesn't change how you write code; it changes how your AI agents work together.",
+      },
+    ],
+  },
+];
+---
+
+<Base title="FAQ — Tmonier" description="Frequently asked questions about Tmonier — the local-first SWE companion that orchestrates your AI coding sessions.">
+  <Nav currentPage="faq" />
+  <main>
+    <!-- Mini hero -->
+    <section style="background: #0B1A2E; padding: 5rem 2.5rem 3rem; text-align: center;">
+      <div style="max-width: 720px; margin: 0 auto;">
+        <p
+          style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(196, 154, 43, 0.6); margin: 0 0 1rem;"
+        >
+          Questions & answers
+        </p>
+        <h1
+          style="font-family: 'Vollkorn SC', serif; font-weight: 900; font-size: clamp(2rem, 4.5vw, 3rem); color: #C49A2B; margin: 0 0 1.25rem; line-height: 1.15;"
+        >
+          Frequently asked questions
+        </h1>
+        <p
+          style="font-family: 'Source Serif 4', serif; font-size: 1.05rem; color: #8B9CAF; line-height: 1.8; margin: 0; max-width: 600px; margin-left: auto; margin-right: auto;"
+        >
+          Everything you need to know about Tmonier — from getting started to privacy and pricing.
+        </p>
+      </div>
+    </section>
+
+    <!-- FAQ content -->
+    <section style="background: #0B1A2E; padding: 0 2.5rem 5rem;">
+      <div style="max-width: 800px; margin: 0 auto;">
+        {categories.map((category) => (
+          <div style="margin-bottom: 3rem;">
+            <h2
+              style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(196, 154, 43, 0.6); margin: 0 0 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(196, 154, 43, 0.15);"
+            >
+              {category.title}
+            </h2>
+            {category.items.map((item) => (
+              <details class="faq-item">
+                <summary class="faq-summary">
+                  <span>{item.question}</span>
+                </summary>
+                <div class="faq-answer">
+                  <div class="faq-answer-inner">
+                    <p
+                      style="font-family: 'Source Serif 4', serif; font-size: 1rem; color: #8B9CAF; line-height: 1.8; margin: 0;"
+                    >
+                      {item.answer}
+                    </p>
+                  </div>
+                </div>
+              </details>
+            ))}
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <Waitlist />
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .faq-item {
+    border-bottom: 1px solid rgba(139, 156, 175, 0.1);
+  }
+
+  .faq-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 0;
+    cursor: pointer;
+    list-style: none;
+    font-family: 'Source Serif 4', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f5f0e8;
+    transition: color 0.2s;
+  }
+
+  .faq-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-summary::marker {
+    display: none;
+    content: '';
+  }
+
+  .faq-summary::after {
+    content: '+';
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: #c49a2b;
+    flex-shrink: 0;
+    margin-left: 1rem;
+    transition: transform 0.3s ease;
+  }
+
+  details[open] > .faq-summary::after {
+    content: '\2212';
+  }
+
+  .faq-summary:hover {
+    color: #c49a2b;
+  }
+
+  .faq-answer {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.4s ease;
+  }
+
+  details[open] > .faq-answer {
+    max-height: 500px;
+  }
+
+  .faq-answer-inner {
+    padding: 0 0 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .faq-summary {
+      font-size: 1rem;
+      padding: 1rem 0;
+    }
+  }
+</style>

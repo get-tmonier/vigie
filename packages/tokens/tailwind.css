@@ -1,0 +1,17 @@
+@theme {
+  --color-navy-deep: #0b1a2e;
+  --color-navy-mid: #1d3557;
+  --color-navy-light: #2a4a7f;
+  --color-gold: #c49a2b;
+  --color-gold-light: #d4aa3c;
+  --color-gold-pale: #e0bc5a;
+  --color-gold-dark: #a67c1a;
+  --color-cream: #f5f0e8;
+  --color-cream-dark: #e8e0d0;
+  --color-slate: #8b9caf;
+
+  --font-vollkorn-sc: "Vollkorn SC", serif;
+  --font-vollkorn: "Vollkorn", serif;
+  --font-source-serif: "Source Serif 4", serif;
+  --font-mono: "JetBrains Mono", monospace;
+}

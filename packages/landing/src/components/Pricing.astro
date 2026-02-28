@@ -1,0 +1,268 @@
+---
+import WheelMark from './WheelMark.astro';
+const plans = [
+  {
+    name: 'Free',
+    price: 'Free',
+    priceEur: null,
+    priceUsd: null,
+    priceNote: 'forever',
+    tagline: 'For individual engineers who want parallel agents with guardrails.',
+    features: [
+      'Spec-first workflow — define the plan, then let agents build',
+      'Up to 3 parallel agents — build features across isolated worktrees',
+      'Unified diff view — see all agent changes in one place',
+      'Cross-agent conflict detection — catch breaking changes before they merge',
+      'Human-in-the-loop checkpoints — nothing ships without your signal',
+      'Personal agent config — custom prompts, toolkits, and guardrails per agent',
+      'Unlimited local daemon',
+      'Local audit log',
+      'GDPR compliant',
+    ],
+    cta: 'Claim your spot',
+    ctaHref: '#waitlist',
+    featured: false,
+  },
+  {
+    name: 'Solo',
+    price: '€7.99',
+    priceEur: '€7.99',
+    priceUsd: '$8.99',
+    priceNote: '/month',
+    badge: 'Best value',
+    tagline: 'For power users who want deeper memory and more parallel firepower.',
+    features: [
+      'Everything in Free, plus:',
+      'Up to 10 parallel agents',
+      'Ticket-to-spec pipeline — import from Jira, ADO, or Linear and keep your board in sync as agents ship',
+      "Agent-assisted PR reviews — review teammates' PRs faster with your agent",
+      'Token usage dashboard — track spend per agent, set budgets, get alerts before costs spike',
+      "Smart model hints — suggests cheaper models for simple tasks so you don't overpay",
+      'Adaptive agent config — learns from your sessions to refine prompts, tools, and guardrails over time',
+    ],
+    cta: 'Claim your spot',
+    ctaHref: '#waitlist',
+    featured: true,
+  },
+  {
+    name: 'Team',
+    price: '€12.99',
+    priceEur: '€12.99',
+    priceUsd: '$15.99',
+    priceNote: '/seat/month',
+    tagline: 'For engineering teams who want shared agent governance and visibility.',
+    features: [
+      'Everything in Solo, plus:',
+      'Team dashboard — agent activity, conflicts, diffs across the team',
+      'Shared architectural memory — team-wide constraints enforced on every agent',
+      'Cross-team agent governance — standardize checkpoints, review flows, merge policies',
+    ],
+    cta: 'Claim your spot',
+    ctaHref: '#waitlist',
+    featured: false,
+  },
+  {
+    name: 'Enterprise',
+    price: 'Custom',
+    priceEur: null,
+    priceUsd: null,
+    priceNote: '',
+    tagline: 'For organizations where code never leaves the building.',
+    features: [
+      'Everything in Team, plus:',
+      'Self-hosted deployment — your infrastructure, your network, your rules',
+      'Dedicated support and SLA',
+      'SOC2 Type II certification',
+      'Custom onboarding',
+      'Data Processing Agreement (DPA)',
+      'Centralized and exportable audit log',
+      'Security questionnaire support',
+    ],
+    cta: 'Contact us',
+    ctaHref: 'mailto:hello@tmonier.com',
+    featured: false,
+  },
+];
+---
+
+<section id="pricing" class="pricing-section" style="background: #F5F0E8; padding: 5rem 2.5rem;">
+  <div style="max-width: 1400px; margin: 0 auto;">
+    <div style="display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+      <h2
+        style="font-family: 'Vollkorn', serif; font-weight: 700; font-size: clamp(1.6rem, 3vw, 2.2rem); color: #0B1A2E; margin: 0;"
+      >
+        Simple pricing
+      </h2>
+      <div
+        id="currency-toggle"
+        style="display: flex; align-items: center; background: #E8E0D0; border-radius: 20px; padding: 3px; gap: 2px; cursor: pointer;"
+        role="group"
+        aria-label="Currency selector"
+      >
+        <button
+          id="btn-eur"
+          data-currency="eur"
+          style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 16px; border: none; cursor: pointer; background: #0B1A2E; color: #F5F0E8; transition: all 0.15s;"
+        >€ EUR</button>
+        <button
+          id="btn-usd"
+          data-currency="usd"
+          style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 16px; border: none; cursor: pointer; background: transparent; color: #8B9CAF; transition: all 0.15s;"
+        >$ USD</button>
+      </div>
+    </div>
+
+    <!-- BYOA callout -->
+    <div
+      style="background: #0B1A2E; border-radius: 8px; padding: 1.25rem 1.75rem; margin-bottom: 3rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;"
+    >
+      <div>
+        <p style="font-family: 'Vollkorn', serif; font-weight: 700; font-size: 1.05rem; color: #F5F0E8; margin: 0 0 0.25rem; line-height: 1.3; display: flex; align-items: center; gap: 0.6rem;">
+          <WheelMark size={20} />
+          No AI token markup — ever.
+        </p>
+        <p style="font-family: 'Source Serif 4', serif; font-size: 0.9rem; color: #8B9CAF; margin: 0; line-height: 1.6;">
+          Your AI subscription. Your machine. Zero middlemen.<br />Tmonier orchestrates locally — starting with Claude Code.
+        </p>
+      </div>
+    </div>
+
+    <div
+      style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; align-items: start;"
+      class="pricing-grid"
+    >
+      {
+        plans.map((plan) => (
+          <div
+            style={`background: #fff; border-radius: 8px; padding: 2rem; position: relative; ${
+              plan.featured
+                ? 'border: 2px solid #C49A2B; box-shadow: 0 8px 32px rgba(196,154,43,0.15);'
+                : 'border: 1px solid #E8E0D0;'
+            }`}
+          >
+            {plan.badge && (
+              <div
+                style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #C49A2B; color: #0B1A2E; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; font-weight: 600; padding: 0.25rem 0.75rem; border-radius: 20px; white-space: nowrap; text-transform: uppercase; letter-spacing: 1px;"
+              >
+                {plan.badge}
+              </div>
+            )}
+
+            <div style="margin-bottom: 1.5rem;">
+              <h3
+                style="font-family: 'Vollkorn SC', serif; font-weight: 700; font-size: 1rem; color: #0B1A2E; margin: 0 0 0.75rem; letter-spacing: 0.05em;"
+              >
+                {plan.name}
+              </h3>
+              <div style="display: flex; align-items: baseline; gap: 0.3rem; margin-bottom: 0.6rem;">
+                <span
+                  class="price-display"
+                  data-eur={plan.priceEur ?? plan.price}
+                  data-usd={plan.priceUsd ?? plan.price}
+                  style="font-family: 'Vollkorn', serif; font-weight: 700; font-size: 2rem; color: #0B1A2E;"
+                >
+                  {plan.price}
+                </span>
+                {plan.priceNote && (
+                  <span
+                    style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #8B9CAF;"
+                  >
+                    {plan.priceNote}
+                  </span>
+                )}
+              </div>
+              {plan.priceEur && (
+                <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: #B0A898; margin: -0.3rem 0 0.6rem; letter-spacing: 0.03em;">
+                  excl. VAT
+                </p>
+              )}
+              <p style="font-family: 'Source Serif 4', serif; font-size: 0.85rem; color: #8B9CAF; margin: 0; line-height: 1.5;">
+                {plan.tagline}
+              </p>
+            </div>
+
+            <ul style="list-style: none; padding: 0; margin: 0 0 2rem;">
+              {plan.features.map((f) => {
+                const isHeader = f.startsWith('Everything in');
+                return (
+                  <li
+                    style={`padding: 0.4rem 0; border-bottom: 1px solid #F5F0E8; display: flex; align-items: flex-start; gap: 0.5rem; ${
+                      isHeader
+                        ? "font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600; color: #C49A2B; text-transform: uppercase; letter-spacing: 0.08em; border-bottom: none; padding-bottom: 0.2rem;"
+                        : "font-family: 'Source Serif 4', serif; font-size: 0.875rem; color: #1D3557;"
+                    }`}
+                  >
+                    {!isHeader && <span style="color: #C49A2B; font-size: 0.75rem; flex-shrink: 0; margin-top: 0.2rem;">&#10003;</span>}
+                    {f}
+                  </li>
+                );
+              })}
+            </ul>
+
+            <a
+              href={plan.ctaHref}
+              style={`display: block; text-align: center; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.8rem; padding: 0.75rem; border-radius: 4px; text-decoration: none; transition: all 0.2s; ${
+                plan.featured
+                  ? 'background: #C49A2B; color: #0B1A2E;'
+                  : 'background: transparent; color: #0B1A2E; border: 1px solid #C49A2B;'
+              }`}
+              onmouseover={
+                plan.featured
+                  ? "this.style.background='#D4AA3C'"
+                  : "this.style.background='rgba(196,154,43,0.1)'"
+              }
+              onmouseout={
+                plan.featured
+                  ? "this.style.background='#C49A2B'"
+                  : "this.style.background='transparent'"
+              }
+            >
+              {plan.cta}
+            </a>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  const btnEur = document.getElementById('btn-eur') as HTMLButtonElement;
+  const btnUsd = document.getElementById('btn-usd') as HTMLButtonElement;
+  const prices = document.querySelectorAll<HTMLElement>('.price-display');
+
+  function setCurrency(currency: 'eur' | 'usd') {
+    const isEur = currency === 'eur';
+    btnEur.style.background = isEur ? '#0B1A2E' : 'transparent';
+    btnEur.style.color = isEur ? '#F5F0E8' : '#8B9CAF';
+    btnUsd.style.background = isEur ? 'transparent' : '#0B1A2E';
+    btnUsd.style.color = isEur ? '#8B9CAF' : '#F5F0E8';
+    prices.forEach((el) => {
+      el.textContent = el.dataset[currency] ?? el.textContent;
+    });
+  }
+
+  btnEur.addEventListener('click', () => setCurrency('eur'));
+  btnUsd.addEventListener('click', () => setCurrency('usd'));
+</script>
+
+<style>
+  .pricing-section {
+    min-height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  @media (max-width: 1024px) {
+    .pricing-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+  }
+  @media (max-width: 768px) {
+    .pricing-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+</style>
