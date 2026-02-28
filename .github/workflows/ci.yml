@@ -36,10 +36,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Biome check (affected)
-        run: pnpm exec turbo check --filter=...[origin/main]
+        run: pnpm exec turbo check --affected
 
       - name: Typecheck (affected)
-        run: pnpm exec turbo typecheck --filter=...[origin/main]
+        run: pnpm exec turbo typecheck --affected
 
       - name: Build (affected)
-        run: pnpm exec turbo build --filter=...[origin/main]
+        run: pnpm exec turbo build --affected
