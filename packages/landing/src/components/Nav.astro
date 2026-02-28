@@ -9,6 +9,7 @@ const { currentPage = 'home' } = Astro.props;
 const isHome = currentPage === 'home';
 const isAction = currentPage === 'see-in-action';
 const isFaq = currentPage === 'faq';
+const isContact = currentPage === 'contact';
 ---
 
 <nav
@@ -51,6 +52,14 @@ const isFaq = currentPage === 'faq';
         onmouseout={`this.style.color='${isFaq ? '#C49A2B' : '#8B9CAF'}'`}
       >
         FAQ
+      </a>
+      <a
+        href="/contact"
+        style={`font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: ${isContact ? '#C49A2B' : '#8B9CAF'}; text-decoration: none; transition: color 0.2s;`}
+        onmouseover="this.style.color='#C49A2B'"
+        onmouseout={`this.style.color='${isContact ? '#C49A2B' : '#8B9CAF'}'`}
+      >
+        Contact
       </a>
       {isAction ? (
         <span
@@ -119,6 +128,13 @@ const isFaq = currentPage === 'faq';
         style={`font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: ${isFaq ? '#C49A2B' : '#8B9CAF'}; text-decoration: none; display: block; padding: 0.75rem 0; transition: color 0.2s;`}
       >
         FAQ
+      </a>
+      <a
+        href="/contact"
+        class="mobile-nav-link"
+        style={`font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: ${isContact ? '#C49A2B' : '#8B9CAF'}; text-decoration: none; display: block; padding: 0.75rem 0; transition: color 0.2s;`}
+      >
+        Contact
       </a>
       {isAction ? (
         <span
