@@ -2,6 +2,34 @@
 @import "@tmonier/tokens/tailwind.css";
 @import "@tmonier/tokens/tokens.css";
 
+/* Vollkorn SC — 400, 600, 700, 900 */
+@import "@fontsource/vollkorn-sc/latin-400.css";
+@import "@fontsource/vollkorn-sc/latin-600.css";
+@import "@fontsource/vollkorn-sc/latin-700.css";
+@import "@fontsource/vollkorn-sc/latin-900.css";
+
+/* Vollkorn — 400–900 normal, 400 italic */
+@import "@fontsource/vollkorn/latin-400.css";
+@import "@fontsource/vollkorn/latin-400-italic.css";
+@import "@fontsource/vollkorn/latin-500.css";
+@import "@fontsource/vollkorn/latin-600.css";
+@import "@fontsource/vollkorn/latin-700.css";
+@import "@fontsource/vollkorn/latin-800.css";
+@import "@fontsource/vollkorn/latin-900.css";
+
+/* Source Serif 4 — 300–700 */
+@import "@fontsource/source-serif-4/latin-300.css";
+@import "@fontsource/source-serif-4/latin-400.css";
+@import "@fontsource/source-serif-4/latin-500.css";
+@import "@fontsource/source-serif-4/latin-600.css";
+@import "@fontsource/source-serif-4/latin-700.css";
+
+/* JetBrains Mono — 400–700 */
+@import "@fontsource/jetbrains-mono/latin-400.css";
+@import "@fontsource/jetbrains-mono/latin-500.css";
+@import "@fontsource/jetbrains-mono/latin-600.css";
+@import "@fontsource/jetbrains-mono/latin-700.css";
+
 html {
   scroll-behavior: smooth;
 }

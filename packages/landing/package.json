@@ -16,6 +16,10 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",
+    "@fontsource/jetbrains-mono": "5.2.8",
+    "@fontsource/source-serif-4": "5.2.9",
+    "@fontsource/vollkorn": "5.2.10",
+    "@fontsource/vollkorn-sc": "5.2.8",
     "@tailwindcss/vite": "4.2.1",
     "@tmonier/tokens": "workspace:*",
     "astro": "5.18.0",
@@ -25,6 +29,7 @@
     "@astrojs/check": "^0.9.6",
     "@resvg/resvg-js": "2.6.2",
     "satori": "0.19.2",
+    "sharp": "0.34.5",
     "typescript": "^5.9.3",
     "wrangler": "^4.69.0"
   }
