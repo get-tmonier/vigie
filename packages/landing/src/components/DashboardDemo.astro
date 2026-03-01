@@ -33,29 +33,29 @@
       </div>
       <div class="mt-[0.35rem]">
         <span class="text-gold">$</span>
-        <span class="terminal-cursor inline-block w-[7px] h-[1em] bg-gold ml-1 align-text-bottom"></span>
+        <span class="terminal-cursor inline-block w-[7px] h-[1em] bg-gold ml-1 align-text-bottom animate-[blink_1.2s_step-end_infinite]"></span>
       </div>
     </div>
   </div>
 
   <!-- 2. Websocket connector: line segment + badge + line segment -->
-  <div class="ws-connector font-mono">
-    <div class="ws-connector-inner flex flex-col items-center">
+  <div class="ws-connector font-mono grid grid-rows-[0fr] opacity-0 [transition:grid-template-rows_1.6s_cubic-bezier(0.22,1,0.36,1),opacity_1s_ease]">
+    <div class="ws-connector-inner flex flex-col items-center overflow-hidden min-h-0">
       <!-- Top line segment -->
-      <div class="ws-dash ws-dash-top w-[2px] h-[28px]"></div>
+      <div class="ws-dash ws-dash-top w-[2px] h-[28px] scale-y-0 origin-top transition-[scale] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]" style="background: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--signal-green) 30%, transparent) 0px, color-mix(in srgb, var(--signal-green) 30%, transparent) 4px, transparent 4px, transparent 8px)"></div>
       <!-- Badge -->
-      <div class="ws-badge flex items-center gap-[0.4rem] bg-signal-green/7 border border-signal-green/25 rounded-[20px] py-1 px-3 my-1">
-        <span class="size-[6px] rounded-full inline-block shrink-0 bg-signal-green animate-[ws-pulse_2s_ease-in-out_infinite]"></span>
+      <div class="ws-badge flex items-center gap-[0.4rem] bg-signal-green/7 border border-signal-green/25 rounded-[20px] py-1 px-3 my-1 opacity-0 transition-opacity duration-[400ms]">
+        <span class="size-[6px] rounded-full inline-block shrink-0 bg-signal-green animate-[pulse-soft_2s_ease-in-out_infinite]"></span>
         <span class="text-[0.52rem] text-signal-green tracking-[0.04em]">ws://localhost:4800</span>
       </div>
       <!-- Bottom line segment -->
-      <div class="ws-dash ws-dash-bottom w-[2px] h-[48px]"></div>
+      <div class="ws-dash ws-dash-bottom w-[2px] h-[48px] scale-y-0 origin-top transition-[scale] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]" style="background: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--signal-green) 30%, transparent) 0px, color-mix(in srgb, var(--signal-green) 30%, transparent) 4px, transparent 4px, transparent 8px)"></div>
     </div>
   </div>
 
   <!-- 3. Browser UI mockup / dashboard (appears last, then animates internally) -->
-  <div class="browser-wrapper">
-    <div class="browser-wrapper-inner flex flex-col items-center">
+  <div class="browser-wrapper grid grid-rows-[0fr] opacity-0 [transition:grid-template-rows_1.8s_cubic-bezier(0.22,1,0.36,1),opacity_1.2s_ease]">
+    <div class="browser-wrapper-inner flex flex-col items-center overflow-hidden min-h-0">
       <div
         class="browser-mock font-mono max-w-[920px] w-full rounded-xl overflow-hidden border border-gold/20 shadow-[0_32px_80px_rgba(0,0,0,0.5)]"
       >
@@ -139,10 +139,10 @@
               <div class="flex items-center gap-2 mt-[0.55rem]">
                 <span class="text-[0.5rem] text-slate/50 shrink-0">context</span>
                 <div class="flex-1 h-[3px] bg-slate/15 rounded-sm overflow-hidden relative">
-                  <div class="context-bar"></div>
+                  <div class="context-bar h-full w-0 rounded-[2px] bg-signal-green [transition:width_1.5s_ease-out,background_0.5s_ease]"></div>
                 </div>
                 <span class="context-pct text-[0.5rem] text-slate/50 shrink-0 min-w-[2.2em] text-right">0%</span>
-                <span class="context-action text-[0.48rem] text-signal-orange shrink-0 cursor-default opacity-0 transition-opacity duration-[400ms] max-md:hidden">fresh window from checkpoint</span>
+                <span class="context-action text-[0.48rem] text-signal-orange shrink-0 cursor-default opacity-0 transition-opacity duration-[400ms] max-md:hidden" style="border-bottom: 1px dotted color-mix(in srgb, var(--signal-orange) 40%, transparent)">fresh window from checkpoint</span>
               </div>
             </div>
 
@@ -204,121 +204,6 @@
   </div>
 </section>
 
-<style>
-  @keyframes fade-up {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes pulse-amber {
-    0%, 100% { border-color: color-mix(in srgb, var(--signal-amber) 30%, transparent); }
-    50%      { border-color: color-mix(in srgb, var(--signal-amber) 60%, transparent); box-shadow: 0 0 12px 0 color-mix(in srgb, var(--signal-amber) 10%, transparent); }
-  }
-
-  /* 1. Terminal entrance */
-  .dashboard-section.is-visible .local-terminal {
-    animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
-  /* 2. WS connector — collapsed, grows via grid */
-  .ws-connector {
-    display: grid;
-    grid-template-rows: 0fr;
-    opacity: 0;
-    transition:
-      grid-template-rows 1.6s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 1s ease;
-  }
-  .ws-connector-inner { overflow: hidden; min-height: 0; }
-
-  /* 3. Browser wrapper — collapsed, grows via grid */
-  .browser-wrapper {
-    display: grid;
-    grid-template-rows: 0fr;
-    opacity: 0;
-    transition:
-      grid-template-rows 1.8s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 1.2s ease;
-  }
-  .browser-wrapper-inner { overflow: hidden; min-height: 0; }
-
-  /* Blink cursor */
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50%      { opacity: 0; }
-  }
-  .terminal-cursor { animation: blink 1.2s step-end infinite; }
-
-  /* Context bar */
-  .context-bar {
-    height: 100%;
-    width: 0;
-    border-radius: 2px;
-    transition: width 1.5s ease-out, background 0.5s ease;
-    background: var(--signal-green);
-  }
-
-  /* Context action underline */
-  .context-action {
-    border-bottom: 1px dotted color-mix(in srgb, var(--signal-orange) 40%, transparent);
-  }
-
-  /* WS dashed line */
-  .ws-dash {
-    background: repeating-linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--signal-green) 30%, transparent) 0px,
-      color-mix(in srgb, var(--signal-green) 30%, transparent) 4px,
-      transparent 4px,
-      transparent 8px
-    );
-    transform: scaleY(0);
-    transform-origin: top;
-    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  /* WS badge — starts invisible */
-  .ws-badge { opacity: 0; transition: opacity 0.4s ease; }
-
-  /* Log lines — :global() because created dynamically via JS */
-  :global(.log-line) {
-    font-family: var(--font-mono), monospace;
-    font-size: 0.62rem;
-    line-height: 1.8;
-    color: color-mix(in srgb, var(--slate) 55%, transparent);
-    display: flex;
-    gap: 0.5rem;
-    align-items: baseline;
-  }
-  :global(.log-line-time) {
-    color: color-mix(in srgb, var(--slate) 35%, transparent);
-    flex-shrink: 0;
-  }
-
-  /* Stream cursor — created dynamically */
-  :global(.stream-cursor) {
-    display: inline-block;
-    width: 5px;
-    height: 0.85em;
-    background: var(--cream);
-    margin-left: 2px;
-    vertical-align: text-bottom;
-    animation: blink 0.6s step-end infinite;
-    opacity: 0.7;
-  }
-
-  .ws-dash.is-drawn { animation: ws-flow 0.6s linear infinite; }
-  @keyframes ws-flow { to { background-position: 0 8px; } }
-  @keyframes ws-pulse {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0.3; }
-  }
-
-  /* Responsive — :global() log-line only */
-  @media (max-width: 768px) {
-    :global(.log-line) { font-size: 0.55rem !important; }
-  }
-</style>
 
 <script>
   const section = document.getElementById('dashboard-demo');
@@ -327,9 +212,11 @@
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            section.classList.add('is-visible');
-
-            // --- Phase 1: Terminal fades in immediately (CSS animation, ~500ms) ---
+            // --- Phase 1: Terminal fades in immediately (~500ms) ---
+            const terminal = section.querySelector<HTMLElement>('.local-terminal');
+            if (terminal) {
+              terminal.classList.add('animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards]');
+            }
 
             // --- Phase 2: WS gap + dashboard grow simultaneously (both endpoints visible before line draws) ---
             const wsConn = section.querySelector<HTMLElement>('.ws-connector');
@@ -354,8 +241,8 @@
 
             if (topLine) {
               setTimeout(() => {
-                topLine.style.transform = 'scaleY(1)';
-                topLine.classList.add('is-drawn');
+                topLine.classList.remove('scale-y-0');
+                topLine.classList.add('animate-[scroll-stripe_0.6s_linear_infinite]');
               }, 2000);
             }
             if (wsBadge) {
@@ -363,8 +250,8 @@
             }
             if (bottomLine) {
               setTimeout(() => {
-                bottomLine.style.transform = 'scaleY(1)';
-                bottomLine.classList.add('is-drawn');
+                bottomLine.classList.remove('scale-y-0');
+                bottomLine.classList.add('animate-[scroll-stripe_0.6s_linear_infinite]');
               }, 2400);
             }
 
@@ -402,8 +289,9 @@
               const t = elapsed;
               setTimeout(() => {
                 const div = document.createElement('div');
-                div.className = 'log-line';
-                div.innerHTML = `<span class="log-line-time">${log.time}</span><span>${log.html}</span>`;
+                div.className = 'log-line font-mono text-[0.62rem] leading-[1.8] flex gap-2 items-baseline max-md:text-[0.55rem]';
+                div.style.color = 'color-mix(in srgb, var(--slate) 55%, transparent)';
+                div.innerHTML = `<span class="log-line-time shrink-0" style="color: color-mix(in srgb, var(--slate) 35%, transparent)">${log.time}</span><span>${log.html}</span>`;
                 container.appendChild(div);
                 container.scrollTop = container.scrollHeight;
               }, t);
@@ -452,7 +340,7 @@
                 let cursor = promptEl.querySelector('.stream-cursor') as HTMLElement;
                 if (!cursor) {
                   cursor = document.createElement('span');
-                  cursor.className = 'stream-cursor';
+                  cursor.className = 'stream-cursor inline-block w-[5px] h-[0.85em] bg-cream ml-[2px] align-text-bottom animate-[blink_0.6s_step-end_infinite] opacity-70';
                 }
                 promptEl.appendChild(cursor);
                 tokenIdx++;

@@ -115,40 +115,33 @@ const isContact = currentPage === 'contact';
 <!-- Spacer so content isn't hidden under the fixed nav -->
 <div class="h-16"></div>
 
-<style>
-  #hamburger-btn.is-open .hamburger-bar:nth-child(1) {
-    transform: translateY(7px) rotate(45deg);
-  }
-  #hamburger-btn.is-open .hamburger-bar:nth-child(2) {
-    opacity: 0;
-  }
-  #hamburger-btn.is-open .hamburger-bar:nth-child(3) {
-    transform: translateY(-7px) rotate(-45deg);
-  }
-  #mobile-menu.is-open {
-    border-top-color: color-mix(in srgb, var(--gold) 15%, transparent);
-  }
-</style>
-
 <script>
   const hamburgerBtn = document.getElementById('hamburger-btn');
   const mobileMenu = document.getElementById('mobile-menu');
 
   if (hamburgerBtn && mobileMenu) {
+    const bars = hamburgerBtn.querySelectorAll<HTMLElement>('.hamburger-bar');
+
+    function setOpen(open: boolean) {
+      hamburgerBtn!.setAttribute('aria-expanded', String(open));
+      mobileMenu!.style.maxHeight = open ? `${mobileMenu!.scrollHeight}px` : '0';
+      mobileMenu!.style.borderTopColor = open ? 'color-mix(in srgb, var(--gold) 15%, transparent)' : '';
+      if (bars[0]) bars[0].style.transform = open ? 'translateY(7px) rotate(45deg)' : '';
+      if (bars[1]) bars[1].style.opacity = open ? '0' : '';
+      if (bars[2]) bars[2].style.transform = open ? 'translateY(-7px) rotate(-45deg)' : '';
+    }
+
+    let isOpen = false;
     hamburgerBtn.addEventListener('click', () => {
-      const isOpen = hamburgerBtn.classList.toggle('is-open');
-      hamburgerBtn.setAttribute('aria-expanded', String(isOpen));
-      mobileMenu.style.maxHeight = isOpen ? `${mobileMenu.scrollHeight}px` : '0';
-      mobileMenu.classList.toggle('is-open', isOpen);
+      isOpen = !isOpen;
+      setOpen(isOpen);
     });
 
     // Close menu when a link is clicked
     mobileMenu.querySelectorAll('a').forEach((link) => {
       link.addEventListener('click', () => {
-        hamburgerBtn.classList.remove('is-open');
-        hamburgerBtn.setAttribute('aria-expanded', 'false');
-        mobileMenu.style.maxHeight = '0';
-        mobileMenu.classList.remove('is-open');
+        isOpen = false;
+        setOpen(false);
       });
     });
 
@@ -156,10 +149,8 @@ const isContact = currentPage === 'contact';
     const mediaQuery = window.matchMedia('(min-width: 1024px)');
     mediaQuery.addEventListener('change', (e) => {
       if (e.matches) {
-        hamburgerBtn.classList.remove('is-open');
-        hamburgerBtn.setAttribute('aria-expanded', 'false');
-        mobileMenu.style.maxHeight = '0';
-        mobileMenu.classList.remove('is-open');
+        isOpen = false;
+        setOpen(false);
       }
     });
   }

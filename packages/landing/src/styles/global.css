@@ -39,3 +39,47 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes pulse-amber {
+  0%,
+  100% {
+    border-color: color-mix(in srgb, var(--signal-amber) 30%, transparent);
+  }
+  50% {
+    border-color: color-mix(in srgb, var(--signal-amber) 60%, transparent);
+    box-shadow: 0 0 12px 0 color-mix(in srgb, var(--signal-amber) 10%, transparent);
+  }
+}
+@keyframes scroll-stripe {
+  to {
+    background-position: 0 8px;
+  }
+}
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
