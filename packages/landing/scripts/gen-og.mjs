@@ -43,7 +43,10 @@ const NAVY = '#0B1A2E';
 const CREAM = '#F5F0E8';
 const MUTED = '#8B9CAF';
 
-const pills = ['Real-time monitoring', 'Human-in-the-loop', 'Local-first', 'Zero markup'];
+// Load mascot as base64 data URI
+const mascotPath = new URL('../src/assets/helmsman.png', import.meta.url);
+const mascotBase64 = readFileSync(mascotPath).toString('base64');
+const mascotDataUri = `data:image/png;base64,${mascotBase64}`;
 
 const svg = await satori(
   {
@@ -54,122 +57,148 @@ const svg = await satori(
         height: '630px',
         background: NAVY,
         display: 'flex',
-        flexDirection: 'column',
-        padding: '72px 96px',
+        flexDirection: 'row',
         position: 'relative',
         overflow: 'hidden',
       },
       children: [
-        // Brand row
-        {
-          type: 'div',
-          props: {
-            style: { display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '36px' },
-            children: [
-              {
-                type: 'span',
-                props: {
-                  style: {
-                    fontFamily: 'Vollkorn SC',
-                    fontWeight: 900,
-                    fontSize: '42px',
-                    color: GOLD,
-                    letterSpacing: '3px',
-                  },
-                  children: 'Tmonier',
-                },
-              },
-              {
-                type: 'span',
-                props: {
-                  style: {
-                    fontFamily: 'JetBrains Mono',
-                    fontWeight: 600,
-                    fontSize: '12px',
-                    letterSpacing: '4px',
-                    textTransform: 'uppercase',
-                    color: 'rgba(139,156,175,0.5)',
-                  },
-                  children: 'You hold the helm.',
-                },
-              },
-            ],
-          },
-        },
-        // Headline
+        // Left column: text
         {
           type: 'div',
           props: {
             style: {
               display: 'flex',
               flexDirection: 'column',
-              fontFamily: 'Vollkorn SC',
-              fontWeight: 900,
-              fontSize: '86px',
-              color: CREAM,
-              lineHeight: 1.0,
-              letterSpacing: '-0.01em',
-              marginBottom: '28px',
+              padding: '72px 0 72px 96px',
+              flex: '1',
+              justifyContent: 'center',
             },
             children: [
-              { type: 'span', props: { children: 'Your crew.' } },
-              { type: 'span', props: { children: 'Under your watch.' } },
+              // Brand row
+              {
+                type: 'div',
+                props: {
+                  style: { display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '36px' },
+                  children: [
+                    {
+                      type: 'span',
+                      props: {
+                        style: {
+                          fontFamily: 'Vollkorn SC',
+                          fontWeight: 900,
+                          fontSize: '42px',
+                          color: GOLD,
+                          letterSpacing: '3px',
+                        },
+                        children: 'Tmonier',
+                      },
+                    },
+                    {
+                      type: 'span',
+                      props: {
+                        style: {
+                          fontFamily: 'JetBrains Mono',
+                          fontWeight: 600,
+                          fontSize: '12px',
+                          letterSpacing: '4px',
+                          textTransform: 'uppercase',
+                          color: 'rgba(139,156,175,0.5)',
+                        },
+                        children: 'You hold the helm.',
+                      },
+                    },
+                  ],
+                },
+              },
+              // Headline
+              {
+                type: 'div',
+                props: {
+                  style: {
+                    display: 'flex',
+                    flexDirection: 'column',
+                    fontFamily: 'Vollkorn SC',
+                    fontWeight: 900,
+                    fontSize: '64px',
+                    color: CREAM,
+                    lineHeight: 1.1,
+                    letterSpacing: '-0.01em',
+                    marginBottom: '32px',
+                  },
+                  children: [
+                    { type: 'span', props: { children: 'Your crew.' } },
+                    { type: 'span', props: { children: 'Under your watch.' } },
+                  ],
+                },
+              },
+              // Pills
+              {
+                type: 'div',
+                props: {
+                  style: { display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '32px' },
+                  children: ['Real-time monitoring', 'Human-in-the-loop', 'Local-first', 'Zero markup'].map((label) => ({
+                    type: 'span',
+                    props: {
+                      style: {
+                        fontFamily: 'JetBrains Mono',
+                        fontWeight: 500,
+                        fontSize: '13px',
+                        color: 'rgba(245,240,232,0.5)',
+                        background: 'rgba(255,255,255,0.04)',
+                        border: '1px solid rgba(255,255,255,0.08)',
+                        borderRadius: '4px',
+                        padding: '6px 14px',
+                      },
+                      children: label,
+                    },
+                  })),
+                },
+              },
+              // URL
+              {
+                type: 'p',
+                props: {
+                  style: {
+                    margin: '0',
+                    fontFamily: 'JetBrains Mono',
+                    fontWeight: 600,
+                    fontSize: '14px',
+                    color: 'rgba(196,154,43,0.4)',
+                    letterSpacing: '2px',
+                  },
+                  children: 'tmonier.com',
+                },
+              },
             ],
           },
         },
-        // Subtitle
-        {
-          type: 'p',
-          props: {
-            style: {
-              fontFamily: 'Source Serif 4',
-              fontWeight: 400,
-              fontSize: '22px',
-              color: MUTED,
-              lineHeight: 1.6,
-              maxWidth: '560px',
-              marginBottom: '48px',
-            },
-            children: 'You launched the agent. Now what? Tmonier shows you — in real time.',
-          },
-        },
-        // Pills
+        // Right column: mascot
         {
           type: 'div',
           props: {
-            style: { display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '32px' },
-            children: pills.map((label) => ({
-              type: 'span',
-              props: {
-                style: {
-                  fontFamily: 'JetBrains Mono',
-                  fontWeight: 500,
-                  fontSize: '13px',
-                  color: 'rgba(245,240,232,0.5)',
-                  background: 'rgba(255,255,255,0.04)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  borderRadius: '4px',
-                  padding: '6px 14px',
-                },
-                children: label,
-              },
-            })),
-          },
-        },
-        // Spacer + URL bottom-left
-        { type: 'div', props: { style: { flex: '1' } } },
-        {
-          type: 'p',
-          props: {
             style: {
-              margin: '0 0 0 0',
-              fontFamily: 'JetBrains Mono',
-              fontWeight: 600,
-              fontSize: '14px',
-              color: 'rgba(196,154,43,0.4)',
-              letterSpacing: '2px',
+              display: 'flex',
+              alignItems: 'flex-end',
+              justifyContent: 'flex-end',
+              width: '340px',
+              flexShrink: 0,
+              overflow: 'hidden',
             },
-            children: 'tmonier.com',
+            children: [
+              {
+                type: 'img',
+                props: {
+                  src: mascotDataUri,
+                  width: 340,
+                  height: 434,
+                  style: {
+                    objectFit: 'cover',
+                    objectPosition: 'top center',
+                    opacity: 0.85,
+                  },
+                },
+              },
+            ],
           },
         },
         // Bottom gold bar

@@ -236,9 +236,9 @@ function buildTree(): VNode {
             style: {
               fontFamily: 'Vollkorn SC',
               fontWeight: 900,
-              fontSize: 86,
+              fontSize: 64,
               color: CREAM,
-              lineHeight: 1.0,
+              lineHeight: 1.1,
             },
             children: 'Your crew.',
           }),
@@ -246,36 +246,20 @@ function buildTree(): VNode {
             style: {
               fontFamily: 'Vollkorn SC',
               fontWeight: 900,
-              fontSize: 86,
+              fontSize: 64,
               color: CREAM,
-              lineHeight: 1.0,
+              lineHeight: 1.1,
             },
             children: 'Under your watch.',
           }),
         ],
       }),
-      // Sub
-      h('div', {
-        style: {
-          fontFamily: 'JetBrains Mono',
-          fontSize: 18,
-          fontWeight: 500,
-          color: SLATE,
-          lineHeight: 1.6,
-          maxWidth: '560px',
-          marginBottom: '48px',
-        },
-        children: 'You launched the agent. Now what? Tmonier shows you — in real time.',
-      }),
       // Pills
       h('div', {
         style: { display: 'flex', gap: '12px', flexWrap: 'wrap' },
-        children: [
-          'Real-time monitoring',
-          'Human-in-the-loop',
-          'Local-first',
-          'Zero markup',
-        ].map(pill),
+        children: ['Real-time monitoring', 'Human-in-the-loop', 'Local-first', 'Zero markup'].map(
+          pill
+        ),
       }),
       // URL
       h('div', {
