@@ -1,9 +1,9 @@
 import { Effect, Layer } from 'effect';
 import { Hono } from 'hono';
 import { streamSSE } from 'hono/streaming';
-import { subscribeToEvents } from '../../queries/subscribe-events.query.js';
-import { InMemoryDaemonReadRepositoryLive } from '../secondary/in-memory-daemon-read-repository.js';
-import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher.js';
+import { subscribeToEvents } from '#modules/supervision/queries/subscribe-events.query';
+import { InMemoryDaemonReadRepositoryLive } from '../secondary/in-memory-daemon-read-repository';
+import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher';
 
 const allLayers = Layer.mergeAll(InMemoryDaemonReadRepositoryLive, InMemoryEventPublisherLive);
 

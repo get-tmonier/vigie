@@ -1,10 +1,10 @@
 import { Effect, Layer } from 'effect';
 import { Hono } from 'hono';
-import { executeCommand } from '../../commands/execute-command.command.js';
-import { listDaemons } from '../../queries/list-daemons.query.js';
-import { InMemoryDaemonReadRepositoryLive } from '../secondary/in-memory-daemon-read-repository.js';
-import { InMemoryDaemonWriteRepositoryLive } from '../secondary/in-memory-daemon-write-repository.js';
-import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher.js';
+import { executeCommand } from '#modules/supervision/commands/execute-command.command';
+import { listDaemons } from '#modules/supervision/queries/list-daemons.query';
+import { InMemoryDaemonReadRepositoryLive } from '../secondary/in-memory-daemon-read-repository';
+import { InMemoryDaemonWriteRepositoryLive } from '../secondary/in-memory-daemon-write-repository';
+import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher';
 
 const allLayers = Layer.mergeAll(
   InMemoryDaemonWriteRepositoryLive,

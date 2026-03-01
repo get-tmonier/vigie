@@ -1,8 +1,8 @@
 import type { DaemonHello } from '@tmonier/shared';
 import { Effect } from 'effect';
-import { createDaemonSession } from '../domain/daemon-session.js';
-import { DaemonWriteRepository } from '../ports/daemon-write-repository.port.js';
-import { EventPublisher } from '../ports/event-publisher.port.js';
+import { createDaemonSession } from '../domain/daemon-session';
+import { DaemonWriteRepository } from '../ports/daemon-write-repository.port';
+import { EventPublisher } from '../ports/event-publisher.port';
 
 export const registerDaemon = (hello: DaemonHello, ws: WebSocket) =>
   Effect.gen(function* () {

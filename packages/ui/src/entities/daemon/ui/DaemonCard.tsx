@@ -1,6 +1,6 @@
-import { cn } from '../../../shared/lib/cn.js';
-import { StatusBadge } from '../../../shared/ui/StatusBadge.js';
-import type { DaemonSession } from '../api/daemon-api.js';
+import { cn } from '#shared/lib/cn';
+import { StatusBadge } from '#shared/ui/StatusBadge';
+import type { DaemonSession } from '../api/daemon-api';
 
 interface DaemonCardProps {
   daemon: DaemonSession;

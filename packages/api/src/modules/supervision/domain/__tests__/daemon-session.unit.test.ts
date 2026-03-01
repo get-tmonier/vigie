@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { createDaemonSession } from '../daemon-session.js';
+import { createDaemonSession } from '../daemon-session';
 
 describe('createDaemonSession', () => {
   it('creates a session from a hello message', () => {

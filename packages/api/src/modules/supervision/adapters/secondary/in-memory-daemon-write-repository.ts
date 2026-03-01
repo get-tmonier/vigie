@@ -1,7 +1,7 @@
 import { Effect, Layer } from 'effect';
-import { DaemonWriteRepository } from '../../ports/daemon-write-repository.port.js';
-import { DaemonNotFoundError } from '../../ports/errors.js';
-import { daemonStore } from './shared-state.js';
+import { DaemonWriteRepository } from '#modules/supervision/ports/daemon-write-repository.port';
+import { DaemonNotFoundError } from '#modules/supervision/ports/errors';
+import { daemonStore } from './shared-state';
 
 export const InMemoryDaemonWriteRepositoryLive = Layer.succeed(DaemonWriteRepository, {
   register: (session, ws) =>

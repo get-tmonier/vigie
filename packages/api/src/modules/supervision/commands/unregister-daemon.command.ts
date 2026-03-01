@@ -1,7 +1,7 @@
 import { Effect } from 'effect';
-import { DaemonReadRepository } from '../ports/daemon-read-repository.port.js';
-import { DaemonWriteRepository } from '../ports/daemon-write-repository.port.js';
-import { EventPublisher } from '../ports/event-publisher.port.js';
+import { DaemonReadRepository } from '../ports/daemon-read-repository.port';
+import { DaemonWriteRepository } from '../ports/daemon-write-repository.port';
+import { EventPublisher } from '../ports/event-publisher.port';
 
 export const unregisterDaemon = (id: string) =>
   Effect.gen(function* () {

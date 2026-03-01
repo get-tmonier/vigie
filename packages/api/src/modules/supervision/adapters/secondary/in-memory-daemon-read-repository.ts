@@ -1,7 +1,7 @@
 import { Effect, Layer } from 'effect';
-import { DaemonReadRepository } from '../../ports/daemon-read-repository.port.js';
-import { DaemonNotFoundError } from '../../ports/errors.js';
-import { daemonStore } from './shared-state.js';
+import { DaemonReadRepository } from '#modules/supervision/ports/daemon-read-repository.port';
+import { DaemonNotFoundError } from '#modules/supervision/ports/errors';
+import { daemonStore } from './shared-state';
 
 export const InMemoryDaemonReadRepositoryLive = Layer.succeed(DaemonReadRepository, {
   get: (id) =>

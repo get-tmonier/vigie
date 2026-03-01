@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
+  "imports": {
+    "#modules/*": "./src/modules/*",
+    "#routes/*": "./src/routes/*"
+  },
   "exports": {
     ".": "./src/index.ts"
   },
@@ -19,7 +23,9 @@
     "typecheck": "tsc --noEmit",
     "test": "bun test",
     "test:unit": "bun scripts/test-filter.ts unit",
-    "test:integration": "bun scripts/test-filter.ts integration"
+    "test:integration": "bun scripts/test-filter.ts integration",
+    "check-imports": "bun ../../scripts/check-imports.ts",
+    "fix-imports": "bun ../../scripts/fix-imports.ts"
   },
   "dependencies": {
     "@tmonier/shared": "workspace:*",

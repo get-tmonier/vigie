@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { createCommand } from '../command.js';
+import { createCommand } from '../command';
 
 describe('createCommand', () => {
   it('creates a command with generated id', () => {

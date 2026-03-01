@@ -1,6 +1,6 @@
 import type { SSEEvent } from '@tmonier/shared';
 import { useEffect, useRef } from 'react';
-import { cn } from '../../../shared/lib/cn.js';
+import { cn } from '#shared/lib/cn';
 
 interface TerminalOutputProps {
   events: SSEEvent[];

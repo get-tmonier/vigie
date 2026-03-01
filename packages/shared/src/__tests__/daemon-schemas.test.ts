@@ -10,13 +10,13 @@ import {
   PingSchema,
   PongSchema,
   UpstreamMessageSchema,
-} from '../schemas/daemon.js';
+} from '../schemas/daemon';
 import {
   SSECommandOutputSchema,
   SSEDaemonConnectedSchema,
   SSEDaemonDisconnectedSchema,
   SSEEventSchema,
-} from '../schemas/sse-events.js';
+} from '../schemas/sse-events';
 
 describe('daemon downstream schemas', () => {
   it('parses command:request', () => {

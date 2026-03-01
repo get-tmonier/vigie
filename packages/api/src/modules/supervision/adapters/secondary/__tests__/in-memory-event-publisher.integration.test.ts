@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it } from 'bun:test';
 import type { SSEDaemonConnected, SSEDaemonDisconnected } from '@tmonier/shared';
 import { Effect } from 'effect';
-import { EventPublisher } from '../../../ports/event-publisher.port.js';
-import { InMemoryEventPublisherLive } from '../in-memory-event-publisher.js';
+import { EventPublisher } from '#modules/supervision/ports/event-publisher.port';
+import { InMemoryEventPublisherLive } from '../in-memory-event-publisher';
 
 const run = <A, E>(effect: Effect.Effect<A, E, EventPublisher>) =>
   Effect.runPromise(Effect.provide(effect, InMemoryEventPublisherLive));

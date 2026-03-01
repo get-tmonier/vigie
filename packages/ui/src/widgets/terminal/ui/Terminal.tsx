@@ -1,6 +1,6 @@
 import type { SSEEvent } from '@tmonier/shared';
-import { CommandInput } from './CommandInput.js';
-import { TerminalOutput } from './TerminalOutput.js';
+import { CommandInput } from './CommandInput';
+import { TerminalOutput } from './TerminalOutput';
 
 interface TerminalProps {
   events: SSEEvent[];

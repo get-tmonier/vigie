@@ -1,5 +1,5 @@
-import { useDaemons } from '../../../entities/daemon/model/use-daemons.js';
-import { DaemonCard } from '../../../entities/daemon/ui/DaemonCard.js';
+import { useDaemons } from '#entities/daemon/model/use-daemons';
+import { DaemonCard } from '#entities/daemon/ui/DaemonCard';
 
 interface DaemonSidebarProps {
   selectedId: string | null;

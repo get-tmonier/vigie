@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
+  "imports": {
+    "#contracts/*": "./src/contracts/*",
+    "#schemas/*": "./src/schemas/*"
+  },
   "exports": {
     ".": "./src/index.ts"
   },
@@ -14,7 +18,9 @@
     "check": "biome check ./src",
     "check:fix": "biome check --write ./src",
     "typecheck": "tsc --noEmit",
-    "test": "bun test"
+    "test": "bun test",
+    "check-imports": "bun ../../scripts/check-imports.ts",
+    "fix-imports": "bun ../../scripts/fix-imports.ts"
   },
   "dependencies": {
     "@ts-rest/core": "3.52.1",

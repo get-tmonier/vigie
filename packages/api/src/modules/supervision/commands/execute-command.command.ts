@@ -1,8 +1,8 @@
 import type { CommandRequest } from '@tmonier/shared';
 import { Effect } from 'effect';
-import { createCommand } from '../domain/command.js';
-import { DaemonWriteRepository } from '../ports/daemon-write-repository.port.js';
-import type { DaemonNotFoundError } from '../ports/errors.js';
+import { createCommand } from '../domain/command';
+import { DaemonWriteRepository } from '../ports/daemon-write-repository.port';
+import type { DaemonNotFoundError } from '../ports/errors';
 
 export const executeCommand = (
   daemonId: string,

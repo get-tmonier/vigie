@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'bun:test';
 import type { SSEEvent } from '@tmonier/shared';
 import { Effect, Layer } from 'effect';
-import { DaemonWriteRepository } from '../../ports/daemon-write-repository.port.js';
-import { EventPublisher } from '../../ports/event-publisher.port.js';
-import { registerDaemon } from '../register-daemon.command.js';
+import { DaemonWriteRepository } from '#modules/supervision/ports/daemon-write-repository.port';
+import { EventPublisher } from '#modules/supervision/ports/event-publisher.port';
+import { registerDaemon } from '../register-daemon.command';
 
 describe('registerDaemon', () => {
   it('registers a daemon and publishes connected event', async () => {

@@ -1,5 +1,5 @@
-export { daemonContract } from './contracts/daemon.js';
-export { healthContract } from './contracts/index.js';
+export { daemonContract } from './contracts/daemon';
+export { healthContract } from './contracts/index';
 export {
   type CommandDone,
   CommandDoneSchema,
@@ -19,8 +19,8 @@ export {
   PongSchema,
   type UpstreamMessage,
   UpstreamMessageSchema,
-} from './schemas/daemon.js';
-export { type HealthResponse, HealthResponseSchema } from './schemas/index.js';
+} from './schemas/daemon';
+export { type HealthResponse, HealthResponseSchema } from './schemas/index';
 export {
   type SSECommandDone,
   SSECommandDoneSchema,
@@ -34,4 +34,4 @@ export {
   SSEDaemonDisconnectedSchema,
   type SSEEvent,
   SSEEventSchema,
-} from './schemas/sse-events.js';
+} from './schemas/sse-events';

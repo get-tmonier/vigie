@@ -3,6 +3,15 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
+  "imports": {
+    "#app/*": "./src/app/*",
+    "#entities/*": "./src/entities/*",
+    "#features/*": "./src/features/*",
+    "#pages/*": "./src/pages/*",
+    "#routes/*": "./src/routes/*",
+    "#shared/*": "./src/shared/*",
+    "#widgets/*": "./src/widgets/*"
+  },
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",
@@ -14,7 +23,9 @@
     "check": "biome check ./src",
     "check:fix": "biome check --write ./src",
     "typecheck": "tsc --noEmit",
-    "test": "bun test"
+    "test": "bun test",
+    "check-imports": "bun ../../scripts/check-imports.ts",
+    "fix-imports": "bun ../../scripts/fix-imports.ts"
   },
   "dependencies": {
     "@fontsource/jetbrains-mono": "5.2.8",

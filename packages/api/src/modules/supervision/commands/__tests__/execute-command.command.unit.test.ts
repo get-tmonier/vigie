@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
-import { DaemonWriteRepository } from '../../ports/daemon-write-repository.port.js';
-import { executeCommand } from '../execute-command.command.js';
+import { DaemonWriteRepository } from '#modules/supervision/ports/daemon-write-repository.port';
+import { executeCommand } from '../execute-command.command';
 
 describe('executeCommand', () => {
   it('creates a command and sends it over WS', async () => {

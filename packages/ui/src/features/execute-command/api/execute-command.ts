@@ -1,4 +1,4 @@
-import { apiFetch } from '../../../shared/api/client.js';
+import { apiFetch } from '#shared/api/client';
 
 interface ExecResponse {
   commandId: string;

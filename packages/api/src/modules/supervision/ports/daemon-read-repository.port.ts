@@ -1,6 +1,6 @@
 import { type Effect, ServiceMap } from 'effect';
-import type { DaemonSession } from '../domain/daemon-session.js';
-import type { DaemonNotFoundError } from './errors.js';
+import type { DaemonSession } from '../domain/daemon-session';
+import type { DaemonNotFoundError } from './errors';
 
 interface DaemonReadRepositoryShape {
   readonly get: (id: string) => Effect.Effect<DaemonSession, DaemonNotFoundError>;

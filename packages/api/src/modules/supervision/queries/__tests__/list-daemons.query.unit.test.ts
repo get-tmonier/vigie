@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
-import { DaemonReadRepository } from '../../ports/daemon-read-repository.port.js';
-import { listDaemons } from '../list-daemons.query.js';
+import { DaemonReadRepository } from '#modules/supervision/ports/daemon-read-repository.port';
+import { listDaemons } from '../list-daemons.query';
 
 describe('listDaemons', () => {
   it('returns list from read repository', async () => {

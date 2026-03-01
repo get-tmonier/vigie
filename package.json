@@ -25,8 +25,8 @@
     "bump:check": "ncu --workspaces --root",
     "knip": "knip",
     "knip:fix": "knip --fix",
-    "verify": "bun knip && bun turbo check && bun turbo typecheck && bun turbo test && bun turbo build",
-    "verify:fix": "bun knip:fix && bun turbo check:fix && bun turbo typecheck && bun turbo test && bun turbo build",
+    "verify": "bun knip && bun turbo check && bun turbo check-imports && bun turbo typecheck && bun turbo test && bun turbo build",
+    "verify:fix": "bun knip:fix && bun turbo check:fix && bun turbo check-imports && bun turbo typecheck && bun turbo test && bun turbo build",
     "prepare": "simple-git-hooks"
   },
   "simple-git-hooks": {

@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
-import { createDaemonSession } from '../../../domain/daemon-session.js';
-import { DaemonReadRepository } from '../../../ports/daemon-read-repository.port.js';
-import { DaemonWriteRepository } from '../../../ports/daemon-write-repository.port.js';
-import { DaemonNotFoundError } from '../../../ports/errors.js';
-import { InMemoryDaemonReadRepositoryLive } from '../in-memory-daemon-read-repository.js';
-import { InMemoryDaemonWriteRepositoryLive } from '../in-memory-daemon-write-repository.js';
-import { daemonStore } from '../shared-state.js';
+import { createDaemonSession } from '#modules/supervision/domain/daemon-session';
+import { DaemonReadRepository } from '#modules/supervision/ports/daemon-read-repository.port';
+import { DaemonWriteRepository } from '#modules/supervision/ports/daemon-write-repository.port';
+import { DaemonNotFoundError } from '#modules/supervision/ports/errors';
+import { InMemoryDaemonReadRepositoryLive } from '../in-memory-daemon-read-repository';
+import { InMemoryDaemonWriteRepositoryLive } from '../in-memory-daemon-write-repository';
+import { daemonStore } from '../shared-state';
 
 const allLayers = Layer.mergeAll(
   InMemoryDaemonWriteRepositoryLive,

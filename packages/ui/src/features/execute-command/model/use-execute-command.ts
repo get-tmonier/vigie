@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { executeCommand } from '../api/execute-command.js';
+import { executeCommand } from '../api/execute-command';
 
 export function useExecuteCommand(daemonId: string | null) {
   const [loading, setLoading] = useState(false);

@@ -1,6 +1,6 @@
 import type { SSEEvent } from '@tmonier/shared';
 import { Effect, Layer } from 'effect';
-import { EventPublisher } from '../../ports/event-publisher.port.js';
+import { EventPublisher } from '#modules/supervision/ports/event-publisher.port';
 
 const subscribers = new Map<string, Set<(event: SSEEvent) => void>>();
 

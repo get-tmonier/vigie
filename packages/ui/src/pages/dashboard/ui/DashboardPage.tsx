@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useExecuteCommand } from '../../../features/execute-command/model/use-execute-command.js';
-import { useSSE } from '../../../features/subscribe-events/model/use-sse.js';
-import { Header } from '../../../shared/ui/Header.js';
-import { DaemonSidebar } from '../../../widgets/daemon-sidebar/ui/DaemonSidebar.js';
-import { Terminal } from '../../../widgets/terminal/ui/Terminal.js';
+import { useExecuteCommand } from '#features/execute-command/model/use-execute-command';
+import { useSSE } from '#features/subscribe-events/model/use-sse';
+import { Header } from '#shared/ui/Header';
+import { DaemonSidebar } from '#widgets/daemon-sidebar/ui/DaemonSidebar';
+import { Terminal } from '#widgets/terminal/ui/Terminal';
 
 export function DashboardPage() {
   const [selectedDaemonId, setSelectedDaemonId] = useState<string | null>(null);

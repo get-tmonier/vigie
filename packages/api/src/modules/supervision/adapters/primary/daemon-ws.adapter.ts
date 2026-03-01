@@ -3,13 +3,13 @@ import { Effect, Layer } from 'effect';
 import { Hono } from 'hono';
 import { upgradeWebSocket, websocket } from 'hono/bun';
 import * as v from 'valibot';
-import { registerDaemon } from '../../commands/register-daemon.command.js';
-import { unregisterDaemon } from '../../commands/unregister-daemon.command.js';
-import type { DaemonSession } from '../../domain/daemon-session.js';
-import { EventPublisher } from '../../ports/event-publisher.port.js';
-import { InMemoryDaemonReadRepositoryLive } from '../secondary/in-memory-daemon-read-repository.js';
-import { InMemoryDaemonWriteRepositoryLive } from '../secondary/in-memory-daemon-write-repository.js';
-import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher.js';
+import { registerDaemon } from '#modules/supervision/commands/register-daemon.command';
+import { unregisterDaemon } from '#modules/supervision/commands/unregister-daemon.command';
+import type { DaemonSession } from '#modules/supervision/domain/daemon-session';
+import { EventPublisher } from '#modules/supervision/ports/event-publisher.port';
+import { InMemoryDaemonReadRepositoryLive } from '../secondary/in-memory-daemon-read-repository';
+import { InMemoryDaemonWriteRepositoryLive } from '../secondary/in-memory-daemon-write-repository';
+import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher';
 
 const allLayers = Layer.mergeAll(
   InMemoryDaemonWriteRepositoryLive,

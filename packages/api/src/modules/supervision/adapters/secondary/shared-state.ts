@@ -1,4 +1,4 @@
-import type { DaemonSession } from '../../domain/daemon-session.js';
+import type { DaemonSession } from '#modules/supervision/domain/daemon-session';
 
 interface DaemonEntry {
   readonly session: DaemonSession;

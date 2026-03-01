@@ -1,6 +1,6 @@
 import type { SSEEvent } from '@tmonier/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { createDaemonEventSource } from '../api/event-source.js';
+import { createDaemonEventSource } from '../api/event-source';
 
 export function useSSE(daemonId: string | null) {
   const [events, setEvents] = useState<SSEEvent[]>([]);

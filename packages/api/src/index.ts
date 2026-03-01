@@ -1,14 +1,11 @@
 import { Effect } from 'effect';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { loadConfig } from './config.js';
-import { daemonRestApp } from './modules/supervision/adapters/primary/daemon-rest.adapter.js';
-import { daemonSseApp } from './modules/supervision/adapters/primary/daemon-sse.adapter.js';
-import {
-  daemonWsApp,
-  websocket,
-} from './modules/supervision/adapters/primary/daemon-ws.adapter.js';
-import { health } from './routes/health.js';
+import { loadConfig } from './config';
+import { daemonRestApp } from './modules/supervision/adapters/primary/daemon-rest.adapter';
+import { daemonSseApp } from './modules/supervision/adapters/primary/daemon-sse.adapter';
+import { daemonWsApp, websocket } from './modules/supervision/adapters/primary/daemon-ws.adapter';
+import { health } from './routes/health';
 
 const { port, corsOrigin } = Effect.runSync(loadConfig);
 

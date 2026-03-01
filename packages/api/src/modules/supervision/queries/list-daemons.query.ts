@@ -1,5 +1,5 @@
 import { Effect } from 'effect';
-import { DaemonReadRepository } from '../ports/daemon-read-repository.port.js';
+import { DaemonReadRepository } from '../ports/daemon-read-repository.port';
 
 export const listDaemons = () =>
   Effect.gen(function* () {

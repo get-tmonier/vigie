@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { type DaemonSession, listDaemons } from '../api/daemon-api.js';
+import { type DaemonSession, listDaemons } from '../api/daemon-api';
 
 export function useDaemons() {
   const [daemons, setDaemons] = useState<DaemonSession[]>([]);
