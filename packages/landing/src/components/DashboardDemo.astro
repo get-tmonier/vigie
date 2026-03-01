@@ -259,7 +259,7 @@
 
   /* Websocket link — appears after action panel (~8s) */
   .dashboard-section.is-visible .ws-link {
-    animation: fade-in 0.2s ease-out 8s forwards;
+    animation: fade-in 0.2s ease-out 5s forwards;
   }
   .dashboard-section.is-visible .ws-dash {
     animation: ws-flow 0.6s linear infinite;
@@ -270,7 +270,7 @@
 
   /* Local terminal */
   .dashboard-section.is-visible .local-terminal {
-    animation: fade-up 0.3s ease-out 8.2s forwards;
+    animation: fade-up 0.3s ease-out 5.2s forwards;
   }
 
   /* Responsive */
@@ -325,15 +325,15 @@
 
             // Log data — each line injected dynamically like a real terminal
             const logs: { time: string; html: string; delay: number }[] = [
-              { time: '14:32:01', html: '<span style="color:#8B9CAF">claude-code</span> · reading <span style="color:#28C840">src/api/users.ts</span>', delay: 400 },
-              { time: '14:33:12', html: '<span style="color:#8B9CAF">claude-code</span> · created <span style="color:#28C840">src/middleware/rate-limit.ts</span>', delay: 650 },
-              { time: '14:34:30', html: '<span style="color:#8B9CAF">claude-code</span> · running <span style="color:#F5F0E8">npm test</span> — <span style="color:#FF5F57">3 failed</span>', delay: 1100 },
-              { time: '14:35:15', html: '<span style="color:#8B9CAF">claude-code</span> · editing <span style="color:#F5F0E8">src/middleware/rate-limit.ts</span>', delay: 450 },
-              { time: '14:36:48', html: '<span style="color:#8B9CAF">claude-code</span> · running <span style="color:#F5F0E8">npm test</span> — <span style="color:#FF5F57">3 failed</span>', delay: 1300 },
-              { time: '14:37:02', html: '<span style="color:#FFBD2E">⚠ scope drift · <span style="color:rgba(255,189,46,0.7)">agent modified package.json — outside declared scope</span></span>', delay: 800 },
-              { time: '14:37:45', html: '<span style="color:#FF8C42">⚠ context 65% · <span style="color:rgba(255,140,66,0.7)">agent may lose early instructions — consider a checkpoint</span></span>', delay: 550 },
-              { time: '14:38:01', html: '<span style="color:#8B9CAF">$ cost hint · <span style="color:rgba(139,156,175,0.7)">this task could run on <span style="color:#F5F0E8">sonnet</span> — ~3x cheaper for similar results</span></span>', delay: 400 },
-              { time: '14:38:03', html: '<span style="color:#FFBD2E">⚠ loop detected · <span style="color:rgba(255,189,46,0.7)">edit → test → fail → edit — 4 cycles in 6 min</span></span>', delay: 900 },
+              { time: '14:32:01', html: '<span style="color:#8B9CAF">claude-code</span> · reading <span style="color:#28C840">src/api/users.ts</span>', delay: 200 },
+              { time: '14:33:12', html: '<span style="color:#8B9CAF">claude-code</span> · created <span style="color:#28C840">src/middleware/rate-limit.ts</span>', delay: 350 },
+              { time: '14:34:30', html: '<span style="color:#8B9CAF">claude-code</span> · running <span style="color:#F5F0E8">npm test</span> — <span style="color:#FF5F57">3 failed</span>', delay: 550 },
+              { time: '14:35:15', html: '<span style="color:#8B9CAF">claude-code</span> · editing <span style="color:#F5F0E8">src/middleware/rate-limit.ts</span>', delay: 250 },
+              { time: '14:36:48', html: '<span style="color:#8B9CAF">claude-code</span> · running <span style="color:#F5F0E8">npm test</span> — <span style="color:#FF5F57">3 failed</span>', delay: 600 },
+              { time: '14:37:02', html: '<span style="color:#FFBD2E">⚠ scope drift · <span style="color:rgba(255,189,46,0.7)">agent modified package.json — outside declared scope</span></span>', delay: 400 },
+              { time: '14:37:45', html: '<span style="color:#FF8C42">⚠ context 65% · <span style="color:rgba(255,140,66,0.7)">agent may lose early instructions — consider a checkpoint</span></span>', delay: 300 },
+              { time: '14:38:01', html: '<span style="color:#8B9CAF">$ cost hint · <span style="color:rgba(139,156,175,0.7)">this task could run on <span style="color:#F5F0E8">sonnet</span> — ~3x cheaper for similar results</span></span>', delay: 200 },
+              { time: '14:38:03', html: '<span style="color:#FFBD2E">⚠ loop detected · <span style="color:rgba(255,189,46,0.7)">edit → test → fail → edit — 4 cycles in 6 min</span></span>', delay: 500 },
             ];
 
             const lineStyle = "font-family:'JetBrains Mono',monospace;font-size:0.62rem;line-height:1.8;color:rgba(139,156,175,0.55);display:flex;gap:0.5rem;align-items:baseline";
@@ -428,10 +428,10 @@
             const ctxPct = section.querySelector<HTMLElement>('.context-pct');
             if (ctxBar && ctxPct) {
               const ctxSteps = [
-                { delay: 1050,  width: '18', pct: '18%', color: '#28C840' },
-                { delay: 2150,  width: '31', pct: '31%', color: '#28C840' },
-                { delay: 2600,  width: '44', pct: '44%', color: '#FFBD2E' },
-                { delay: 3900,  width: '57', pct: '57%', color: '#FFBD2E' },
+                { delay: 550,   width: '18', pct: '18%', color: '#28C840' },
+                { delay: 1100,  width: '31', pct: '31%', color: '#28C840' },
+                { delay: 1350,  width: '44', pct: '44%', color: '#FFBD2E' },
+                { delay: 1950,  width: '57', pct: '57%', color: '#FFBD2E' },
                 { delay: loopDetectedTime, width: '65', pct: '65%', color: '#FF8C42' },
               ];
               for (const step of ctxSteps) {
@@ -452,10 +452,10 @@
             const costEl = section.querySelector<HTMLElement>('.cost-counter');
             if (costEl) {
               const costSteps = [
-                { delay: 1050,  value: '$0.40', color: '' },
-                { delay: 2150,  value: '$1.12', color: '' },
-                { delay: 2600,  value: '$2.30', color: '#FFBD2E' },
-                { delay: 3900,  value: '$3.45', color: '#FF8C42' },
+                { delay: 550,   value: '$0.40', color: '' },
+                { delay: 1100,  value: '$1.12', color: '' },
+                { delay: 1350,  value: '$2.30', color: '#FFBD2E' },
+                { delay: 1950,  value: '$3.45', color: '#FF8C42' },
                 { delay: loopDetectedTime, value: '$4.20', color: '#FF8C42' },
               ];
               for (const step of costSteps) {
