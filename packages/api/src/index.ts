@@ -1,4 +1,3 @@
-import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { health } from './routes/health.js';
 
@@ -12,4 +11,8 @@ app.route('/', health);
 
 const port = 3001;
 console.log(`@tmonier/api listening on http://localhost:${port}`);
-serve({ fetch: app.fetch, port });
+
+export default {
+  port,
+  fetch: app.fetch,
+};

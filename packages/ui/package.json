@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",
-    "start": "node .output/server/index.mjs",
+    "start": "bun .output/server/index.mjs",
     "lint": "biome lint ./src",
     "check": "biome check ./src",
     "typecheck": "tsc --noEmit"

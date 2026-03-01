@@ -21,25 +21,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          version: 10.30.3
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
+          bun-version: latest
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Biome check (affected)
-        run: pnpm exec turbo check --affected
+        run: bun turbo check --affected
 
       - name: Typecheck (affected)
-        run: pnpm exec turbo typecheck --affected
+        run: bun turbo typecheck --affected
 
       - name: Build (affected)
-        run: pnpm exec turbo build --affected
+        run: bun turbo build --affected
