@@ -43,7 +43,7 @@ const NAVY = '#0B1A2E';
 const CREAM = '#F5F0E8';
 const MUTED = '#8B9CAF';
 
-const pills = ['Local-first', 'Human-in-the-loop', 'Ticket -> Production', 'BYOA - zero markup'];
+const pills = ['Real-time monitoring', 'Human-in-the-loop', 'Local-first', 'Zero markup'];
 
 const svg = await satori(
   {
@@ -112,8 +112,8 @@ const svg = await satori(
               marginBottom: '28px',
             },
             children: [
-              { type: 'span', props: { children: 'Ship 10x faster.' } },
-              { type: 'span', props: { children: 'Break nothing.' } },
+              { type: 'span', props: { children: 'Your crew.' } },
+              { type: 'span', props: { children: 'Under your watch.' } },
             ],
           },
         },
@@ -130,7 +130,7 @@ const svg = await satori(
               maxWidth: '560px',
               marginBottom: '48px',
             },
-            children: 'You design. The AI agents crew executes. Nothing merges without your signal.',
+            children: 'You launched the agent. Now what? Tmonier shows you — in real time.',
           },
         },
         // Pills

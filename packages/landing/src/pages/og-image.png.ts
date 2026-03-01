@@ -240,7 +240,7 @@ function buildTree(): VNode {
               color: CREAM,
               lineHeight: 1.0,
             },
-            children: 'Ship 10x faster.',
+            children: 'Your crew.',
           }),
           h('div', {
             style: {
@@ -250,7 +250,7 @@ function buildTree(): VNode {
               color: CREAM,
               lineHeight: 1.0,
             },
-            children: 'Break nothing.',
+            children: 'Under your watch.',
           }),
         ],
       }),
@@ -265,16 +265,16 @@ function buildTree(): VNode {
           maxWidth: '560px',
           marginBottom: '48px',
         },
-        children: 'You design. The AI agents crew executes. Nothing merges without your signal.',
+        children: 'You launched the agent. Now what? Tmonier shows you — in real time.',
       }),
       // Pills
       h('div', {
         style: { display: 'flex', gap: '12px', flexWrap: 'wrap' },
         children: [
-          'Local-first',
+          'Real-time monitoring',
           'Human-in-the-loop',
-          'Spec → Production',
-          'BYOA — zero markup',
+          'Local-first',
+          'Zero markup',
         ].map(pill),
       }),
       // URL
