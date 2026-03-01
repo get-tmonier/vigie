@@ -4,13 +4,16 @@
   "workspaces": ["packages/*"],
   "trustedDependencies": ["sharp", "workerd"],
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --filter=@tmonier/api --filter=@tmonier/ui",
+    "dev:landing": "turbo run dev --filter=@tmonier/landing",
+    "dev:all": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",
     "format": "turbo run format",
     "check": "turbo run check",
     "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
     "bump": "ncu --workspaces --root -u && bun install",
     "bump:check": "ncu --workspaces --root"
   },
