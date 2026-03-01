@@ -14,11 +14,19 @@
       "cache": false
     },
     "check": {},
+    "check:fix": {
+      "cache": false
+    },
     "format": {
+      "cache": false
+    },
+    "format:fix": {
       "cache": false
     },
     "typecheck": {
       "dependsOn": ["^build"]
-    }
+    },
+    "test": {},
+    "knip": {}
   }
 }

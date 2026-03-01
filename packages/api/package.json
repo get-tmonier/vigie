@@ -3,14 +3,21 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "build": "bun build src/index.ts --outdir dist --target bun",
     "start": "bun dist/index.js",
     "lint": "biome lint ./src",
+    "lint:fix": "biome check --write ./src",
+    "format": "biome format --write ./src",
+    "format:fix": "biome format --write ./src",
     "check": "biome check ./src",
-    "typecheck": "tsc --noEmit"
+    "check:fix": "biome check --write ./src",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
   },
   "dependencies": {
     "@tmonier/shared": "workspace:*",

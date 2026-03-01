@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   ci:
-    name: Check, Typecheck & Build
+    name: Knip, Check, Typecheck, Test & Build
     runs-on: ubuntu-latest
 
     steps:
@@ -29,11 +29,17 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Knip (unused code)
+        run: bun knip
+
       - name: Biome check (affected)
         run: bun turbo check --affected
 
       - name: Typecheck (affected)
         run: bun turbo typecheck --affected
+
+      - name: Test (affected)
+        run: bun turbo test --affected
 
       - name: Build (affected)
         run: bun turbo build --affected
