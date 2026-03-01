@@ -72,7 +72,7 @@
       </div>
 
       <!-- Main area -->
-      <div style="flex: 1; padding: 1.25rem; background: rgba(11,26,46,0.4); min-width: 0; position: relative;">
+      <div style="flex: 1; padding: 1.25rem; background: rgba(11,26,46,0.4); min-width: 0; position: relative; min-height: 420px;">
         <!-- Header row -->
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 0.5rem;">
           <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #F5F0E8; font-weight: 600;">Rate-limit /api/users</span>
@@ -109,53 +109,7 @@
         <!-- Activity log -->
         <div style="background: rgba(11,26,46,0.5); border: 1px solid rgba(139,156,175,0.1); border-radius: 6px; padding: 0.6rem 0.75rem; margin-bottom: 0.75rem;">
           <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(139,156,175,0.4); margin-bottom: 0.5rem;">Activity</div>
-          <div style="display: flex; flex-direction: column; gap: 0.25rem;">
-            <!-- Log line 1: reading route -->
-            <div class="log-line log-1" style="opacity: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; line-height: 1.8; color: rgba(139,156,175,0.55); display: flex; gap: 0.5rem; align-items: baseline;">
-              <span style="color: rgba(139,156,175,0.35); flex-shrink: 0;">14:32:01</span>
-              <span><span style="color: #8B9CAF;">claude-code</span> · reading <span style="color: #28C840;">src/api/users.ts</span></span>
-            </div>
-            <!-- Log line 2: created middleware -->
-            <div class="log-line log-2" style="opacity: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; line-height: 1.8; color: rgba(139,156,175,0.55); display: flex; gap: 0.5rem; align-items: baseline;">
-              <span style="color: rgba(139,156,175,0.35); flex-shrink: 0;">14:33:12</span>
-              <span><span style="color: #8B9CAF;">claude-code</span> · created <span style="color: #28C840;">src/middleware/rate-limit.ts</span></span>
-            </div>
-            <!-- Log line 3: test run — fails -->
-            <div class="log-line log-3" style="opacity: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; line-height: 1.8; color: rgba(139,156,175,0.55); display: flex; gap: 0.5rem; align-items: baseline;">
-              <span style="color: rgba(139,156,175,0.35); flex-shrink: 0;">14:34:30</span>
-              <span><span style="color: #8B9CAF;">claude-code</span> · running <span style="color: #F5F0E8;">npm test</span> &mdash; <span style="color: #FF5F57;">3 failed</span></span>
-            </div>
-            <!-- Log line 4: edit again -->
-            <div class="log-line log-4" style="opacity: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; line-height: 1.8; color: rgba(139,156,175,0.55); display: flex; gap: 0.5rem; align-items: baseline;">
-              <span style="color: rgba(139,156,175,0.35); flex-shrink: 0;">14:35:15</span>
-              <span><span style="color: #8B9CAF;">claude-code</span> · editing <span style="color: #F5F0E8;">src/middleware/rate-limit.ts</span></span>
-            </div>
-            <!-- Log line 5: test again — still fails -->
-            <div class="log-line log-5" style="opacity: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; line-height: 1.8; color: rgba(139,156,175,0.55); display: flex; gap: 0.5rem; align-items: baseline;">
-              <span style="color: rgba(139,156,175,0.35); flex-shrink: 0;">14:36:48</span>
-              <span><span style="color: #8B9CAF;">claude-code</span> · running <span style="color: #F5F0E8;">npm test</span> &mdash; <span style="color: #FF5F57;">3 failed</span></span>
-            </div>
-            <!-- Log line 6: loop detected -->
-            <div class="log-line log-6" style="opacity: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; line-height: 1.8; display: flex; gap: 0.5rem; align-items: baseline;">
-              <span style="color: rgba(139,156,175,0.35); flex-shrink: 0;">14:37:02</span>
-              <span style="color: #FFBD2E;">&#9888; loop detected · <span style="color: rgba(255,189,46,0.7);">edit &rarr; test &rarr; fail &rarr; edit &mdash; 4 cycles in 6 min</span></span>
-            </div>
-            <!-- Log line 7: scope drift -->
-            <div class="log-line log-7" style="opacity: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; line-height: 1.8; display: flex; gap: 0.5rem; align-items: baseline;">
-              <span style="color: rgba(139,156,175,0.35); flex-shrink: 0;">14:37:45</span>
-              <span style="color: #FFBD2E;">&#9888; scope drift · <span style="color: rgba(255,189,46,0.7);">agent modified package.json &mdash; outside declared scope</span></span>
-            </div>
-            <!-- Log line 8: context window warning -->
-            <div class="log-line log-8" style="opacity: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; line-height: 1.8; display: flex; gap: 0.5rem; align-items: baseline;">
-              <span style="color: rgba(139,156,175,0.35); flex-shrink: 0;">14:38:01</span>
-              <span style="color: #FF8C42;">&#9888; context 65% · <span style="color: rgba(255,140,66,0.7);">agent may lose early instructions &mdash; consider a checkpoint</span></span>
-            </div>
-            <!-- Log line 9: model cost suggestion -->
-            <div class="log-line log-9" style="opacity: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; line-height: 1.8; display: flex; gap: 0.5rem; align-items: baseline;">
-              <span style="color: rgba(139,156,175,0.35); flex-shrink: 0;">14:38:03</span>
-              <span style="color: #8B9CAF;">&#x24; cost hint · <span style="color: rgba(139,156,175,0.7);">this task could run on <span style="color: #F5F0E8;">sonnet</span> &mdash; ~3x cheaper for similar results</span></span>
-            </div>
-          </div>
+          <div class="log-container" style="display: flex; flex-direction: column; gap: 0.25rem; height: 130px; overflow-y: hidden;"></div>
         </div>
 
         <!-- Action panel — appears after loop detection -->
@@ -175,9 +129,7 @@
           <!-- Suggested prompt -->
           <div style="background: rgba(11,26,46,0.6); border: 1px solid rgba(139,156,175,0.15); border-radius: 6px; padding: 0.55rem 0.65rem; margin-bottom: 0.6rem;">
             <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(139,156,175,0.4); margin-bottom: 0.3rem;">Suggested prompt</div>
-            <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: #F5F0E8; margin: 0; line-height: 1.6; font-style: italic;">
-              "Tests expect a Redis mock &mdash; use ioredis-mock in the test setup instead of connecting to a real instance."
-            </p>
+            <p class="suggested-prompt-text" style="font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: #F5F0E8; margin: 0; line-height: 1.6; font-style: italic; min-height: 1.6em;"></p>
           </div>
 
           <!-- Action buttons -->
@@ -216,7 +168,7 @@
   <!-- Websocket link -->
   <div class="ws-link" style="opacity: 0; display: flex; flex-direction: column; align-items: center; gap: 0; margin: 0 auto; padding: 0.75rem 0;">
     <!-- Dashed line -->
-    <div style="width: 1px; height: 28px; border-left: 1.5px dashed rgba(40,200,64,0.3);"></div>
+    <div class="ws-dash" style="width: 2px; height: 28px; background: repeating-linear-gradient(to bottom, rgba(40,200,64,0.3) 0px, rgba(40,200,64,0.3) 4px, transparent 4px, transparent 8px); background-size: 2px 8px;"></div>
     <!-- Label -->
     <div style="display: flex; align-items: center; gap: 0.35rem; background: rgba(40,200,64,0.06); border: 1px solid rgba(40,200,64,0.2); border-radius: 20px; padding: 0.2rem 0.65rem;">
       <svg width="8" height="8" viewBox="0 0 16 16" fill="none" style="flex-shrink: 0;">
@@ -226,7 +178,7 @@
       <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; color: #28C840; letter-spacing: 0.03em;">ws://localhost:4800</span>
     </div>
     <!-- Dashed line -->
-    <div style="width: 1px; height: 28px; border-left: 1.5px dashed rgba(40,200,64,0.3);"></div>
+    <div class="ws-dash" style="width: 2px; height: 28px; background: repeating-linear-gradient(to bottom, rgba(40,200,64,0.3) 0px, rgba(40,200,64,0.3) 4px, transparent 4px, transparent 8px); background-size: 2px 8px;"></div>
   </div>
 
   <!-- Local daemon terminal -->
@@ -295,26 +247,9 @@
     animation: fade-in 0.2s ease-out 0.15s forwards;
   }
 
-  /* Log lines staggered */
-  .dashboard-section.is-visible .log-1 { animation: fade-in 0.15s ease-out 0.2s forwards; }
-  .dashboard-section.is-visible .log-2 { animation: fade-in 0.15s ease-out 0.3s forwards; }
-  .dashboard-section.is-visible .log-3 { animation: fade-in 0.15s ease-out 0.4s forwards; }
-  .dashboard-section.is-visible .log-4 { animation: fade-in 0.15s ease-out 0.5s forwards; }
-  .dashboard-section.is-visible .log-5 { animation: fade-in 0.15s ease-out 0.6s forwards; }
-  .dashboard-section.is-visible .log-6 { animation: fade-in 0.15s ease-out 0.75s forwards; }
-  .dashboard-section.is-visible .log-7 { animation: fade-in 0.15s ease-out 0.85s forwards; }
-  .dashboard-section.is-visible .log-8 { animation: fade-in 0.15s ease-out 0.95s forwards; }
-  .dashboard-section.is-visible .log-9 { animation: fade-in 0.15s ease-out 1.05s forwards; }
+  /* Log lines — animated via JS */
 
-  /* Action panel slides in after warnings */
-  .dashboard-section.is-visible .action-panel {
-    animation: panel-in 0.3s ease-out 1.2s forwards, pulse-amber 2.5s ease-in-out 1.5s infinite;
-  }
-
-  /* Action buttons staggered */
-  .dashboard-section.is-visible .action-btn-rollback { animation: fade-in 0.15s ease-out 1.4s forwards; }
-  .dashboard-section.is-visible .action-btn-send     { animation: fade-in 0.15s ease-out 1.5s forwards; }
-  .dashboard-section.is-visible .action-btn-stop     { animation: fade-in 0.15s ease-out 1.6s forwards; }
+  /* Action panel & buttons — animated via JS */
 
   /* Blink cursor */
   @keyframes blink {
@@ -322,14 +257,20 @@
     50%      { opacity: 0; }
   }
 
-  /* Websocket link */
+  /* Websocket link — appears after action panel (~8s) */
   .dashboard-section.is-visible .ws-link {
-    animation: fade-in 0.2s ease-out 1.6s forwards;
+    animation: fade-in 0.2s ease-out 8s forwards;
+  }
+  .dashboard-section.is-visible .ws-dash {
+    animation: ws-flow 0.6s linear infinite;
+  }
+  @keyframes ws-flow {
+    to { background-position: 0 8px; }
   }
 
   /* Local terminal */
   .dashboard-section.is-visible .local-terminal {
-    animation: fade-up 0.3s ease-out 1.75s forwards;
+    animation: fade-up 0.3s ease-out 8.2s forwards;
   }
 
   /* Responsive */
@@ -364,6 +305,9 @@
     .local-terminal {
       max-width: 100% !important;
     }
+    .ws-link {
+      padding: 0.4rem 0 !important;
+    }
   }
 </style>
 
@@ -376,22 +320,119 @@
           if (entry.isIntersecting) {
             section.classList.add('is-visible');
 
-            // Agent card border turns amber when loop detected
+            const container = section.querySelector<HTMLElement>('.log-container');
+            if (!container) return;
+
+            // Log data — each line injected dynamically like a real terminal
+            const logs: { time: string; html: string; delay: number }[] = [
+              { time: '14:32:01', html: '<span style="color:#8B9CAF">claude-code</span> · reading <span style="color:#28C840">src/api/users.ts</span>', delay: 400 },
+              { time: '14:33:12', html: '<span style="color:#8B9CAF">claude-code</span> · created <span style="color:#28C840">src/middleware/rate-limit.ts</span>', delay: 650 },
+              { time: '14:34:30', html: '<span style="color:#8B9CAF">claude-code</span> · running <span style="color:#F5F0E8">npm test</span> — <span style="color:#FF5F57">3 failed</span>', delay: 1100 },
+              { time: '14:35:15', html: '<span style="color:#8B9CAF">claude-code</span> · editing <span style="color:#F5F0E8">src/middleware/rate-limit.ts</span>', delay: 450 },
+              { time: '14:36:48', html: '<span style="color:#8B9CAF">claude-code</span> · running <span style="color:#F5F0E8">npm test</span> — <span style="color:#FF5F57">3 failed</span>', delay: 1300 },
+              { time: '14:37:02', html: '<span style="color:#FFBD2E">⚠ scope drift · <span style="color:rgba(255,189,46,0.7)">agent modified package.json — outside declared scope</span></span>', delay: 800 },
+              { time: '14:37:45', html: '<span style="color:#FF8C42">⚠ context 65% · <span style="color:rgba(255,140,66,0.7)">agent may lose early instructions — consider a checkpoint</span></span>', delay: 550 },
+              { time: '14:38:01', html: '<span style="color:#8B9CAF">$ cost hint · <span style="color:rgba(139,156,175,0.7)">this task could run on <span style="color:#F5F0E8">sonnet</span> — ~3x cheaper for similar results</span></span>', delay: 400 },
+              { time: '14:38:03', html: '<span style="color:#FFBD2E">⚠ loop detected · <span style="color:rgba(255,189,46,0.7)">edit → test → fail → edit — 4 cycles in 6 min</span></span>', delay: 900 },
+            ];
+
+            const lineStyle = "font-family:'JetBrains Mono',monospace;font-size:0.62rem;line-height:1.8;color:rgba(139,156,175,0.55);display:flex;gap:0.5rem;align-items:baseline";
+
+            let elapsed = 300;
+            logs.forEach((log, i) => {
+              elapsed += log.delay;
+              const t = elapsed;
+              setTimeout(() => {
+                const div = document.createElement('div');
+                div.className = 'log-line';
+                div.style.cssText = lineStyle;
+                div.innerHTML = `<span style="color:rgba(139,156,175,0.35);flex-shrink:0">${log.time}</span><span>${log.html}</span>`;
+                container.appendChild(div);
+                // Auto-scroll to bottom
+                container.scrollTop = container.scrollHeight;
+              }, t);
+            });
+
+            const loopDetectedTime = elapsed;
+
+            // --- Agent card border turns amber when loop detected ---
             setTimeout(() => {
               const card = section.querySelector<HTMLElement>('.agent-card');
-              if (card) card.style.borderColor = 'rgba(255,189,46,0.4)';
-            }, 2200);
+              if (card) {
+                card.style.transition = 'border-color 0.4s ease';
+                card.style.borderColor = 'rgba(255,189,46,0.4)';
+              }
+            }, loopDetectedTime);
 
-            // Animate context window bar
+            // --- Action panel slides in after loop detected ---
+            const panel = section.querySelector<HTMLElement>('.action-panel');
+            if (panel) {
+              setTimeout(() => {
+                panel.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+                panel.style.opacity = '1';
+                panel.style.transform = 'translateY(0)';
+                panel.style.animation = 'pulse-amber 2.5s ease-in-out 0.3s infinite';
+              }, loopDetectedTime + 500);
+            }
+
+            // --- Stream suggested prompt like LLM token output ---
+            const promptEl = section.querySelector<HTMLElement>('.suggested-prompt-text');
+            if (promptEl) {
+              const promptText = '\u201cTests expect a Redis mock \u2014 use ioredis-mock in the test setup instead of connecting to a real instance.\u201d';
+              // Split into "tokens" (small word groups, like LLM streaming)
+              const words = promptText.split(' ');
+              const tokens: string[] = [];
+              for (let i = 0; i < words.length; i += 2) {
+                tokens.push(words.slice(i, i + 2).join(' '));
+              }
+              let tokenIdx = 0;
+              const streamStart = loopDetectedTime + 600;
+              const streamToken = () => {
+                if (tokenIdx >= tokens.length) {
+                  // Remove cursor after streaming done
+                  const cursor = promptEl.querySelector('.stream-cursor');
+                  if (cursor) cursor.remove();
+                  return;
+                }
+                promptEl.textContent = (promptEl.textContent || '') + (tokenIdx > 0 ? ' ' : '') + tokens[tokenIdx];
+                // Add blinking cursor at end
+                let cursor = promptEl.querySelector('.stream-cursor') as HTMLElement;
+                if (!cursor) {
+                  cursor = document.createElement('span');
+                  cursor.className = 'stream-cursor';
+                  cursor.style.cssText = 'display:inline-block;width:5px;height:0.85em;background:#F5F0E8;margin-left:2px;vertical-align:text-bottom;animation:blink 0.6s step-end infinite;opacity:0.7';
+                }
+                promptEl.appendChild(cursor);
+                tokenIdx++;
+                // Variable delay per token (20-60ms per token, like real streaming)
+                setTimeout(streamToken, 80 + Math.random() * 120);
+              };
+              setTimeout(streamToken, streamStart);
+            }
+
+            // Action buttons staggered after panel
+            const btnRollback = section.querySelector<HTMLElement>('.action-btn-rollback');
+            const btnSend = section.querySelector<HTMLElement>('.action-btn-send');
+            const btnStop = section.querySelector<HTMLElement>('.action-btn-stop');
+            [btnRollback, btnSend, btnStop].forEach((btn, i) => {
+              if (btn) {
+                setTimeout(() => {
+                  btn.style.transition = 'opacity 0.15s ease-out';
+                  btn.style.opacity = '1';
+                }, loopDetectedTime + 700 + i * 100);
+              }
+            });
+
+            // --- Context window bar: synced with log progression ---
             const ctxBar = section.querySelector<HTMLElement>('.context-bar');
             const ctxPct = section.querySelector<HTMLElement>('.context-pct');
             if (ctxBar && ctxPct) {
               const ctxSteps = [
-                { delay: 500,  width: '18', pct: '18%', color: '#28C840' },
-                { delay: 1100, width: '31', pct: '31%', color: '#28C840' },
-                { delay: 1700, width: '44', pct: '44%', color: '#FFBD2E' },
-                { delay: 2200, width: '57', pct: '57%', color: '#FFBD2E' },
-                { delay: 2800, width: '65', pct: '65%', color: '#FF8C42' },
+                { delay: 1050,  width: '18', pct: '18%', color: '#28C840' },
+                { delay: 2150,  width: '31', pct: '31%', color: '#28C840' },
+                { delay: 2600,  width: '44', pct: '44%', color: '#FFBD2E' },
+                { delay: 3900,  width: '57', pct: '57%', color: '#FFBD2E' },
+                { delay: loopDetectedTime, width: '65', pct: '65%', color: '#FF8C42' },
               ];
               for (const step of ctxSteps) {
                 setTimeout(() => {
@@ -401,24 +442,23 @@
                   ctxPct.style.color = step.color;
                 }, step.delay);
               }
-              // Show "fresh window" action when context hits 65%
               const ctxAction = section.querySelector<HTMLElement>('.context-action');
               if (ctxAction) {
-                setTimeout(() => { ctxAction.style.opacity = '1'; }, 2900);
+                setTimeout(() => { ctxAction.style.opacity = '1'; }, loopDetectedTime + 100);
               }
             }
 
-            // Animate cost counter — climbs fast to show burn
+            // --- Cost counter: synced with log progression ---
             const costEl = section.querySelector<HTMLElement>('.cost-counter');
             if (costEl) {
-              const steps = [
-                { delay: 500,  value: '$0.40', color: '' },
-                { delay: 1100, value: '$1.12', color: '' },
-                { delay: 1700, value: '$2.30', color: '#FFBD2E' },
-                { delay: 2200, value: '$3.45', color: '#FF8C42' },
-                { delay: 2800, value: '$4.20', color: '#FF8C42' },
+              const costSteps = [
+                { delay: 1050,  value: '$0.40', color: '' },
+                { delay: 2150,  value: '$1.12', color: '' },
+                { delay: 2600,  value: '$2.30', color: '#FFBD2E' },
+                { delay: 3900,  value: '$3.45', color: '#FF8C42' },
+                { delay: loopDetectedTime, value: '$4.20', color: '#FF8C42' },
               ];
-              for (const step of steps) {
+              for (const step of costSteps) {
                 setTimeout(() => {
                   costEl.textContent = step.value;
                   if (step.color) costEl.style.color = step.color;
