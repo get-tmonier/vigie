@@ -265,8 +265,7 @@ function buildTree(): VNode {
           maxWidth: '560px',
           marginBottom: '48px',
         },
-        children:
-          'You design. The AI agents crew executes. Nothing merges without your signal.',
+        children: 'You design. The AI agents crew executes. Nothing merges without your signal.',
       }),
       // Pills
       h('div', {
