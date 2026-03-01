@@ -25,10 +25,12 @@
     "bump:check": "ncu --workspaces --root",
     "knip": "knip",
     "knip:fix": "knip --fix",
+    "verify": "bun knip && bun turbo check && bun turbo typecheck && bun turbo build",
+    "verify:fix": "bun knip:fix && bun turbo check:fix && bun turbo typecheck && bun turbo build",
     "prepare": "simple-git-hooks"
   },
   "simple-git-hooks": {
-    "pre-commit": "bun biome check --staged --no-errors-on-unmatched"
+    "pre-commit": "bun run verify"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.4",
