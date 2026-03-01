@@ -8,11 +8,14 @@
     "lint:fix": "turbo run lint:fix",
     "format": "turbo run format",
     "check": "turbo run check",
-    "typecheck": "turbo run typecheck"
+    "typecheck": "turbo run typecheck",
+    "bump": "ncu --workspaces --root -u && pnpm install",
+    "bump:check": "ncu --workspaces --root"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.4",
-    "turbo": "^2.8.12"
+    "npm-check-updates": "19.6.3",
+    "turbo": "2.8.12"
   },
   "packageManager": "pnpm@10.30.3"
 }
