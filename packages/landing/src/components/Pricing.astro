@@ -111,7 +111,7 @@ const plans = [
           No AI token markup — ever.
         </p>
         <p style="font-family: 'Source Serif 4', serif; font-size: 0.9rem; color: #8B9CAF; margin: 0; line-height: 1.6;">
-          Your AI subscription. Your machine. Zero middlemen.<br />Tmonier orchestrates locally — starting with Claude Code.
+          Your AI subscription. Your machine. Zero middlemen.
         </p>
       </div>
     </div>
@@ -123,6 +123,7 @@ const plans = [
       {
         plans.map((plan) => (
           <div
+            class="reveal-pricing"
             style={`background: #fff; border-radius: 8px; padding: 2rem; position: relative; ${
               plan.featured
                 ? 'border: 2px solid #C49A2B; box-shadow: 0 8px 32px rgba(196,154,43,0.15);'
@@ -254,4 +255,31 @@ const plans = [
       grid-template-columns: 1fr !important;
     }
   }
+
+  .reveal-pricing {
+    opacity: 0;
+    transform: translateY(30px) scale(0.97);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .reveal-pricing.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 </style>
+
+<script>
+  const pricingCards = document.querySelectorAll('.reveal-pricing');
+  const pricingObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const card = entry.target as HTMLElement;
+        const allCards = Array.from(document.querySelectorAll('.reveal-pricing'));
+        const index = allCards.indexOf(card);
+        card.style.transitionDelay = `${index * 100}ms`;
+        card.classList.add('visible');
+        pricingObserver.unobserve(card);
+      }
+    });
+  }, { threshold: 0.2, rootMargin: '0px 0px -60px 0px' });
+  pricingCards.forEach((card) => pricingObserver.observe(card));
+</script>

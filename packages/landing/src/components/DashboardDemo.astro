@@ -4,7 +4,7 @@
 <section
   id="dashboard-demo"
   class="dashboard-section"
-  style="background: #0B1A2E; padding: 0 1.5rem 5rem; overflow: hidden;"
+  style="background: #0B1A2E; padding: 0 1.5rem 2rem; overflow: hidden;"
 >
   <!-- Browser UI mockup -->
   <div
@@ -74,8 +74,8 @@
       <!-- Main area -->
       <div style="flex: 1; padding: 1.25rem; background: rgba(11,26,46,0.4); min-width: 0; position: relative;">
         <!-- Header row -->
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #F5F0E8; font-weight: 600;">Add rate limiting to POST /api/users</span>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 0.5rem;">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #F5F0E8; font-weight: 600;">Rate-limit /api/users</span>
           <div style="display: flex; align-items: center; gap: 0.6rem;">
             <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; background: rgba(40,200,64,0.12); color: #28C840; border: 1px solid rgba(40,200,64,0.3); border-radius: 10px; padding: 0.1rem 0.55rem;">1 agent active</span>
             <span class="cost-counter" style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: #8B9CAF;">$0.00</span>
@@ -87,7 +87,7 @@
           class="agent-card"
           style="opacity: 0; background: rgba(29,53,87,0.5); border: 1px solid rgba(40,200,64,0.3); border-radius: 8px; padding: 0.75rem; margin-bottom: 1rem;"
         >
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+          <div class="agent-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
             <div style="display: flex; align-items: center; gap: 0.35rem;">
               <span style="width: 6px; height: 6px; background: #28C840; border-radius: 50%; display: inline-block;"></span>
               <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #C49A2B; font-weight: 600;">Claude Code</span>
@@ -181,7 +181,7 @@
           </div>
 
           <!-- Action buttons -->
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <div style="display: flex; gap: 0.35rem; justify-content: flex-end;">
             <div
               class="action-btn-rollback"
               style="opacity: 0; display: flex; align-items: center; gap: 0.3rem; font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; background: rgba(196,154,43,0.12); border: 1px solid rgba(196,154,43,0.35); border-radius: 5px; padding: 0.35rem 0.6rem; color: #C49A2B; font-weight: 600; cursor: default;"
@@ -190,7 +190,7 @@
                 <path d="M2 8a6 6 0 1 1 1.76 4.24" stroke="#C49A2B" stroke-width="1.5" stroke-linecap="round"/>
                 <path d="M2 4v4h4" stroke="#C49A2B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              Rollback to checkpoint #3
+              Rollback #3
             </div>
             <div
               class="action-btn-send"
@@ -199,7 +199,7 @@
               <svg width="10" height="10" viewBox="0 0 16 16" fill="none" style="flex-shrink: 0;">
                 <path d="M2 8h12M10 4l4 4-4 4" stroke="#28C840" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              Send prompt &amp; resume
+              Resume
             </div>
             <div
               class="action-btn-stop"
@@ -287,34 +287,34 @@
 
   /* Browser mock entrance */
   .dashboard-section.is-visible .browser-mock {
-    animation: fade-up 0.6s ease-out forwards;
+    animation: fade-up 0.3s ease-out forwards;
   }
 
   /* Agent card */
   .dashboard-section.is-visible .agent-card {
-    animation: fade-in 0.4s ease-out 0.3s forwards;
+    animation: fade-in 0.2s ease-out 0.15s forwards;
   }
 
-  /* Log lines staggered — tighter timing for the "normal" ones, pause before warnings */
-  .dashboard-section.is-visible .log-1 { animation: fade-in 0.3s ease-out 0.5s forwards; }
-  .dashboard-section.is-visible .log-2 { animation: fade-in 0.3s ease-out 0.8s forwards; }
-  .dashboard-section.is-visible .log-3 { animation: fade-in 0.3s ease-out 1.1s forwards; }
-  .dashboard-section.is-visible .log-4 { animation: fade-in 0.3s ease-out 1.4s forwards; }
-  .dashboard-section.is-visible .log-5 { animation: fade-in 0.3s ease-out 1.7s forwards; }
-  .dashboard-section.is-visible .log-6 { animation: fade-in 0.3s ease-out 2.2s forwards; }
-  .dashboard-section.is-visible .log-7 { animation: fade-in 0.3s ease-out 2.5s forwards; }
-  .dashboard-section.is-visible .log-8 { animation: fade-in 0.3s ease-out 2.8s forwards; }
-  .dashboard-section.is-visible .log-9 { animation: fade-in 0.3s ease-out 3.1s forwards; }
+  /* Log lines staggered */
+  .dashboard-section.is-visible .log-1 { animation: fade-in 0.15s ease-out 0.2s forwards; }
+  .dashboard-section.is-visible .log-2 { animation: fade-in 0.15s ease-out 0.3s forwards; }
+  .dashboard-section.is-visible .log-3 { animation: fade-in 0.15s ease-out 0.4s forwards; }
+  .dashboard-section.is-visible .log-4 { animation: fade-in 0.15s ease-out 0.5s forwards; }
+  .dashboard-section.is-visible .log-5 { animation: fade-in 0.15s ease-out 0.6s forwards; }
+  .dashboard-section.is-visible .log-6 { animation: fade-in 0.15s ease-out 0.75s forwards; }
+  .dashboard-section.is-visible .log-7 { animation: fade-in 0.15s ease-out 0.85s forwards; }
+  .dashboard-section.is-visible .log-8 { animation: fade-in 0.15s ease-out 0.95s forwards; }
+  .dashboard-section.is-visible .log-9 { animation: fade-in 0.15s ease-out 1.05s forwards; }
 
   /* Action panel slides in after warnings */
   .dashboard-section.is-visible .action-panel {
-    animation: panel-in 0.5s ease-out 3.5s forwards, pulse-amber 2.5s ease-in-out 4.0s infinite;
+    animation: panel-in 0.3s ease-out 1.2s forwards, pulse-amber 2.5s ease-in-out 1.5s infinite;
   }
 
   /* Action buttons staggered */
-  .dashboard-section.is-visible .action-btn-rollback { animation: fade-in 0.3s ease-out 3.9s forwards; }
-  .dashboard-section.is-visible .action-btn-send     { animation: fade-in 0.3s ease-out 4.1s forwards; }
-  .dashboard-section.is-visible .action-btn-stop     { animation: fade-in 0.3s ease-out 4.3s forwards; }
+  .dashboard-section.is-visible .action-btn-rollback { animation: fade-in 0.15s ease-out 1.4s forwards; }
+  .dashboard-section.is-visible .action-btn-send     { animation: fade-in 0.15s ease-out 1.5s forwards; }
+  .dashboard-section.is-visible .action-btn-stop     { animation: fade-in 0.15s ease-out 1.6s forwards; }
 
   /* Blink cursor */
   @keyframes blink {
@@ -324,12 +324,12 @@
 
   /* Websocket link */
   .dashboard-section.is-visible .ws-link {
-    animation: fade-in 0.4s ease-out 4.3s forwards;
+    animation: fade-in 0.2s ease-out 1.6s forwards;
   }
 
   /* Local terminal */
   .dashboard-section.is-visible .local-terminal {
-    animation: fade-up 0.5s ease-out 4.6s forwards;
+    animation: fade-up 0.3s ease-out 1.75s forwards;
   }
 
   /* Responsive */
@@ -338,10 +338,31 @@
       flex-direction: column !important;
     }
     .browser-sidebar {
-      width: 100% !important;
-      border-right: none !important;
-      border-bottom: 1px solid rgba(196,154,43,0.1);
       display: none !important;
+    }
+    .agent-card {
+      padding: 0.6rem !important;
+    }
+    .agent-card .agent-header {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 0.25rem !important;
+    }
+    .agent-file {
+      font-size: 0.52rem !important;
+      word-break: break-all;
+    }
+    .context-action {
+      display: none !important;
+    }
+    .action-panel {
+      padding: 0.6rem !important;
+    }
+    .log-line {
+      font-size: 0.55rem !important;
+    }
+    .local-terminal {
+      max-width: 100% !important;
     }
   }
 </style>
