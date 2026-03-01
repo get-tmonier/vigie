@@ -2,21 +2,22 @@
 const steps = [
   {
     number: '01',
-    label: 'You define the spec',
+    label: 'You see everything, live',
     description:
-      'Describe what you want built. Tmonier drafts a technical spec — tradeoffs, boundaries, contracts — and decomposes it into parallel tasks. You review and approve the plan before any code is written.',
+      "Every file your agent touches, every command it runs — visible in real time. No more wondering what it's up to. No more surprises.",
   },
   {
     number: '02',
-    label: 'N agents build in parallel',
+    label: 'Tmonier flags anything off',
     description:
-      'Each agent works in an isolated worktree on its slice of the feature. Tmonier monitors all of them: progress, conflicts, drift. You see everything from one dashboard. Any agent can raise a question — only you answer.',
+      "Loop detected. Scope violated. Budget exceeded. Deterministic rules on observable signals — not an LLM judging an LLM.",
+    signals: ['File loops', 'Command repetition', 'Scope drift', 'Context bloat'],
   },
   {
     number: '03',
-    label: 'You review everything in one place',
+    label: 'You call the shots',
     description:
-      'All changes validated against each other. Architectural consistency checked. Conflicts surfaced. You review one unified diff, not five. Approve once, merge once. Done.',
+      'Your checkpoints, your call. Correct course, approve, or stop. One unified diff to review. Approve once, merge once. The helm is yours.',
   },
 ];
 ---
@@ -35,10 +36,15 @@ const steps = [
         How it works
       </p>
       <h2
-        style="font-family: 'Vollkorn SC', serif; font-size: clamp(1.8rem, 4vw, 2.8rem); color: #F5F0E8; margin: 0; line-height: 1.2;"
+        style="font-family: 'Vollkorn SC', serif; font-size: clamp(1.8rem, 4vw, 2.8rem); color: #F5F0E8; margin: 0 0 0.75rem; line-height: 1.2;"
       >
-        From spec to merge in three steps
+        Watch. Know. Decide.
       </h2>
+      <p
+        style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #8B9CAF; margin: 0;"
+      >
+        Three steps. You're never flying blind.
+      </p>
     </div>
 
     <div style="display: flex; flex-direction: column; gap: 2rem;">
@@ -62,10 +68,21 @@ const steps = [
                 {step.label}
               </h3>
               <p
-                style="font-family: 'Source Serif 4', serif; font-size: 0.95rem; color: #8B9CAF; line-height: 1.75; margin: 0;"
+                style={`font-family: 'Source Serif 4', serif; font-size: 0.95rem; color: #8B9CAF; line-height: 1.75; margin: 0${step.signals ? ' 0 1rem' : ''};`}
               >
                 {step.description}
               </p>
+              {step.signals && (
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                  {step.signals.map((s) => (
+                    <span
+                      style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; color: #C49A2B; letter-spacing: 0.08em; text-transform: uppercase; background: rgba(196,154,43,0.08); border: 1px solid rgba(196,154,43,0.2); border-radius: 4px; padding: 0.25rem 0.6rem;"
+                    >
+                      {s}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         ))
