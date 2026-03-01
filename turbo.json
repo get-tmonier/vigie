@@ -27,6 +27,8 @@
       "dependsOn": ["^build"]
     },
     "test": {},
+    "test:unit": {},
+    "test:integration": {},
     "knip": {}
   }
 }

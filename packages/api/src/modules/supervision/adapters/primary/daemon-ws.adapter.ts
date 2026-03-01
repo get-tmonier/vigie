@@ -1,7 +1,7 @@
 import { UpstreamMessageSchema } from '@tmonier/shared';
 import { Effect, Layer } from 'effect';
 import { Hono } from 'hono';
-import { createBunWebSocket } from 'hono/bun';
+import { upgradeWebSocket, websocket } from 'hono/bun';
 import * as v from 'valibot';
 import { registerDaemon } from '../../commands/register-daemon.command.js';
 import { unregisterDaemon } from '../../commands/unregister-daemon.command.js';
@@ -10,8 +10,6 @@ import { EventPublisher } from '../../ports/event-publisher.port.js';
 import { InMemoryDaemonReadRepositoryLive } from '../secondary/in-memory-daemon-read-repository.js';
 import { InMemoryDaemonWriteRepositoryLive } from '../secondary/in-memory-daemon-write-repository.js';
 import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher.js';
-
-const { upgradeWebSocket, websocket } = createBunWebSocket();
 
 const allLayers = Layer.mergeAll(
   InMemoryDaemonWriteRepositoryLive,
