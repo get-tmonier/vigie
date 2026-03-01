@@ -16,7 +16,8 @@
     "format:fix": "biome format --write ./src",
     "check": "biome check ./src",
     "check:fix": "biome check --write ./src",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
   },
   "dependencies": {
     "@tmonier/shared": "workspace:*",
