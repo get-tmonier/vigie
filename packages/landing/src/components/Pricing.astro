@@ -40,9 +40,9 @@ const plans = [
   },
   {
     name: 'Team',
-    price: '€9.99',
-    priceEur: '€9.99',
-    priceUsd: '$11.99',
+    price: '€6.99',
+    priceEur: '€6.99',
+    priceUsd: '$7.49',
     priceNote: '/seat/month',
     tagline: 'For teams where one agent going off-script affects everyone.',
     features: [
@@ -92,7 +92,7 @@ const plans = [
         <button
           id="btn-eur"
           data-currency="eur"
-          class="currency-btn is-active font-mono text-[0.7rem] font-semibold py-1 px-[0.65rem] rounded-[16px] border-none cursor-pointer transition-all duration-150 bg-transparent text-slate"
+          class="currency-btn font-mono text-[0.7rem] font-semibold py-1 px-[0.65rem] rounded-[16px] border-none cursor-pointer transition-all duration-150 bg-navy-deep text-cream"
         >€ EUR</button>
         <button
           id="btn-usd"
@@ -201,8 +201,12 @@ const plans = [
 
   function setCurrency(currency: 'eur' | 'usd') {
     const isEur = currency === 'eur';
-    btnEur.classList.toggle('is-active', isEur);
-    btnUsd.classList.toggle('is-active', !isEur);
+    const active = isEur ? btnEur : btnUsd;
+    const inactive = isEur ? btnUsd : btnEur;
+    active.classList.add('bg-navy-deep', 'text-cream');
+    active.classList.remove('bg-transparent', 'text-slate');
+    inactive.classList.add('bg-transparent', 'text-slate');
+    inactive.classList.remove('bg-navy-deep', 'text-cream');
     prices.forEach((el) => {
       el.textContent = el.dataset[currency] ?? el.textContent;
     });
@@ -211,17 +215,6 @@ const plans = [
   btnEur.addEventListener('click', () => setCurrency('eur'));
   btnUsd.addEventListener('click', () => setCurrency('usd'));
 </script>
-
-<style>
-  .currency-btn.is-active {
-    background: var(--navy-deep);
-    color: var(--cream);
-  }
-  .reveal-pricing.visible {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-</style>
 
 <script>
   const pricingCards = document.querySelectorAll('.reveal-pricing');
@@ -232,7 +225,7 @@ const plans = [
         const allCards = Array.from(document.querySelectorAll('.reveal-pricing'));
         const index = allCards.indexOf(card);
         card.style.transitionDelay = `${index * 100}ms`;
-        card.classList.add('visible');
+        card.classList.remove('opacity-0', 'translate-y-[30px]', 'scale-[0.97]');
         pricingObserver.unobserve(card);
       }
     });
