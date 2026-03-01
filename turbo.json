@@ -19,6 +19,7 @@
     },
     "typecheck": {
       "dependsOn": ["^build"]
-    }
+    },
+    "knip": {}
   }
 }

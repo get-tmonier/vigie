@@ -15,10 +15,12 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "bump": "ncu --workspaces --root -u && bun install",
-    "bump:check": "ncu --workspaces --root"
+    "bump:check": "ncu --workspaces --root",
+    "knip": "knip"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.4",
+    "knip": "^5.85.0",
     "npm-check-updates": "19.6.3",
     "turbo": "2.8.12"
   },
