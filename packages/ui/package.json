@@ -1,5 +1,35 @@
 {
   "name": "@tmonier/ui",
   "version": "0.0.1",
-  "private": true
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev --port 3000",
+    "build": "vite build",
+    "start": "node .output/server/index.mjs",
+    "lint": "biome lint ./src",
+    "check": "biome check ./src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fontsource/jetbrains-mono": "5.2.8",
+    "@fontsource/source-serif-4": "5.2.9",
+    "@fontsource/vollkorn": "5.2.10",
+    "@fontsource/vollkorn-sc": "5.2.8",
+    "@tailwindcss/vite": "4.2.1",
+    "@tanstack/react-router": "1.163.3",
+    "@tanstack/react-start": "1.164.0",
+    "@tmonier/shared": "workspace:*",
+    "@tmonier/tokens": "workspace:*",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "tailwindcss": "4.2.1",
+    "vite": "7.3.1"
+  },
+  "devDependencies": {
+    "@tanstack/react-router-devtools": "1.163.3",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5.9.3"
+  }
 }
