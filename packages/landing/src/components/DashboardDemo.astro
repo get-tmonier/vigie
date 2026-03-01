@@ -3,42 +3,34 @@
 
 <section
   id="dashboard-demo"
-  class="dashboard-section"
-  style="background: #0B1A2E; padding: 0 1.5rem 2rem; overflow: hidden;"
+  class="dashboard-section bg-navy-deep px-6 pb-8 overflow-hidden"
 >
   <!-- Browser UI mockup -->
   <div
-    class="browser-mock"
-    style="opacity: 0; transform: translateY(24px); max-width: 920px; margin: 0 auto; border-radius: 12px; overflow: hidden; border: 1px solid rgba(196,154,43,0.2); box-shadow: 0 32px 80px rgba(0,0,0,0.5);"
+    class="browser-mock opacity-0 translate-y-6 max-w-[920px] mx-auto rounded-xl overflow-hidden border border-gold/20 shadow-[0_32px_80px_rgba(0,0,0,0.5)]"
   >
     <!-- Browser chrome -->
-    <div
-      style="background: rgba(29,53,87,0.7); padding: 0.65rem 1rem; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid rgba(196,154,43,0.1);"
-    >
+    <div class="bg-navy-mid/70 py-[0.65rem] px-4 flex items-center gap-2 border-b border-gold/10">
+      <!-- macOS traffic-light colors — kept as inline per convention -->
       <span style="width: 12px; height: 12px; background: #FF5F57; border-radius: 50%; display: inline-block; flex-shrink: 0;"></span>
       <span style="width: 12px; height: 12px; background: #FFBD2E; border-radius: 50%; display: inline-block; flex-shrink: 0;"></span>
       <span style="width: 12px; height: 12px; background: #28C840; border-radius: 50%; display: inline-block; flex-shrink: 0;"></span>
       <!-- Address bar -->
-      <div
-        style="flex: 1; margin: 0 0.75rem; background: rgba(11,26,46,0.7); border: 1px solid rgba(139,156,175,0.15); border-radius: 6px; padding: 0.25rem 0.75rem; display: flex; align-items: center; gap: 0.4rem; max-width: 320px; margin-left: auto; margin-right: auto;"
-      >
-        <svg width="10" height="12" viewBox="0 0 10 12" fill="none" style="flex-shrink: 0; opacity: 0.5;">
+      <div class="flex-1 mx-3 bg-navy-deep/70 border border-slate/15 rounded-md py-1 px-3 flex items-center gap-[0.4rem] max-w-[320px] ml-auto mr-auto">
+        <svg width="10" height="12" viewBox="0 0 10 12" fill="none" class="shrink-0 opacity-50">
           <path d="M5 0C3.067 0 1.5 1.567 1.5 3.5V5H1C0.448 5 0 5.448 0 6v5c0 .552.448 1 1 1h8c.552 0 1-.448 1-1V6c0-.552-.448-1-1-1H8.5V3.5C8.5 1.567 6.933 0 5 0zm2.5 5h-5V3.5C2.5 2.12 3.62 1 5 1s2.5 1.12 2.5 2.5V5z" fill="#8B9CAF"/>
         </svg>
-        <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: rgba(139,156,175,0.6);">app.tmonier.com</span>
+        <span class="font-mono text-[0.65rem] text-slate/60">app.tmonier.com</span>
       </div>
     </div>
 
     <!-- Browser body -->
-    <div class="browser-body" style="display: flex; background: rgba(11,26,46,0.5);">
+    <div class="browser-body flex bg-navy-deep/50">
       <!-- Sidebar -->
-      <div
-        class="browser-sidebar"
-        style="width: 180px; flex-shrink: 0; background: rgba(11,26,46,0.6); border-right: 1px solid rgba(196,154,43,0.1); padding: 1.25rem 0;"
-      >
+      <div class="browser-sidebar w-[180px] shrink-0 bg-navy-deep/60 border-r border-gold/10 py-5">
         <!-- Logo -->
-        <div style="padding: 0 1rem 1.25rem; border-bottom: 1px solid rgba(139,156,175,0.1); margin-bottom: 1rem;">
-          <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <div class="px-4 pb-5 border-b border-slate/10 mb-4">
+          <div class="flex items-center gap-2">
             <svg width="18" height="18" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="50" cy="50" r="46" stroke="#C49A2B" stroke-width="4"/>
               <circle cx="50" cy="50" r="8" fill="#C49A2B"/>
@@ -51,94 +43,92 @@
               <line x1="82" y1="18" x2="71" y2="29" stroke="#C49A2B" stroke-width="3.5" stroke-linecap="round"/>
               <line x1="29" y1="71" x2="18" y2="82" stroke="#C49A2B" stroke-width="3.5" stroke-linecap="round"/>
             </svg>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #C49A2B; font-weight: 600;">tmonier</span>
+            <span class="font-mono text-[0.78rem] text-gold font-semibold">tmonier</span>
           </div>
         </div>
         <!-- Nav items -->
-        <nav style="padding: 0 0.75rem; display: flex; flex-direction: column; gap: 0.15rem;">
-          <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.6rem; border-radius: 6px; background: rgba(196,154,43,0.08); border: 1px solid rgba(196,154,43,0.15);">
+        <nav class="px-3 flex flex-col gap-[0.15rem]">
+          <div class="flex items-center gap-[0.6rem] py-[0.45rem] px-[0.6rem] rounded-md bg-gold/8 border border-gold/15">
             <span style="width: 6px; height: 6px; background: #28C840; border-radius: 50%; display: inline-block; flex-shrink: 0;"></span>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #F5F0E8;">Agents</span>
+            <span class="font-mono text-[0.7rem] text-cream">Agents</span>
           </div>
-          <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.6rem; border-radius: 6px;">
-            <span style="width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0;"></span>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #8B9CAF;">Runs</span>
+          <div class="flex items-center gap-[0.6rem] py-[0.45rem] px-[0.6rem] rounded-md">
+            <span class="w-[6px] h-[6px] rounded-full inline-block shrink-0"></span>
+            <span class="font-mono text-[0.7rem] text-slate">Runs</span>
           </div>
-          <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.6rem; border-radius: 6px;">
-            <span style="width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0;"></span>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #8B9CAF;">Settings</span>
+          <div class="flex items-center gap-[0.6rem] py-[0.45rem] px-[0.6rem] rounded-md">
+            <span class="w-[6px] h-[6px] rounded-full inline-block shrink-0"></span>
+            <span class="font-mono text-[0.7rem] text-slate">Settings</span>
           </div>
         </nav>
       </div>
 
       <!-- Main area -->
-      <div style="flex: 1; padding: 1.25rem; background: rgba(11,26,46,0.4); min-width: 0; position: relative; min-height: 420px;">
+      <div class="flex-1 p-5 bg-navy-deep/40 min-w-0 relative min-h-[420px]">
         <!-- Header row -->
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 0.5rem;">
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #F5F0E8; font-weight: 600;">Rate-limit /api/users</span>
-          <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <div class="flex items-center justify-between mb-4 gap-2">
+          <span class="font-mono text-[0.7rem] text-cream font-semibold">Rate-limit /api/users</span>
+          <div class="flex items-center gap-[0.6rem]">
             <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; background: rgba(40,200,64,0.12); color: #28C840; border: 1px solid rgba(40,200,64,0.3); border-radius: 10px; padding: 0.1rem 0.55rem;">1 agent active</span>
-            <span class="cost-counter" style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: #8B9CAF;">$0.00</span>
+            <span class="cost-counter font-mono text-[0.65rem] text-slate">$0.00</span>
           </div>
         </div>
 
         <!-- Agent card -->
         <div
-          class="agent-card"
-          style="opacity: 0; background: rgba(29,53,87,0.5); border: 1px solid rgba(40,200,64,0.3); border-radius: 8px; padding: 0.75rem; margin-bottom: 1rem;"
+          class="agent-card opacity-0 bg-navy-mid/50 rounded-lg p-3 mb-4"
+          style="border: 1px solid rgba(40,200,64,0.3);"
         >
-          <div class="agent-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
-            <div style="display: flex; align-items: center; gap: 0.35rem;">
+          <div class="agent-header flex items-center justify-between mb-[0.4rem]">
+            <div class="flex items-center gap-[0.35rem]">
               <span style="width: 6px; height: 6px; background: #28C840; border-radius: 50%; display: inline-block;"></span>
-              <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #C49A2B; font-weight: 600;">Claude Code</span>
+              <span class="font-mono text-[0.7rem] text-gold font-semibold">Claude Code</span>
               <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; background: rgba(139,156,175,0.1); border: 1px solid rgba(139,156,175,0.2); border-radius: 4px; padding: 0.05rem 0.35rem; color: #8B9CAF;">opus</span>
             </div>
-            <span class="agent-file" style="font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: rgba(139,156,175,0.6);">src/middleware/rate-limit.ts</span>
+            <span class="agent-file font-mono text-[0.6rem] text-slate/60">src/middleware/rate-limit.ts</span>
           </div>
           <!-- Context window gauge -->
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.55rem;">
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; color: rgba(139,156,175,0.5); flex-shrink: 0;">context</span>
-            <div style="flex: 1; height: 3px; background: rgba(139,156,175,0.15); border-radius: 2px; overflow: hidden; position: relative;">
+          <div class="flex items-center gap-2 mt-[0.55rem]">
+            <span class="font-mono text-[0.5rem] text-slate/50 shrink-0">context</span>
+            <div class="flex-1 h-[3px] bg-slate/15 rounded-sm overflow-hidden relative">
               <div class="context-bar" style="height: 100%; width: 0; border-radius: 2px; transition: width 1.5s ease-out, background 0.5s ease; background: #28C840;"></div>
             </div>
-            <span class="context-pct" style="font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; color: rgba(139,156,175,0.5); flex-shrink: 0; min-width: 2.2em; text-align: right;">0%</span>
+            <span class="context-pct font-mono text-[0.5rem] text-slate/50 shrink-0 min-w-[2.2em] text-right">0%</span>
             <span class="context-action" style="opacity: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.48rem; color: #FF8C42; flex-shrink: 0; cursor: default; border-bottom: 1px dotted rgba(255,140,66,0.4); transition: opacity 0.4s ease;">fresh window from checkpoint</span>
           </div>
         </div>
 
         <!-- Activity log -->
-        <div style="background: rgba(11,26,46,0.5); border: 1px solid rgba(139,156,175,0.1); border-radius: 6px; padding: 0.6rem 0.75rem; margin-bottom: 0.75rem;">
-          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(139,156,175,0.4); margin-bottom: 0.5rem;">Activity</div>
-          <div class="log-container" style="display: flex; flex-direction: column; gap: 0.25rem; height: 130px; overflow-y: hidden;"></div>
+        <div class="bg-navy-deep/50 border border-slate/10 rounded-md py-[0.6rem] px-3 mb-3">
+          <div class="font-mono text-[0.55rem] tracking-[0.08em] uppercase text-slate/40 mb-2">Activity</div>
+          <div class="log-container flex flex-col gap-1 h-[130px] overflow-y-hidden"></div>
         </div>
 
         <!-- Action panel — appears after loop detection -->
         <div
-          class="action-panel"
-          style="opacity: 0; background: rgba(29,53,87,0.4); border: 1px solid rgba(196,154,43,0.3); border-radius: 8px; padding: 0.75rem; transform: translateY(8px);"
+          class="action-panel opacity-0 translate-y-2 bg-navy-mid/40 border border-gold/30 rounded-lg p-3"
         >
           <!-- Panel header -->
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
-            <div style="display: flex; align-items: center; gap: 0.4rem;">
+          <div class="flex items-center justify-between mb-[0.6rem]">
+            <div class="flex items-center gap-[0.4rem]">
               <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: #FFBD2E; font-weight: 700;">&#9888;</span>
-              <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: #F5F0E8; font-weight: 600;">Agent paused &mdash; loop detected</span>
+              <span class="font-mono text-[0.62rem] text-cream font-semibold">Agent paused &mdash; loop detected</span>
             </div>
             <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.55rem; color: #FF8C42;">$4.20 spent</span>
           </div>
 
           <!-- Suggested prompt -->
-          <div style="background: rgba(11,26,46,0.6); border: 1px solid rgba(139,156,175,0.15); border-radius: 6px; padding: 0.55rem 0.65rem; margin-bottom: 0.6rem;">
-            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(139,156,175,0.4); margin-bottom: 0.3rem;">Suggested prompt</div>
-            <p class="suggested-prompt-text" style="font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: #F5F0E8; margin: 0; line-height: 1.6; font-style: italic; min-height: 1.6em;"></p>
+          <div class="bg-navy-deep/60 border border-slate/15 rounded-md py-[0.55rem] px-[0.65rem] mb-[0.6rem]">
+            <div class="font-mono text-[0.5rem] tracking-[0.08em] uppercase text-slate/40 mb-[0.3rem]">Suggested prompt</div>
+            <p class="suggested-prompt-text font-mono text-[0.6rem] text-cream m-0 leading-[1.6] italic min-h-[1.6em]"></p>
           </div>
 
           <!-- Action buttons -->
-          <div style="display: flex; gap: 0.35rem; justify-content: flex-end;">
+          <div class="flex gap-[0.35rem] justify-end">
             <div
-              class="action-btn-rollback"
-              style="opacity: 0; display: flex; align-items: center; gap: 0.3rem; font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; background: rgba(196,154,43,0.12); border: 1px solid rgba(196,154,43,0.35); border-radius: 5px; padding: 0.35rem 0.6rem; color: #C49A2B; font-weight: 600; cursor: default;"
+              class="action-btn-rollback opacity-0 flex items-center gap-[0.3rem] font-mono text-[0.58rem] bg-gold/12 border border-gold/35 rounded-[5px] py-[0.35rem] px-[0.6rem] text-gold font-semibold cursor-default"
             >
-              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" style="flex-shrink: 0;">
+              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="shrink-0">
                 <path d="M2 8a6 6 0 1 1 1.76 4.24" stroke="#C49A2B" stroke-width="1.5" stroke-linecap="round"/>
                 <path d="M2 4v4h4" stroke="#C49A2B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
@@ -148,7 +138,7 @@
               class="action-btn-send"
               style="opacity: 0; display: flex; align-items: center; gap: 0.3rem; font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; background: rgba(40,200,64,0.1); border: 1px solid rgba(40,200,64,0.3); border-radius: 5px; padding: 0.35rem 0.6rem; color: #28C840; font-weight: 600; cursor: default;"
             >
-              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" style="flex-shrink: 0;">
+              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="shrink-0">
                 <path d="M2 8h12M10 4l4 4-4 4" stroke="#28C840" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
               Resume
@@ -165,55 +155,57 @@
     </div>
   </div>
 
-  <!-- Websocket link -->
-  <div class="ws-link" style="opacity: 0; display: flex; flex-direction: column; align-items: center; gap: 0; margin: 0 auto; padding: 0.75rem 0;">
-    <!-- Dashed line -->
-    <div class="ws-dash" style="width: 2px; height: 28px; background: repeating-linear-gradient(to bottom, rgba(40,200,64,0.3) 0px, rgba(40,200,64,0.3) 4px, transparent 4px, transparent 8px); background-size: 2px 8px;"></div>
-    <!-- Label -->
-    <div style="display: flex; align-items: center; gap: 0.35rem; background: rgba(40,200,64,0.06); border: 1px solid rgba(40,200,64,0.2); border-radius: 20px; padding: 0.2rem 0.65rem;">
-      <svg width="8" height="8" viewBox="0 0 16 16" fill="none" style="flex-shrink: 0;">
-        <path d="M5 1C3.34 1 2 2.34 2 4c0 1.1.6 2.06 1.48 2.58A3 3 0 0 0 2 9v2a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V9a3 3 0 0 0-1.48-2.42A3 3 0 0 0 14 4c0-1.66-1.34-3-3-3H5z" stroke="#28C840" stroke-width="1.5" fill="none"/>
-        <circle cx="8" cy="7" r="1.5" fill="#28C840"/>
-      </svg>
-      <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; color: #28C840; letter-spacing: 0.03em;">ws://localhost:4800</span>
+  <!-- Websocket connector + terminal: single wrapper, fades in together so line never shows without terminal -->
+  <div class="ws-connector opacity-0 flex flex-col items-center mt-6">
+    <!-- Inner div: line is absolute here so it stops at the top of the terminal -->
+    <div class="relative flex flex-col items-center w-full">
+      <div
+        class="ws-dash absolute left-1/2 top-0 bottom-0 -translate-x-1/2 w-[2px]"
+        style="background: repeating-linear-gradient(to bottom, rgba(40,200,64,0.3) 0px, rgba(40,200,64,0.3) 4px, transparent 4px, transparent 8px);"
+      ></div>
+      <!-- Badge — floats over the line -->
+      <div class="relative z-10 py-[52px]">
+        <div style="display: flex; align-items: center; gap: 0.4rem; background: rgba(40,200,64,0.07); border: 1px solid rgba(40,200,64,0.25); border-radius: 20px; padding: 0.25rem 0.75rem;">
+          <span style="width: 6px; height: 6px; background: #28C840; border-radius: 50%; display: inline-block; flex-shrink: 0; animation: ws-pulse 2s ease-in-out infinite;"></span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.52rem; color: #28C840; letter-spacing: 0.04em;">ws://localhost:4800</span>
+        </div>
+      </div>
     </div>
-    <!-- Dashed line -->
-    <div class="ws-dash" style="width: 2px; height: 28px; background: repeating-linear-gradient(to bottom, rgba(40,200,64,0.3) 0px, rgba(40,200,64,0.3) 4px, transparent 4px, transparent 8px); background-size: 2px 8px;"></div>
-  </div>
 
-  <!-- Local daemon terminal -->
-  <div
-    class="local-terminal"
-    style="opacity: 0; transform: translateY(16px); max-width: 520px; margin: 0 auto; border-radius: 10px; overflow: hidden; border: 1px solid rgba(139,156,175,0.15); box-shadow: 0 16px 48px rgba(0,0,0,0.3);"
-  >
+    <!-- Local daemon terminal: sibling to the line wrapper, so the line stops here -->
+    <div
+      class="local-terminal max-w-[520px] w-full rounded-[10px] overflow-hidden border border-slate/15 shadow-[0_16px_48px_rgba(0,0,0,0.3)]"
+    >
     <!-- Window chrome -->
-    <div style="background: rgba(29,53,87,0.5); padding: 0.55rem 0.85rem; display: flex; gap: 0.45rem; align-items: center; border-bottom: 1px solid rgba(139,156,175,0.1);">
+    <div class="bg-navy-mid/50 py-[0.55rem] px-[0.85rem] flex gap-[0.45rem] items-center border-b border-slate/10">
+      <!-- macOS traffic-light colors — kept as inline per convention -->
       <span style="width: 10px; height: 10px; background: #FF5F57; border-radius: 50%; display: inline-block;"></span>
       <span style="width: 10px; height: 10px; background: #FFBD2E; border-radius: 50%; display: inline-block;"></span>
       <span style="width: 10px; height: 10px; background: #28C840; border-radius: 50%; display: inline-block;"></span>
-      <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: rgba(139,156,175,0.4); margin-left: 0.4rem;">zsh — ~/projects/my-app</span>
+      <span class="font-mono text-[0.6rem] text-slate/40 ml-[0.4rem]">zsh — ~/projects/my-app</span>
     </div>
     <!-- Terminal content -->
-    <div style="background: rgba(11,26,46,0.6); padding: 1rem 1.25rem; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; line-height: 2;">
+    <div class="bg-navy-deep/60 py-4 px-5 font-mono text-[0.68rem] leading-[2]">
       <div>
-        <span style="color: #C49A2B;">$</span>
-        <span style="color: #E0BC5A;"> tmonier start</span>
+        <span class="text-gold">$</span>
+        <span class="text-gold-pale"> tmonier start</span>
       </div>
-      <div style="color: #8B9CAF;">
+      <div class="text-slate">
         <span style="color: #28C840;">&#10003;</span> daemon running on localhost:4800
       </div>
-      <div style="color: rgba(139,156,175,0.5);">
+      <div class="text-slate/50">
         watching claude-code · all events forwarded to dashboard
       </div>
-      <div style="color: rgba(139,156,175,0.35); font-size: 0.58rem; margin-top: 0.15rem;">
+      <div class="text-slate/35 text-[0.58rem] mt-[0.15rem]">
         local-first &mdash; your data never leaves your machine
       </div>
-      <div style="margin-top: 0.35rem;">
-        <span style="color: #C49A2B;">$</span>
+      <div class="mt-[0.35rem]">
+        <span class="text-gold">$</span>
         <span style="display: inline-block; width: 7px; height: 1em; background: #C49A2B; margin-left: 4px; vertical-align: text-bottom; animation: blink 1.2s step-end infinite;"></span>
       </div>
     </div>
-  </div>
+    </div><!-- /local-terminal -->
+  </div><!-- /ws-connector -->
 </section>
 
 <style>
@@ -257,9 +249,9 @@
     50%      { opacity: 0; }
   }
 
-  /* Websocket link — appears after action panel (~8s) */
-  .dashboard-section.is-visible .ws-link {
-    animation: fade-in 0.2s ease-out 5s forwards;
+  /* Connector + terminal appear together after action panel */
+  .dashboard-section.is-visible .ws-connector {
+    animation: fade-in 0.3s ease-out 5s forwards;
   }
   .dashboard-section.is-visible .ws-dash {
     animation: ws-flow 0.6s linear infinite;
@@ -267,11 +259,11 @@
   @keyframes ws-flow {
     to { background-position: 0 8px; }
   }
-
-  /* Local terminal */
-  .dashboard-section.is-visible .local-terminal {
-    animation: fade-up 0.3s ease-out 5.2s forwards;
+  @keyframes ws-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
   }
+
 
   /* Responsive */
   @media (max-width: 768px) {
@@ -305,8 +297,8 @@
     .local-terminal {
       max-width: 100% !important;
     }
-    .ws-link {
-      padding: 0.4rem 0 !important;
+    .ws-connector {
+      margin-top: 1rem !important;
     }
   }
 </style>
