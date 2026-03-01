@@ -56,7 +56,7 @@ bun turbo build --filter=@tmonier/landing      # build single package
 
 ## Rules
 
-- **Feature branches only** — never commit directly to `main`. Rebase on `main` before opening a PR.
+- **Feature branches only** — never commit directly to `main`. Before starting any work, create or switch to a feature branch. Always `git pull --rebase origin main` before beginning work and before opening a PR.
 - **Never `git push` directly** — always ask before pushing to any remote.
 - **Conventional Commits** — `type(scope): description` (e.g. `feat(api): add auth endpoint`, `fix(tokens): correct color value`).
 - **No AI attribution** — never add `Co-Authored-By` or any Claude/AI mention in commit messages.
