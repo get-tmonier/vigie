@@ -24,6 +24,7 @@
     "bump": "ncu --workspaces --root -u && bun install",
     "bump:check": "ncu --workspaces --root",
     "knip": "knip",
+    "knip:fix": "knip --fix",
     "prepare": "simple-git-hooks"
   },
   "simple-git-hooks": {
