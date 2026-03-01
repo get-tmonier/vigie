@@ -6,6 +6,7 @@ export default {
     "packages/api": {
       project: ["src/**/*.ts"],
       ignoreDependencies: ["@tmonier/shared"],
+      ignoreBinaries: ["dist/index.js"],
     },
     "packages/ui": {
       entry: ["src/routes/**/*.tsx", "src/router.tsx"],
