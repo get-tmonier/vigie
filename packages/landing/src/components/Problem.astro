@@ -1,24 +1,4 @@
 ---
-const problems = [
-  {
-    title: 'AI ships bugs at scale',
-    description:
-      "Your agents generate 500 lines in 10 minutes. But Agent 2's auth refactor broke Agent 1's API contract. Nobody caught it until production. The faster AI codes, the faster bugs compound.",
-    contrast: 'Tmonier validates cross-agent changes before anything merges.',
-  },
-  {
-    title: 'You became the integration layer',
-    description:
-      "5 agents, 5 worktrees, 5 diffs to review. You're the only one who sees the full picture — and you're doing it manually, across tabs, with no tooling. AI was supposed to save you time. Instead, you're a full-time code reviewer for robots.",
-    contrast: 'Tmonier gives you one dashboard, structured checkpoints, and conflict detection.',
-  },
-  {
-    title: 'Nobody owns the architecture anymore',
-    description:
-      'Each agent optimizes locally. None of them know your service boundaries, your naming conventions, or what was decided last sprint. The codebase drifts — not in one session, but across dozens. Death by a thousand AI commits.',
-    contrast: 'Tmonier enforces architectural memory across every agent, every session.',
-  },
-];
 ---
 
 <section class="problem-section" style="background: #F5F0E8; padding: 5rem 2.5rem;">
@@ -33,45 +13,62 @@ const problems = [
       <h2
         style="font-family: 'Vollkorn', serif; font-weight: 700; font-size: clamp(1.75rem, 3.2vw, 2.5rem); color: #0B1A2E; margin: 0 0 1rem; line-height: 1.2;"
       >
-        Your AI agents are fast.<br />But fast without guardrails is dangerous.
+        Two problems. Two specific answers.
       </h2>
-      <p
-        style="font-family: 'Source Serif 4', serif; font-size: 1.05rem; color: #4A5568; line-height: 1.75; margin: 0;"
-      >
-        Parallel AI agents multiply your output. They also multiply your risk. Without orchestration, speed becomes your most expensive liability.
-      </p>
     </div>
 
+    <!-- New blocks: visibility, context drift, CLAUDE.md bloat -->
     <div
-      style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;"
-      class="problem-grid"
+      class="problem-new-blocks"
+      style="display: flex; flex-direction: column; gap: 2rem;"
     >
-      {
-        problems.map((p) => (
-          <div
-            style="background: #fff; border: 1px solid #E8E0D0; border-radius: 8px; padding: 2rem; display: flex; flex-direction: column; justify-content: space-between;"
-          >
-            <div>
-              <h3
-                style="font-family: 'Vollkorn', serif; font-weight: 700; font-size: 1.15rem; color: #0B1A2E; margin: 0 0 0.9rem; line-height: 1.3;"
-              >
-                {p.title}
-              </h3>
-              <p
-                style="font-family: 'Source Serif 4', serif; font-size: 0.95rem; color: #4A5568; line-height: 1.75; margin: 0 0 1.75rem;"
-              >
-                {p.description}
-              </p>
-            </div>
-            <p
-              style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 600; color: #0B1A2E; border-top: 1px solid #E8E0D0; padding-top: 1.1rem; margin: 0; display: flex; align-items: center; gap: 0.5rem;"
-            >
-              <span style="color: #C49A2B;">&rarr;</span>
-              {p.contrast}
-            </p>
-          </div>
-        ))
-      }
+
+      <!-- Block 1: Visibility -->
+      <div style="border-left: 3px solid #C49A2B; padding-left: 1.5rem;">
+        <h3
+          style="font-family: 'Vollkorn SC', serif; font-weight: 700; font-size: 1.4rem; color: #0B1A2E; margin: 0 0 0.75rem; line-height: 1.3;"
+        >
+          You have no idea what your agent is doing right now.
+        </h3>
+        <p
+          style="font-family: 'Source Serif 4', serif; font-size: 1.05rem; color: #3D4A5C; line-height: 1.7; margin: 0 0 0.9rem;"
+        >
+          Your agent is running. Is it stuck? Did it touch files it shouldn't? You won't know until the damage is done.
+        </p>
+        <p
+          style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: #C49A2B; margin: 0;"
+        >
+          &rarr; Real-time visibility. Every file, every command, as it happens.
+        </p>
+      </div>
+
+      <!-- Block 2: Context drift -->
+      <div style="border-left: 3px solid #C49A2B; padding-left: 1.5rem;">
+        <h3
+          style="font-family: 'Vollkorn SC', serif; font-weight: 700; font-size: 1.4rem; color: #0B1A2E; margin: 0 0 0.75rem; line-height: 1.3;"
+        >
+          Your agent is contradicting itself. You just can't see it.
+        </h3>
+        <p
+          style="font-family: 'Source Serif 4', serif; font-size: 1.05rem; color: #3D4A5C; line-height: 1.7; margin: 0 0 0.9rem;"
+        >
+          After an hour of context, compaction kicks in. The agent forgets its own decisions — and reintroduces code you deleted.{' '}
+          <a
+            href="https://dev.to/gonewx/the-hidden-cost-of-ai-coding-context-loss-and-how-developers-are-fixing-it-4b0d"
+            target="_blank"
+            rel="noopener"
+            style="color: rgba(196,154,43,0.6); text-decoration: underline; text-underline-offset: 3px;"
+            onmouseover="this.style.color='#C49A2B'"
+            onmouseout="this.style.color='rgba(196,154,43,0.6)'"
+          >documented by 200+ developers &rarr;</a>
+        </p>
+        <p
+          style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: #C49A2B; margin: 0;"
+        >
+          &rarr; Compaction-proof memory. Decisions persisted locally, never lost.
+        </p>
+      </div>
+
     </div>
 
   </div>
@@ -79,16 +76,10 @@ const problems = [
 
 <style>
   .problem-section {
-    min-height: 100vh;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: center;
   }
 
-  @media (max-width: 768px) {
-    .problem-grid {
-      grid-template-columns: 1fr !important;
-    }
-  }
 </style>

@@ -7,17 +7,12 @@ const plans = [
     priceEur: null,
     priceUsd: null,
     priceNote: 'forever',
-    tagline: 'For individual engineers who want parallel agents with guardrails.',
+    tagline: 'For engineers who want to see what their agent is actually doing.',
     features: [
-      'Spec-first workflow — define the plan, then let agents build',
-      'Up to 3 parallel agents — build features across isolated worktrees',
-      'Unified diff view — see all agent changes in one place',
-      'Cross-agent conflict detection — catch breaking changes before they merge',
-      'Human-in-the-loop checkpoints — nothing ships without your signal',
-      'Personal agent config — custom prompts, toolkits, and guardrails per agent',
-      'Unlimited local daemon',
-      'Local audit log',
-      'GDPR compliant',
+      'Local-first — your code stays on your machine, we never store it',
+      'Real-time activity — every file touched, every command run',
+      'Loop & scope detection — flagged before they burn your session',
+      '1 supervised agent',
     ],
     cta: 'Claim your spot',
     ctaHref: '#waitlist',
@@ -25,20 +20,18 @@ const plans = [
   },
   {
     name: 'Solo',
-    price: '€7.99',
-    priceEur: '€7.99',
-    priceUsd: '$8.99',
+    price: '€4.99',
+    priceEur: '€4.99',
+    priceUsd: '$5.99',
     priceNote: '/month',
     badge: 'Best value',
-    tagline: 'For power users who want deeper memory and more parallel firepower.',
+    tagline: 'For power users who want memory that survives compaction and costs that stay under control.',
     features: [
       'Everything in Free, plus:',
-      'Up to 10 parallel agents',
-      'Ticket-to-spec pipeline — import from Jira, ADO, or Linear and keep your board in sync as agents ship',
-      "Agent-assisted PR reviews — review teammates' PRs faster with your agent",
-      'Token usage dashboard — track spend per agent, set budgets, get alerts before costs spike',
-      "Smart model hints — suggests cheaper models for simple tasks so you don't overpay",
-      'Adaptive agent config — learns from your sessions to refine prompts, tools, and guardrails over time',
+      'Checkpoints & rollback — revert to the last clean state and resume with full context, no reprompting',
+      'Budget guardrails — alerts before costs spike, never a surprise bill',
+      'Compaction-proof memory — decisions persisted locally across context resets',
+      'Up to 5 supervised agents',
     ],
     cta: 'Claim your spot',
     ctaHref: '#waitlist',
@@ -46,16 +39,16 @@ const plans = [
   },
   {
     name: 'Team',
-    price: '€12.99',
-    priceEur: '€12.99',
-    priceUsd: '$15.99',
+    price: '€9.99',
+    priceEur: '€9.99',
+    priceUsd: '$11.99',
     priceNote: '/seat/month',
-    tagline: 'For engineering teams who want shared agent governance and visibility.',
+    tagline: 'For teams where one agent going off-script affects everyone.',
     features: [
       'Everything in Solo, plus:',
-      'Team dashboard — agent activity, conflicts, diffs across the team',
-      'Shared architectural memory — team-wide constraints enforced on every agent',
-      'Cross-team agent governance — standardize checkpoints, review flows, merge policies',
+      'Team activity dashboard — who ran what, across the whole team',
+      'Cross-agent conflict detection — breaking changes surfaced before review',
+      'Shared guardrails — team-wide constraints on every agent, every session',
     ],
     cta: 'Claim your spot',
     ctaHref: '#waitlist',
@@ -67,16 +60,12 @@ const plans = [
     priceEur: null,
     priceUsd: null,
     priceNote: '',
-    tagline: 'For organizations where code never leaves the building.',
+    tagline: 'For organizations that need full control, compliance & dedicated support.',
     features: [
       'Everything in Team, plus:',
-      'Self-hosted deployment — your infrastructure, your network, your rules',
-      'Dedicated support and SLA',
-      'SOC2 Type II certification',
-      'Custom onboarding',
-      'Data Processing Agreement (DPA)',
-      'Centralized and exportable audit log',
-      'Security questionnaire support',
+      'Self-hosted — your infrastructure, your network, your rules',
+      'SLA & dedicated support',
+      'SOC2 Type II + DPA',
     ],
     cta: 'Contact us',
     ctaHref: '/contact',
@@ -122,7 +111,7 @@ const plans = [
           No AI token markup — ever.
         </p>
         <p style="font-family: 'Source Serif 4', serif; font-size: 0.9rem; color: #8B9CAF; margin: 0; line-height: 1.6;">
-          Your AI subscription. Your machine. Zero middlemen.<br />Tmonier orchestrates locally — starting with Claude Code.
+          Your AI subscription. Your machine. Zero middlemen.
         </p>
       </div>
     </div>
@@ -134,6 +123,7 @@ const plans = [
       {
         plans.map((plan) => (
           <div
+            class="reveal-pricing"
             style={`background: #fff; border-radius: 8px; padding: 2rem; position: relative; ${
               plan.featured
                 ? 'border: 2px solid #C49A2B; box-shadow: 0 8px 32px rgba(196,154,43,0.15);'
@@ -265,4 +255,31 @@ const plans = [
       grid-template-columns: 1fr !important;
     }
   }
+
+  .reveal-pricing {
+    opacity: 0;
+    transform: translateY(30px) scale(0.97);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .reveal-pricing.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 </style>
+
+<script>
+  const pricingCards = document.querySelectorAll('.reveal-pricing');
+  const pricingObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const card = entry.target as HTMLElement;
+        const allCards = Array.from(document.querySelectorAll('.reveal-pricing'));
+        const index = allCards.indexOf(card);
+        card.style.transitionDelay = `${index * 100}ms`;
+        card.classList.add('visible');
+        pricingObserver.unobserve(card);
+      }
+    });
+  }, { threshold: 0.2, rootMargin: '0px 0px -60px 0px' });
+  pricingCards.forEach((card) => pricingObserver.observe(card));
+</script>

@@ -22,17 +22,26 @@ import helmsmanImg from '../assets/helmsman.png';
 
       <h1
         class="hero-heading"
-        style="font-family: 'Vollkorn SC', serif; font-weight: 900; font-size: clamp(2.2rem, 4.5vw, 3.2rem); color: #C49A2B; margin: 0 0 1.5rem; line-height: 1.15; letter-spacing: -0.01em;"
+        style="font-family: 'Vollkorn SC', serif; font-weight: 900; font-size: clamp(2.2rem, 4.5vw, 3.2rem); color: #C49A2B; margin: 0 0 1.25rem; line-height: 1.15; letter-spacing: -0.01em;"
       >
-        Ship 10x faster.<br />Break nothing.
+        Your crew.<br />Under your watch.
       </h1>
 
       <p
-        class="hero-body"
-        style="font-family: 'Source Serif 4', serif; font-weight: 400; font-size: 1.1rem; color: #8B9CAF; line-height: 1.8; margin: 0 0 2.5rem; max-width: 500px;"
+        class="hero-subtitle"
+        style="font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.85rem; color: #8B9CAF; margin: 0 0 1.25rem;"
       >
-        You design. The AI agents crew executes.<br />Nothing merges without your signal.
+        You launched the agent. Now what?
       </p>
+
+      <div class="hero-body" style="margin: 0 0 2.5rem; max-width: 500px;">
+        <div style="border-left: 2px solid rgba(196,154,43,0.3); padding-left: 1rem; margin: 0 0 1.25rem; display: flex; flex-direction: column; gap: 0.4rem;">
+          <p style="font-family: 'Source Serif 4', serif; font-weight: 400; font-size: 1.05rem; color: rgba(139,156,175,0.6); line-height: 1.4; margin: 0;">Looping for an hour. You had no idea.</p>
+          <p style="font-family: 'Source Serif 4', serif; font-weight: 400; font-size: 1.05rem; color: rgba(139,156,175,0.6); line-height: 1.4; margin: 0;">It opened your auth layer. You never asked.</p>
+          <p style="font-family: 'Source Serif 4', serif; font-weight: 400; font-size: 1.05rem; color: rgba(139,156,175,0.6); line-height: 1.4; margin: 0;">$180 in token usage. Still not done.</p>
+        </div>
+        <p style="font-family: 'Source Serif 4', serif; font-weight: 400; font-size: 1.05rem; color: #8B9CAF; line-height: 1.6; margin: 0;">Tmonier shows you — in real time. When something's off, you're the one who catches it.</p>
+      </div>
 
       <div class="hero-buttons" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
         <a
@@ -43,15 +52,6 @@ import helmsmanImg from '../assets/helmsman.png';
           onmouseout="this.style.background='#C49A2B'"
         >
           Claim your spot
-        </a>
-        <a
-          class="hero-btn"
-          href="/see-in-action"
-          style="font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.875rem; color: #C49A2B; border: 2px solid rgba(196, 154, 43, 0.5); padding: 0.8rem 1.6rem; border-radius: 4px; text-decoration: none; transition: background 0.2s, border-color 0.2s; display: inline-block;"
-          onmouseover="this.style.background='rgba(196,154,43,0.1)';this.style.borderColor='#C49A2B'"
-          onmouseout="this.style.background='transparent';this.style.borderColor='rgba(196,154,43,0.5)'"
-        >
-          See it in action &rarr;
         </a>
       </div>
     </div>
@@ -133,13 +133,23 @@ import helmsmanImg from '../assets/helmsman.png';
       margin: 0 0 0.8rem !important;
     }
     .hero-heading {
-      margin: 0 0 0.4rem !important;
+      margin: 0 0 0.35rem !important;
       font-size: 1.7rem !important;
     }
+    .hero-subtitle {
+      margin: 0 0 0.5rem !important;
+      font-size: 0.72rem !important;
+    }
     .hero-body {
-      margin: 0 0 3.5rem !important;
-      font-size: 0.85rem !important;
+      margin: 0 0 1.25rem !important;
+    }
+    .hero-body p {
+      font-size: 0.78rem !important;
       line-height: 1.4 !important;
+    }
+    .hero-pill {
+      margin-top: 0.5rem !important;
+      font-size: 0.62rem !important;
     }
 
     .hero-buttons {

@@ -7,7 +7,6 @@ interface Props {
 
 const { currentPage = 'home' } = Astro.props;
 const isHome = currentPage === 'home';
-const isAction = currentPage === 'see-in-action';
 const isFaq = currentPage === 'faq';
 const isContact = currentPage === 'contact';
 ---
@@ -61,22 +60,6 @@ const isContact = currentPage === 'contact';
       >
         Contact
       </a>
-      {isAction ? (
-        <span
-          style="font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.8rem; color: rgba(196, 154, 43, 0.4); border: 2px solid rgba(196, 154, 43, 0.2); padding: 0.5rem 1.1rem; border-radius: 4px; cursor: default;"
-        >
-          See it in action
-        </span>
-      ) : (
-        <a
-          href="/see-in-action"
-          style="font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.8rem; color: #C49A2B; border: 2px solid rgba(196, 154, 43, 0.5); padding: 0.5rem 1.1rem; border-radius: 4px; text-decoration: none; transition: background 0.2s, border-color 0.2s;"
-          onmouseover="this.style.background='rgba(196,154,43,0.1)';this.style.borderColor='#C49A2B'"
-          onmouseout="this.style.background='transparent';this.style.borderColor='rgba(196,154,43,0.5)'"
-        >
-          See it in action
-        </a>
-      )}
       <a
         href={isHome ? '#waitlist' : '/#waitlist'}
         style="font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.8rem; background: #C49A2B; color: #0B1A2E; padding: 0.5rem 1.1rem; border-radius: 4px; text-decoration: none; transition: background 0.2s;"
@@ -136,22 +119,6 @@ const isContact = currentPage === 'contact';
       >
         Contact
       </a>
-      {isAction ? (
-        <span
-          class="mobile-nav-link"
-          style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: rgba(196, 154, 43, 0.4); display: block; padding: 0.75rem 0; cursor: default;"
-        >
-          See it in action
-        </span>
-      ) : (
-        <a
-          href="/see-in-action"
-          class="mobile-nav-link"
-          style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #8B9CAF; text-decoration: none; display: block; padding: 0.75rem 0; transition: color 0.2s;"
-        >
-          See it in action
-        </a>
-      )}
       <div style="border-top: 1px solid rgba(196, 154, 43, 0.15); margin-top: 0.5rem; padding-top: 0.75rem;">
         <a
           href={isHome ? '#waitlist' : '/#waitlist'}
