@@ -2,7 +2,7 @@
 import WheelMark from '#components/WheelMark.astro';
 ---
 
-<section id="waitlist" class="waitlist-section bg-navy-deep py-24 px-10 text-center">
+<section id="waitlist" class="bg-navy-deep py-24 px-10 text-center min-h-[calc(100vh-64px-60px)] box-border flex flex-col justify-center max-md:min-h-[calc(100dvh-64px-52px)] max-md:py-8 max-md:px-5 max-md:pb-6">
   <div class="max-w-[600px] mx-auto">
     <div class="flex justify-center mb-10">
       <WheelMark size={80} />
@@ -28,7 +28,7 @@ import WheelMark from '#components/WheelMark.astro';
 
     <div class="newsletter-form-container">
       <form
-        class="newsletter-form waitlist-form flex gap-3 max-w-[480px] mx-auto mb-4"
+        class="newsletter-form waitlist-form flex gap-3 max-w-[480px] mx-auto mb-4 max-[540px]:flex-col"
         action="https://app.loops.so/api/newsletter-form/cmm61m1au0ws70i1mpmh6f87r"
         method="POST"
       >
@@ -175,30 +175,3 @@ import WheelMark from '#components/WheelMark.astro';
     container.classList.add('newsletter-handlers-added');
   }
 </script>
-
-<style>
-  @media (max-width: 540px) {
-    .waitlist-form {
-      flex-direction: column;
-    }
-  }
-
-  .waitlist-section {
-    min-height: calc(100vh - 64px - 60px);
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  @media (max-width: 768px) {
-    .waitlist-section {
-      min-height: calc(100dvh - 64px - 52px) !important;
-      box-sizing: border-box !important;
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: center !important;
-      padding: 2rem 1.25rem 1.5rem !important;
-    }
-  }
-</style>

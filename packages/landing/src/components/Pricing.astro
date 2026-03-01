@@ -75,7 +75,7 @@ const plans = [
 ];
 ---
 
-<section id="pricing" class="pricing-section bg-cream py-20 px-10">
+<section id="pricing" class="bg-cream py-20 px-10 min-h-screen box-border flex flex-col justify-center">
   <div class="max-w-[1400px] mx-auto">
     <div class="flex items-center gap-5 mb-6 flex-wrap">
       <h2
@@ -92,12 +92,12 @@ const plans = [
         <button
           id="btn-eur"
           data-currency="eur"
-          class="currency-btn is-active font-mono text-[0.7rem] font-semibold py-1 px-[0.65rem] rounded-[16px] border-none cursor-pointer transition-all duration-150"
+          class="currency-btn is-active font-mono text-[0.7rem] font-semibold py-1 px-[0.65rem] rounded-[16px] border-none cursor-pointer transition-all duration-150 bg-transparent text-slate"
         >€ EUR</button>
         <button
           id="btn-usd"
           data-currency="usd"
-          class="currency-btn font-mono text-[0.7rem] font-semibold py-1 px-[0.65rem] rounded-[16px] border-none cursor-pointer transition-all duration-150"
+          class="currency-btn font-mono text-[0.7rem] font-semibold py-1 px-[0.65rem] rounded-[16px] border-none cursor-pointer transition-all duration-150 bg-transparent text-slate"
         >$ USD</button>
       </div>
     </div>
@@ -115,11 +115,11 @@ const plans = [
       </div>
     </div>
 
-    <div class="pricing-grid grid grid-cols-4 gap-6 items-start">
+    <div class="pricing-grid grid grid-cols-4 gap-6 items-start max-lg:grid-cols-2 max-md:grid-cols-1">
       {
         plans.map((plan) => (
           <div
-            class:list={['reveal-pricing bg-white rounded-lg p-8 relative', plan.featured ? 'border-2 border-gold shadow-[0_8px_32px_rgba(196,154,43,0.15)]' : 'border border-cream-dark']}
+            class:list={['reveal-pricing opacity-0 translate-y-[30px] scale-[0.97] transition-[opacity,transform] duration-500 ease-in-out bg-white rounded-lg p-8 relative', plan.featured ? 'border-2 border-gold shadow-[0_8px_32px_rgba(196,154,43,0.15)]' : 'border border-cream-dark']}
           >
             {plan.badge && (
               <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gold text-navy-deep font-mono text-[0.65rem] font-semibold py-1 px-3 rounded-[20px] whitespace-nowrap uppercase tracking-[1px]">
@@ -213,39 +213,9 @@ const plans = [
 </script>
 
 <style>
-  .pricing-section {
-    min-height: 100vh;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  @media (max-width: 1024px) {
-    .pricing-grid {
-      grid-template-columns: repeat(2, 1fr) !important;
-    }
-  }
-  @media (max-width: 768px) {
-    .pricing-grid {
-      grid-template-columns: 1fr !important;
-    }
-  }
-
-  .currency-btn {
-    background: transparent;
-    color: var(--slate);
-  }
-
   .currency-btn.is-active {
     background: var(--navy-deep);
     color: var(--cream);
-  }
-
-  .reveal-pricing {
-    opacity: 0;
-    transform: translateY(30px) scale(0.97);
-    transition: opacity 0.5s ease, transform 0.5s ease;
   }
   .reveal-pricing.visible {
     opacity: 1;

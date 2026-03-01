@@ -11,7 +11,7 @@ import Footer from '#components/Footer.astro';
   <Nav currentPage="contact" />
   <main>
     <!-- Mini hero -->
-    <section class="bg-navy-deep pt-20 px-10 pb-12 text-center">
+    <section class="bg-navy-deep pt-20 px-10 pb-12 text-center max-md:pt-12 max-md:px-5 max-md:pb-8">
       <div class="max-w-[720px] mx-auto">
         <p class="font-mono text-[0.75rem] tracking-[0.15em] uppercase text-gold/60 m-0 mb-4">
           Get in touch
@@ -26,7 +26,7 @@ import Footer from '#components/Footer.astro';
     </section>
 
     <!-- Form -->
-    <section class="bg-navy-deep px-10 pb-24">
+    <section class="bg-navy-deep px-10 pb-24 max-md:px-5 max-md:pb-16 max-md:pt-0">
       <div class="max-w-[600px] mx-auto">
         <form
           id="contact-form"
@@ -49,7 +49,7 @@ import Footer from '#components/Footer.astro';
               required
               placeholder="Your name"
               autocomplete="name"
-              class="contact-input font-mono text-cream w-full text-sm bg-navy-mid/50 border border-gold/20 rounded-[4px] py-[0.85rem] px-4 outline-none box-border transition-colors duration-200 focus:border-gold/60"
+              class="contact-input font-mono text-cream w-full text-sm bg-navy-mid/50 border border-gold/20 rounded-[4px] py-[0.85rem] px-4 outline-none box-border transition-colors duration-200 focus:border-gold/60 placeholder:text-slate/40"
             />
           </div>
 
@@ -67,7 +67,7 @@ import Footer from '#components/Footer.astro';
               required
               placeholder="your@email.com"
               autocomplete="email"
-              class="contact-input font-mono text-cream w-full text-sm bg-navy-mid/50 border border-gold/20 rounded-[4px] py-[0.85rem] px-4 outline-none box-border transition-colors duration-200 focus:border-gold/60"
+              class="contact-input font-mono text-cream w-full text-sm bg-navy-mid/50 border border-gold/20 rounded-[4px] py-[0.85rem] px-4 outline-none box-border transition-colors duration-200 focus:border-gold/60 placeholder:text-slate/40"
             />
           </div>
 
@@ -84,12 +84,12 @@ import Footer from '#components/Footer.astro';
               required
               class="contact-input font-mono text-cream w-full text-sm bg-navy-mid/50 border border-gold/20 rounded-[4px] py-[0.85rem] px-4 outline-none box-border cursor-pointer appearance-none transition-colors duration-200 focus:border-gold/60"
             >
-              <option value="" disabled selected class="contact-option contact-option--placeholder">Select a topic…</option>
-              <option value="General question" class="contact-option">General question</option>
-              <option value="Bug report" class="contact-option">Bug report</option>
-              <option value="Enterprise inquiry" class="contact-option">Enterprise inquiry</option>
-              <option value="Press & partnerships" class="contact-option">Press & partnerships</option>
-              <option value="Other" class="contact-option">Other</option>
+              <option value="" disabled selected class="bg-navy-deep text-slate">Select a topic…</option>
+              <option value="General question" class="bg-navy-deep">General question</option>
+              <option value="Bug report" class="bg-navy-deep">Bug report</option>
+              <option value="Enterprise inquiry" class="bg-navy-deep">Enterprise inquiry</option>
+              <option value="Press & partnerships" class="bg-navy-deep">Press & partnerships</option>
+              <option value="Other" class="bg-navy-deep">Other</option>
             </select>
           </div>
 
@@ -106,7 +106,7 @@ import Footer from '#components/Footer.astro';
               required
               rows="6"
               placeholder="Tell us what's on your mind…"
-              class="contact-input font-mono text-cream w-full text-sm bg-navy-mid/50 border border-gold/20 rounded-[4px] py-[0.85rem] px-4 outline-none box-border resize-y leading-[1.6] transition-colors duration-200 focus:border-gold/60"
+              class="contact-input font-mono text-cream w-full text-sm bg-navy-mid/50 border border-gold/20 rounded-[4px] py-[0.85rem] px-4 outline-none box-border resize-y leading-[1.6] transition-colors duration-200 focus:border-gold/60 placeholder:text-slate/40"
             ></textarea>
           </div>
 
@@ -129,26 +129,3 @@ import Footer from '#components/Footer.astro';
   </main>
   <Footer />
 </Base>
-
-<style>
-  @media (max-width: 768px) {
-    section:first-of-type {
-      padding: 3rem 1.25rem 2rem;
-    }
-    section:last-of-type {
-      padding: 0 1.25rem 4rem;
-    }
-  }
-
-  ::placeholder {
-    color: color-mix(in srgb, var(--slate) 40%, transparent);
-  }
-
-  .contact-option {
-    background: var(--navy-deep);
-  }
-
-  .contact-option--placeholder {
-    color: var(--slate);
-  }
-</style>

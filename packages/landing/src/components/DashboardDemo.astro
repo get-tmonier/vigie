@@ -7,7 +7,7 @@
 >
   <!-- 1. Local daemon terminal (appears first) -->
   <div
-    class="local-terminal opacity-0 translate-y-6 max-w-[520px] mx-auto mb-6 rounded-[10px] overflow-hidden border border-slate/15 shadow-[0_16px_48px_rgba(0,0,0,0.3)]"
+    class="local-terminal font-mono opacity-0 translate-y-6 max-w-[520px] mx-auto mb-6 rounded-[10px] overflow-hidden border border-slate/15 shadow-[0_16px_48px_rgba(0,0,0,0.3)] max-md:max-w-full"
   >
     <!-- Window chrome -->
     <div class="bg-navy-mid/50 py-[0.55rem] px-[0.85rem] flex gap-[0.45rem] items-center border-b border-slate/10">
@@ -39,7 +39,7 @@
   </div>
 
   <!-- 2. Websocket connector: line segment + badge + line segment -->
-  <div class="ws-connector">
+  <div class="ws-connector font-mono">
     <div class="ws-connector-inner flex flex-col items-center">
       <!-- Top line segment -->
       <div class="ws-dash ws-dash-top w-[2px] h-[28px]"></div>
@@ -57,7 +57,7 @@
   <div class="browser-wrapper">
     <div class="browser-wrapper-inner flex flex-col items-center">
       <div
-        class="browser-mock max-w-[920px] w-full rounded-xl overflow-hidden border border-gold/20 shadow-[0_32px_80px_rgba(0,0,0,0.5)]"
+        class="browser-mock font-mono max-w-[920px] w-full rounded-xl overflow-hidden border border-gold/20 shadow-[0_32px_80px_rgba(0,0,0,0.5)]"
       >
         <!-- Browser chrome -->
         <div class="bg-navy-mid/70 py-[0.65rem] px-4 flex items-center gap-2 border-b border-gold/10">
@@ -74,13 +74,13 @@
         </div>
 
         <!-- Browser body -->
-        <div class="browser-body flex bg-navy-deep/50">
+        <div class="browser-body flex bg-navy-deep/50 max-md:flex-col">
           <!-- Sidebar -->
-          <div class="browser-sidebar w-[180px] shrink-0 bg-navy-deep/60 border-r border-gold/10 py-5">
+          <div class="browser-sidebar w-[180px] shrink-0 bg-navy-deep/60 border-r border-gold/10 py-5 max-md:hidden">
             <!-- Logo -->
             <div class="px-4 pb-5 border-b border-slate/10 mb-4">
               <div class="flex items-center gap-2">
-                <svg width="18" height="18" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="18" height="18" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-gold">
                   <circle cx="50" cy="50" r="46" stroke="currentColor" stroke-width="4"/>
                   <circle cx="50" cy="50" r="8" fill="currentColor"/>
                   <line x1="50" y1="4" x2="50" y2="20" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
@@ -125,15 +125,15 @@
 
             <!-- Agent card -->
             <div
-              class="agent-card opacity-0 bg-navy-mid/50 rounded-lg p-3 mb-4 border border-signal-green/30"
+              class="agent-card opacity-0 bg-navy-mid/50 rounded-lg p-3 mb-4 border border-signal-green/30 transition-[opacity,transform] duration-300 ease-out max-md:p-[0.6rem]"
             >
-              <div class="agent-header flex items-center justify-between mb-[0.4rem]">
+              <div class="agent-header flex items-center justify-between mb-[0.4rem] max-md:flex-col max-md:items-start max-md:gap-1">
                 <div class="flex items-center gap-[0.35rem]">
                   <span class="size-[6px] rounded-full inline-block bg-signal-green"></span>
                   <span class="text-[0.7rem] text-gold font-semibold">Claude Code</span>
                   <span class="badge-model text-[0.5rem] bg-slate/10 border border-slate/20 rounded-[4px] py-[0.05rem] px-[0.35rem] text-slate">opus</span>
                 </div>
-                <span class="agent-file text-[0.6rem] text-slate/60">src/middleware/rate-limit.ts</span>
+                <span class="agent-file text-[0.6rem] text-slate/60 max-md:text-[0.52rem] max-md:break-all">src/middleware/rate-limit.ts</span>
               </div>
               <!-- Context window gauge -->
               <div class="flex items-center gap-2 mt-[0.55rem]">
@@ -142,7 +142,7 @@
                   <div class="context-bar"></div>
                 </div>
                 <span class="context-pct text-[0.5rem] text-slate/50 shrink-0 min-w-[2.2em] text-right">0%</span>
-                <span class="context-action text-[0.48rem] text-signal-orange shrink-0 cursor-default opacity-0 transition-opacity duration-[400ms]">fresh window from checkpoint</span>
+                <span class="context-action text-[0.48rem] text-signal-orange shrink-0 cursor-default opacity-0 transition-opacity duration-[400ms] max-md:hidden">fresh window from checkpoint</span>
               </div>
             </div>
 
@@ -154,7 +154,7 @@
 
             <!-- Action panel — appears after loop detection -->
             <div
-              class="action-panel opacity-0 translate-y-2 bg-navy-mid/40 border border-gold/30 rounded-lg p-3"
+              class="action-panel opacity-0 translate-y-2 bg-navy-mid/40 border border-gold/30 rounded-lg p-3 max-md:p-[0.6rem]"
             >
               <!-- Panel header -->
               <div class="flex items-center justify-between mb-[0.6rem]">
@@ -210,24 +210,12 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  @keyframes fade-in {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
   @keyframes pulse-amber {
     0%, 100% { border-color: color-mix(in srgb, var(--signal-amber) 30%, transparent); }
     50%      { border-color: color-mix(in srgb, var(--signal-amber) 60%, transparent); box-shadow: 0 0 12px 0 color-mix(in srgb, var(--signal-amber) 10%, transparent); }
   }
 
-  /* Monospace via CSS — avoids Tailwind v4 font-size-adjust from font-mono */
-  .browser-mock,
-  .local-terminal,
-  .ws-connector {
-    font-family: var(--font-mono), monospace;
-  }
-
-  /* 1. Terminal entrance — first thing to appear */
+  /* 1. Terminal entrance */
   .dashboard-section.is-visible .local-terminal {
     animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
@@ -241,10 +229,7 @@
       grid-template-rows 1.6s cubic-bezier(0.22, 1, 0.36, 1),
       opacity 1s ease;
   }
-  .ws-connector-inner {
-    overflow: hidden;
-    min-height: 0;
-  }
+  .ws-connector-inner { overflow: hidden; min-height: 0; }
 
   /* 3. Browser wrapper — collapsed, grows via grid */
   .browser-wrapper {
@@ -255,25 +240,14 @@
       grid-template-rows 1.8s cubic-bezier(0.22, 1, 0.36, 1),
       opacity 1.2s ease;
   }
-  .browser-wrapper-inner {
-    overflow: hidden;
-    min-height: 0;
-  }
-
-  /* Agent card — fades in after browser appears */
-  .agent-card {
-    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
-  }
+  .browser-wrapper-inner { overflow: hidden; min-height: 0; }
 
   /* Blink cursor */
   @keyframes blink {
     0%, 100% { opacity: 1; }
     50%      { opacity: 0; }
   }
-
-  .terminal-cursor {
-    animation: blink 1.2s step-end infinite;
-  }
+  .terminal-cursor { animation: blink 1.2s step-end infinite; }
 
   /* Context bar */
   .context-bar {
@@ -289,7 +263,7 @@
     border-bottom: 1px dotted color-mix(in srgb, var(--signal-orange) 40%, transparent);
   }
 
-  /* WS dashed line — starts invisible, draws top-to-bottom */
+  /* WS dashed line */
   .ws-dash {
     background: repeating-linear-gradient(
       to bottom,
@@ -304,15 +278,7 @@
   }
 
   /* WS badge — starts invisible */
-  .ws-badge {
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-
-  /* Sidebar SVG uses currentColor */
-  .browser-sidebar svg {
-    color: var(--gold);
-  }
+  .ws-badge { opacity: 0; transition: opacity 0.4s ease; }
 
   /* Log lines — :global() because created dynamically via JS */
   :global(.log-line) {
@@ -324,7 +290,6 @@
     gap: 0.5rem;
     align-items: baseline;
   }
-
   :global(.log-line-time) {
     color: color-mix(in srgb, var(--slate) 35%, transparent);
     flex-shrink: 0;
@@ -342,49 +307,16 @@
     opacity: 0.7;
   }
 
-  .ws-dash.is-drawn {
-    animation: ws-flow 0.6s linear infinite;
-  }
-  @keyframes ws-flow {
-    to { background-position: 0 8px; }
-  }
+  .ws-dash.is-drawn { animation: ws-flow 0.6s linear infinite; }
+  @keyframes ws-flow { to { background-position: 0 8px; } }
   @keyframes ws-pulse {
     0%, 100% { opacity: 1; }
     50%       { opacity: 0.3; }
   }
 
-  /* Responsive */
+  /* Responsive — :global() log-line only */
   @media (max-width: 768px) {
-    .browser-body {
-      flex-direction: column !important;
-    }
-    .browser-sidebar {
-      display: none !important;
-    }
-    .agent-card {
-      padding: 0.6rem !important;
-    }
-    .agent-card .agent-header {
-      flex-direction: column !important;
-      align-items: flex-start !important;
-      gap: 0.25rem !important;
-    }
-    .agent-file {
-      font-size: 0.52rem !important;
-      word-break: break-all;
-    }
-    .context-action {
-      display: none !important;
-    }
-    .action-panel {
-      padding: 0.6rem !important;
-    }
-    :global(.log-line) {
-      font-size: 0.55rem !important;
-    }
-    .local-terminal {
-      max-width: 100% !important;
-    }
+    :global(.log-line) { font-size: 0.55rem !important; }
   }
 </style>
 

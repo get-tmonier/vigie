@@ -192,12 +192,12 @@ const categories = [
               {category.title}
             </h2>
             {category.items.map((item) => (
-              <details class="faq-item">
-                <summary class="faq-summary">
+              <details class="faq-item border-b border-slate/10">
+                <summary class="faq-summary flex items-center justify-between py-5 cursor-pointer list-none font-source-serif text-[1.1rem] font-semibold text-cream transition-colors duration-200 hover:text-gold max-md:text-base max-md:py-4">
                   <span>{item.question}</span>
                 </summary>
-                <div class="faq-answer">
-                  <div class="faq-answer-inner">
+                <div class="faq-answer overflow-hidden max-h-0 transition-[max-height] duration-[400ms] ease-in-out">
+                  <div class="faq-answer-inner pb-6">
                     <p class="font-source-serif text-slate text-base leading-[1.8] m-0">
                       {item.answer}
                     </p>
@@ -216,33 +216,13 @@ const categories = [
 </Base>
 
 <style>
-  .faq-item {
-    border-bottom: 1px solid rgba(139, 156, 175, 0.1);
-  }
-
-  .faq-summary {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 1.25rem 0;
-    cursor: pointer;
-    list-style: none;
-    font-family: 'Source Serif 4', serif;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--cream);
-    transition: color 0.2s;
-  }
-
   .faq-summary::-webkit-details-marker {
     display: none;
   }
-
   .faq-summary::marker {
     display: none;
     content: '';
   }
-
   .faq-summary::after {
     content: '+';
     font-family: 'JetBrains Mono', monospace;
@@ -253,33 +233,10 @@ const categories = [
     margin-left: 1rem;
     transition: transform 0.3s ease;
   }
-
   details[open] > .faq-summary::after {
     content: '\2212';
   }
-
-  .faq-summary:hover {
-    color: var(--gold);
-  }
-
-  .faq-answer {
-    overflow: hidden;
-    max-height: 0;
-    transition: max-height 0.4s ease;
-  }
-
   details[open] > .faq-answer {
     max-height: 500px;
-  }
-
-  .faq-answer-inner {
-    padding: 0 0 1.5rem;
-  }
-
-  @media (max-width: 768px) {
-    .faq-summary {
-      font-size: 1rem;
-      padding: 1rem 0;
-    }
   }
 </style>

@@ -60,13 +60,13 @@ const isContact = currentPage === 'contact';
     <!-- Mobile hamburger button -->
     <button
       id="hamburger-btn"
-      class="lg:hidden bg-transparent border-none cursor-pointer p-2"
+      class="lg:hidden bg-transparent border-none cursor-pointer p-2 flex flex-col gap-[5px]"
       aria-label="Menu"
       aria-expanded="false"
     >
-      <span class="hamburger-bar"></span>
-      <span class="hamburger-bar"></span>
-      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar block w-[22px] h-0.5 bg-gold rounded-[1px] transition-[transform,opacity] duration-300 ease-in-out"></span>
+      <span class="hamburger-bar block w-[22px] h-0.5 bg-gold rounded-[1px] transition-[transform,opacity] duration-300 ease-in-out"></span>
+      <span class="hamburger-bar block w-[22px] h-0.5 bg-gold rounded-[1px] transition-[transform,opacity] duration-300 ease-in-out"></span>
     </button>
   </div>
 
@@ -116,38 +116,15 @@ const isContact = currentPage === 'contact';
 <div class="h-16"></div>
 
 <style>
-  #hamburger-btn {
-    flex-direction: column;
-    gap: 5px;
-  }
-
-  @media (max-width: 1023px) {
-    #hamburger-btn {
-      display: flex;
-    }
-  }
-
-  .hamburger-bar {
-    display: block;
-    width: 22px;
-    height: 2px;
-    background: var(--gold);
-    border-radius: 1px;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-  }
-
   #hamburger-btn.is-open .hamburger-bar:nth-child(1) {
     transform: translateY(7px) rotate(45deg);
   }
-
   #hamburger-btn.is-open .hamburger-bar:nth-child(2) {
     opacity: 0;
   }
-
   #hamburger-btn.is-open .hamburger-bar:nth-child(3) {
     transform: translateY(-7px) rotate(-45deg);
   }
-
   #mobile-menu.is-open {
     border-top-color: color-mix(in srgb, var(--gold) 15%, transparent);
   }
