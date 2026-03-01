@@ -14,6 +14,8 @@ jobs:
   ci:
     name: Knip, Check, Typecheck, Test & Build
     runs-on: ubuntu-latest
+    env:
+      TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha || github.event.before || 'HEAD~1' }}
 
     steps:
       - name: Checkout
