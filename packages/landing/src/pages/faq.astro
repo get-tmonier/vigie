@@ -16,7 +16,7 @@ const categories = [
       {
         question: 'How does it work?',
         answer:
-          'Run tmonier start in your project. A lightweight daemon connects to Claude Code via hooks and streams every event — file edits, shell commands, token usage — to a real-time dashboard. No code leaves your machine.',
+          'Run tmonier start in your project. A lightweight daemon spawns Claude Code, captures every event — file edits, shell commands, token usage — and streams them to a real-time dashboard. No code leaves your machine.',
       },
       {
         question: 'What does "local-first" mean?',
@@ -69,14 +69,14 @@ const categories = [
           'Available on Solo and above. Checkpoints are approval gates that snapshot your project state. If something goes wrong, you roll back to the last clean state and resume with just the necessary context — no reprompting needed.',
       },
       {
+        question: 'Can I monitor multiple agents at once?',
+        answer:
+          'Yes. The Free plan monitors 1 agent. The Solo plan supports up to 5 concurrent agents, each with its own activity stream in the dashboard.',
+      },
+      {
         question: 'How does cost awareness work?',
         answer:
           'A live cost counter tracks spending in real time. Tmonier hints when a cheaper model would suffice for the current task. On Solo and above, you can set budget guardrails that pause the session before exceeding a threshold.',
-      },
-      {
-        question: 'Can I use Tmonier with a single agent?',
-        answer:
-          'Yes — Tmonier is designed for exactly that. One agent, fully monitored. You get loop detection, scope drift alerts, context window tracking, cost awareness, and checkpoints, all focused on making that single agent more reliable.',
       },
     ],
   },
