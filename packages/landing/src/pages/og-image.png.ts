@@ -5,7 +5,6 @@ import satori from 'satori';
 const GOLD = '#C49A2B';
 const NAVY = '#0B1A2E';
 const CREAM = '#F5F0E8';
-const SLATE = '#8B9CAF';
 
 async function fetchFont(family: string, weight: number): Promise<ArrayBuffer> {
   const css = await fetch(
