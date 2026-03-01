@@ -10,7 +10,17 @@ export const Route = createRootRoute({
     links: [{ rel: 'stylesheet', href: '/src/app/styles/global.css' }],
   }),
   component: RootComponent,
+  notFoundComponent: NotFound,
 });
+
+function NotFound() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+      <h1 className="font-vollkorn-sc text-4xl font-bold text-gold">404</h1>
+      <p className="font-source-serif text-lg text-cream">Page not found.</p>
+    </div>
+  );
+}
 
 function RootComponent() {
   return (
