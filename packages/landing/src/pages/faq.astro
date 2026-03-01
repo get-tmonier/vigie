@@ -167,37 +167,27 @@ const categories = [
   <Nav currentPage="faq" />
   <main>
     <!-- Mini hero -->
-    <section class="bg-navy-deep" style="padding: 5rem 2.5rem 3rem; text-align: center;">
-      <div style="max-width: 720px; margin: 0 auto;">
-        <p
-          class="font-mono"
-          style="font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(196, 154, 43, 0.6); margin: 0 0 1rem;"
-        >
+    <section class="bg-navy-deep pt-20 px-10 pb-12 text-center">
+      <div class="max-w-[720px] mx-auto">
+        <p class="font-mono text-[0.75rem] tracking-[0.15em] uppercase text-gold/60 m-0 mb-4">
           Questions & answers
         </p>
-        <h1
-          class="font-vollkorn-sc text-gold"
-          style="font-weight: 900; font-size: clamp(2rem, 4.5vw, 3rem); margin: 0 0 1.25rem; line-height: 1.15;"
-        >
+        <h1 class="font-vollkorn-sc text-gold font-black text-[clamp(2rem,4.5vw,3rem)] m-0 mb-5 leading-[1.15]">
           Frequently asked questions
         </h1>
-        <p
-          class="font-source-serif text-slate"
-          style="font-size: 1.05rem; line-height: 1.8; margin: 0; max-width: 600px; margin-left: auto; margin-right: auto;"
-        >
+        <p class="font-source-serif text-slate text-[1.05rem] leading-[1.8] m-0 max-w-[600px] mx-auto">
           Everything you need to know about Tmonier — from getting started to privacy and pricing.
         </p>
       </div>
     </section>
 
     <!-- FAQ content -->
-    <section class="bg-navy-deep" style="padding: 0 2.5rem 5rem;">
-      <div style="max-width: 800px; margin: 0 auto;">
+    <section class="bg-navy-deep px-10 pb-20">
+      <div class="max-w-[800px] mx-auto">
         {categories.map((category) => (
-          <div style="margin-bottom: 3rem;">
+          <div class="mb-12">
             <h2
-              class="font-mono"
-              style="font-size: 0.75rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(196, 154, 43, 0.6); margin: 0 0 1.5rem; padding-bottom: 0.75rem; border-bottom: 1px solid rgba(196, 154, 43, 0.15);"
+              class="font-mono text-[0.75rem] font-semibold tracking-[0.15em] uppercase text-gold/60 m-0 mb-6 pb-3 border-b border-gold/15"
             >
               {category.title}
             </h2>
@@ -208,10 +198,7 @@ const categories = [
                 </summary>
                 <div class="faq-answer">
                   <div class="faq-answer-inner">
-                    <p
-                      class="font-source-serif text-slate"
-                      style="font-size: 1rem; line-height: 1.8; margin: 0;"
-                    >
+                    <p class="font-source-serif text-slate text-base leading-[1.8] m-0">
                       {item.answer}
                     </p>
                   </div>
@@ -243,7 +230,7 @@ const categories = [
     font-family: 'Source Serif 4', serif;
     font-size: 1.1rem;
     font-weight: 600;
-    color: #f5f0e8;
+    color: var(--cream);
     transition: color 0.2s;
   }
 
@@ -261,7 +248,7 @@ const categories = [
     font-family: 'JetBrains Mono', monospace;
     font-size: 1.25rem;
     font-weight: 400;
-    color: #c49a2b;
+    color: var(--gold);
     flex-shrink: 0;
     margin-left: 1rem;
     transition: transform 0.3s ease;
@@ -272,7 +259,7 @@ const categories = [
   }
 
   .faq-summary:hover {
-    color: #c49a2b;
+    color: var(--gold);
   }
 
   .faq-answer {

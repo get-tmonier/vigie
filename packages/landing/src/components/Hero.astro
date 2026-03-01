@@ -4,53 +4,44 @@ import helmsmanImg from '#assets/helmsman.png';
 ---
 
 <section
-  class="hero-section"
-  style="background: radial-gradient(ellipse at 60% 110%, rgba(196, 154, 43, 0.08) 0%, transparent 60%), #0B1A2E; padding: 5rem 2.5rem 6rem;"
+  class="hero-section py-20 px-10 pb-24"
 >
   <div
-    style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;"
-    class="hero-grid"
+    class="hero-grid max-w-[1200px] mx-auto grid grid-cols-2 gap-16 items-center"
   >
     <!-- Left: text -->
     <div class="hero-left">
       <p
-        class="hero-tagline font-mono"
-        style="font-weight: 500; font-size: 0.7rem; letter-spacing: 4px; color: rgba(196, 154, 43, 0.6); text-transform: uppercase; margin: 0 0 1.5rem;"
+        class="hero-tagline font-mono font-medium text-[0.7rem] tracking-[4px] text-gold/60 uppercase m-0 mb-6"
       >
         You hold the helm.
       </p>
 
       <h1
-        class="hero-heading font-vollkorn-sc text-gold"
-        style="font-weight: 900; font-size: clamp(2.2rem, 4.5vw, 3.2rem); margin: 0 0 1.25rem; line-height: 1.15; letter-spacing: -0.01em;"
+        class="hero-heading font-vollkorn-sc text-gold font-black text-[clamp(2.2rem,4.5vw,3.2rem)] m-0 mb-5 leading-[1.15] tracking-[-0.01em]"
       >
         Your crew.<br />Under your watch.
       </h1>
 
       <p
-        class="hero-subtitle font-mono text-slate"
-        style="font-weight: 500; font-size: 0.85rem; margin: 0 0 1.25rem;"
+        class="hero-subtitle font-mono text-slate font-medium text-[0.85rem] m-0 mb-5"
       >
         You launched the agent. Now what?
       </p>
 
-
-      <div class="hero-body" style="margin: 0 0 2.5rem; max-width: 500px;">
-        <div style="border-left: 2px solid rgba(196,154,43,0.3); padding-left: 1rem; margin: 0 0 1.25rem; display: flex; flex-direction: column; gap: 0.4rem;">
-          <p class="font-source-serif" style="font-weight: 400; font-size: 1.05rem; color: rgba(139,156,175,0.6); line-height: 1.4; margin: 0;">Looping for an hour. You had no idea.</p>
-          <p class="font-source-serif" style="font-weight: 400; font-size: 1.05rem; color: rgba(139,156,175,0.6); line-height: 1.4; margin: 0;">It opened your auth layer. You never asked.</p>
-          <p class="font-source-serif" style="font-weight: 400; font-size: 1.05rem; color: rgba(139,156,175,0.6); line-height: 1.4; margin: 0;">$180 in token usage. Still not done.</p>
+      <div class="hero-body m-0 mb-10 max-w-[500px]">
+        <div class="border-l-2 border-gold/30 pl-4 m-0 mb-5 flex flex-col gap-[0.4rem]">
+          <p class="font-source-serif font-normal text-[1.05rem] text-slate/60 leading-[1.4] m-0">Looping for an hour. You had no idea.</p>
+          <p class="font-source-serif font-normal text-[1.05rem] text-slate/60 leading-[1.4] m-0">It opened your auth layer. You never asked.</p>
+          <p class="font-source-serif font-normal text-[1.05rem] text-slate/60 leading-[1.4] m-0">$180 in token usage. Still not done.</p>
         </div>
-        <p class="font-source-serif text-slate" style="font-weight: 400; font-size: 1.05rem; line-height: 1.6; margin: 0;">Tmonier shows you — in real time. When something's off, you're the one who catches it.</p>
+        <p class="font-source-serif text-slate font-normal text-[1.05rem] leading-[1.6] m-0">Tmonier shows you — in real time. When something's off, you're the one who catches it.</p>
       </div>
 
-      <div class="hero-buttons" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+      <div class="hero-buttons flex gap-4 items-center flex-wrap">
         <a
-          class="hero-btn font-mono bg-gold text-navy-deep"
+          class="hero-btn font-mono bg-gold text-navy-deep font-semibold text-sm py-[0.85rem] px-[1.8rem] rounded-[4px] no-underline transition-colors duration-200 inline-block hover:bg-gold-light"
           href="#waitlist"
-          style="font-weight: 600; font-size: 0.875rem; padding: 0.85rem 1.8rem; border-radius: 4px; text-decoration: none; transition: background 0.2s; display: inline-block;"
-          onmouseover="this.style.background='#D4AA3C'"
-          onmouseout="this.style.background='#C49A2B'"
         >
           Claim your spot
         </a>
@@ -58,10 +49,9 @@ import helmsmanImg from '#assets/helmsman.png';
     </div>
 
     <!-- Right: mascotte + definition plaque -->
-    <div class="hero-right" style="display: flex; flex-direction: column; align-items: center; gap: 0;">
+    <div class="hero-right flex flex-col items-center gap-0">
       <div
-        class="hero-mascotte-frame"
-        style="position: relative; display: inline-block; border-radius: 12px 12px 0 0; border: 2px solid rgba(196, 154, 43, 0.2); border-bottom: none; overflow: hidden; max-width: 320px; width: 100%; aspect-ratio: 1568 / 2000;"
+        class="hero-mascotte-frame relative inline-block rounded-t-xl border-2 border-b-0 border-gold/20 overflow-hidden max-w-[320px] w-full aspect-[1568/2000]"
       >
         <Image
           src={helmsmanImg}
@@ -70,22 +60,21 @@ import helmsmanImg from '#assets/helmsman.png';
           format="webp"
           loading="eager"
           fetchpriority="high"
-          style="display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(1.15); transform-origin: center 20%;"
+          class="block w-full h-full object-cover scale-[1.15] origin-[center_20%]"
         />
       </div>
 
       <!-- Definition plaque -->
       <div
-        class="hero-plaque"
-        style="max-width: 320px; width: 100%; border: 2px solid rgba(196, 154, 43, 0.2); border-top: 1px solid rgba(196, 154, 43, 0.1); border-radius: 0 0 12px 12px; background: rgba(196, 154, 43, 0.04); padding: 1.1rem 1.4rem 1.2rem;"
+        class="hero-plaque max-w-[320px] w-full border-2 border-gold/20 border-t border-t-gold/10 rounded-b-xl bg-gold/4 pt-[1.1rem] px-[1.4rem] pb-[1.2rem]"
       >
-        <div style="display: flex; align-items: baseline; gap: 0.65rem; flex-wrap: wrap; margin-bottom: 0.25rem;">
-          <span class="font-vollkorn-sc text-gold" style="font-weight: 900; font-size: 1.05rem;">tmonier</span>
-          <span class="font-mono" style="font-size: 0.72rem; color: rgba(139, 156, 175, 0.6);">/ti.mɔ.nje/</span>
-          <span class="font-mono" style="font-size: 0.65rem; color: rgba(196, 154, 43, 0.45); letter-spacing: 0.1em; text-transform: uppercase;">n. French</span>
+        <div class="flex items-baseline gap-[0.65rem] flex-wrap mb-1">
+          <span class="font-vollkorn-sc text-gold font-black text-[1.05rem]">tmonier</span>
+          <span class="font-mono text-[0.72rem] text-slate/60">/ti.mɔ.nje/</span>
+          <span class="font-mono text-[0.65rem] text-gold/45 tracking-[0.1em] uppercase">n. French</span>
         </div>
-        <p class="font-mono" style="font-size: 0.6rem; color: rgba(139, 156, 175, 0.25); margin: 0 0 0.4rem; letter-spacing: 0.02em;">alt. Timonier</p>
-        <p class="font-source-serif" style="font-size: 0.82rem; color: rgba(139, 156, 175, 0.8); line-height: 1.65; margin: 0;">
+        <p class="font-mono text-[0.6rem] text-slate/25 m-0 mb-[0.4rem] tracking-[0.02em]">alt. Timonier</p>
+        <p class="font-source-serif text-[0.82rem] text-slate/80 leading-[1.65] m-0">
           The helmsman — the person at the helm who steers the ship while the crew executes.
         </p>
       </div>
@@ -100,6 +89,7 @@ import helmsmanImg from '#assets/helmsman.png';
     display: flex;
     flex-direction: column;
     justify-content: center;
+    background: radial-gradient(ellipse at 60% 110%, color-mix(in srgb, var(--gold) 8%, transparent) 0%, transparent 60%), var(--navy-deep);
   }
 
   @media (max-width: 768px) {
@@ -185,9 +175,9 @@ import helmsmanImg from '#assets/helmsman.png';
       flex-shrink: 0 !important;
       border-radius: 12px 0 0 12px !important;
       border-right: none !important;
-      border-bottom: 2px solid rgba(196, 154, 43, 0.2) !important;
+      border-bottom: 2px solid color-mix(in srgb, var(--gold) 20%, transparent) !important;
       overflow: hidden !important;
-      background: #0B1A2E !important;
+      background: var(--navy-deep) !important;
     }
     .hero-mascotte-frame img {
       height: 100% !important;
@@ -202,8 +192,8 @@ import helmsmanImg from '#assets/helmsman.png';
       flex: 1 !important;
       min-width: 0 !important;
       border-radius: 0 12px 12px 0 !important;
-      border-top: 2px solid rgba(196, 154, 43, 0.2) !important;
-      border-left: 1px solid rgba(196, 154, 43, 0.1) !important;
+      border-top: 2px solid color-mix(in srgb, var(--gold) 20%, transparent) !important;
+      border-left: 1px solid color-mix(in srgb, var(--gold) 10%, transparent) !important;
       padding: 0.6rem 0.75rem !important;
       display: flex !important;
       flex-direction: column !important;

@@ -11,6 +11,10 @@ export const colors = {
   slate: '#8b9caf',
   success: '#22c55e',
   error: '#ef4444',
+  signalGreen: '#28c840',
+  signalRed: '#ff5f57',
+  signalAmber: '#ffbd2e',
+  signalOrange: '#ff8c42',
 } as const;
 
 export const fonts = {

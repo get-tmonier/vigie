@@ -11,44 +11,34 @@ import Footer from '#components/Footer.astro';
   <Nav currentPage="contact" />
   <main>
     <!-- Mini hero -->
-    <section class="bg-navy-deep" style="padding: 5rem 2.5rem 3rem; text-align: center;">
-      <div style="max-width: 720px; margin: 0 auto;">
-        <p
-          class="font-mono"
-          style="font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: rgba(196, 154, 43, 0.6); margin: 0 0 1rem;"
-        >
+    <section class="bg-navy-deep pt-20 px-10 pb-12 text-center">
+      <div class="max-w-[720px] mx-auto">
+        <p class="font-mono text-[0.75rem] tracking-[0.15em] uppercase text-gold/60 m-0 mb-4">
           Get in touch
         </p>
-        <h1
-          class="font-vollkorn-sc text-gold"
-          style="font-weight: 900; font-size: clamp(2rem, 4.5vw, 3rem); margin: 0 0 1.25rem; line-height: 1.15;"
-        >
+        <h1 class="font-vollkorn-sc text-gold font-black text-[clamp(2rem,4.5vw,3rem)] m-0 mb-5 leading-[1.15]">
           Contact us
         </h1>
-        <p
-          class="font-source-serif text-slate"
-          style="font-size: 1.05rem; line-height: 1.8; margin: 0; max-width: 520px; margin-left: auto; margin-right: auto;"
-        >
+        <p class="font-source-serif text-slate text-[1.05rem] leading-[1.8] m-0 max-w-[520px] mx-auto">
           A question, a bug, or just want to say hi? We read every message and reply within 24 hours.
         </p>
       </div>
     </section>
 
     <!-- Form -->
-    <section class="bg-navy-deep" style="padding: 0 2.5rem 6rem;">
-      <div style="max-width: 600px; margin: 0 auto;">
+    <section class="bg-navy-deep px-10 pb-24">
+      <div class="max-w-[600px] mx-auto">
         <form
           id="contact-form"
           action="mailto:support@tmonier.com"
           method="POST"
           enctype="text/plain"
-          style="display: flex; flex-direction: column; gap: 1.25rem;"
+          class="flex flex-col gap-5"
         >
           <div class="field-group">
             <label
               for="contact-name"
-              class="font-mono"
-              style="font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(196, 154, 43, 0.6); display: block; margin-bottom: 0.5rem;"
+              class="font-mono text-[0.72rem] font-semibold tracking-[0.1em] uppercase text-gold/60 block mb-2"
             >
               Name
             </label>
@@ -59,18 +49,14 @@ import Footer from '#components/Footer.astro';
               required
               placeholder="Your name"
               autocomplete="name"
-              class="contact-input font-mono text-cream"
-              style="width: 100%; font-size: 0.875rem; background: rgba(29, 53, 87, 0.5); border: 1px solid rgba(196, 154, 43, 0.2); border-radius: 4px; padding: 0.85rem 1rem; outline: none; box-sizing: border-box; transition: border-color 0.2s;"
-              onfocus="this.style.borderColor='rgba(196,154,43,0.6)'"
-              onblur="this.style.borderColor='rgba(196,154,43,0.2)'"
+              class="contact-input font-mono text-cream w-full text-sm bg-navy-mid/50 border border-gold/20 rounded-[4px] py-[0.85rem] px-4 outline-none box-border transition-colors duration-200 focus:border-gold/60"
             />
           </div>
 
           <div class="field-group">
             <label
               for="contact-email"
-              class="font-mono"
-              style="font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(196, 154, 43, 0.6); display: block; margin-bottom: 0.5rem;"
+              class="font-mono text-[0.72rem] font-semibold tracking-[0.1em] uppercase text-gold/60 block mb-2"
             >
               Email
             </label>
@@ -81,18 +67,14 @@ import Footer from '#components/Footer.astro';
               required
               placeholder="your@email.com"
               autocomplete="email"
-              class="contact-input font-mono text-cream"
-              style="width: 100%; font-size: 0.875rem; background: rgba(29, 53, 87, 0.5); border: 1px solid rgba(196, 154, 43, 0.2); border-radius: 4px; padding: 0.85rem 1rem; outline: none; box-sizing: border-box; transition: border-color 0.2s;"
-              onfocus="this.style.borderColor='rgba(196,154,43,0.6)'"
-              onblur="this.style.borderColor='rgba(196,154,43,0.2)'"
+              class="contact-input font-mono text-cream w-full text-sm bg-navy-mid/50 border border-gold/20 rounded-[4px] py-[0.85rem] px-4 outline-none box-border transition-colors duration-200 focus:border-gold/60"
             />
           </div>
 
           <div class="field-group">
             <label
               for="contact-subject"
-              class="font-mono"
-              style="font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(196, 154, 43, 0.6); display: block; margin-bottom: 0.5rem;"
+              class="font-mono text-[0.72rem] font-semibold tracking-[0.1em] uppercase text-gold/60 block mb-2"
             >
               Subject
             </label>
@@ -100,25 +82,21 @@ import Footer from '#components/Footer.astro';
               id="contact-subject"
               name="subject"
               required
-              class="contact-input font-mono text-cream"
-              style="width: 100%; font-size: 0.875rem; background: rgba(29, 53, 87, 0.5); border: 1px solid rgba(196, 154, 43, 0.2); border-radius: 4px; padding: 0.85rem 1rem; outline: none; box-sizing: border-box; cursor: pointer; appearance: none; transition: border-color 0.2s;"
-              onfocus="this.style.borderColor='rgba(196,154,43,0.6)'"
-              onblur="this.style.borderColor='rgba(196,154,43,0.2)'"
+              class="contact-input font-mono text-cream w-full text-sm bg-navy-mid/50 border border-gold/20 rounded-[4px] py-[0.85rem] px-4 outline-none box-border cursor-pointer appearance-none transition-colors duration-200 focus:border-gold/60"
             >
-              <option value="" disabled selected style="background: #0B1A2E; color: #8B9CAF;">Select a topic…</option>
-              <option value="General question" style="background: #0B1A2E;">General question</option>
-              <option value="Bug report" style="background: #0B1A2E;">Bug report</option>
-              <option value="Enterprise inquiry" style="background: #0B1A2E;">Enterprise inquiry</option>
-              <option value="Press & partnerships" style="background: #0B1A2E;">Press & partnerships</option>
-              <option value="Other" style="background: #0B1A2E;">Other</option>
+              <option value="" disabled selected class="contact-option contact-option--placeholder">Select a topic…</option>
+              <option value="General question" class="contact-option">General question</option>
+              <option value="Bug report" class="contact-option">Bug report</option>
+              <option value="Enterprise inquiry" class="contact-option">Enterprise inquiry</option>
+              <option value="Press & partnerships" class="contact-option">Press & partnerships</option>
+              <option value="Other" class="contact-option">Other</option>
             </select>
           </div>
 
           <div class="field-group">
             <label
               for="contact-message"
-              class="font-mono"
-              style="font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(196, 154, 43, 0.6); display: block; margin-bottom: 0.5rem;"
+              class="font-mono text-[0.72rem] font-semibold tracking-[0.1em] uppercase text-gold/60 block mb-2"
             >
               Message
             </label>
@@ -128,33 +106,22 @@ import Footer from '#components/Footer.astro';
               required
               rows="6"
               placeholder="Tell us what's on your mind…"
-              class="contact-input font-mono text-cream"
-              style="width: 100%; font-size: 0.875rem; background: rgba(29, 53, 87, 0.5); border: 1px solid rgba(196, 154, 43, 0.2); border-radius: 4px; padding: 0.85rem 1rem; outline: none; box-sizing: border-box; resize: vertical; line-height: 1.6; transition: border-color 0.2s;"
-              onfocus="this.style.borderColor='rgba(196,154,43,0.6)'"
-              onblur="this.style.borderColor='rgba(196,154,43,0.2)'"
+              class="contact-input font-mono text-cream w-full text-sm bg-navy-mid/50 border border-gold/20 rounded-[4px] py-[0.85rem] px-4 outline-none box-border resize-y leading-[1.6] transition-colors duration-200 focus:border-gold/60"
             ></textarea>
           </div>
 
           <button
             type="submit"
-            class="font-mono bg-gold text-navy-deep"
-            style="font-weight: 600; font-size: 0.875rem; border: none; border-radius: 4px; padding: 0.9rem 2rem; cursor: pointer; align-self: flex-start; transition: background 0.2s;"
-            onmouseover="this.style.background='#D4AA3C'"
-            onmouseout="this.style.background='#C49A2B'"
+            class="font-mono bg-gold text-navy-deep font-semibold text-sm border-none rounded-[4px] py-[0.9rem] px-8 cursor-pointer self-start transition-colors duration-200 hover:bg-gold-light"
           >
             Send message
           </button>
         </form>
 
-        <p
-          class="font-mono"
-          style="font-size: 0.72rem; color: rgba(139, 156, 175, 0.5); margin: 2rem 0 0; line-height: 1.6;"
-        >
+        <p class="font-mono text-[0.72rem] text-slate/50 mt-8 leading-[1.6]">
           Or reach us directly at <a
             href="mailto:support@tmonier.com"
-            style="color: rgba(196, 154, 43, 0.6); text-decoration: none;"
-            onmouseover="this.style.color='#C49A2B'"
-            onmouseout="this.style.color='rgba(196,154,43,0.6)'"
+            class="text-gold/60 no-underline hover:text-gold transition-colors duration-200"
           >support@tmonier.com</a>
         </p>
       </div>
@@ -166,14 +133,22 @@ import Footer from '#components/Footer.astro';
 <style>
   @media (max-width: 768px) {
     section:first-of-type {
-      padding: 3rem 1.25rem 2rem !important;
+      padding: 3rem 1.25rem 2rem;
     }
     section:last-of-type {
-      padding: 0 1.25rem 4rem !important;
+      padding: 0 1.25rem 4rem;
     }
   }
 
   ::placeholder {
-    color: rgba(139, 156, 175, 0.4);
+    color: color-mix(in srgb, var(--slate) 40%, transparent);
+  }
+
+  .contact-option {
+    background: var(--navy-deep);
+  }
+
+  .contact-option--placeholder {
+    color: var(--slate);
   }
 </style>
