@@ -1,0 +1,45 @@
+import type { SSEEvent } from '@tmonier/shared';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { createDaemonEventSource } from '../api/event-source.js';
+
+export function useSSE(daemonId: string | null) {
+  const [events, setEvents] = useState<SSEEvent[]>([]);
+  const [connected, setConnected] = useState(false);
+  const esRef = useRef<EventSource | null>(null);
+
+  useEffect(() => {
+    if (!daemonId) return;
+
+    setEvents([]);
+    const es = createDaemonEventSource(daemonId);
+    esRef.current = es;
+
+    es.onopen = () => setConnected(true);
+    es.onerror = () => setConnected(false);
+
+    const handleEvent = (event: MessageEvent) => {
+      try {
+        const data = JSON.parse(event.data) as SSEEvent;
+        setEvents((prev) => [...prev, data]);
+      } catch {
+        // ignore invalid events
+      }
+    };
+
+    es.addEventListener('command:output', handleEvent);
+    es.addEventListener('command:done', handleEvent);
+    es.addEventListener('command:error', handleEvent);
+    es.addEventListener('daemon:connected', handleEvent);
+    es.addEventListener('daemon:disconnected', handleEvent);
+
+    return () => {
+      es.close();
+      esRef.current = null;
+      setConnected(false);
+    };
+  }, [daemonId]);
+
+  const clear = useCallback(() => setEvents([]), []);
+
+  return { events, connected, clear };
+}

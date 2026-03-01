@@ -9,6 +9,8 @@ export const colors = {
   cream: '#f5f0e8',
   creamDark: '#e8e0d0',
   slate: '#8b9caf',
+  success: '#22c55e',
+  error: '#ef4444',
 } as const;
 
 export const fonts = {

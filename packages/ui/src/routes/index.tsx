@@ -6,47 +6,10 @@ export const Route = createFileRoute('/')({
 
 function Home() {
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        gap: '1.5rem',
-      }}
-    >
-      <h1
-        style={{
-          fontFamily: '"Vollkorn SC", serif',
-          fontSize: '3rem',
-          fontWeight: 700,
-          color: 'var(--gold)',
-          margin: 0,
-        }}
-      >
-        tmonier
-      </h1>
-      <p
-        style={{
-          fontFamily: '"Source Serif 4", serif',
-          fontSize: '1.25rem',
-          color: 'var(--cream)',
-          margin: 0,
-        }}
-      >
-        Your local-first SWE companion.
-      </p>
-      <code
-        style={{
-          fontFamily: '"JetBrains Mono", monospace',
-          fontSize: '0.875rem',
-          color: 'var(--gold-light)',
-          backgroundColor: 'var(--navy-mid)',
-          padding: '0.5rem 1rem',
-          borderRadius: '0.375rem',
-        }}
-      >
+    <div className="flex flex-col items-center justify-center min-h-screen gap-6">
+      <h1 className="font-vollkorn-sc text-5xl font-bold text-gold m-0">tmonier</h1>
+      <p className="font-source-serif text-xl text-cream m-0">Your local-first SWE companion.</p>
+      <code className="font-mono text-sm text-gold-light bg-navy-mid px-4 py-2 rounded-md">
         @tmonier/ui is running
       </code>
     </div>

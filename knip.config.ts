@@ -5,8 +5,6 @@ export default {
     ".": {},
     "packages/api": {
       project: ["src/**/*.ts"],
-      ignoreDependencies: ["@tmonier/shared"],
-      ignoreBinaries: ["dist/index.js"],
     },
     "packages/ui": {
       entry: ["src/routes/**/*.tsx", "src/router.tsx"],
@@ -17,7 +15,6 @@ export default {
         "@fontsource/source-serif-4",
         "@fontsource/vollkorn",
         "@fontsource/vollkorn-sc",
-        "@tmonier/shared",
         "@tmonier/tokens",
         "tailwindcss",
       ],
@@ -52,5 +49,6 @@ export default {
     },
   },
   ignore: [".ncurc.cjs"],
+  ignoreExportsUsedInFile: false,
   ignoreWorkspaces: [],
 } satisfies KnipConfig;

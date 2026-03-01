@@ -20,6 +20,7 @@
         "@tmonier/shared": "workspace:*",
         "effect": "4.0.0-beta.21",
         "hono": "4.12.3",
+        "valibot": "1.2.0",
       },
       "devDependencies": {
         "typescript": "5.9.3",
@@ -80,7 +81,9 @@
         "@tmonier/tokens": "workspace:*",
         "react": "19.2.4",
         "react-dom": "19.2.4",
+        "tailwind-merge": "3.5.0",
         "tailwindcss": "4.2.1",
+        "valibot": "1.2.0",
         "vite": "7.3.1",
       },
       "devDependencies": {
@@ -1295,6 +1298,8 @@
     "supports-color": ["supports-color@10.2.2", "", {}, "sha512-SS+jx45GF1QjgEXQx4NJZV9ImqmO2NPz5FNsIHrsDjh2YsHnawpan7SNQ1o8NuhrbHZy9AZhIoCUiCeaW/C80g=="],
 
     "svgo": ["svgo@4.0.0", "", { "dependencies": { "commander": "^11.1.0", "css-select": "^5.1.0", "css-tree": "^3.0.1", "css-what": "^6.1.0", "csso": "^5.0.5", "picocolors": "^1.1.1", "sax": "^1.4.1" }, "bin": "./bin/svgo.js" }, "sha512-VvrHQ+9uniE+Mvx3+C9IEe/lWasXCU0nXMY2kZeLrHNICuRiC8uMPyM14UEaMOFA5mhyQqEkB02VoQ16n3DLaw=="],
+
+    "tailwind-merge": ["tailwind-merge@3.5.0", "", {}, "sha512-I8K9wewnVDkL1NTGoqWmVEIlUcB9gFriAEkXkfCjX5ib8ezGxtR3xD7iZIxrfArjEsH7F1CHD4RFUtxefdqV/A=="],
 
     "tailwindcss": ["tailwindcss@4.2.1", "", {}, "sha512-/tBrSQ36vCleJkAOsy9kbNTgaxvGbyOamC30PRePTQe/o1MFwEKHQk4Cn7BNGaPtjp+PuUrByJehM1hgxfq4sw=="],
 

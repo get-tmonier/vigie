@@ -7,7 +7,7 @@ export const Route = createRootRoute({
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { title: 'tmonier' },
     ],
-    links: [{ rel: 'stylesheet', href: '/src/styles/global.css' }],
+    links: [{ rel: 'stylesheet', href: '/src/app/styles/global.css' }],
   }),
   component: RootComponent,
 });
