@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import helmsmanImg from '../assets/helmsman.png';
+import helmsmanImg from '#assets/helmsman.png';
 ---
 
 <section
@@ -14,22 +14,22 @@ import helmsmanImg from '../assets/helmsman.png';
     <!-- Left: text -->
     <div class="hero-left">
       <p
-        class="hero-tagline"
-        style="font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.7rem; letter-spacing: 4px; color: rgba(196, 154, 43, 0.6); text-transform: uppercase; margin: 0 0 1.5rem;"
+        class="hero-tagline font-mono"
+        style="font-weight: 500; font-size: 0.7rem; letter-spacing: 4px; color: rgba(196, 154, 43, 0.6); text-transform: uppercase; margin: 0 0 1.5rem;"
       >
         You hold the helm.
       </p>
 
       <h1
-        class="hero-heading"
-        style="font-family: 'Vollkorn SC', serif; font-weight: 900; font-size: clamp(2.2rem, 4.5vw, 3.2rem); color: #C49A2B; margin: 0 0 1.25rem; line-height: 1.15; letter-spacing: -0.01em;"
+        class="hero-heading font-vollkorn-sc text-gold"
+        style="font-weight: 900; font-size: clamp(2.2rem, 4.5vw, 3.2rem); margin: 0 0 1.25rem; line-height: 1.15; letter-spacing: -0.01em;"
       >
         Your crew.<br />Under your watch.
       </h1>
 
       <p
-        class="hero-subtitle"
-        style="font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.85rem; color: #8B9CAF; margin: 0 0 1.25rem;"
+        class="hero-subtitle font-mono text-slate"
+        style="font-weight: 500; font-size: 0.85rem; margin: 0 0 1.25rem;"
       >
         You launched the agent. Now what?
       </p>
@@ -37,18 +37,18 @@ import helmsmanImg from '../assets/helmsman.png';
 
       <div class="hero-body" style="margin: 0 0 2.5rem; max-width: 500px;">
         <div style="border-left: 2px solid rgba(196,154,43,0.3); padding-left: 1rem; margin: 0 0 1.25rem; display: flex; flex-direction: column; gap: 0.4rem;">
-          <p style="font-family: 'Source Serif 4', serif; font-weight: 400; font-size: 1.05rem; color: rgba(139,156,175,0.6); line-height: 1.4; margin: 0;">Looping for an hour. You had no idea.</p>
-          <p style="font-family: 'Source Serif 4', serif; font-weight: 400; font-size: 1.05rem; color: rgba(139,156,175,0.6); line-height: 1.4; margin: 0;">It opened your auth layer. You never asked.</p>
-          <p style="font-family: 'Source Serif 4', serif; font-weight: 400; font-size: 1.05rem; color: rgba(139,156,175,0.6); line-height: 1.4; margin: 0;">$180 in token usage. Still not done.</p>
+          <p class="font-source-serif" style="font-weight: 400; font-size: 1.05rem; color: rgba(139,156,175,0.6); line-height: 1.4; margin: 0;">Looping for an hour. You had no idea.</p>
+          <p class="font-source-serif" style="font-weight: 400; font-size: 1.05rem; color: rgba(139,156,175,0.6); line-height: 1.4; margin: 0;">It opened your auth layer. You never asked.</p>
+          <p class="font-source-serif" style="font-weight: 400; font-size: 1.05rem; color: rgba(139,156,175,0.6); line-height: 1.4; margin: 0;">$180 in token usage. Still not done.</p>
         </div>
-        <p style="font-family: 'Source Serif 4', serif; font-weight: 400; font-size: 1.05rem; color: #8B9CAF; line-height: 1.6; margin: 0;">Tmonier shows you — in real time. When something's off, you're the one who catches it.</p>
+        <p class="font-source-serif text-slate" style="font-weight: 400; font-size: 1.05rem; line-height: 1.6; margin: 0;">Tmonier shows you — in real time. When something's off, you're the one who catches it.</p>
       </div>
 
       <div class="hero-buttons" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
         <a
-          class="hero-btn"
+          class="hero-btn font-mono bg-gold text-navy-deep"
           href="#waitlist"
-          style="font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.875rem; background: #C49A2B; color: #0B1A2E; padding: 0.85rem 1.8rem; border-radius: 4px; text-decoration: none; transition: background 0.2s; display: inline-block;"
+          style="font-weight: 600; font-size: 0.875rem; padding: 0.85rem 1.8rem; border-radius: 4px; text-decoration: none; transition: background 0.2s; display: inline-block;"
           onmouseover="this.style.background='#D4AA3C'"
           onmouseout="this.style.background='#C49A2B'"
         >
@@ -80,12 +80,12 @@ import helmsmanImg from '../assets/helmsman.png';
         style="max-width: 320px; width: 100%; border: 2px solid rgba(196, 154, 43, 0.2); border-top: 1px solid rgba(196, 154, 43, 0.1); border-radius: 0 0 12px 12px; background: rgba(196, 154, 43, 0.04); padding: 1.1rem 1.4rem 1.2rem;"
       >
         <div style="display: flex; align-items: baseline; gap: 0.65rem; flex-wrap: wrap; margin-bottom: 0.25rem;">
-          <span style="font-family: 'Vollkorn SC', serif; font-weight: 900; font-size: 1.05rem; color: #C49A2B;">tmonier</span>
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: rgba(139, 156, 175, 0.6);">/ti.mɔ.nje/</span>
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: rgba(196, 154, 43, 0.45); letter-spacing: 0.1em; text-transform: uppercase;">n. French</span>
+          <span class="font-vollkorn-sc text-gold" style="font-weight: 900; font-size: 1.05rem;">tmonier</span>
+          <span class="font-mono" style="font-size: 0.72rem; color: rgba(139, 156, 175, 0.6);">/ti.mɔ.nje/</span>
+          <span class="font-mono" style="font-size: 0.65rem; color: rgba(196, 154, 43, 0.45); letter-spacing: 0.1em; text-transform: uppercase;">n. French</span>
         </div>
-        <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: rgba(139, 156, 175, 0.25); margin: 0 0 0.4rem; letter-spacing: 0.02em;">alt. Timonier</p>
-        <p style="font-family: 'Source Serif 4', serif; font-size: 0.82rem; color: rgba(139, 156, 175, 0.8); line-height: 1.65; margin: 0;">
+        <p class="font-mono" style="font-size: 0.6rem; color: rgba(139, 156, 175, 0.25); margin: 0 0 0.4rem; letter-spacing: 0.02em;">alt. Timonier</p>
+        <p class="font-source-serif" style="font-size: 0.82rem; color: rgba(139, 156, 175, 0.8); line-height: 1.65; margin: 0;">
           The helmsman — the person at the helm who steers the ship while the crew executes.
         </p>
       </div>

@@ -29,9 +29,6 @@ export default {
       ],
       project: ["src/**/*.{astro,ts,tsx}", "scripts/**/*.mjs"],
       ignoreDependencies: [
-        "wrangler",
-        "@astrojs/cloudflare",
-        "@cloudflare/workers-types",
         "@fontsource/jetbrains-mono",
         "@fontsource/source-serif-4",
         "@fontsource/vollkorn",

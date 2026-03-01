@@ -1,4 +1,6 @@
 ---
+import { cn } from '#lib/cn';
+
 interface Props {
   size?: number;
   class?: string;
@@ -12,7 +14,7 @@ const { size = 24, class: className = '' } = Astro.props;
   viewBox="0 0 64 64"
   width={size}
   height={size}
-  class={className}
+  class={cn(className)}
   aria-hidden="true"
 >
   <defs>

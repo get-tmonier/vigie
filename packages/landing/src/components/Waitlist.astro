@@ -1,29 +1,32 @@
 ---
-import WheelMark from './WheelMark.astro';
+import WheelMark from '#components/WheelMark.astro';
 ---
 
-<section id="waitlist" class="waitlist-section" style="background: #0B1A2E; padding: 6rem 2.5rem; text-align: center;">
+<section id="waitlist" class="waitlist-section bg-navy-deep" style="padding: 6rem 2.5rem; text-align: center;">
   <div style="max-width: 600px; margin: 0 auto;">
     <div style="display: flex; justify-content: center; margin-bottom: 2.5rem;">
       <WheelMark size={80} />
     </div>
 
     <h2
-      style="font-family: 'Vollkorn', serif; font-weight: 700; font-size: clamp(1.4rem, 3vw, 1.9rem); color: #8B9CAF; margin: 0 0 1rem; line-height: 1.35;"
+      class="font-vollkorn text-slate"
+      style="font-weight: 700; font-size: clamp(1.4rem, 3vw, 1.9rem); margin: 0 0 1rem; line-height: 1.35;"
     >
       AI writes the code.
     </h2>
 
     <p
-      style="font-family: 'Vollkorn SC', serif; font-weight: 700; font-size: clamp(1.3rem, 3vw, 1.8rem); color: #C49A2B; margin: 0 0 1.5rem; line-height: 1.3;"
+      class="font-vollkorn-sc text-gold"
+      style="font-weight: 700; font-size: clamp(1.3rem, 3vw, 1.8rem); margin: 0 0 1.5rem; line-height: 1.3;"
     >
       You hold the helm.
     </p>
 
     <p
-      style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: #F5F0E8; margin: 0 0 2rem; line-height: 1.6;"
+      class="font-mono text-cream"
+      style="font-size: 0.82rem; margin: 0 0 2rem; line-height: 1.6;"
     >
-      Early adopters get their <span style="color: #C49A2B; font-weight: 600;">first month free</span> on the Solo plan.
+      Early adopters get their <span class="text-gold" style="font-weight: 600;">first month free</span> on the Solo plan.
     </p>
 
     <div class="newsletter-form-container">
@@ -34,20 +37,20 @@ import WheelMark from './WheelMark.astro';
         style="display: flex; gap: 0.75rem; max-width: 480px; margin: 0 auto 1rem;"
       >
         <input
-          class="newsletter-form-input"
+          class="newsletter-form-input font-mono text-cream"
           type="email"
           name="newsletter-form-input"
           placeholder="your@email.com"
           required
           autocomplete="email"
-          style="flex: 1; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; background: rgba(29, 53, 87, 0.5); border: 1px solid rgba(196, 154, 43, 0.25); border-radius: 4px; color: #F5F0E8; padding: 0.8rem 1rem; outline: none; min-width: 0;"
+          style="flex: 1; font-size: 0.85rem; background: rgba(29, 53, 87, 0.5); border: 1px solid rgba(196, 154, 43, 0.25); border-radius: 4px; padding: 0.8rem 1rem; outline: none; min-width: 0;"
           onfocus="this.style.borderColor='rgba(196,154,43,0.6)'"
           onblur="this.style.borderColor='rgba(196,154,43,0.25)'"
         />
         <button
           type="submit"
-          class="newsletter-form-button"
-          style="font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.85rem; background: #C49A2B; color: #0B1A2E; border: none; border-radius: 4px; padding: 0.8rem 1.4rem; cursor: pointer; white-space: nowrap; transition: background 0.2s;"
+          class="newsletter-form-button font-mono bg-gold text-navy-deep"
+          style="font-weight: 600; font-size: 0.85rem; border: none; border-radius: 4px; padding: 0.8rem 1.4rem; cursor: pointer; white-space: nowrap; transition: background 0.2s;"
           onmouseover="this.style.background='#D4AA3C'"
           onmouseout="this.style.background='#C49A2B'"
         >
@@ -55,29 +58,29 @@ import WheelMark from './WheelMark.astro';
         </button>
         <button
           type="button"
-          class="newsletter-loading-button"
-          style="display: none; font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.85rem; background: #C49A2B; color: #0B1A2E; border: none; border-radius: 4px; padding: 0.8rem 1.4rem; white-space: nowrap; opacity: 0.7; cursor: not-allowed;"
+          class="newsletter-loading-button font-mono bg-gold text-navy-deep"
+          style="display: none; font-weight: 600; font-size: 0.85rem; border: none; border-radius: 4px; padding: 0.8rem 1.4rem; white-space: nowrap; opacity: 0.7; cursor: not-allowed;"
         >
           Sending…
         </button>
       </form>
 
       <div class="newsletter-success" style="display: none; justify-content: center; align-items: center; padding: 0.8rem; margin-bottom: 1rem;">
-        <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: #C49A2B; margin: 0;">
+        <p class="font-mono text-gold" style="font-size: 0.82rem; margin: 0;">
           &#10003; You're on the list. We'll be in touch when the beta opens.
         </p>
       </div>
 
       <div class="newsletter-error" style="display: none; justify-content: center; align-items: center; padding: 0.8rem; margin-bottom: 1rem;">
-        <p class="newsletter-error-message" style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: #c0392b; margin: 0;">
+        <p class="newsletter-error-message font-mono" style="font-size: 0.82rem; color: #c0392b; margin: 0;">
           Oops! Something went wrong, please try again
         </p>
       </div>
 
       <button
-        class="newsletter-back-button"
+        class="newsletter-back-button font-mono text-slate"
         type="button"
-        style="display: none; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #8B9CAF; background: transparent; border: none; cursor: pointer; margin: 0.5rem auto;"
+        style="display: none; font-size: 0.75rem; background: transparent; border: none; cursor: pointer; margin: 0.5rem auto;"
         onmouseover="this.style.textDecoration='underline'"
         onmouseout="this.style.textDecoration='none'"
       >
@@ -86,7 +89,8 @@ import WheelMark from './WheelMark.astro';
     </div>
 
     <p
-      style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: rgba(139,156,175,0.6); margin: 0;"
+      class="font-mono"
+      style="font-size: 0.72rem; color: rgba(139,156,175,0.6); margin: 0;"
     >
       Limited spots — no spam, just your invite when the beta opens.
     </p>

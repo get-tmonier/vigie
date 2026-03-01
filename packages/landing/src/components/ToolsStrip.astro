@@ -2,19 +2,19 @@
 const availableTools = ['Claude Code'];
 ---
 
-<section style="background: #0B1A2E; padding: 1.25rem 2.5rem; border-top: 1px solid rgba(196,154,43,0.08); border-bottom: 1px solid rgba(196,154,43,0.08);">
+<section class="bg-navy-deep" style="padding: 1.25rem 2.5rem; border-top: 1px solid rgba(196,154,43,0.08); border-bottom: 1px solid rgba(196,154,43,0.08);">
   <div style="max-width: 1200px; margin: 0 auto;">
     <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-      <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; letter-spacing: 3px; color: rgba(139,156,175,0.45); text-transform: uppercase; white-space: nowrap; flex-shrink: 0; margin: 0; min-width: 6rem;">
+      <p class="font-mono" style="font-size: 0.68rem; letter-spacing: 3px; color: rgba(139,156,175,0.45); text-transform: uppercase; white-space: nowrap; flex-shrink: 0; margin: 0; min-width: 6rem;">
         Your AI
       </p>
       <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;">
         {availableTools.map((t) => (
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 500; color: rgba(245,240,232,0.85); background: rgba(196,154,43,0.1); border: 1px solid rgba(196,154,43,0.25); border-radius: 4px; padding: 0.3rem 0.7rem; white-space: nowrap;">
+          <span class="font-mono" style="font-size: 0.72rem; font-weight: 500; color: rgba(245,240,232,0.85); background: rgba(196,154,43,0.1); border: 1px solid rgba(196,154,43,0.25); border-radius: 4px; padding: 0.3rem 0.7rem; white-space: nowrap;">
             {t}
           </span>
         ))}
-        <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: rgba(139,156,175,0.4); padding-left: 0.25rem;">
+        <span class="font-mono" style="font-size: 0.65rem; color: rgba(139,156,175,0.4); padding-left: 0.25rem;">
           Coming soon: OpenCode <span style="color: rgba(196,154,43,0.5);">&#9679;</span> supports Copilot license since Jan 2026 <span style="padding-left: 0.5rem; color: rgba(139,156,175,0.3);">|</span><span style="padding-left: 0.5rem;">Codex, Aider, Cline & more</span>
         </span>
       </div>

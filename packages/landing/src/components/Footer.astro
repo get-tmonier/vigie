@@ -1,9 +1,10 @@
 ---
-import WheelMark from './WheelMark.astro';
+import WheelMark from '#components/WheelMark.astro';
 ---
 
 <footer
-  style="background: #0B1A2E; border-top: 1px solid rgba(139, 156, 175, 0.1); padding: 1.5rem 2.5rem;"
+  class="bg-navy-deep"
+  style="border-top: 1px solid rgba(139, 156, 175, 0.1); padding: 1.5rem 2.5rem;"
 >
   <div
     style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: nowrap; gap: 0.75rem;"
@@ -11,11 +12,12 @@ import WheelMark from './WheelMark.astro';
     <!-- Left: logo + copyright -->
     <div class="footer-left" style="display: flex; align-items: center; gap: 0.6rem; white-space: nowrap;">
       <WheelMark size={16} />
-      <span style="font-family: 'Vollkorn SC', serif; font-weight: 700; font-size: 0.85rem; color: #C49A2B; line-height: 1;"
+      <span class="font-vollkorn-sc text-gold" style="font-weight: 700; font-size: 0.85rem; line-height: 1;"
         >Tmonier</span
       >
       <span
-        style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #8B9CAF; margin-left: 0.3rem; line-height: 1;"
+        class="font-mono text-slate"
+        style="font-size: 0.72rem; margin-left: 0.3rem; line-height: 1;"
         >© 2026</span
       >
     </div>
@@ -24,7 +26,8 @@ import WheelMark from './WheelMark.astro';
     <div style="display: flex; gap: 1.5rem; align-items: center;">
       <a
         href="/faq"
-        style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #8B9CAF; text-decoration: none;"
+        class="font-mono text-slate"
+        style="font-size: 0.75rem; text-decoration: none;"
         onmouseover="this.style.color='#C49A2B'"
         onmouseout="this.style.color='#8B9CAF'"
       >
@@ -32,7 +35,8 @@ import WheelMark from './WheelMark.astro';
       </a>
       <a
         href="/contact"
-        style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #8B9CAF; text-decoration: none;"
+        class="font-mono text-slate"
+        style="font-size: 0.75rem; text-decoration: none;"
         onmouseover="this.style.color='#C49A2B'"
         onmouseout="this.style.color='#8B9CAF'"
       >
@@ -41,7 +45,7 @@ import WheelMark from './WheelMark.astro';
     </div>
 
     <!-- Right: made in -->
-    <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #8B9CAF; white-space: nowrap;"
+    <span class="font-mono text-slate" style="font-size: 0.72rem; white-space: nowrap;"
       >Made in 🇧🇪</span
     >
   </div>

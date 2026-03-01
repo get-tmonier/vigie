@@ -1,5 +1,5 @@
 ---
-import WheelMark from './WheelMark.astro';
+import WheelMark from '#components/WheelMark.astro';
 const plans = [
   {
     name: 'Free',
@@ -75,11 +75,12 @@ const plans = [
 ];
 ---
 
-<section id="pricing" class="pricing-section" style="background: #F5F0E8; padding: 5rem 2.5rem;">
+<section id="pricing" class="pricing-section bg-cream" style="padding: 5rem 2.5rem;">
   <div style="max-width: 1400px; margin: 0 auto;">
     <div style="display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
       <h2
-        style="font-family: 'Vollkorn', serif; font-weight: 700; font-size: clamp(1.6rem, 3vw, 2.2rem); color: #0B1A2E; margin: 0;"
+        class="font-vollkorn text-navy-deep"
+        style="font-weight: 700; font-size: clamp(1.6rem, 3vw, 2.2rem); margin: 0;"
       >
         Simple pricing
       </h2>
@@ -92,12 +93,14 @@ const plans = [
         <button
           id="btn-eur"
           data-currency="eur"
-          style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 16px; border: none; cursor: pointer; background: #0B1A2E; color: #F5F0E8; transition: all 0.15s;"
+          class="font-mono bg-navy-deep text-cream"
+          style="font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 16px; border: none; cursor: pointer; transition: all 0.15s;"
         >€ EUR</button>
         <button
           id="btn-usd"
           data-currency="usd"
-          style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 16px; border: none; cursor: pointer; background: transparent; color: #8B9CAF; transition: all 0.15s;"
+          class="font-mono text-slate"
+          style="font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.65rem; border-radius: 16px; border: none; cursor: pointer; background: transparent; transition: all 0.15s;"
         >$ USD</button>
       </div>
     </div>
@@ -107,11 +110,11 @@ const plans = [
       style="background: #0B1A2E; border-radius: 8px; padding: 1.25rem 1.75rem; margin-bottom: 3rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;"
     >
       <div>
-        <p style="font-family: 'Vollkorn', serif; font-weight: 700; font-size: 1.05rem; color: #F5F0E8; margin: 0 0 0.25rem; line-height: 1.3; display: flex; align-items: center; gap: 0.6rem;">
+        <p class="font-vollkorn text-cream" style="font-weight: 700; font-size: 1.05rem; margin: 0 0 0.25rem; line-height: 1.3; display: flex; align-items: center; gap: 0.6rem;">
           <WheelMark size={20} />
           No AI token markup — ever.
         </p>
-        <p style="font-family: 'Source Serif 4', serif; font-size: 0.9rem; color: #8B9CAF; margin: 0; line-height: 1.6;">
+        <p class="font-source-serif text-slate" style="font-size: 0.9rem; margin: 0; line-height: 1.6;">
           Your AI subscription. Your machine. Zero middlemen.
         </p>
       </div>
@@ -141,22 +144,24 @@ const plans = [
 
             <div style="margin-bottom: 1.5rem;">
               <h3
-                style="font-family: 'Vollkorn SC', serif; font-weight: 700; font-size: 1rem; color: #0B1A2E; margin: 0 0 0.75rem; letter-spacing: 0.05em;"
+                class="font-vollkorn-sc text-navy-deep"
+                style="font-weight: 700; font-size: 1rem; margin: 0 0 0.75rem; letter-spacing: 0.05em;"
               >
                 {plan.name}
               </h3>
               <div style="display: flex; align-items: baseline; gap: 0.3rem; margin-bottom: 0.6rem;">
                 <span
-                  class="price-display"
+                  class="price-display font-vollkorn text-navy-deep"
                   data-eur={plan.priceEur ?? plan.price}
                   data-usd={plan.priceUsd ?? plan.price}
-                  style="font-family: 'Vollkorn', serif; font-weight: 700; font-size: 2rem; color: #0B1A2E;"
+                  style="font-weight: 700; font-size: 2rem;"
                 >
                   {plan.price}
                 </span>
                 {plan.priceNote && (
                   <span
-                    style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #8B9CAF;"
+                    class="font-mono text-slate"
+                    style="font-size: 0.75rem;"
                   >
                     {plan.priceNote}
                   </span>
@@ -167,7 +172,7 @@ const plans = [
                   excl. VAT
                 </p>
               )}
-              <p style="font-family: 'Source Serif 4', serif; font-size: 0.85rem; color: #8B9CAF; margin: 0; line-height: 1.5;">
+              <p class="font-source-serif text-slate" style="font-size: 0.85rem; margin: 0; line-height: 1.5;">
                 {plan.tagline}
               </p>
             </div>
