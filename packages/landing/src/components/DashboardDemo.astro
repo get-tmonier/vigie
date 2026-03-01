@@ -339,7 +339,7 @@
             const lineStyle = "font-family:'JetBrains Mono',monospace;font-size:0.62rem;line-height:1.8;color:rgba(139,156,175,0.55);display:flex;gap:0.5rem;align-items:baseline";
 
             let elapsed = 300;
-            logs.forEach((log, i) => {
+            logs.forEach((log) => {
               elapsed += log.delay;
               const t = elapsed;
               setTimeout(() => {

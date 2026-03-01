@@ -1,5 +1,23 @@
 {
   "name": "@tmonier/api",
   "version": "0.0.1",
-  "private": true
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "start": "bun dist/index.js",
+    "lint": "biome lint ./src",
+    "check": "biome check ./src",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tmonier/shared": "workspace:*",
+    "effect": "4.0.0-beta.21",
+    "hono": "4.12.3"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
 }

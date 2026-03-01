@@ -41,7 +41,6 @@ const fonts = [
 const GOLD = '#C49A2B';
 const NAVY = '#0B1A2E';
 const CREAM = '#F5F0E8';
-const MUTED = '#8B9CAF';
 
 // Load mascot as base64 data URI
 const mascotPath = new URL('../src/assets/helmsman.png', import.meta.url);

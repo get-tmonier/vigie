@@ -3,7 +3,8 @@
 Monorepo for [tmonier.com](https://tmonier.com) — a local-first SWE companion.
 
 ## Stack
-- **Turborepo** monorepo with **pnpm** workspaces
+- **Turborepo** monorepo with **Bun** workspaces
+- **Bun** as runtime and package manager
 - **Biome** for lint/format (no ESLint, no Prettier) — config at root `biome.json`
 - **TypeScript strict** across all packages
 
@@ -18,12 +19,12 @@ Monorepo for [tmonier.com](https://tmonier.com) — a local-first SWE companion.
 
 ## Commands
 ```bash
-pnpm install           # install all dependencies
-turbo build            # build all packages
-turbo dev              # dev servers (all packages)
-turbo check            # biome check all packages
-turbo build --filter=@tmonier/landing   # build only landing
-pnpm --filter @tmonier/landing dev      # dev server for landing only
+bun install            # install all dependencies
+bun turbo build        # build all packages
+bun turbo dev          # dev servers (all packages)
+bun turbo check        # biome check all packages
+bun turbo build --filter=@tmonier/landing   # build only landing
+bun --filter @tmonier/landing dev           # dev server for landing only
 ```
 
 ## Key conventions

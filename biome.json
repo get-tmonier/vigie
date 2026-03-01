@@ -29,7 +29,7 @@
     }
   },
   "files": {
-    "includes": ["**", "!node_modules", "!dist", "!.astro", "!.turbo"]
+    "includes": ["**", "!node_modules", "!dist", "!.astro", "!.turbo", "!**/routeTree.gen.ts", "!.output"]
   },
   "overrides": [
     {
