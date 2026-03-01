@@ -8,6 +8,9 @@
     "build": "vite build",
     "start": "bun .output/server/index.mjs",
     "lint": "biome lint ./src",
+    "lint:fix": "biome check --write ./src",
+    "format": "biome format --write ./src",
+    "format:fix": "biome format --write ./src",
     "check": "biome check ./src",
     "typecheck": "tsc --noEmit"
   },
