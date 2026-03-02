@@ -6,8 +6,22 @@ import { listDaemons } from '../list-daemons.query';
 describe('listDaemons', () => {
   it('returns list from read repository', async () => {
     const mockSessions = [
-      { id: '1', hostname: 'host1', pid: 1, version: '0.1.0', connectedAt: Date.now() },
-      { id: '2', hostname: 'host2', pid: 2, version: '0.1.0', connectedAt: Date.now() },
+      {
+        id: '1',
+        userId: 'u1',
+        hostname: 'host1',
+        pid: 1,
+        version: '0.1.0',
+        connectedAt: Date.now(),
+      },
+      {
+        id: '2',
+        userId: 'u1',
+        hostname: 'host2',
+        pid: 2,
+        version: '0.1.0',
+        connectedAt: Date.now(),
+      },
     ];
 
     const testLayer = Layer.succeed(DaemonReadRepository, {

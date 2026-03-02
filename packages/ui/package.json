@@ -34,6 +34,8 @@
     "@fontsource/vollkorn-sc": "5.2.8",
     "@tanstack/react-router": "1.163.3",
     "@tanstack/react-start": "1.164.0",
+    "@better-auth/api-key": "1.5.1",
+    "better-auth": "1.5.1",
     "@tmonier/shared": "workspace:*",
     "@tmonier/tokens": "workspace:*",
     "react": "19.2.4",

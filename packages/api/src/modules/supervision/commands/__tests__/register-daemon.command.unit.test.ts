@@ -38,12 +38,13 @@ describe('registerDaemon', () => {
     const mockWs = {} as WebSocket;
 
     const session = await Effect.runPromise(
-      Effect.provide(registerDaemon(hello, mockWs), testLayers)
+      Effect.provide(registerDaemon(hello, mockWs, 'user-1'), testLayers)
     );
 
     expect(registered).toBe(true);
     expect(session.hostname).toBe('test-host');
     expect(session.pid).toBe(42);
+    expect(session.userId).toBe('user-1');
     expect(published).toHaveLength(1);
     expect(published[0].type).toBe('daemon:connected');
   });

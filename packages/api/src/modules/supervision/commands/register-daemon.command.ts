@@ -4,11 +4,11 @@ import { createDaemonSession } from '../domain/daemon-session';
 import { DaemonWriteRepository } from '../ports/daemon-write-repository.port';
 import { EventPublisher } from '../ports/event-publisher.port';
 
-export const registerDaemon = (hello: DaemonHello, ws: WebSocket) =>
+export const registerDaemon = (hello: DaemonHello, ws: WebSocket, userId: string) =>
   Effect.gen(function* () {
     const repo = yield* Effect.service(DaemonWriteRepository);
     const publisher = yield* Effect.service(EventPublisher);
-    const session = createDaemonSession(hello);
+    const session = createDaemonSession(hello, userId);
     yield* repo.register(session, ws);
     yield* publisher.publish(session.id, {
       type: 'daemon:connected',

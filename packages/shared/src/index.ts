@@ -1,5 +1,14 @@
+export { authContract } from './contracts/auth';
 export { daemonContract } from './contracts/daemon';
 export { healthContract } from './contracts/index';
+export {
+  type ApiKeyCreatedResponse,
+  ApiKeyCreatedResponseSchema,
+  type ApiKeyCreateRequest,
+  ApiKeyCreateRequestSchema,
+  type ApiKeyResponse,
+  ApiKeyResponseSchema,
+} from './schemas/auth';
 export {
   type CommandDone,
   CommandDoneSchema,
