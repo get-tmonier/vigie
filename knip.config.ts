@@ -5,6 +5,7 @@ export default {
     ".": {},
     "packages/api": {
       project: ["src/**/*.ts"],
+      ignoreBinaries: ["dist/index.js"],
     },
     "packages/ui": {
       entry: ["src/routes/**/*.tsx", "src/router.tsx"],
