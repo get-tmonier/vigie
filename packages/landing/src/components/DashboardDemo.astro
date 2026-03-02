@@ -113,7 +113,7 @@
           </div>
 
           <!-- Main area -->
-          <div class="flex-1 p-5 bg-navy-deep/40 min-w-0 relative min-h-[420px]">
+          <div class="flex-1 p-5 bg-navy-deep/40 min-w-0 relative">
             <!-- Header row -->
             <div class="flex items-center justify-between mb-4 gap-2">
               <span class="text-[0.7rem] text-cream font-semibold">Rate-limit /api/users</span>
@@ -153,8 +153,9 @@
             </div>
 
             <!-- Action panel — appears after loop detection -->
+            <div class="action-panel-wrapper grid grid-rows-[0fr] [transition:grid-template-rows_0.6s_cubic-bezier(0.22,1,0.36,1)]">
             <div
-              class="action-panel opacity-0 translate-y-2 bg-navy-mid/40 border border-gold/30 rounded-lg p-3 max-md:p-[0.6rem]"
+              class="action-panel opacity-0 translate-y-2 overflow-hidden min-h-0 bg-navy-mid/40 border border-gold/30 rounded-lg p-3 max-md:p-[0.6rem]"
             >
               <!-- Panel header -->
               <div class="flex items-center justify-between mb-[0.6rem]">
@@ -196,6 +197,7 @@
                   Stop agent
                 </div>
               </div>
+            </div>
             </div>
           </div>
         </div>
@@ -309,8 +311,16 @@
             }, loopDetectedTime);
 
             // --- Action panel slides in after loop detected ---
+            const panelWrapper = section.querySelector<HTMLElement>('.action-panel-wrapper');
             const panel = section.querySelector<HTMLElement>('.action-panel');
+            if (panelWrapper) {
+              // Expand the grid wrapper first so space grows smoothly
+              setTimeout(() => {
+                panelWrapper.style.gridTemplateRows = '1fr';
+              }, loopDetectedTime + 300);
+            }
             if (panel) {
+              // Then fade in the panel content after the space has opened
               setTimeout(() => {
                 panel.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
                 panel.style.opacity = '1';
@@ -361,6 +371,11 @@
                 }, loopDetectedTime + 700 + i * 100);
               }
             });
+
+            // Signal that the full demo animation is complete
+            setTimeout(() => {
+              document.dispatchEvent(new CustomEvent('dashboard-demo-complete'));
+            }, loopDetectedTime + 1100);
 
             // --- Context window bar: synced with log progression ---
             const ctxBar = section.querySelector<HTMLElement>('.context-bar');

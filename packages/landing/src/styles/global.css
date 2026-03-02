@@ -83,3 +83,12 @@ body {
     opacity: 0.3;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  #below-demo-gate {
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    transition: none !important;
+  }
+}
