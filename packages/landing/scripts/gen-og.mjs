@@ -46,9 +46,9 @@ const NAVY = colors.navyDeep;
 const CREAM = colors.cream;
 
 // Load mascot as base64 data URI
-const mascotPath = new URL('../src/assets/helmsman.png', import.meta.url);
+const mascotPath = new URL('../src/assets/helmsman.jpg', import.meta.url);
 const mascotBase64 = readFileSync(mascotPath).toString('base64');
-const mascotDataUri = `data:image/png;base64,${mascotBase64}`;
+const mascotDataUri = `data:image/jpeg;base64,${mascotBase64}`;
 
 const svg = await satori(
   {
