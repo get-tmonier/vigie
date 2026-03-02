@@ -1,46 +1,49 @@
-import { describe, expect, it } from 'bun:test';
+import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
 import { Hono } from 'hono';
-import { createMiddleware } from 'hono/factory';
-import type { DaemonAuthEnv } from '../daemon-auth.middleware';
 
-function createMockDaemonAuthMiddleware(verifyResult: {
-  valid: boolean;
-  key?: { referenceId: string };
-}) {
-  return createMiddleware<DaemonAuthEnv>(async (c, next) => {
-    const token = c.req.query('token');
-    if (!token) {
-      return c.json({ error: 'Missing token query parameter' }, 401);
-    }
+const verifyApiKey = mock();
 
-    if (!verifyResult.valid || !verifyResult.key) {
-      return c.json({ error: 'Invalid API key' }, 401);
-    }
+mock.module('#modules/auth/auth-instance', () => ({
+  auth: {
+    api: {
+      verifyApiKey,
+    },
+  },
+}));
 
-    c.set('daemonUserId', verifyResult.key.referenceId);
-    await next();
-  });
+const { daemonAuthMiddleware } = await import('../daemon-auth.middleware');
+type DaemonAuthEnv = import('../daemon-auth.middleware').DaemonAuthEnv;
+
+function createApp() {
+  const app = new Hono<DaemonAuthEnv>();
+  app.use('*', daemonAuthMiddleware);
+  app.get('/ws/daemon', (c) => c.json({ userId: c.get('daemonUserId') }));
+  return app;
 }
 
 describe('daemonAuthMiddleware', () => {
-  it('returns 401 when token query param is missing', async () => {
-    const middleware = createMockDaemonAuthMiddleware({ valid: false });
-    const app = new Hono<DaemonAuthEnv>();
-    app.use('*', middleware);
-    app.get('/ws/daemon', (c) => c.text('ok'));
+  let consoleErrorSpy: ReturnType<typeof spyOn>;
 
+  beforeEach(() => {
+    consoleErrorSpy = spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    verifyApiKey.mockReset();
+    consoleErrorSpy.mockRestore();
+  });
+
+  it('returns 401 when token query param is missing', async () => {
+    const app = createApp();
     const res = await app.request('/ws/daemon');
     expect(res.status).toBe(401);
     const body = await res.json();
     expect(body.error).toBe('Missing token query parameter');
   });
 
-  it('returns 401 when token is invalid', async () => {
-    const middleware = createMockDaemonAuthMiddleware({ valid: false });
-    const app = new Hono<DaemonAuthEnv>();
-    app.use('*', middleware);
-    app.get('/ws/daemon', (c) => c.text('ok'));
-
+  it('returns 401 when API key is invalid', async () => {
+    verifyApiKey.mockResolvedValue({ valid: false });
+    const app = createApp();
     const res = await app.request('/ws/daemon?token=bad_token');
     expect(res.status).toBe(401);
     const body = await res.json();
@@ -48,19 +51,23 @@ describe('daemonAuthMiddleware', () => {
   });
 
   it('sets daemonUserId and passes through when token is valid', async () => {
-    const middleware = createMockDaemonAuthMiddleware({
+    verifyApiKey.mockResolvedValue({
       valid: true,
       key: { referenceId: 'user-123' },
     });
-    const app = new Hono<DaemonAuthEnv>();
-    app.use('*', middleware);
-    app.get('/ws/daemon', (c) => {
-      return c.json({ userId: c.get('daemonUserId') });
-    });
-
+    const app = createApp();
     const res = await app.request('/ws/daemon?token=tmonier_validkey');
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.userId).toBe('user-123');
+  });
+
+  it('returns 401 when verifyApiKey throws', async () => {
+    verifyApiKey.mockRejectedValue(new Error('DB connection failed'));
+    const app = createApp();
+    const res = await app.request('/ws/daemon?token=tmonier_somekey');
+    expect(res.status).toBe(401);
+    const body = await res.json();
+    expect(body.error).toBe('Authentication failed');
   });
 });

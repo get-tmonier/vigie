@@ -1,19 +1,11 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import * as v from 'valibot';
 import { signIn, useSession } from '#shared/api/auth-client';
+import { isSafeRedirect } from '#shared/lib/is-safe-redirect';
 
 const LoginSearchSchema = v.object({
   callbackURL: v.optional(v.string()),
 });
-
-function isSafeRedirect(url: string): boolean {
-  try {
-    const parsed = new URL(url, window.location.origin);
-    return parsed.origin === window.location.origin || parsed.hostname === '127.0.0.1';
-  } catch {
-    return false;
-  }
-}
 
 export const Route = createFileRoute('/login')({
   validateSearch: (search) => v.parse(LoginSearchSchema, search),
