@@ -1,6 +1,11 @@
 ---
 import '#styles/global.css';
 
+import jbMono400 from '@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2?url';
+import sourceSerif400 from '@fontsource/source-serif-4/files/source-serif-4-latin-400-normal.woff2?url';
+import vollkornSc700 from '@fontsource/vollkorn-sc/files/vollkorn-sc-latin-700-normal.woff2?url';
+import vollkornSc900 from '@fontsource/vollkorn-sc/files/vollkorn-sc-latin-900-normal.woff2?url';
+
 interface Props {
   title?: string;
   description?: string;
@@ -49,6 +54,12 @@ const websiteJsonLd = {
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Preload critical above-the-fold fonts -->
+    <link rel="preload" href={vollkornSc900} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={vollkornSc700} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={jbMono400} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={sourceSerif400} as="font" type="font/woff2" crossorigin />
 
     <!-- DNS prefetch for external APIs -->
     <link rel="dns-prefetch" href="https://app.loops.so" />

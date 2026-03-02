@@ -10,6 +10,9 @@ export default defineConfig({
   output: 'static',
   prefetch: false,
   integrations: [sitemap()],
+  build: {
+    inlineStylesheets: 'always',
+  },
 
   vite: {
     plugins: [tailwindcss()],
