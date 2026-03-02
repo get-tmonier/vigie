@@ -41,13 +41,6 @@
             "noUnusedVariables": "off"
           }
         }
-      },
-      "assist": {
-        "actions": {
-          "source": {
-            "organizeImports": "off"
-          }
-        }
       }
     }
   ]

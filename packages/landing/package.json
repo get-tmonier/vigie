@@ -15,12 +15,12 @@
     "build": "bun scripts/gen-favicon.mjs && bun scripts/gen-og.mjs && astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "lint": "biome lint ./src",
-    "lint:fix": "biome check --write ./src",
-    "format": "biome format --write ./src",
-    "format:fix": "biome format --write ./src",
-    "check": "biome check ./src",
-    "check:fix": "biome check --write ./src",
+    "lint": "biome lint .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "format:fix": "biome format --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
     "typecheck": "astro check"
   },
   "dependencies": {

@@ -6,9 +6,7 @@ import { Resvg } from '@resvg/resvg-js';
 const svg = readFileSync(new URL('../public/favicon.svg', import.meta.url), 'utf-8');
 
 function renderPng(size) {
-  return Buffer.from(
-    new Resvg(svg, { fitTo: { mode: 'width', value: size } }).render().asPng(),
-  );
+  return Buffer.from(new Resvg(svg, { fitTo: { mode: 'width', value: size } }).render().asPng());
 }
 
 function buildIco(images) {
@@ -21,12 +19,12 @@ function buildIco(images) {
     const entry = Buffer.alloc(16);
     entry.writeUInt8(size >= 256 ? 0 : size, 0); // width  (0 = 256)
     entry.writeUInt8(size >= 256 ? 0 : size, 1); // height (0 = 256)
-    entry.writeUInt8(0, 2);                       // color count
-    entry.writeUInt8(0, 3);                       // reserved
-    entry.writeUInt16LE(1, 4);                    // planes
-    entry.writeUInt16LE(32, 6);                   // bit depth
-    entry.writeUInt32LE(data.length, 8);          // image size
-    entry.writeUInt32LE(offset, 12);              // image offset
+    entry.writeUInt8(0, 2); // color count
+    entry.writeUInt8(0, 3); // reserved
+    entry.writeUInt16LE(1, 4); // planes
+    entry.writeUInt16LE(32, 6); // bit depth
+    entry.writeUInt32LE(data.length, 8); // image size
+    entry.writeUInt32LE(offset, 12); // image offset
     offset += data.length;
     return entry;
   });
