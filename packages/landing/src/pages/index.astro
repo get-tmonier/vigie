@@ -1,17 +1,17 @@
 ---
-import Base from '#layouts/Base.astro';
-import Nav from '#components/Nav.astro';
-import Hero from '#components/Hero.astro';
 import DashboardDemo from '#components/DashboardDemo.astro';
-import ToolsStrip from '#components/ToolsStrip.astro';
-import Pricing from '#components/Pricing.astro';
-import Waitlist from '#components/Waitlist.astro';
 import Footer from '#components/Footer.astro';
+import Hero from '#components/Hero.astro';
+import Nav from '#components/Nav.astro';
+import Pricing from '#components/Pricing.astro';
+import ToolsStrip from '#components/ToolsStrip.astro';
+import Waitlist from '#components/Waitlist.astro';
+import Base from '#layouts/Base.astro';
 ---
 
 <Base>
   <Nav />
-  <main>
+  <main id="main">
     <Hero />
     <section id="how-it-works" class="bg-navy-deep pt-12 px-10 pb-4 text-center">
       <div class="max-w-[720px] mx-auto">
@@ -35,7 +35,7 @@ import Footer from '#components/Footer.astro';
     </section>
     <DashboardDemo />
 
-    <div id="below-demo-gate" class="opacity-0 translate-y-8 pointer-events-none [transition:opacity_0.8s_ease-out,transform_0.8s_cubic-bezier(0.16,1,0.3,1)]">
+    <div id="below-demo-gate">
       <!-- What Tmonier caught -->
       <section class="bg-navy-deep py-8 px-10">
         <div class="max-w-[900px] mx-auto">
@@ -141,9 +141,9 @@ import Footer from '#components/Footer.astro';
 <noscript>
   <style>
     #below-demo-gate {
-      opacity: 1 !important;
-      transform: none !important;
-      pointer-events: auto !important;
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
     }
   </style>
 </noscript>
@@ -155,7 +155,9 @@ import Footer from '#components/Footer.astro';
   function revealGate() {
     if (revealed || !gate) return;
     revealed = true;
-    gate.classList.remove('opacity-0', 'translate-y-8', 'pointer-events-none');
+    gate.style.opacity = '1';
+    gate.style.transform = 'none';
+    gate.style.pointerEvents = 'auto';
     gate.dataset.revealed = '1';
 
     // Defer reveal-card observers until gate is open so IntersectionObserver fires at correct positions

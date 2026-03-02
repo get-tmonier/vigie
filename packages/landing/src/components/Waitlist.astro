@@ -32,13 +32,16 @@ import WheelMark from '#components/WheelMark.astro';
         action="https://app.loops.so/api/newsletter-form/cmm61m1au0ws70i1mpmh6f87r"
         method="POST"
       >
+        <label for="waitlist-email" class="sr-only">Email address</label>
         <input
+          id="waitlist-email"
           class="newsletter-form-input font-mono text-cream flex-1 text-[0.85rem] bg-navy-mid/50 border border-gold/25 rounded-[4px] py-[0.8rem] px-4 outline-none min-w-0 transition-colors duration-200 focus:border-gold/60"
           type="email"
           name="newsletter-form-input"
           placeholder="your@email.com"
           required
           autocomplete="email"
+          aria-describedby="waitlist-error-msg"
         />
         <button
           type="submit"
@@ -54,14 +57,14 @@ import WheelMark from '#components/WheelMark.astro';
         </button>
       </form>
 
-      <div class="newsletter-success hidden justify-center items-center p-[0.8rem] mb-4">
+      <div class="newsletter-success hidden justify-center items-center p-[0.8rem] mb-4" aria-live="polite">
         <p class="font-mono text-gold text-[0.82rem] m-0">
           &#10003; You're on the list. We'll be in touch when the beta opens.
         </p>
       </div>
 
-      <div class="newsletter-error hidden justify-center items-center p-[0.8rem] mb-4">
-        <p class="newsletter-error-message font-mono text-[0.82rem] text-[#c0392b] m-0">
+      <div class="newsletter-error hidden justify-center items-center p-[0.8rem] mb-4" aria-live="polite">
+        <p id="waitlist-error-msg" class="newsletter-error-message font-mono text-[0.82rem] text-[#c0392b] m-0">
           Oops! Something went wrong, please try again
         </p>
       </div>

@@ -2,8 +2,8 @@
 // Run via: node scripts/gen-og.mjs  (or automatically as part of `pnpm build`)
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
+import satori from 'satori';
 
 const require = createRequire(import.meta.url);
 
@@ -38,9 +38,12 @@ const fonts = [
   },
 ];
 
-const GOLD = '#C49A2B';
-const NAVY = '#0B1A2E';
-const CREAM = '#F5F0E8';
+// Import color tokens to stay in sync with design system
+import { colors } from '@tmonier/tokens';
+
+const GOLD = colors.gold;
+const NAVY = colors.navyDeep;
+const CREAM = colors.cream;
 
 // Load mascot as base64 data URI
 const mascotPath = new URL('../src/assets/helmsman.png', import.meta.url);
@@ -77,7 +80,12 @@ const svg = await satori(
               {
                 type: 'div',
                 props: {
-                  style: { display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '36px' },
+                  style: {
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                    marginBottom: '36px',
+                  },
                   children: [
                     {
                       type: 'span',
@@ -135,7 +143,12 @@ const svg = await satori(
                 type: 'div',
                 props: {
                   style: { display: 'flex', gap: '12px', flexWrap: 'wrap', marginBottom: '32px' },
-                  children: ['Real-time monitoring', 'Human-in-the-loop', 'Local-first', 'Zero markup'].map((label) => ({
+                  children: [
+                    'Real-time monitoring',
+                    'Human-in-the-loop',
+                    'Local-first',
+                    'Zero markup',
+                  ].map((label) => ({
                     type: 'span',
                     props: {
                       style: {
@@ -222,7 +235,7 @@ const svg = await satori(
     width: 1200,
     height: 630,
     fonts,
-  },
+  }
 );
 
 const png = new Resvg(svg, { fitTo: { mode: 'width', value: 1200 } }).render().asPng();

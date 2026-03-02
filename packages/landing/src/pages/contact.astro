@@ -1,7 +1,7 @@
 ---
-import Base from '#layouts/Base.astro';
-import Nav from '#components/Nav.astro';
 import Footer from '#components/Footer.astro';
+import Nav from '#components/Nav.astro';
+import Base from '#layouts/Base.astro';
 ---
 
 <Base
@@ -9,11 +9,11 @@ import Footer from '#components/Footer.astro';
   description="Get in touch with the Tmonier team. We'd love to hear from you."
 >
   <Nav currentPage="contact" />
-  <main>
+  <main id="main">
     <!-- Mini hero -->
     <section class="bg-navy-deep pt-20 px-10 pb-12 text-center max-md:pt-12 max-md:px-5 max-md:pb-8">
       <div class="max-w-[720px] mx-auto">
-        <p class="font-mono text-[0.75rem] tracking-[0.15em] uppercase text-gold/60 m-0 mb-4">
+        <p class="font-mono text-[0.75rem] tracking-[0.15em] uppercase text-gold/80 m-0 mb-4">
           Get in touch
         </p>
         <h1 class="font-vollkorn-sc text-gold font-black text-[clamp(2rem,4.5vw,3rem)] m-0 mb-5 leading-[1.15]">
@@ -38,7 +38,7 @@ import Footer from '#components/Footer.astro';
           <div class="field-group">
             <label
               for="contact-name"
-              class="font-mono text-[0.72rem] font-semibold tracking-[0.1em] uppercase text-gold/60 block mb-2"
+              class="font-mono text-[0.72rem] font-semibold tracking-[0.1em] uppercase text-gold/80 block mb-2"
             >
               Name
             </label>
@@ -49,14 +49,14 @@ import Footer from '#components/Footer.astro';
               required
               placeholder="Your name"
               autocomplete="name"
-              class="contact-input font-mono text-cream w-full text-sm bg-navy-mid/50 border border-gold/20 rounded-[4px] py-[0.85rem] px-4 outline-none box-border transition-colors duration-200 focus:border-gold/60 placeholder:text-slate/40"
+              class:list={["contact-input font-mono text-cream w-full text-sm bg-navy-mid/50 border border-gold/20 rounded-[4px] py-[0.85rem] px-4 outline-none box-border transition-colors duration-200 focus:border-gold/60 placeholder:text-slate/50"]}
             />
           </div>
 
           <div class="field-group">
             <label
               for="contact-email"
-              class="font-mono text-[0.72rem] font-semibold tracking-[0.1em] uppercase text-gold/60 block mb-2"
+              class="font-mono text-[0.72rem] font-semibold tracking-[0.1em] uppercase text-gold/80 block mb-2"
             >
               Email
             </label>
@@ -67,14 +67,14 @@ import Footer from '#components/Footer.astro';
               required
               placeholder="your@email.com"
               autocomplete="email"
-              class="contact-input font-mono text-cream w-full text-sm bg-navy-mid/50 border border-gold/20 rounded-[4px] py-[0.85rem] px-4 outline-none box-border transition-colors duration-200 focus:border-gold/60 placeholder:text-slate/40"
+              class:list={["contact-input font-mono text-cream w-full text-sm bg-navy-mid/50 border border-gold/20 rounded-[4px] py-[0.85rem] px-4 outline-none box-border transition-colors duration-200 focus:border-gold/60 placeholder:text-slate/50"]}
             />
           </div>
 
           <div class="field-group">
             <label
               for="contact-subject"
-              class="font-mono text-[0.72rem] font-semibold tracking-[0.1em] uppercase text-gold/60 block mb-2"
+              class="font-mono text-[0.72rem] font-semibold tracking-[0.1em] uppercase text-gold/80 block mb-2"
             >
               Subject
             </label>
@@ -96,7 +96,7 @@ import Footer from '#components/Footer.astro';
           <div class="field-group">
             <label
               for="contact-message"
-              class="font-mono text-[0.72rem] font-semibold tracking-[0.1em] uppercase text-gold/60 block mb-2"
+              class="font-mono text-[0.72rem] font-semibold tracking-[0.1em] uppercase text-gold/80 block mb-2"
             >
               Message
             </label>
@@ -105,8 +105,8 @@ import Footer from '#components/Footer.astro';
               name="message"
               required
               rows="6"
-              placeholder="Tell us what's on your mind…"
-              class="contact-input font-mono text-cream w-full text-sm bg-navy-mid/50 border border-gold/20 rounded-[4px] py-[0.85rem] px-4 outline-none box-border resize-y leading-[1.6] transition-colors duration-200 focus:border-gold/60 placeholder:text-slate/40"
+              placeholder="Tell us what's on your mind..."
+              class:list={["contact-input font-mono text-cream w-full text-sm bg-navy-mid/50 border border-gold/20 rounded-[4px] py-[0.85rem] px-4 outline-none box-border resize-y leading-[1.6] transition-colors duration-200 focus:border-gold/60 placeholder:text-slate/50"]}
             ></textarea>
           </div>
 
@@ -121,7 +121,7 @@ import Footer from '#components/Footer.astro';
         <p class="font-mono text-[0.72rem] text-slate/50 mt-8 leading-[1.6]">
           Or reach us directly at <a
             href="mailto:support@tmonier.com"
-            class="text-gold/60 no-underline hover:text-gold transition-colors duration-200"
+            class="text-gold/80 no-underline hover:text-gold transition-colors duration-200"
           >support@tmonier.com</a>
         </p>
       </div>

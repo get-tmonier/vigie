@@ -29,11 +29,6 @@
     "test": {},
     "test:unit": {},
     "test:integration": {},
-    "check-imports": {},
-    "//#knip": {},
-    "//#bump": {
-      "cache": false
-    },
-    "//#bump:check": {}
+    "check-imports": {}
   }
 }

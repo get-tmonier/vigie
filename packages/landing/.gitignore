@@ -23,12 +23,5 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 
-# wrangler local state
-.wrangler/
-
 # VSCode local history
 .history/
-
-.dev.vars*
-!.dev.vars.example
-!.env.example
