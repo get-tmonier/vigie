@@ -27,6 +27,13 @@
       "dependsOn": ["^build"]
     },
     "test": {},
-    "knip": {}
+    "test:unit": {},
+    "test:integration": {},
+    "check-imports": {},
+    "//#knip": {},
+    "//#bump": {
+      "cache": false
+    },
+    "//#bump:check": {}
   }
 }

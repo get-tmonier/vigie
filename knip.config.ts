@@ -5,7 +5,6 @@ export default {
     ".": {},
     "packages/api": {
       project: ["src/**/*.ts"],
-      ignoreDependencies: ["@tmonier/shared"],
       ignoreBinaries: ["dist/index.js"],
     },
     "packages/ui": {
@@ -17,7 +16,6 @@ export default {
         "@fontsource/source-serif-4",
         "@fontsource/vollkorn",
         "@fontsource/vollkorn-sc",
-        "@tmonier/shared",
         "@tmonier/tokens",
         "tailwindcss",
       ],
@@ -32,9 +30,6 @@ export default {
       ],
       project: ["src/**/*.{astro,ts,tsx}", "scripts/**/*.mjs"],
       ignoreDependencies: [
-        "wrangler",
-        "@astrojs/cloudflare",
-        "@cloudflare/workers-types",
         "@fontsource/jetbrains-mono",
         "@fontsource/source-serif-4",
         "@fontsource/vollkorn",
@@ -52,5 +47,6 @@ export default {
     },
   },
   ignore: [".ncurc.cjs"],
+  ignoreExportsUsedInFile: false,
   ignoreWorkspaces: [],
 } satisfies KnipConfig;

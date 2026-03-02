@@ -2,20 +2,20 @@
 const availableTools = ['Claude Code'];
 ---
 
-<section style="background: #0B1A2E; padding: 1.25rem 2.5rem; border-top: 1px solid rgba(196,154,43,0.08); border-bottom: 1px solid rgba(196,154,43,0.08);">
-  <div style="max-width: 1200px; margin: 0 auto;">
-    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-      <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; letter-spacing: 3px; color: rgba(139,156,175,0.45); text-transform: uppercase; white-space: nowrap; flex-shrink: 0; margin: 0; min-width: 6rem;">
+<section class="bg-navy-deep py-5 px-10 border-t border-b border-gold/8">
+  <div class="max-w-[1200px] mx-auto">
+    <div class="flex items-center gap-4 flex-wrap">
+      <p class="font-mono text-[0.68rem] tracking-[3px] text-slate/45 uppercase whitespace-nowrap shrink-0 m-0 min-w-[6rem]">
         Your AI
       </p>
-      <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;">
+      <div class="flex gap-[0.6rem] flex-wrap items-center">
         {availableTools.map((t) => (
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 500; color: rgba(245,240,232,0.85); background: rgba(196,154,43,0.1); border: 1px solid rgba(196,154,43,0.25); border-radius: 4px; padding: 0.3rem 0.7rem; white-space: nowrap;">
+          <span class="font-mono text-[0.72rem] font-medium text-cream/85 bg-gold/10 border border-gold/25 rounded-[4px] py-[0.3rem] px-[0.7rem] whitespace-nowrap">
             {t}
           </span>
         ))}
-        <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: rgba(139,156,175,0.4); padding-left: 0.25rem;">
-          Coming soon: OpenCode <span style="color: rgba(196,154,43,0.5);">&#9679;</span> supports Copilot license since Jan 2026 <span style="padding-left: 0.5rem; color: rgba(139,156,175,0.3);">|</span><span style="padding-left: 0.5rem;">Codex, Aider, Cline & more</span>
+        <span class="font-mono text-[0.65rem] text-slate/40 pl-1">
+          Coming soon: OpenCode <span class="text-gold/50">&#9679;</span> supports Copilot license since Jan 2026 <span class="pl-2 text-slate/30">|</span><span class="pl-2">Codex, Aider, Cline & more</span>
         </span>
       </div>
     </div>

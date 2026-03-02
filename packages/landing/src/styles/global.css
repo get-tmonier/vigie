@@ -15,6 +15,7 @@
 @import "@fontsource/source-serif-4/latin-400.css";
 
 /* JetBrains Mono — only used weights */
+@import "@fontsource/jetbrains-mono/latin-400.css";
 @import "@fontsource/jetbrains-mono/latin-500.css";
 @import "@fontsource/jetbrains-mono/latin-600.css";
 @import "@fontsource/jetbrains-mono/latin-700.css";
@@ -37,4 +38,57 @@ body {
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes pulse-amber {
+  0%,
+  100% {
+    border-color: color-mix(in srgb, var(--signal-amber) 30%, transparent);
+  }
+  50% {
+    border-color: color-mix(in srgb, var(--signal-amber) 60%, transparent);
+    box-shadow: 0 0 12px 0 color-mix(in srgb, var(--signal-amber) 10%, transparent);
+  }
+}
+@keyframes scroll-stripe {
+  to {
+    background-position: 0 8px;
+  }
+}
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #below-demo-gate {
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+    transition: none !important;
+  }
 }

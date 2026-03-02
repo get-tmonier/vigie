@@ -66,7 +66,7 @@ bun turbo build --filter=@tmonier/landing      # build single package
 ## Conventions
 
 - CSS vars from `@tmonier/tokens` — design tokens are the single source of truth
-- Google Fonts loaded via `<link>` tags (not `@import` in CSS)
+- Fonts loaded via `@fontsource/*` npm packages (self-hosted, imported in global.css via `@import`)
 - Landing page deploys to **Cloudflare Pages** — output: `packages/landing/dist/`
 - No `any` — strict TypeScript everywhere
 - **Effect** for all backend business logic (no try/catch)

@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
+  "imports": {
+    "#modules/*": "./src/modules/*",
+    "#routes/*": "./src/routes/*"
+  },
   "exports": {
     ".": "./src/index.ts"
   },
@@ -17,12 +21,17 @@
     "check": "biome check ./src",
     "check:fix": "biome check --write ./src",
     "typecheck": "tsc --noEmit",
-    "test": "bun test"
+    "test": "bun test",
+    "test:unit": "bun scripts/test-filter.ts unit",
+    "test:integration": "bun scripts/test-filter.ts integration",
+    "check-imports": "bun ../../scripts/check-imports.ts",
+    "fix-imports": "bun ../../scripts/fix-imports.ts"
   },
   "dependencies": {
     "@tmonier/shared": "workspace:*",
     "effect": "4.0.0-beta.21",
-    "hono": "4.12.3"
+    "hono": "4.12.3",
+    "valibot": "1.2.0"
   },
   "devDependencies": {
     "typescript": "5.9.3"

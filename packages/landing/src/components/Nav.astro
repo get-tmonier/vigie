@@ -1,5 +1,5 @@
 ---
-import WheelMark from './WheelMark.astro';
+import WheelMark from '#components/WheelMark.astro';
 
 interface Props {
   currentPage?: string;
@@ -12,16 +12,13 @@ const isContact = currentPage === 'contact';
 ---
 
 <nav
-  class="fixed top-0 left-0 right-0 z-50"
-  style="background: rgba(11, 26, 46, 0.92); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(196, 154, 43, 0.1);"
+  class="fixed top-0 left-0 right-0 z-50 bg-navy-deep/92 backdrop-blur-[12px] border-b border-gold/10"
 >
   <div class="flex items-center justify-between px-6 py-4 md:px-10">
     <!-- Logo -->
     <a href="/" class="flex items-center gap-3 no-underline">
       <WheelMark size={24} />
-      <span
-        style="font-family: 'Vollkorn SC', serif; font-weight: 700; font-size: 1.15rem; color: #C49A2B; letter-spacing: 0.03em;"
-      >
+      <span class="font-vollkorn-sc text-gold font-bold text-[1.15rem] tracking-[0.03em]">
         Tmonier
       </span>
     </a>
@@ -30,41 +27,31 @@ const isContact = currentPage === 'contact';
     <div class="hidden lg:flex items-center gap-8">
       <a
         href={isHome ? '#how-it-works' : '/#how-it-works'}
-        style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #8B9CAF; text-decoration: none; transition: color 0.2s;"
-        onmouseover="this.style.color='#C49A2B'"
-        onmouseout="this.style.color='#8B9CAF'"
+        class="font-mono text-slate text-[0.8rem] no-underline transition-colors duration-200 hover:text-gold"
       >
         How it works
       </a>
       <a
         href={isHome ? '#pricing' : '/#pricing'}
-        style="font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #8B9CAF; text-decoration: none; transition: color 0.2s;"
-        onmouseover="this.style.color='#C49A2B'"
-        onmouseout="this.style.color='#8B9CAF'"
+        class="font-mono text-slate text-[0.8rem] no-underline transition-colors duration-200 hover:text-gold"
       >
         Pricing
       </a>
       <a
         href="/faq"
-        style={`font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: ${isFaq ? '#C49A2B' : '#8B9CAF'}; text-decoration: none; transition: color 0.2s;`}
-        onmouseover="this.style.color='#C49A2B'"
-        onmouseout={`this.style.color='${isFaq ? '#C49A2B' : '#8B9CAF'}'`}
+        class:list={['font-mono text-[0.8rem] no-underline transition-colors duration-200', isFaq ? 'text-gold' : 'text-slate hover:text-gold']}
       >
         FAQ
       </a>
       <a
         href="/contact"
-        style={`font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: ${isContact ? '#C49A2B' : '#8B9CAF'}; text-decoration: none; transition: color 0.2s;`}
-        onmouseover="this.style.color='#C49A2B'"
-        onmouseout={`this.style.color='${isContact ? '#C49A2B' : '#8B9CAF'}'`}
+        class:list={['font-mono text-[0.8rem] no-underline transition-colors duration-200', isContact ? 'text-gold' : 'text-slate hover:text-gold']}
       >
         Contact
       </a>
       <a
         href={isHome ? '#waitlist' : '/#waitlist'}
-        style="font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.8rem; background: #C49A2B; color: #0B1A2E; padding: 0.5rem 1.1rem; border-radius: 4px; text-decoration: none; transition: background 0.2s;"
-        onmouseover="this.style.background='#D4AA3C'"
-        onmouseout="this.style.background='#C49A2B'"
+        class="font-mono bg-gold text-navy-deep font-semibold text-[0.8rem] py-2 px-[1.1rem] rounded-[4px] no-underline transition-colors duration-200 hover:bg-gold-light"
       >
         Claim your spot
       </a>
@@ -73,57 +60,50 @@ const isContact = currentPage === 'contact';
     <!-- Mobile hamburger button -->
     <button
       id="hamburger-btn"
-      class="lg:hidden"
+      class="lg:hidden bg-transparent border-none cursor-pointer p-2 flex flex-col gap-[5px]"
       aria-label="Menu"
       aria-expanded="false"
-      style="background: none; border: none; cursor: pointer; padding: 8px;"
     >
-      <span class="hamburger-bar"></span>
-      <span class="hamburger-bar"></span>
-      <span class="hamburger-bar"></span>
+      <span class="hamburger-bar block w-[22px] h-0.5 bg-gold rounded-[1px] transition-[transform,opacity] duration-300 ease-in-out"></span>
+      <span class="hamburger-bar block w-[22px] h-0.5 bg-gold rounded-[1px] transition-[transform,opacity] duration-300 ease-in-out"></span>
+      <span class="hamburger-bar block w-[22px] h-0.5 bg-gold rounded-[1px] transition-[transform,opacity] duration-300 ease-in-out"></span>
     </button>
   </div>
 
   <!-- Mobile menu panel -->
   <div
     id="mobile-menu"
-    class="lg:hidden"
-    style="overflow: hidden; max-height: 0; transition: max-height 0.3s ease-in-out; border-top: 1px solid rgba(196, 154, 43, 0);"
+    class="lg:hidden overflow-hidden max-h-0 transition-[max-height] duration-300 ease-in-out border-t border-transparent"
   >
-    <div style="padding: 0.5rem 1.5rem 1.5rem;">
+    <div class="pt-2 px-6 pb-6">
       <a
         href={isHome ? '#how-it-works' : '/#how-it-works'}
-        class="mobile-nav-link"
-        style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #8B9CAF; text-decoration: none; display: block; padding: 0.75rem 0; transition: color 0.2s;"
+        class="mobile-nav-link font-mono text-slate text-[0.85rem] no-underline block py-3 transition-colors duration-200 hover:text-gold"
       >
         How it works
       </a>
       <a
         href={isHome ? '#pricing' : '/#pricing'}
-        class="mobile-nav-link"
-        style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #8B9CAF; text-decoration: none; display: block; padding: 0.75rem 0; transition: color 0.2s;"
+        class="mobile-nav-link font-mono text-slate text-[0.85rem] no-underline block py-3 transition-colors duration-200 hover:text-gold"
       >
         Pricing
       </a>
       <a
         href="/faq"
-        class="mobile-nav-link"
-        style={`font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: ${isFaq ? '#C49A2B' : '#8B9CAF'}; text-decoration: none; display: block; padding: 0.75rem 0; transition: color 0.2s;`}
+        class:list={['mobile-nav-link font-mono text-[0.85rem] no-underline block py-3 transition-colors duration-200', isFaq ? 'text-gold' : 'text-slate hover:text-gold']}
       >
         FAQ
       </a>
       <a
         href="/contact"
-        class="mobile-nav-link"
-        style={`font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: ${isContact ? '#C49A2B' : '#8B9CAF'}; text-decoration: none; display: block; padding: 0.75rem 0; transition: color 0.2s;`}
+        class:list={['mobile-nav-link font-mono text-[0.85rem] no-underline block py-3 transition-colors duration-200', isContact ? 'text-gold' : 'text-slate hover:text-gold']}
       >
         Contact
       </a>
-      <div style="border-top: 1px solid rgba(196, 154, 43, 0.15); margin-top: 0.5rem; padding-top: 0.75rem;">
+      <div class="border-t border-gold/15 mt-2 pt-3">
         <a
           href={isHome ? '#waitlist' : '/#waitlist'}
-          class="mobile-nav-link"
-          style="font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.85rem; background: #C49A2B; color: #0B1A2E; padding: 0.65rem 1.1rem; border-radius: 4px; text-decoration: none; display: block; text-align: center; transition: background 0.2s;"
+          class="mobile-nav-link font-mono bg-gold text-navy-deep font-semibold text-[0.85rem] py-[0.65rem] px-[1.1rem] rounded-[4px] no-underline block text-center transition-colors duration-200 hover:bg-gold-light"
         >
           Claim your spot
         </a>
@@ -133,61 +113,35 @@ const isContact = currentPage === 'contact';
 </nav>
 
 <!-- Spacer so content isn't hidden under the fixed nav -->
-<div style="height: 64px;"></div>
-
-<style>
-  #hamburger-btn {
-    flex-direction: column;
-    gap: 5px;
-  }
-
-  @media (max-width: 1023px) {
-    #hamburger-btn {
-      display: flex;
-    }
-  }
-
-  .hamburger-bar {
-    display: block;
-    width: 22px;
-    height: 2px;
-    background: #C49A2B;
-    border-radius: 1px;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-  }
-
-  #hamburger-btn.is-open .hamburger-bar:nth-child(1) {
-    transform: translateY(7px) rotate(45deg);
-  }
-
-  #hamburger-btn.is-open .hamburger-bar:nth-child(2) {
-    opacity: 0;
-  }
-
-  #hamburger-btn.is-open .hamburger-bar:nth-child(3) {
-    transform: translateY(-7px) rotate(-45deg);
-  }
-</style>
+<div class="h-16"></div>
 
 <script>
   const hamburgerBtn = document.getElementById('hamburger-btn');
   const mobileMenu = document.getElementById('mobile-menu');
 
   if (hamburgerBtn && mobileMenu) {
+    const bars = hamburgerBtn.querySelectorAll<HTMLElement>('.hamburger-bar');
+
+    function setOpen(open: boolean) {
+      hamburgerBtn!.setAttribute('aria-expanded', String(open));
+      mobileMenu!.style.maxHeight = open ? `${mobileMenu!.scrollHeight}px` : '0';
+      mobileMenu!.style.borderTopColor = open ? 'color-mix(in srgb, var(--gold) 15%, transparent)' : '';
+      if (bars[0]) bars[0].style.transform = open ? 'translateY(7px) rotate(45deg)' : '';
+      if (bars[1]) bars[1].style.opacity = open ? '0' : '';
+      if (bars[2]) bars[2].style.transform = open ? 'translateY(-7px) rotate(-45deg)' : '';
+    }
+
+    let isOpen = false;
     hamburgerBtn.addEventListener('click', () => {
-      const isOpen = hamburgerBtn.classList.toggle('is-open');
-      hamburgerBtn.setAttribute('aria-expanded', String(isOpen));
-      mobileMenu.style.maxHeight = isOpen ? `${mobileMenu.scrollHeight}px` : '0';
-      mobileMenu.style.borderTopColor = isOpen ? 'rgba(196, 154, 43, 0.15)' : 'rgba(196, 154, 43, 0)';
+      isOpen = !isOpen;
+      setOpen(isOpen);
     });
 
     // Close menu when a link is clicked
     mobileMenu.querySelectorAll('a').forEach((link) => {
       link.addEventListener('click', () => {
-        hamburgerBtn.classList.remove('is-open');
-        hamburgerBtn.setAttribute('aria-expanded', 'false');
-        mobileMenu.style.maxHeight = '0';
-        mobileMenu.style.borderTopColor = 'rgba(196, 154, 43, 0)';
+        isOpen = false;
+        setOpen(false);
       });
     });
 
@@ -195,10 +149,8 @@ const isContact = currentPage === 'contact';
     const mediaQuery = window.matchMedia('(min-width: 1024px)');
     mediaQuery.addEventListener('change', (e) => {
       if (e.matches) {
-        hamburgerBtn.classList.remove('is-open');
-        hamburgerBtn.setAttribute('aria-expanded', 'false');
-        mobileMenu.style.maxHeight = '0';
-        mobileMenu.style.borderTopColor = 'rgba(196, 154, 43, 0)';
+        isOpen = false;
+        setOpen(false);
       }
     });
   }

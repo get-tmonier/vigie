@@ -3,6 +3,13 @@
   "type": "module",
   "version": "0.0.1",
   "private": true,
+  "imports": {
+    "#components/*": "./src/components/*",
+    "#layouts/*": "./src/layouts/*",
+    "#assets/*": "./src/assets/*",
+    "#styles/*": "./src/styles/*",
+    "#lib/*": "./src/lib/*"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "bun scripts/gen-favicon.mjs && bun scripts/gen-og.mjs && astro build",
@@ -17,7 +24,6 @@
     "typecheck": "astro check"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "12.6.12",
     "@fontsource/jetbrains-mono": "5.2.8",
     "@fontsource/source-serif-4": "5.2.9",
     "@fontsource/vollkorn": "5.2.10",
@@ -25,16 +31,15 @@
     "@tailwindcss/vite": "4.2.1",
     "@tmonier/tokens": "workspace:*",
     "astro": "5.18.0",
+    "tailwind-merge": "3.5.0",
     "tailwindcss": "4.2.1"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.6",
-    "@cloudflare/workers-types": "4.20260305.0",
     "@resvg/resvg-js": "2.6.2",
     "satori": "0.19.2",
     "sharp": "0.34.5",
     "typescript": "5.9.3",
-    "vite": "6.4.1",
-    "wrangler": "4.69.0"
+    "vite": "6.4.1"
   }
 }

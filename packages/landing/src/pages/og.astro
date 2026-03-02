@@ -16,35 +16,124 @@
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body { width: 1200px; height: 630px; overflow: hidden; }
+
+      .og-wrapper {
+        width: 1200px;
+        height: 630px;
+        background: #0B1A2E;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 72px 96px;
+        overflow: hidden;
+      }
+
+      .og-glow {
+        position: absolute;
+        top: -100px;
+        right: -80px;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(ellipse, rgba(196,154,43,0.07) 0%, transparent 65%);
+        pointer-events: none;
+      }
+
+      .og-watermark {
+        position: absolute;
+        right: 80px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 340px;
+        height: 340px;
+        opacity: 0.07;
+      }
+
+      .og-brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 36px;
+      }
+
+      .og-brand-name {
+        font-family: 'Vollkorn SC', serif;
+        font-weight: 900;
+        font-size: 42px;
+        color: #C49A2B;
+        letter-spacing: 3px;
+      }
+
+      .og-tagline {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: rgba(139,156,175,0.5);
+        align-self: center;
+      }
+
+      .og-headline {
+        font-family: 'Vollkorn SC', serif;
+        font-weight: 900;
+        font-size: 64px;
+        color: #F5F0E8;
+        line-height: 1.1;
+        letter-spacing: -0.01em;
+        margin-bottom: 0;
+      }
+
+      .og-pills {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .og-pill {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(245,240,232,0.5);
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 4px;
+        padding: 6px 14px;
+      }
+
+      .og-url {
+        position: absolute;
+        bottom: 48px;
+        left: 96px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(196,154,43,0.4);
+        letter-spacing: 2px;
+      }
+
+      .og-border-accent {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #C49A2B 30%, #C49A2B 70%, transparent);
+        opacity: 0.4;
+      }
     </style>
   </head>
   <body>
-    <div style="
-      width: 1200px;
-      height: 630px;
-      background: #0B1A2E;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 72px 96px;
-      overflow: hidden;
-    ">
+    <div class="og-wrapper">
 
       <!-- Background glow -->
-      <div style="
-        position: absolute;
-        top: -100px; right: -80px;
-        width: 600px; height: 600px;
-        background: radial-gradient(ellipse, rgba(196,154,43,0.07) 0%, transparent 65%);
-        pointer-events: none;
-      "></div>
+      <div class="og-glow"></div>
 
       <!-- Large watermark wheel (right side) -->
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 64 64"
-        style="position: absolute; right: 80px; top: 50%; transform: translateY(-50%); width: 340px; height: 340px; opacity: 0.07;"
+        class="og-watermark"
       >
         <circle cx="32" cy="32" r="27" fill="none" stroke="#C49A2B" stroke-width="2.5"/>
         <circle cx="32" cy="32" r="19" fill="none" stroke="#C49A2B" stroke-width="2"/>
@@ -68,7 +157,7 @@
       </svg>
 
       <!-- Brand name -->
-      <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 36px;">
+      <div class="og-brand">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="44" height="44">
           <defs>
             <linearGradient id="og-brass" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -97,71 +186,25 @@
           <line x1="27.4" y1="29.8" x2="12.7" y2="15.1" stroke="url(#og-brass)" stroke-width="2.5" stroke-linecap="round"/>
           <ellipse cx="11.4" cy="13.8" rx="2.2" ry="3" transform="rotate(135 11.4 13.8)" fill="url(#og-brass)"/>
         </svg>
-        <span style="
-          font-family: 'Vollkorn SC', serif;
-          font-weight: 900;
-          font-size: 42px;
-          color: #C49A2B;
-          letter-spacing: 3px;
-        ">Tmonier</span>
-        <span style="
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 12px;
-          font-weight: 600;
-          letter-spacing: 4px;
-          text-transform: uppercase;
-          color: rgba(139,156,175,0.5);
-          align-self: center;
-        ">You hold the helm.</span>
+        <span class="og-brand-name">Tmonier</span>
+        <span class="og-tagline">You hold the helm.</span>
       </div>
 
       <!-- Main headline -->
-      <h1 style="
-        font-family: 'Vollkorn SC', serif;
-        font-weight: 900;
-        font-size: 64px;
-        color: #F5F0E8;
-        line-height: 1.1;
-        letter-spacing: -0.01em;
-        margin-bottom: 0;
-      ">Your crew.<br/>Under your watch.</h1>
+      <h1 class="og-headline">Your crew.<br/>Under your watch.</h1>
 
       <!-- Pills row -->
-      <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+      <div class="og-pills">
         {['Real-time monitoring', 'Human-in-the-loop', 'Local-first', 'Zero markup'].map((label) => (
-          <span style="
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-            font-weight: 500;
-            color: rgba(245,240,232,0.5);
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 4px;
-            padding: 6px 14px;
-          ">{label}</span>
+          <span class="og-pill">{label}</span>
         ))}
       </div>
 
       <!-- Bottom: URL -->
-      <p style="
-        position: absolute;
-        bottom: 48px;
-        left: 96px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 14px;
-        font-weight: 600;
-        color: rgba(196,154,43,0.4);
-        letter-spacing: 2px;
-      ">tmonier.com</p>
+      <p class="og-url">tmonier.com</p>
 
       <!-- Bottom border accent -->
-      <div style="
-        position: absolute;
-        bottom: 0; left: 0; right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, transparent, #C49A2B 30%, #C49A2B 70%, transparent);
-        opacity: 0.4;
-      "></div>
+      <div class="og-border-accent"></div>
     </div>
   </body>
 </html>

@@ -10,7 +10,12 @@
     "declarationMap": true,
     "sourceMap": true,
     "outDir": "dist",
-    "rootDir": "src"
+    "rootDir": "src",
+    "types": ["bun-types"],
+    "paths": {
+      "#contracts/*": ["./src/contracts/*"],
+      "#schemas/*": ["./src/schemas/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["dist", "node_modules"]

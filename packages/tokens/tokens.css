@@ -10,5 +10,11 @@
   --cream: #f5f0e8;
   --cream-dark: #e8e0d0;
   --slate: #8b9caf;
+  --success: #22c55e;
+  --error: #ef4444;
+  --signal-green: #28c840;
+  --signal-red: #ff5f57;
+  --signal-amber: #ffbd2e;
+  --signal-orange: #ff8c42;
   --white: #ffffff;
 }

@@ -1,32 +1,32 @@
 ---
-import Base from '../layouts/Base.astro';
-import Nav from '../components/Nav.astro';
-import Hero from '../components/Hero.astro';
-import DashboardDemo from '../components/DashboardDemo.astro';
-import ToolsStrip from '../components/ToolsStrip.astro';
-import Pricing from '../components/Pricing.astro';
-import Waitlist from '../components/Waitlist.astro';
-import Footer from '../components/Footer.astro';
+import Base from '#layouts/Base.astro';
+import Nav from '#components/Nav.astro';
+import Hero from '#components/Hero.astro';
+import DashboardDemo from '#components/DashboardDemo.astro';
+import ToolsStrip from '#components/ToolsStrip.astro';
+import Pricing from '#components/Pricing.astro';
+import Waitlist from '#components/Waitlist.astro';
+import Footer from '#components/Footer.astro';
 ---
 
 <Base>
   <Nav />
   <main>
     <Hero />
-    <section id="how-it-works" style="background: #0B1A2E; padding: 3rem 2.5rem 1rem; text-align: center;">
-      <div style="max-width: 720px; margin: 0 auto;">
+    <section id="how-it-works" class="bg-navy-deep pt-12 px-10 pb-4 text-center">
+      <div class="max-w-[720px] mx-auto">
         <p
-          style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: #C49A2B; margin: 0 0 1rem;"
+          class="font-mono text-gold text-[0.75rem] tracking-[0.15em] uppercase m-0 mb-4"
         >
           How it works
         </p>
         <h2
-          style="font-family: 'Vollkorn SC', serif; font-size: clamp(1.8rem, 4vw, 2.8rem); color: #F5F0E8; margin: 0 0 0.75rem; line-height: 1.2;"
+          class="font-vollkorn-sc text-cream text-[clamp(1.8rem,4vw,2.8rem)] m-0 mb-3 leading-[1.2]"
         >
           Watch. Know. Decide.
         </h2>
         <p
-          style="font-family: 'Source Serif 4', serif; font-size: 1.05rem; color: #8B9CAF; margin: 0; line-height: 1.8;"
+          class="font-source-serif text-slate text-[1.05rem] m-0 leading-[1.8]"
         >
           One Claude Code agent. Every file read, every edit, every test run.<br/>
           Loops caught. Scope drift flagged. Nothing ships without your approval.
@@ -35,137 +35,164 @@ import Footer from '../components/Footer.astro';
     </section>
     <DashboardDemo />
 
-    <!-- What Tmonier caught -->
-    <section style="background: #0B1A2E; padding: 2rem 2.5rem 2rem;">
-      <div style="max-width: 900px; margin: 0 auto;">
-        <p
-          style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(139,156,175,0.5); text-align: center; margin: 0 0 0.5rem;"
-        >
-          What Tmonier caught
-        </p>
-        <p
-          style="font-family: 'Source Serif 4', serif; font-weight: 400; font-size: 0.72rem; color: #8B9CAF; line-height: 1.5; text-align: center; max-width: 440px; margin: 0 auto 2rem;"
-        >
-          Not heuristics. Counts, boundaries, and thresholds — the kind of rules that don't hallucinate.
-        </p>
+    <div id="below-demo-gate" class="opacity-0 translate-y-8 pointer-events-none [transition:opacity_0.8s_ease-out,transform_0.8s_cubic-bezier(0.16,1,0.3,1)]">
+      <!-- What Tmonier caught -->
+      <section class="bg-navy-deep py-8 px-10">
+        <div class="max-w-[900px] mx-auto">
+          <p
+            class="font-mono text-[0.85rem] tracking-[0.12em] uppercase text-slate/50 text-center m-0 mb-2"
+          >
+            What Tmonier caught
+          </p>
+          <p
+            class="font-source-serif text-slate font-normal text-[0.72rem] leading-[1.5] text-center max-w-[440px] mx-auto m-0 mb-8"
+          >
+            Not heuristics. Counts, boundaries, and thresholds — the kind of rules that don't hallucinate.
+          </p>
 
-        <div class="features-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
-          <!-- Feature 1: Real-time visibility -->
-          <div class="reveal-card" style="background: rgba(29,53,87,0.25); border: 1px solid rgba(40,200,64,0.2); border-radius: 10px; padding: 1.5rem;">
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-              <span style="width: 8px; height: 8px; background: #28C840; border-radius: 50%; display: inline-block;"></span>
-              <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; color: #28C840; text-transform: uppercase; letter-spacing: 0.06em;">Live</span>
+          <div class="features-grid grid grid-cols-3 gap-6 max-md:grid-cols-1">
+            <!-- Feature 1: Real-time visibility -->
+            <div class="reveal-card opacity-0 translate-y-6 transition-[opacity,transform] duration-500 ease-in-out bg-navy-mid/25 border border-signal-green/20 rounded-[10px] p-6">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="size-2 rounded-full inline-block bg-signal-green"></span>
+                <span class="font-mono text-[0.7rem] font-semibold text-signal-green uppercase tracking-[0.06em]">Live</span>
+              </div>
+              <h3 class="font-vollkorn-sc text-cream font-bold text-[1.1rem] m-0 mb-2">
+                Real-time visibility
+              </h3>
+              <p class="font-source-serif text-slate text-[0.9rem] m-0 leading-[1.6]">
+                Every file read, every edit, every test run &mdash; streamed live to your dashboard.
+              </p>
             </div>
-            <h3 style="font-family: 'Vollkorn SC', serif; font-weight: 700; font-size: 1.1rem; color: #F5F0E8; margin: 0 0 0.5rem;">
-              Real-time visibility
-            </h3>
-            <p style="font-family: 'Source Serif 4', serif; font-size: 0.9rem; color: #8B9CAF; margin: 0; line-height: 1.6;">
-              Every file read, every edit, every test run &mdash; streamed live to your dashboard.
-            </p>
+
+            <!-- Feature 2: Loop & drift detection -->
+            <div class="reveal-card opacity-0 translate-y-6 transition-[opacity,transform] duration-500 ease-in-out bg-navy-mid/25 border border-signal-amber/20 rounded-[10px] p-6">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="font-mono text-[0.85rem] text-signal-amber">&#9888;</span>
+                <span class="font-mono text-[0.7rem] font-semibold text-signal-amber uppercase tracking-[0.06em]">Alert</span>
+              </div>
+              <h3 class="font-vollkorn-sc text-cream font-bold text-[1.1rem] m-0 mb-2">
+                Loop &amp; drift detection
+              </h3>
+              <p class="font-source-serif text-slate text-[0.9rem] m-0 leading-[1.6]">
+                Stuck in a cycle? Touching files outside scope? Flagged before it burns your budget.
+              </p>
+            </div>
+
+            <!-- Feature 3: Context & cost awareness -->
+            <div class="reveal-card opacity-0 translate-y-6 transition-[opacity,transform] duration-500 ease-in-out bg-navy-mid/25 border border-signal-orange/20 rounded-[10px] p-6">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="font-mono text-[0.85rem] text-signal-orange">&#x24;</span>
+                <span class="font-mono text-[0.7rem] font-semibold text-signal-orange uppercase tracking-[0.06em]">Cost</span>
+              </div>
+              <h3 class="font-vollkorn-sc text-cream font-bold text-[1.1rem] m-0 mb-2">
+                Context &amp; cost awareness
+              </h3>
+              <p class="font-source-serif text-slate text-[0.9rem] m-0 leading-[1.6]">
+                Context window filling up? Wrong model for the job? Tmonier tells you before you waste tokens.
+              </p>
+            </div>
           </div>
 
-          <!-- Feature 2: Loop & drift detection -->
-          <div class="reveal-card" style="background: rgba(29,53,87,0.25); border: 1px solid rgba(255,189,46,0.2); border-radius: 10px; padding: 1.5rem;">
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-              <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #FFBD2E;">&#9888;</span>
-              <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; color: #FFBD2E; text-transform: uppercase; letter-spacing: 0.06em;">Alert</span>
+          <!-- Second row -->
+          <div class="features-grid grid grid-cols-2 gap-6 mt-6 max-w-[620px] mx-auto max-md:grid-cols-1">
+            <!-- Feature 4: Checkpoints & rollback -->
+            <div class="reveal-card opacity-0 translate-y-6 transition-[opacity,transform] duration-500 ease-in-out bg-navy-mid/25 border border-gold/20 rounded-[10px] p-6">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="font-mono text-gold text-[0.85rem]">&#10003;</span>
+                <span class="font-mono text-gold text-[0.7rem] font-semibold uppercase tracking-[0.06em]">Gate</span>
+              </div>
+              <h3 class="font-vollkorn-sc text-cream font-bold text-[1.1rem] m-0 mb-2">
+                Checkpoints &amp; rollback
+              </h3>
+              <p class="font-source-serif text-slate text-[0.9rem] m-0 leading-[1.6]">
+                Nothing ships without your signal. Things go sideways? Roll back to the last clean state in one click.
+              </p>
             </div>
-            <h3 style="font-family: 'Vollkorn SC', serif; font-weight: 700; font-size: 1.1rem; color: #F5F0E8; margin: 0 0 0.5rem;">
-              Loop &amp; drift detection
-            </h3>
-            <p style="font-family: 'Source Serif 4', serif; font-size: 0.9rem; color: #8B9CAF; margin: 0; line-height: 1.6;">
-              Stuck in a cycle? Touching files outside scope? Flagged before it burns your budget.
-            </p>
-          </div>
 
-          <!-- Feature 3: Context & cost awareness -->
-          <div class="reveal-card" style="background: rgba(29,53,87,0.25); border: 1px solid rgba(255,140,66,0.2); border-radius: 10px; padding: 1.5rem;">
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-              <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #FF8C42;">&#x24;</span>
-              <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; color: #FF8C42; text-transform: uppercase; letter-spacing: 0.06em;">Cost</span>
+            <!-- Feature 5: Local-first -->
+            <div class="reveal-card opacity-0 translate-y-6 transition-[opacity,transform] duration-500 ease-in-out bg-navy-mid/25 border border-signal-green/20 rounded-[10px] p-6">
+              <div class="flex items-center gap-2 mb-3">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" class="shrink-0 text-signal-green">
+                  <path d="M5 1C3.34 1 2 2.34 2 4c0 1.1.6 2.06 1.48 2.58A3 3 0 0 0 2 9v2a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V9a3 3 0 0 0-1.48-2.42A3 3 0 0 0 14 4c0-1.66-1.34-3-3-3H5z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                  <circle cx="8" cy="7" r="1.5" fill="currentColor"/>
+                </svg>
+                <span class="font-mono text-[0.7rem] font-semibold text-signal-green uppercase tracking-[0.06em]">Local</span>
+              </div>
+              <h3 class="font-vollkorn-sc text-cream font-bold text-[1.1rem] m-0 mb-2">
+                Local-first daemon
+              </h3>
+              <p class="font-source-serif text-slate text-[0.9rem] m-0 leading-[1.6]">
+                Runs on your machine. Your code never leaves localhost. Dashboard connects via local websocket.
+              </p>
             </div>
-            <h3 style="font-family: 'Vollkorn SC', serif; font-weight: 700; font-size: 1.1rem; color: #F5F0E8; margin: 0 0 0.5rem;">
-              Context &amp; cost awareness
-            </h3>
-            <p style="font-family: 'Source Serif 4', serif; font-size: 0.9rem; color: #8B9CAF; margin: 0; line-height: 1.6;">
-              Context window filling up? Wrong model for the job? Tmonier tells you before you waste tokens.
-            </p>
           </div>
         </div>
+      </section>
 
-        <!-- Second row -->
-        <div class="features-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-top: 1.5rem; max-width: 620px; margin-left: auto; margin-right: auto;">
-          <!-- Feature 4: Checkpoints & rollback -->
-          <div class="reveal-card" style="background: rgba(29,53,87,0.25); border: 1px solid rgba(196,154,43,0.2); border-radius: 10px; padding: 1.5rem;">
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-              <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #C49A2B;">&#10003;</span>
-              <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; color: #C49A2B; text-transform: uppercase; letter-spacing: 0.06em;">Gate</span>
-            </div>
-            <h3 style="font-family: 'Vollkorn SC', serif; font-weight: 700; font-size: 1.1rem; color: #F5F0E8; margin: 0 0 0.5rem;">
-              Checkpoints &amp; rollback
-            </h3>
-            <p style="font-family: 'Source Serif 4', serif; font-size: 0.9rem; color: #8B9CAF; margin: 0; line-height: 1.6;">
-              Nothing ships without your signal. Things go sideways? Roll back to the last clean state in one click.
-            </p>
-          </div>
-
-          <!-- Feature 5: Local-first -->
-          <div class="reveal-card" style="background: rgba(29,53,87,0.25); border: 1px solid rgba(40,200,64,0.2); border-radius: 10px; padding: 1.5rem;">
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink: 0;">
-                <path d="M5 1C3.34 1 2 2.34 2 4c0 1.1.6 2.06 1.48 2.58A3 3 0 0 0 2 9v2a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V9a3 3 0 0 0-1.48-2.42A3 3 0 0 0 14 4c0-1.66-1.34-3-3-3H5z" stroke="#28C840" stroke-width="1.5" fill="none"/>
-                <circle cx="8" cy="7" r="1.5" fill="#28C840"/>
-              </svg>
-              <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; color: #28C840; text-transform: uppercase; letter-spacing: 0.06em;">Local</span>
-            </div>
-            <h3 style="font-family: 'Vollkorn SC', serif; font-weight: 700; font-size: 1.1rem; color: #F5F0E8; margin: 0 0 0.5rem;">
-              Local-first daemon
-            </h3>
-            <p style="font-family: 'Source Serif 4', serif; font-size: 0.9rem; color: #8B9CAF; margin: 0; line-height: 1.6;">
-              Runs on your machine. Your code never leaves localhost. Dashboard connects via local websocket.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <ToolsStrip />
-    <Pricing />
-    <Waitlist />
+      <ToolsStrip />
+      <Pricing />
+      <Waitlist />
+    </div>
   </main>
   <Footer />
 </Base>
 
-<style>
-  .reveal-card {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-  .reveal-card.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  @media (max-width: 768px) {
-    .features-grid {
-      grid-template-columns: 1fr !important;
+<noscript>
+  <style>
+    #below-demo-gate {
+      opacity: 1 !important;
+      transform: none !important;
+      pointer-events: auto !important;
     }
-  }
-</style>
+  </style>
+</noscript>
 
 <script>
-  const cards = document.querySelectorAll('.reveal-card');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const card = entry.target as HTMLElement;
-        const siblings = Array.from(card.parentElement!.querySelectorAll('.reveal-card'));
-        const index = siblings.indexOf(card);
-        card.style.transitionDelay = `${index * 120}ms`;
-        card.classList.add('visible');
-        observer.unobserve(card);
+  const gate = document.getElementById('below-demo-gate');
+  let revealed = false;
+
+  function revealGate() {
+    if (revealed || !gate) return;
+    revealed = true;
+    gate.classList.remove('opacity-0', 'translate-y-8', 'pointer-events-none');
+    gate.dataset.revealed = '1';
+
+    // Defer reveal-card observers until gate is open so IntersectionObserver fires at correct positions
+    requestAnimationFrame(initRevealCards);
+  }
+
+  function initRevealCards() {
+    const cards = document.querySelectorAll('.reveal-card');
+    const cardObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const card = entry.target as HTMLElement;
+          const siblings = Array.from(card.parentElement!.querySelectorAll('.reveal-card'));
+          const index = siblings.indexOf(card);
+          card.style.transitionDelay = `${index * 120}ms`;
+          card.classList.remove('opacity-0', 'translate-y-6');
+          cardObserver.unobserve(card);
+        }
+      });
+    }, { threshold: 0.3, rootMargin: '0px 0px -80px 0px' });
+    cards.forEach((card) => cardObserver.observe(card));
+  }
+
+  // Primary: demo animation complete
+  document.addEventListener('dashboard-demo-complete', revealGate, { once: true });
+
+  // Fallback 1: 10s timeout safety net
+  setTimeout(revealGate, 10000);
+
+  // Fallback 2: user scrolls to the gate (handles anchor links like #pricing)
+  if (gate) {
+    const gateObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        revealGate();
+        gateObserver.disconnect();
       }
-    });
-  }, { threshold: 0.3, rootMargin: '0px 0px -80px 0px' });
-  cards.forEach((card) => observer.observe(card));
+    }, { threshold: 0.05 });
+    gateObserver.observe(gate);
+  }
 </script>

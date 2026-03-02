@@ -1,62 +1,41 @@
 ---
-import WheelMark from './WheelMark.astro';
+import WheelMark from '#components/WheelMark.astro';
 ---
 
-<footer
-  style="background: #0B1A2E; border-top: 1px solid rgba(139, 156, 175, 0.1); padding: 1.5rem 2.5rem;"
->
+<footer class="bg-navy-deep border-t border-slate/10 py-6 px-10 max-md:py-4 max-md:px-5">
   <div
-    style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: nowrap; gap: 0.75rem;"
+    class="max-w-[1200px] mx-auto flex items-center justify-between flex-nowrap gap-3"
   >
     <!-- Left: logo + copyright -->
-    <div class="footer-left" style="display: flex; align-items: center; gap: 0.6rem; white-space: nowrap;">
+    <div class="footer-left flex items-center gap-[0.6rem] whitespace-nowrap">
       <WheelMark size={16} />
-      <span style="font-family: 'Vollkorn SC', serif; font-weight: 700; font-size: 0.85rem; color: #C49A2B; line-height: 1;"
+      <span class="font-vollkorn-sc text-gold font-bold text-[0.85rem] leading-none max-md:text-[0.72rem]"
         >Tmonier</span
       >
-      <span
-        style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #8B9CAF; margin-left: 0.3rem; line-height: 1;"
+      <span class="font-mono text-slate text-[0.72rem] ml-[0.3rem] leading-none max-md:text-[0.65rem]"
         >© 2026</span
       >
     </div>
 
     <!-- Centre: links -->
-    <div style="display: flex; gap: 1.5rem; align-items: center;">
+    <div class="flex gap-6 items-center">
       <a
         href="/faq"
-        style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #8B9CAF; text-decoration: none;"
-        onmouseover="this.style.color='#C49A2B'"
-        onmouseout="this.style.color='#8B9CAF'"
+        class="font-mono text-slate text-[0.75rem] no-underline hover:text-gold transition-colors duration-200"
       >
         FAQ
       </a>
       <a
         href="/contact"
-        style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #8B9CAF; text-decoration: none;"
-        onmouseover="this.style.color='#C49A2B'"
-        onmouseout="this.style.color='#8B9CAF'"
+        class="font-mono text-slate text-[0.75rem] no-underline hover:text-gold transition-colors duration-200"
       >
         Contact
       </a>
     </div>
 
     <!-- Right: made in -->
-    <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #8B9CAF; white-space: nowrap;"
+    <span class="font-mono text-slate text-[0.72rem] whitespace-nowrap"
       >Made in 🇧🇪</span
     >
   </div>
 </footer>
-
-<style>
-  @media (max-width: 768px) {
-    footer {
-      padding: 1rem 1.25rem !important;
-    }
-    .footer-left span:first-of-type {
-      font-size: 0.72rem !important;
-    }
-    .footer-left span:last-of-type {
-      font-size: 0.65rem !important;
-    }
-  }
-</style>

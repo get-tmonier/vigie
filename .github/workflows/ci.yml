@@ -37,6 +37,9 @@ jobs:
       - name: Biome check (affected)
         run: bun turbo check --affected
 
+      - name: Import conventions (affected)
+        run: bun turbo check-imports --affected
+
       - name: Typecheck (affected)
         run: bun turbo typecheck --affected
 

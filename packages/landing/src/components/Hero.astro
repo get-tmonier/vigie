@@ -1,56 +1,48 @@
 ---
 import { Image } from 'astro:assets';
-import helmsmanImg from '../assets/helmsman.png';
+import helmsmanImg from '#assets/helmsman.png';
 ---
 
 <section
-  class="hero-section"
-  style="background: radial-gradient(ellipse at 60% 110%, rgba(196, 154, 43, 0.08) 0%, transparent 60%), #0B1A2E; padding: 5rem 2.5rem 6rem;"
+  class="hero-section min-h-[calc(100vh-64px)] box-border flex flex-col justify-center py-20 px-10 pb-24 max-md:h-[calc(100dvh-64px)] max-md:py-4 max-md:px-5 max-md:pb-3 max-md:overflow-hidden"
+  style="background: radial-gradient(ellipse at 60% 110%, color-mix(in srgb, var(--gold) 8%, transparent) 0%, transparent 60%), var(--navy-deep)"
 >
   <div
-    style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;"
-    class="hero-grid"
+    class="hero-grid max-w-[1200px] mx-auto grid grid-cols-2 gap-16 items-center max-md:flex max-md:flex-col max-md:flex-1 max-md:gap-7 max-md:min-h-0 max-md:justify-center max-md:items-stretch"
   >
     <!-- Left: text -->
-    <div class="hero-left">
+    <div class="hero-left max-md:shrink-0">
       <p
-        class="hero-tagline"
-        style="font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.7rem; letter-spacing: 4px; color: rgba(196, 154, 43, 0.6); text-transform: uppercase; margin: 0 0 1.5rem;"
+        class="hero-tagline font-mono font-medium text-[0.7rem] tracking-[4px] text-gold/60 uppercase m-0 mb-6 max-md:m-0 max-md:mb-[0.8rem]"
       >
         You hold the helm.
       </p>
 
       <h1
-        class="hero-heading"
-        style="font-family: 'Vollkorn SC', serif; font-weight: 900; font-size: clamp(2.2rem, 4.5vw, 3.2rem); color: #C49A2B; margin: 0 0 1.25rem; line-height: 1.15; letter-spacing: -0.01em;"
+        class="hero-heading font-vollkorn-sc text-gold font-black text-[clamp(2.2rem,4.5vw,3.2rem)] m-0 mb-5 leading-[1.15] tracking-[-0.01em] max-md:m-0 max-md:mb-[0.35rem] max-md:text-[1.7rem]"
       >
         Your crew.<br />Under your watch.
       </h1>
 
       <p
-        class="hero-subtitle"
-        style="font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 0.85rem; color: #8B9CAF; margin: 0 0 1.25rem;"
+        class="hero-subtitle font-mono text-slate font-medium text-[0.85rem] m-0 mb-5 max-md:m-0 max-md:mb-2 max-md:text-[0.72rem]"
       >
         You launched the agent. Now what?
       </p>
 
-
-      <div class="hero-body" style="margin: 0 0 2.5rem; max-width: 500px;">
-        <div style="border-left: 2px solid rgba(196,154,43,0.3); padding-left: 1rem; margin: 0 0 1.25rem; display: flex; flex-direction: column; gap: 0.4rem;">
-          <p style="font-family: 'Source Serif 4', serif; font-weight: 400; font-size: 1.05rem; color: rgba(139,156,175,0.6); line-height: 1.4; margin: 0;">Looping for an hour. You had no idea.</p>
-          <p style="font-family: 'Source Serif 4', serif; font-weight: 400; font-size: 1.05rem; color: rgba(139,156,175,0.6); line-height: 1.4; margin: 0;">It opened your auth layer. You never asked.</p>
-          <p style="font-family: 'Source Serif 4', serif; font-weight: 400; font-size: 1.05rem; color: rgba(139,156,175,0.6); line-height: 1.4; margin: 0;">$180 in token usage. Still not done.</p>
+      <div class="hero-body m-0 mb-10 max-w-[500px] max-md:m-0 max-md:mb-5">
+        <div class="border-l-2 border-gold/30 pl-4 m-0 mb-5 flex flex-col gap-[0.4rem]">
+          <p class="font-source-serif font-normal text-[1.05rem] text-slate/60 leading-[1.4] m-0 max-md:text-[0.78rem] max-md:leading-[1.4]">Looping for an hour. You had no idea.</p>
+          <p class="font-source-serif font-normal text-[1.05rem] text-slate/60 leading-[1.4] m-0 max-md:text-[0.78rem] max-md:leading-[1.4]">It opened your auth layer. You never asked.</p>
+          <p class="font-source-serif font-normal text-[1.05rem] text-slate/60 leading-[1.4] m-0 max-md:text-[0.78rem] max-md:leading-[1.4]">$180 in token usage. Still not done.</p>
         </div>
-        <p style="font-family: 'Source Serif 4', serif; font-weight: 400; font-size: 1.05rem; color: #8B9CAF; line-height: 1.6; margin: 0;">Tmonier shows you — in real time. When something's off, you're the one who catches it.</p>
+        <p class="font-source-serif text-slate font-normal text-[1.05rem] leading-[1.6] m-0 max-md:text-[0.78rem] max-md:leading-[1.4]">Tmonier shows you — in real time. When something's off, you're the one who catches it.</p>
       </div>
 
-      <div class="hero-buttons" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+      <div class="hero-buttons flex gap-4 items-center flex-wrap max-md:flex-col max-md:items-stretch max-md:gap-[0.45rem]">
         <a
-          class="hero-btn"
+          class="hero-btn font-mono bg-gold text-navy-deep font-semibold text-sm py-[0.85rem] px-[1.8rem] rounded-[4px] no-underline transition-colors duration-200 inline-block hover:bg-gold-light max-md:block max-md:w-full max-md:text-center max-md:py-[0.65rem] max-md:px-[1.2rem] max-md:text-[0.78rem]"
           href="#waitlist"
-          style="font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 0.875rem; background: #C49A2B; color: #0B1A2E; padding: 0.85rem 1.8rem; border-radius: 4px; text-decoration: none; transition: background 0.2s; display: inline-block;"
-          onmouseover="this.style.background='#D4AA3C'"
-          onmouseout="this.style.background='#C49A2B'"
         >
           Claim your spot
         </a>
@@ -58,10 +50,9 @@ import helmsmanImg from '../assets/helmsman.png';
     </div>
 
     <!-- Right: mascotte + definition plaque -->
-    <div class="hero-right" style="display: flex; flex-direction: column; align-items: center; gap: 0;">
+    <div class="hero-right flex flex-col items-center gap-0 max-md:shrink-0 max-md:flex-row max-md:items-stretch max-md:justify-center max-md:gap-0 max-md:m-0 max-md:p-0 max-md:h-[180px]">
       <div
-        class="hero-mascotte-frame"
-        style="position: relative; display: inline-block; border-radius: 12px 12px 0 0; border: 2px solid rgba(196, 154, 43, 0.2); border-bottom: none; overflow: hidden; max-width: 320px; width: 100%; aspect-ratio: 1568 / 2000;"
+        class="hero-mascotte-frame relative inline-block rounded-t-xl border-2 border-b-0 border-gold/20 overflow-hidden max-w-[320px] w-full aspect-[1568/2000] max-md:w-[140px] max-md:max-w-[140px] max-md:shrink-0 max-md:rounded-l-xl max-md:rounded-tr-none max-md:rounded-br-none max-md:border-r-0 max-md:border-b-2 max-md:border-b-gold/20 max-md:bg-navy-deep max-md:aspect-auto"
       >
         <Image
           src={helmsmanImg}
@@ -70,155 +61,24 @@ import helmsmanImg from '../assets/helmsman.png';
           format="webp"
           loading="eager"
           fetchpriority="high"
-          style="display: block; width: 100%; height: 100%; object-fit: cover; transform: scale(1.15); transform-origin: center 20%;"
+          class="block w-full h-full object-cover scale-[1.15] origin-[center_20%] max-md:h-full max-md:w-full max-md:object-cover max-md:object-[top_center] max-md:scale-100 max-md:origin-center"
         />
       </div>
 
       <!-- Definition plaque -->
       <div
-        class="hero-plaque"
-        style="max-width: 320px; width: 100%; border: 2px solid rgba(196, 154, 43, 0.2); border-top: 1px solid rgba(196, 154, 43, 0.1); border-radius: 0 0 12px 12px; background: rgba(196, 154, 43, 0.04); padding: 1.1rem 1.4rem 1.2rem;"
+        class="hero-plaque max-w-[320px] w-full border-2 border-gold/20 border-t border-t-gold/10 rounded-b-xl bg-gold/4 pt-[1.1rem] px-[1.4rem] pb-[1.2rem] max-md:max-w-none max-md:w-auto max-md:flex-1 max-md:min-w-0 max-md:rounded-r-xl max-md:rounded-tl-none max-md:rounded-bl-none max-md:py-[0.6rem] max-md:px-3 max-md:flex max-md:flex-col max-md:justify-center max-md:border-t-2 max-md:border-t-gold/20 max-md:border-l max-md:border-l-gold/10"
       >
-        <div style="display: flex; align-items: baseline; gap: 0.65rem; flex-wrap: wrap; margin-bottom: 0.25rem;">
-          <span style="font-family: 'Vollkorn SC', serif; font-weight: 900; font-size: 1.05rem; color: #C49A2B;">tmonier</span>
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: rgba(139, 156, 175, 0.6);">/ti.mɔ.nje/</span>
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: rgba(196, 154, 43, 0.45); letter-spacing: 0.1em; text-transform: uppercase;">n. French</span>
+        <div class="flex items-baseline gap-[0.65rem] flex-wrap mb-1">
+          <span class="font-vollkorn-sc text-gold font-black text-[1.05rem] max-md:text-[0.7rem]">tmonier</span>
+          <span class="font-mono text-[0.72rem] text-slate/60 max-md:text-[0.7rem]">/ti.mɔ.nje/</span>
+          <span class="font-mono text-[0.65rem] text-gold/45 tracking-[0.1em] uppercase max-md:text-[0.7rem]">n. French</span>
         </div>
-        <p style="font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: rgba(139, 156, 175, 0.25); margin: 0 0 0.4rem; letter-spacing: 0.02em;">alt. Timonier</p>
-        <p style="font-family: 'Source Serif 4', serif; font-size: 0.82rem; color: rgba(139, 156, 175, 0.8); line-height: 1.65; margin: 0;">
+        <p class="font-mono text-[0.6rem] text-slate/25 m-0 mb-[0.4rem] tracking-[0.02em] max-md:hidden">alt. Timonier</p>
+        <p class="font-source-serif text-[0.82rem] text-slate/80 leading-[1.65] m-0 max-md:text-[0.65rem] max-md:leading-[1.45] max-md:m-0">
           The helmsman — the person at the helm who steers the ship while the crew executes.
         </p>
       </div>
     </div>
   </div>
 </section>
-
-<style>
-  .hero-section {
-    min-height: calc(100vh - 64px);
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  @media (max-width: 768px) {
-    /* Section fills exactly the viewport below the nav spacer */
-    .hero-section {
-      height: calc(100dvh - 64px) !important;
-      padding: 1rem 1.25rem 0.75rem !important;
-      box-sizing: border-box !important;
-      display: flex !important;
-      flex-direction: column !important;
-      overflow: hidden !important;
-    }
-
-    /* Stack vertically, center the group as a whole */
-    .hero-grid {
-      display: flex !important;
-      flex-direction: column !important;
-      flex: 1 !important;
-      grid-template-columns: unset !important;
-      gap: 1.75rem !important;
-      min-height: 0 !important;
-      justify-content: center !important;
-      align-items: stretch !important;
-    }
-
-    /* Text block — natural size, no grow */
-    .hero-left {
-      flex-shrink: 0 !important;
-    }
-
-    .hero-tagline {
-      margin: 0 0 0.8rem !important;
-    }
-    .hero-heading {
-      margin: 0 0 0.35rem !important;
-      font-size: 1.7rem !important;
-    }
-    .hero-subtitle {
-      margin: 0 0 0.5rem !important;
-      font-size: 0.72rem !important;
-    }
-    .hero-body {
-      margin: 0 0 1.25rem !important;
-    }
-    .hero-body p {
-      font-size: 0.78rem !important;
-      line-height: 1.4 !important;
-    }
-    .hero-pill {
-      margin-top: 0.5rem !important;
-      font-size: 0.62rem !important;
-    }
-
-    .hero-buttons {
-      flex-direction: column !important;
-      align-items: stretch !important;
-      gap: 0.45rem !important;
-    }
-    .hero-btn {
-      display: block !important;
-      width: 100% !important;
-      text-align: center !important;
-      box-sizing: border-box !important;
-      padding: 0.65rem 1.2rem !important;
-      font-size: 0.78rem !important;
-    }
-
-    /* Mascotte block — side by side: image left, plaque right */
-    .hero-right {
-      flex-shrink: 0 !important;
-      flex-direction: row !important;
-      align-items: stretch !important;
-      justify-content: center !important;
-      gap: 0 !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      height: 180px !important;
-    }
-
-    .hero-mascotte-frame {
-      width: 140px !important;
-      max-width: 140px !important;
-      flex-shrink: 0 !important;
-      border-radius: 12px 0 0 12px !important;
-      border-right: none !important;
-      border-bottom: 2px solid rgba(196, 154, 43, 0.2) !important;
-      overflow: hidden !important;
-      background: #0B1A2E !important;
-    }
-    .hero-mascotte-frame img {
-      height: 100% !important;
-      width: 100% !important;
-      object-fit: cover !important;
-      object-position: top center !important;
-    }
-
-    .hero-plaque {
-      max-width: none !important;
-      width: auto !important;
-      flex: 1 !important;
-      min-width: 0 !important;
-      border-radius: 0 12px 12px 0 !important;
-      border-top: 2px solid rgba(196, 154, 43, 0.2) !important;
-      border-left: 1px solid rgba(196, 154, 43, 0.1) !important;
-      padding: 0.6rem 0.75rem !important;
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: center !important;
-    }
-    .hero-plaque span {
-      font-size: 0.7rem !important;
-    }
-    .hero-plaque p {
-      font-size: 0.65rem !important;
-      line-height: 1.45 !important;
-      margin: 0 !important;
-    }
-    .hero-plaque p:first-of-type {
-      display: none !important;
-    }
-  }
-</style>

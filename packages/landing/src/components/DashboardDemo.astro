@@ -3,313 +3,209 @@
 
 <section
   id="dashboard-demo"
-  class="dashboard-section"
-  style="background: #0B1A2E; padding: 0 1.5rem 2rem; overflow: hidden;"
+  class="dashboard-section bg-navy-deep px-6 pb-8 overflow-hidden"
 >
-  <!-- Browser UI mockup -->
+  <!-- 1. Local daemon terminal (appears first) -->
   <div
-    class="browser-mock"
-    style="opacity: 0; transform: translateY(24px); max-width: 920px; margin: 0 auto; border-radius: 12px; overflow: hidden; border: 1px solid rgba(196,154,43,0.2); box-shadow: 0 32px 80px rgba(0,0,0,0.5);"
-  >
-    <!-- Browser chrome -->
-    <div
-      style="background: rgba(29,53,87,0.7); padding: 0.65rem 1rem; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid rgba(196,154,43,0.1);"
-    >
-      <span style="width: 12px; height: 12px; background: #FF5F57; border-radius: 50%; display: inline-block; flex-shrink: 0;"></span>
-      <span style="width: 12px; height: 12px; background: #FFBD2E; border-radius: 50%; display: inline-block; flex-shrink: 0;"></span>
-      <span style="width: 12px; height: 12px; background: #28C840; border-radius: 50%; display: inline-block; flex-shrink: 0;"></span>
-      <!-- Address bar -->
-      <div
-        style="flex: 1; margin: 0 0.75rem; background: rgba(11,26,46,0.7); border: 1px solid rgba(139,156,175,0.15); border-radius: 6px; padding: 0.25rem 0.75rem; display: flex; align-items: center; gap: 0.4rem; max-width: 320px; margin-left: auto; margin-right: auto;"
-      >
-        <svg width="10" height="12" viewBox="0 0 10 12" fill="none" style="flex-shrink: 0; opacity: 0.5;">
-          <path d="M5 0C3.067 0 1.5 1.567 1.5 3.5V5H1C0.448 5 0 5.448 0 6v5c0 .552.448 1 1 1h8c.552 0 1-.448 1-1V6c0-.552-.448-1-1-1H8.5V3.5C8.5 1.567 6.933 0 5 0zm2.5 5h-5V3.5C2.5 2.12 3.62 1 5 1s2.5 1.12 2.5 2.5V5z" fill="#8B9CAF"/>
-        </svg>
-        <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: rgba(139,156,175,0.6);">app.tmonier.com</span>
-      </div>
-    </div>
-
-    <!-- Browser body -->
-    <div class="browser-body" style="display: flex; background: rgba(11,26,46,0.5);">
-      <!-- Sidebar -->
-      <div
-        class="browser-sidebar"
-        style="width: 180px; flex-shrink: 0; background: rgba(11,26,46,0.6); border-right: 1px solid rgba(196,154,43,0.1); padding: 1.25rem 0;"
-      >
-        <!-- Logo -->
-        <div style="padding: 0 1rem 1.25rem; border-bottom: 1px solid rgba(139,156,175,0.1); margin-bottom: 1rem;">
-          <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <svg width="18" height="18" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="50" cy="50" r="46" stroke="#C49A2B" stroke-width="4"/>
-              <circle cx="50" cy="50" r="8" fill="#C49A2B"/>
-              <line x1="50" y1="4" x2="50" y2="20" stroke="#C49A2B" stroke-width="4" stroke-linecap="round"/>
-              <line x1="50" y1="80" x2="50" y2="96" stroke="#C49A2B" stroke-width="4" stroke-linecap="round"/>
-              <line x1="4" y1="50" x2="20" y2="50" stroke="#C49A2B" stroke-width="4" stroke-linecap="round"/>
-              <line x1="80" y1="50" x2="96" y2="50" stroke="#C49A2B" stroke-width="4" stroke-linecap="round"/>
-              <line x1="18" y1="18" x2="29" y2="29" stroke="#C49A2B" stroke-width="3.5" stroke-linecap="round"/>
-              <line x1="71" y1="71" x2="82" y2="82" stroke="#C49A2B" stroke-width="3.5" stroke-linecap="round"/>
-              <line x1="82" y1="18" x2="71" y2="29" stroke="#C49A2B" stroke-width="3.5" stroke-linecap="round"/>
-              <line x1="29" y1="71" x2="18" y2="82" stroke="#C49A2B" stroke-width="3.5" stroke-linecap="round"/>
-            </svg>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: #C49A2B; font-weight: 600;">tmonier</span>
-          </div>
-        </div>
-        <!-- Nav items -->
-        <nav style="padding: 0 0.75rem; display: flex; flex-direction: column; gap: 0.15rem;">
-          <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.6rem; border-radius: 6px; background: rgba(196,154,43,0.08); border: 1px solid rgba(196,154,43,0.15);">
-            <span style="width: 6px; height: 6px; background: #28C840; border-radius: 50%; display: inline-block; flex-shrink: 0;"></span>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #F5F0E8;">Agents</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.6rem; border-radius: 6px;">
-            <span style="width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0;"></span>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #8B9CAF;">Runs</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.6rem; border-radius: 6px;">
-            <span style="width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0;"></span>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #8B9CAF;">Settings</span>
-          </div>
-        </nav>
-      </div>
-
-      <!-- Main area -->
-      <div style="flex: 1; padding: 1.25rem; background: rgba(11,26,46,0.4); min-width: 0; position: relative; min-height: 420px;">
-        <!-- Header row -->
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 0.5rem;">
-          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #F5F0E8; font-weight: 600;">Rate-limit /api/users</span>
-          <div style="display: flex; align-items: center; gap: 0.6rem;">
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; background: rgba(40,200,64,0.12); color: #28C840; border: 1px solid rgba(40,200,64,0.3); border-radius: 10px; padding: 0.1rem 0.55rem;">1 agent active</span>
-            <span class="cost-counter" style="font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: #8B9CAF;">$0.00</span>
-          </div>
-        </div>
-
-        <!-- Agent card -->
-        <div
-          class="agent-card"
-          style="opacity: 0; background: rgba(29,53,87,0.5); border: 1px solid rgba(40,200,64,0.3); border-radius: 8px; padding: 0.75rem; margin-bottom: 1rem;"
-        >
-          <div class="agent-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
-            <div style="display: flex; align-items: center; gap: 0.35rem;">
-              <span style="width: 6px; height: 6px; background: #28C840; border-radius: 50%; display: inline-block;"></span>
-              <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #C49A2B; font-weight: 600;">Claude Code</span>
-              <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; background: rgba(139,156,175,0.1); border: 1px solid rgba(139,156,175,0.2); border-radius: 4px; padding: 0.05rem 0.35rem; color: #8B9CAF;">opus</span>
-            </div>
-            <span class="agent-file" style="font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: rgba(139,156,175,0.6);">src/middleware/rate-limit.ts</span>
-          </div>
-          <!-- Context window gauge -->
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.55rem;">
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; color: rgba(139,156,175,0.5); flex-shrink: 0;">context</span>
-            <div style="flex: 1; height: 3px; background: rgba(139,156,175,0.15); border-radius: 2px; overflow: hidden; position: relative;">
-              <div class="context-bar" style="height: 100%; width: 0; border-radius: 2px; transition: width 1.5s ease-out, background 0.5s ease; background: #28C840;"></div>
-            </div>
-            <span class="context-pct" style="font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; color: rgba(139,156,175,0.5); flex-shrink: 0; min-width: 2.2em; text-align: right;">0%</span>
-            <span class="context-action" style="opacity: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.48rem; color: #FF8C42; flex-shrink: 0; cursor: default; border-bottom: 1px dotted rgba(255,140,66,0.4); transition: opacity 0.4s ease;">fresh window from checkpoint</span>
-          </div>
-        </div>
-
-        <!-- Activity log -->
-        <div style="background: rgba(11,26,46,0.5); border: 1px solid rgba(139,156,175,0.1); border-radius: 6px; padding: 0.6rem 0.75rem; margin-bottom: 0.75rem;">
-          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.55rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(139,156,175,0.4); margin-bottom: 0.5rem;">Activity</div>
-          <div class="log-container" style="display: flex; flex-direction: column; gap: 0.25rem; height: 130px; overflow-y: hidden;"></div>
-        </div>
-
-        <!-- Action panel — appears after loop detection -->
-        <div
-          class="action-panel"
-          style="opacity: 0; background: rgba(29,53,87,0.4); border: 1px solid rgba(196,154,43,0.3); border-radius: 8px; padding: 0.75rem; transform: translateY(8px);"
-        >
-          <!-- Panel header -->
-          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem;">
-            <div style="display: flex; align-items: center; gap: 0.4rem;">
-              <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: #FFBD2E; font-weight: 700;">&#9888;</span>
-              <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; color: #F5F0E8; font-weight: 600;">Agent paused &mdash; loop detected</span>
-            </div>
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.55rem; color: #FF8C42;">$4.20 spent</span>
-          </div>
-
-          <!-- Suggested prompt -->
-          <div style="background: rgba(11,26,46,0.6); border: 1px solid rgba(139,156,175,0.15); border-radius: 6px; padding: 0.55rem 0.65rem; margin-bottom: 0.6rem;">
-            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(139,156,175,0.4); margin-bottom: 0.3rem;">Suggested prompt</div>
-            <p class="suggested-prompt-text" style="font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: #F5F0E8; margin: 0; line-height: 1.6; font-style: italic; min-height: 1.6em;"></p>
-          </div>
-
-          <!-- Action buttons -->
-          <div style="display: flex; gap: 0.35rem; justify-content: flex-end;">
-            <div
-              class="action-btn-rollback"
-              style="opacity: 0; display: flex; align-items: center; gap: 0.3rem; font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; background: rgba(196,154,43,0.12); border: 1px solid rgba(196,154,43,0.35); border-radius: 5px; padding: 0.35rem 0.6rem; color: #C49A2B; font-weight: 600; cursor: default;"
-            >
-              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" style="flex-shrink: 0;">
-                <path d="M2 8a6 6 0 1 1 1.76 4.24" stroke="#C49A2B" stroke-width="1.5" stroke-linecap="round"/>
-                <path d="M2 4v4h4" stroke="#C49A2B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              Rollback #3
-            </div>
-            <div
-              class="action-btn-send"
-              style="opacity: 0; display: flex; align-items: center; gap: 0.3rem; font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; background: rgba(40,200,64,0.1); border: 1px solid rgba(40,200,64,0.3); border-radius: 5px; padding: 0.35rem 0.6rem; color: #28C840; font-weight: 600; cursor: default;"
-            >
-              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" style="flex-shrink: 0;">
-                <path d="M2 8h12M10 4l4 4-4 4" stroke="#28C840" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              Resume
-            </div>
-            <div
-              class="action-btn-stop"
-              style="opacity: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; background: rgba(255,95,87,0.08); border: 1px solid rgba(255,95,87,0.25); border-radius: 5px; padding: 0.35rem 0.6rem; color: rgba(255,95,87,0.7); cursor: default;"
-            >
-              Stop agent
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Websocket link -->
-  <div class="ws-link" style="opacity: 0; display: flex; flex-direction: column; align-items: center; gap: 0; margin: 0 auto; padding: 0.75rem 0;">
-    <!-- Dashed line -->
-    <div class="ws-dash" style="width: 2px; height: 28px; background: repeating-linear-gradient(to bottom, rgba(40,200,64,0.3) 0px, rgba(40,200,64,0.3) 4px, transparent 4px, transparent 8px); background-size: 2px 8px;"></div>
-    <!-- Label -->
-    <div style="display: flex; align-items: center; gap: 0.35rem; background: rgba(40,200,64,0.06); border: 1px solid rgba(40,200,64,0.2); border-radius: 20px; padding: 0.2rem 0.65rem;">
-      <svg width="8" height="8" viewBox="0 0 16 16" fill="none" style="flex-shrink: 0;">
-        <path d="M5 1C3.34 1 2 2.34 2 4c0 1.1.6 2.06 1.48 2.58A3 3 0 0 0 2 9v2a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V9a3 3 0 0 0-1.48-2.42A3 3 0 0 0 14 4c0-1.66-1.34-3-3-3H5z" stroke="#28C840" stroke-width="1.5" fill="none"/>
-        <circle cx="8" cy="7" r="1.5" fill="#28C840"/>
-      </svg>
-      <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; color: #28C840; letter-spacing: 0.03em;">ws://localhost:4800</span>
-    </div>
-    <!-- Dashed line -->
-    <div class="ws-dash" style="width: 2px; height: 28px; background: repeating-linear-gradient(to bottom, rgba(40,200,64,0.3) 0px, rgba(40,200,64,0.3) 4px, transparent 4px, transparent 8px); background-size: 2px 8px;"></div>
-  </div>
-
-  <!-- Local daemon terminal -->
-  <div
-    class="local-terminal"
-    style="opacity: 0; transform: translateY(16px); max-width: 520px; margin: 0 auto; border-radius: 10px; overflow: hidden; border: 1px solid rgba(139,156,175,0.15); box-shadow: 0 16px 48px rgba(0,0,0,0.3);"
+    class="local-terminal font-mono opacity-0 translate-y-6 max-w-[520px] mx-auto mb-6 rounded-[10px] overflow-hidden border border-slate/15 shadow-[0_16px_48px_rgba(0,0,0,0.3)] max-md:max-w-full"
   >
     <!-- Window chrome -->
-    <div style="background: rgba(29,53,87,0.5); padding: 0.55rem 0.85rem; display: flex; gap: 0.45rem; align-items: center; border-bottom: 1px solid rgba(139,156,175,0.1);">
-      <span style="width: 10px; height: 10px; background: #FF5F57; border-radius: 50%; display: inline-block;"></span>
-      <span style="width: 10px; height: 10px; background: #FFBD2E; border-radius: 50%; display: inline-block;"></span>
-      <span style="width: 10px; height: 10px; background: #28C840; border-radius: 50%; display: inline-block;"></span>
-      <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: rgba(139,156,175,0.4); margin-left: 0.4rem;">zsh — ~/projects/my-app</span>
+    <div class="bg-navy-mid/50 py-[0.55rem] px-[0.85rem] flex gap-[0.45rem] items-center border-b border-slate/10">
+      <span class="size-[10px] rounded-full inline-block bg-signal-red"></span>
+      <span class="size-[10px] rounded-full inline-block bg-signal-amber"></span>
+      <span class="size-[10px] rounded-full inline-block bg-signal-green"></span>
+      <span class="text-[0.6rem] text-slate/40 ml-[0.4rem]">zsh — ~/projects/my-app</span>
     </div>
     <!-- Terminal content -->
-    <div style="background: rgba(11,26,46,0.6); padding: 1rem 1.25rem; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; line-height: 2;">
+    <div class="bg-navy-deep/60 py-4 px-5 text-[0.68rem] leading-[2]">
       <div>
-        <span style="color: #C49A2B;">$</span>
-        <span style="color: #E0BC5A;"> tmonier start</span>
+        <span class="text-gold">$</span>
+        <span class="text-gold-pale"> tmonier start</span>
       </div>
-      <div style="color: #8B9CAF;">
-        <span style="color: #28C840;">&#10003;</span> daemon running on localhost:4800
+      <div class="text-slate">
+        <span class="text-signal-green">&#10003;</span> daemon running on localhost:4800
       </div>
-      <div style="color: rgba(139,156,175,0.5);">
+      <div class="text-slate/50">
         watching claude-code · all events forwarded to dashboard
       </div>
-      <div style="color: rgba(139,156,175,0.35); font-size: 0.58rem; margin-top: 0.15rem;">
+      <div class="text-slate/35 text-[0.58rem] mt-[0.15rem]">
         local-first &mdash; your data never leaves your machine
       </div>
-      <div style="margin-top: 0.35rem;">
-        <span style="color: #C49A2B;">$</span>
-        <span style="display: inline-block; width: 7px; height: 1em; background: #C49A2B; margin-left: 4px; vertical-align: text-bottom; animation: blink 1.2s step-end infinite;"></span>
+      <div class="mt-[0.35rem]">
+        <span class="text-gold">$</span>
+        <span class="terminal-cursor inline-block w-[7px] h-[1em] bg-gold ml-1 align-text-bottom animate-[blink_1.2s_step-end_infinite]"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Websocket connector: line segment + badge + line segment -->
+  <div class="ws-connector font-mono grid grid-rows-[0fr] opacity-0 [transition:grid-template-rows_1.6s_cubic-bezier(0.22,1,0.36,1),opacity_1s_ease]">
+    <div class="ws-connector-inner flex flex-col items-center overflow-hidden min-h-0">
+      <!-- Top line segment -->
+      <div class="ws-dash ws-dash-top w-[2px] h-[28px] scale-y-0 origin-top transition-[scale] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]" style="background: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--signal-green) 30%, transparent) 0px, color-mix(in srgb, var(--signal-green) 30%, transparent) 4px, transparent 4px, transparent 8px)"></div>
+      <!-- Badge -->
+      <div class="ws-badge flex items-center gap-[0.4rem] bg-signal-green/7 border border-signal-green/25 rounded-[20px] py-1 px-3 my-1 opacity-0 transition-opacity duration-[400ms]">
+        <span class="size-[6px] rounded-full inline-block shrink-0 bg-signal-green animate-[pulse-soft_2s_ease-in-out_infinite]"></span>
+        <span class="text-[0.52rem] text-signal-green tracking-[0.04em]">ws://localhost:4800</span>
+      </div>
+      <!-- Bottom line segment -->
+      <div class="ws-dash ws-dash-bottom w-[2px] h-[48px] scale-y-0 origin-top transition-[scale] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]" style="background: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--signal-green) 30%, transparent) 0px, color-mix(in srgb, var(--signal-green) 30%, transparent) 4px, transparent 4px, transparent 8px)"></div>
+    </div>
+  </div>
+
+  <!-- 3. Browser UI mockup / dashboard (appears last, then animates internally) -->
+  <div class="browser-wrapper grid grid-rows-[0fr] opacity-0 [transition:grid-template-rows_1.8s_cubic-bezier(0.22,1,0.36,1),opacity_1.2s_ease]">
+    <div class="browser-wrapper-inner flex flex-col items-center overflow-hidden min-h-0">
+      <div
+        class="browser-mock font-mono max-w-[920px] w-full rounded-xl overflow-hidden border border-gold/20 shadow-[0_32px_80px_rgba(0,0,0,0.5)]"
+      >
+        <!-- Browser chrome -->
+        <div class="bg-navy-mid/70 py-[0.65rem] px-4 flex items-center gap-2 border-b border-gold/10">
+          <span class="size-3 rounded-full inline-block shrink-0 bg-signal-red"></span>
+          <span class="size-3 rounded-full inline-block shrink-0 bg-signal-amber"></span>
+          <span class="size-3 rounded-full inline-block shrink-0 bg-signal-green"></span>
+          <!-- Address bar -->
+          <div class="flex-1 mx-3 bg-navy-deep/70 border border-slate/15 rounded-md py-1 px-3 flex items-center gap-[0.4rem] max-w-[320px] ml-auto mr-auto">
+            <svg width="10" height="12" viewBox="0 0 10 12" fill="none" class="shrink-0 opacity-50 text-slate">
+              <path d="M5 0C3.067 0 1.5 1.567 1.5 3.5V5H1C0.448 5 0 5.448 0 6v5c0 .552.448 1 1 1h8c.552 0 1-.448 1-1V6c0-.552-.448-1-1-1H8.5V3.5C8.5 1.567 6.933 0 5 0zm2.5 5h-5V3.5C2.5 2.12 3.62 1 5 1s2.5 1.12 2.5 2.5V5z" fill="currentColor"/>
+            </svg>
+            <span class="text-[0.65rem] text-slate/60">app.tmonier.com</span>
+          </div>
+        </div>
+
+        <!-- Browser body -->
+        <div class="browser-body flex bg-navy-deep/50 max-md:flex-col">
+          <!-- Sidebar -->
+          <div class="browser-sidebar w-[180px] shrink-0 bg-navy-deep/60 border-r border-gold/10 py-5 max-md:hidden">
+            <!-- Logo -->
+            <div class="px-4 pb-5 border-b border-slate/10 mb-4">
+              <div class="flex items-center gap-2">
+                <svg width="18" height="18" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-gold">
+                  <circle cx="50" cy="50" r="46" stroke="currentColor" stroke-width="4"/>
+                  <circle cx="50" cy="50" r="8" fill="currentColor"/>
+                  <line x1="50" y1="4" x2="50" y2="20" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                  <line x1="50" y1="80" x2="50" y2="96" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                  <line x1="4" y1="50" x2="20" y2="50" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                  <line x1="80" y1="50" x2="96" y2="50" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
+                  <line x1="18" y1="18" x2="29" y2="29" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+                  <line x1="71" y1="71" x2="82" y2="82" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+                  <line x1="82" y1="18" x2="71" y2="29" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+                  <line x1="29" y1="71" x2="18" y2="82" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+                </svg>
+                <span class="text-[0.78rem] text-gold font-semibold">tmonier</span>
+              </div>
+            </div>
+            <!-- Nav items -->
+            <nav class="px-3 flex flex-col gap-[0.15rem]">
+              <div class="flex items-center gap-[0.6rem] py-[0.45rem] px-[0.6rem] rounded-md bg-gold/8 border border-gold/15">
+                <span class="size-[6px] rounded-full inline-block shrink-0 bg-signal-green"></span>
+                <span class="text-[0.7rem] text-cream">Agents</span>
+              </div>
+              <div class="flex items-center gap-[0.6rem] py-[0.45rem] px-[0.6rem] rounded-md">
+                <span class="w-[6px] h-[6px] rounded-full inline-block shrink-0"></span>
+                <span class="text-[0.7rem] text-slate">Runs</span>
+              </div>
+              <div class="flex items-center gap-[0.6rem] py-[0.45rem] px-[0.6rem] rounded-md">
+                <span class="w-[6px] h-[6px] rounded-full inline-block shrink-0"></span>
+                <span class="text-[0.7rem] text-slate">Settings</span>
+              </div>
+            </nav>
+          </div>
+
+          <!-- Main area -->
+          <div class="flex-1 p-5 bg-navy-deep/40 min-w-0 relative">
+            <!-- Header row -->
+            <div class="flex items-center justify-between mb-4 gap-2">
+              <span class="text-[0.7rem] text-cream font-semibold">Rate-limit /api/users</span>
+              <div class="flex items-center gap-[0.6rem]">
+                <span class="badge-active text-[0.65rem] bg-signal-green/12 text-signal-green border border-signal-green/30 rounded-[10px] py-[0.1rem] px-[0.55rem]">1 agent active</span>
+                <span class="cost-counter text-[0.65rem] text-slate">$0.00</span>
+              </div>
+            </div>
+
+            <!-- Agent card -->
+            <div
+              class="agent-card opacity-0 bg-navy-mid/50 rounded-lg p-3 mb-4 border border-signal-green/30 transition-[opacity,transform] duration-300 ease-out max-md:p-[0.6rem]"
+            >
+              <div class="agent-header flex items-center justify-between mb-[0.4rem] max-md:flex-col max-md:items-start max-md:gap-1">
+                <div class="flex items-center gap-[0.35rem]">
+                  <span class="size-[6px] rounded-full inline-block bg-signal-green"></span>
+                  <span class="text-[0.7rem] text-gold font-semibold">Claude Code</span>
+                  <span class="badge-model text-[0.5rem] bg-slate/10 border border-slate/20 rounded-[4px] py-[0.05rem] px-[0.35rem] text-slate">opus</span>
+                </div>
+                <span class="agent-file text-[0.6rem] text-slate/60 max-md:text-[0.52rem] max-md:break-all">src/middleware/rate-limit.ts</span>
+              </div>
+              <!-- Context window gauge -->
+              <div class="flex items-center gap-2 mt-[0.55rem]">
+                <span class="text-[0.5rem] text-slate/50 shrink-0">context</span>
+                <div class="flex-1 h-[3px] bg-slate/15 rounded-sm overflow-hidden relative">
+                  <div class="context-bar h-full w-0 rounded-[2px] bg-signal-green [transition:width_1.5s_ease-out,background_0.5s_ease]"></div>
+                </div>
+                <span class="context-pct text-[0.5rem] text-slate/50 shrink-0 min-w-[2.2em] text-right">0%</span>
+                <span class="context-action text-[0.48rem] text-signal-orange shrink-0 cursor-default opacity-0 transition-opacity duration-[400ms] max-md:hidden" style="border-bottom: 1px dotted color-mix(in srgb, var(--signal-orange) 40%, transparent)">fresh window from checkpoint</span>
+              </div>
+            </div>
+
+            <!-- Activity log -->
+            <div class="bg-navy-deep/50 border border-slate/10 rounded-md py-[0.6rem] px-3 mb-3">
+              <div class="text-[0.55rem] tracking-[0.08em] uppercase text-slate/40 mb-2">Activity</div>
+              <div class="log-container flex flex-col gap-1 h-[130px] overflow-y-hidden"></div>
+            </div>
+
+            <!-- Action panel — appears after loop detection -->
+            <div class="action-panel-wrapper grid grid-rows-[0fr] [transition:grid-template-rows_0.6s_cubic-bezier(0.22,1,0.36,1)]">
+            <div
+              class="action-panel opacity-0 translate-y-2 overflow-hidden min-h-0 bg-navy-mid/40 border border-gold/30 rounded-lg p-3 max-md:p-[0.6rem]"
+            >
+              <!-- Panel header -->
+              <div class="flex items-center justify-between mb-[0.6rem]">
+                <div class="flex items-center gap-[0.4rem]">
+                  <span class="text-[0.6rem] text-signal-amber font-bold">&#9888;</span>
+                  <span class="text-[0.62rem] text-cream font-semibold">Agent paused &mdash; loop detected</span>
+                </div>
+                <span class="text-[0.55rem] text-signal-orange">$4.20 spent</span>
+              </div>
+
+              <!-- Suggested prompt -->
+              <div class="bg-navy-deep/60 border border-slate/15 rounded-md py-[0.55rem] px-[0.65rem] mb-[0.6rem]">
+                <div class="text-[0.5rem] tracking-[0.08em] uppercase text-slate/40 mb-[0.3rem]">Suggested prompt</div>
+                <p class="suggested-prompt-text text-[0.6rem] text-cream m-0 leading-[1.6] italic min-h-[1.6em]"></p>
+              </div>
+
+              <!-- Action buttons -->
+              <div class="flex gap-[0.35rem] justify-end">
+                <div
+                  class="action-btn-rollback opacity-0 flex items-center gap-[0.3rem] text-[0.58rem] bg-gold/12 border border-gold/35 rounded-[5px] py-[0.35rem] px-[0.6rem] text-gold font-semibold cursor-default"
+                >
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="shrink-0">
+                    <path d="M2 8a6 6 0 1 1 1.76 4.24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M2 4v4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Rollback #3
+                </div>
+                <div
+                  class="action-btn-send opacity-0 flex items-center gap-[0.3rem] text-[0.58rem] bg-signal-green/10 border border-signal-green/30 rounded-[5px] py-[0.35rem] px-[0.6rem] text-signal-green font-semibold cursor-default"
+                >
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="shrink-0">
+                    <path d="M2 8h12M10 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  Resume
+                </div>
+                <div
+                  class="action-btn-stop opacity-0 text-[0.58rem] bg-signal-red/8 border border-signal-red/25 rounded-[5px] py-[0.35rem] px-[0.6rem] text-signal-red/70 cursor-default"
+                >
+                  Stop agent
+                </div>
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<style>
-  @keyframes fade-up {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes fade-in {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes panel-in {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes pulse-amber {
-    0%, 100% { border-color: rgba(255,189,46,0.3); }
-    50%      { border-color: rgba(255,189,46,0.6); box-shadow: 0 0 12px 0 rgba(255,189,46,0.1); }
-  }
-
-  /* Browser mock entrance */
-  .dashboard-section.is-visible .browser-mock {
-    animation: fade-up 0.3s ease-out forwards;
-  }
-
-  /* Agent card */
-  .dashboard-section.is-visible .agent-card {
-    animation: fade-in 0.2s ease-out 0.15s forwards;
-  }
-
-  /* Log lines — animated via JS */
-
-  /* Action panel & buttons — animated via JS */
-
-  /* Blink cursor */
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50%      { opacity: 0; }
-  }
-
-  /* Websocket link — appears after action panel (~8s) */
-  .dashboard-section.is-visible .ws-link {
-    animation: fade-in 0.2s ease-out 5s forwards;
-  }
-  .dashboard-section.is-visible .ws-dash {
-    animation: ws-flow 0.6s linear infinite;
-  }
-  @keyframes ws-flow {
-    to { background-position: 0 8px; }
-  }
-
-  /* Local terminal */
-  .dashboard-section.is-visible .local-terminal {
-    animation: fade-up 0.3s ease-out 5.2s forwards;
-  }
-
-  /* Responsive */
-  @media (max-width: 768px) {
-    .browser-body {
-      flex-direction: column !important;
-    }
-    .browser-sidebar {
-      display: none !important;
-    }
-    .agent-card {
-      padding: 0.6rem !important;
-    }
-    .agent-card .agent-header {
-      flex-direction: column !important;
-      align-items: flex-start !important;
-      gap: 0.25rem !important;
-    }
-    .agent-file {
-      font-size: 0.52rem !important;
-      word-break: break-all;
-    }
-    .context-action {
-      display: none !important;
-    }
-    .action-panel {
-      padding: 0.6rem !important;
-    }
-    .log-line {
-      font-size: 0.55rem !important;
-    }
-    .local-terminal {
-      max-width: 100% !important;
-    }
-    .ws-link {
-      padding: 0.4rem 0 !important;
-    }
-  }
-</style>
 
 <script>
   const section = document.getElementById('dashboard-demo');
@@ -318,37 +214,87 @@
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            section.classList.add('is-visible');
+            // --- Phase 1: Terminal fades in immediately (~500ms) ---
+            const terminal = section.querySelector<HTMLElement>('.local-terminal');
+            if (terminal) {
+              terminal.classList.add('animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards]');
+            }
+
+            // --- Phase 2: WS gap + dashboard grow simultaneously (both endpoints visible before line draws) ---
+            const wsConn = section.querySelector<HTMLElement>('.ws-connector');
+            const browserWrap = section.querySelector<HTMLElement>('.browser-wrapper');
+
+            if (wsConn) {
+              // Grid expands at 800ms — gap grows but line/badge stay invisible
+              setTimeout(() => { wsConn.style.gridTemplateRows = '1fr'; }, 800);
+              // Container becomes visible at 1000ms (still no line segments)
+              setTimeout(() => { wsConn.style.opacity = '1'; }, 1000);
+            }
+            if (browserWrap) {
+              // Dashboard grid expands simultaneously with ws gap
+              setTimeout(() => { browserWrap.style.gridTemplateRows = '1fr'; }, 800);
+              setTimeout(() => { browserWrap.style.opacity = '1'; }, 1000);
+            }
+
+            // --- Phase 3: WS line draws top-to-bottom (both endpoints now visible) ---
+            const topLine = section.querySelector<HTMLElement>('.ws-dash-top');
+            const bottomLine = section.querySelector<HTMLElement>('.ws-dash-bottom');
+            const wsBadge = section.querySelector<HTMLElement>('.ws-badge');
+
+            if (topLine) {
+              setTimeout(() => {
+                topLine.classList.remove('scale-y-0');
+                topLine.classList.add('animate-[scroll-stripe_0.6s_linear_infinite]');
+              }, 2000);
+            }
+            if (wsBadge) {
+              setTimeout(() => { wsBadge.style.opacity = '1'; }, 2300);
+            }
+            if (bottomLine) {
+              setTimeout(() => {
+                bottomLine.classList.remove('scale-y-0');
+                bottomLine.classList.add('animate-[scroll-stripe_0.6s_linear_infinite]');
+              }, 2400);
+            }
+
+            // --- Phase 4: Dashboard internal animations start after line fully drawn ---
+            const dashboardStart = 2800;
 
             const container = section.querySelector<HTMLElement>('.log-container');
             if (!container) return;
 
+            // Agent card fade in
+            const agentCard = section.querySelector<HTMLElement>('.agent-card');
+            if (agentCard) {
+              setTimeout(() => {
+                agentCard.style.opacity = '1';
+                agentCard.style.transform = 'translateY(0)';
+              }, dashboardStart);
+            }
+
             // Log data — each line injected dynamically like a real terminal
             const logs: { time: string; html: string; delay: number }[] = [
-              { time: '14:32:01', html: '<span style="color:#8B9CAF">claude-code</span> · reading <span style="color:#28C840">src/api/users.ts</span>', delay: 200 },
-              { time: '14:33:12', html: '<span style="color:#8B9CAF">claude-code</span> · created <span style="color:#28C840">src/middleware/rate-limit.ts</span>', delay: 350 },
-              { time: '14:34:30', html: '<span style="color:#8B9CAF">claude-code</span> · running <span style="color:#F5F0E8">npm test</span> — <span style="color:#FF5F57">3 failed</span>', delay: 550 },
-              { time: '14:35:15', html: '<span style="color:#8B9CAF">claude-code</span> · editing <span style="color:#F5F0E8">src/middleware/rate-limit.ts</span>', delay: 250 },
-              { time: '14:36:48', html: '<span style="color:#8B9CAF">claude-code</span> · running <span style="color:#F5F0E8">npm test</span> — <span style="color:#FF5F57">3 failed</span>', delay: 600 },
-              { time: '14:37:02', html: '<span style="color:#FFBD2E">⚠ scope drift · <span style="color:rgba(255,189,46,0.7)">agent modified package.json — outside declared scope</span></span>', delay: 400 },
-              { time: '14:37:45', html: '<span style="color:#FF8C42">⚠ context 65% · <span style="color:rgba(255,140,66,0.7)">agent may lose early instructions — consider a checkpoint</span></span>', delay: 300 },
-              { time: '14:38:01', html: '<span style="color:#8B9CAF">$ cost hint · <span style="color:rgba(139,156,175,0.7)">this task could run on <span style="color:#F5F0E8">sonnet</span> — ~3x cheaper for similar results</span></span>', delay: 200 },
-              { time: '14:38:03', html: '<span style="color:#FFBD2E">⚠ loop detected · <span style="color:rgba(255,189,46,0.7)">edit → test → fail → edit — 4 cycles in 6 min</span></span>', delay: 500 },
+              { time: '14:32:01', html: '<span class="text-slate">claude-code</span> · reading <span class="text-signal-green">src/api/users.ts</span>', delay: 200 },
+              { time: '14:33:12', html: '<span class="text-slate">claude-code</span> · created <span class="text-signal-green">src/middleware/rate-limit.ts</span>', delay: 350 },
+              { time: '14:34:30', html: '<span class="text-slate">claude-code</span> · running <span class="text-cream">npm test</span> — <span class="text-signal-red">3 failed</span>', delay: 550 },
+              { time: '14:35:15', html: '<span class="text-slate">claude-code</span> · editing <span class="text-cream">src/middleware/rate-limit.ts</span>', delay: 250 },
+              { time: '14:36:48', html: '<span class="text-slate">claude-code</span> · running <span class="text-cream">npm test</span> — <span class="text-signal-red">3 failed</span>', delay: 600 },
+              { time: '14:37:02', html: '<span class="text-signal-amber">⚠ scope drift · <span class="text-signal-amber/70">agent modified package.json — outside declared scope</span></span>', delay: 400 },
+              { time: '14:37:45', html: '<span class="text-signal-orange">⚠ context 65% · <span class="text-signal-orange/70">agent may lose early instructions — consider a checkpoint</span></span>', delay: 300 },
+              { time: '14:38:01', html: '<span class="text-slate">$ cost hint · <span class="text-slate/70">this task could run on <span class="text-cream">sonnet</span> — ~3x cheaper for similar results</span></span>', delay: 200 },
+              { time: '14:38:03', html: '<span class="text-signal-amber">⚠ loop detected · <span class="text-signal-amber/70">edit → test → fail → edit — 4 cycles in 6 min</span></span>', delay: 500 },
             ];
 
-            const lineStyle = "font-family:'JetBrains Mono',monospace;font-size:0.62rem;line-height:1.8;color:rgba(139,156,175,0.55);display:flex;gap:0.5rem;align-items:baseline";
-
-            let elapsed = 300;
+            let elapsed = dashboardStart + 300;
             logs.forEach((log) => {
               elapsed += log.delay;
               const t = elapsed;
               setTimeout(() => {
                 const div = document.createElement('div');
-                div.className = 'log-line';
-                div.style.cssText = lineStyle;
-                div.innerHTML = `<span style="color:rgba(139,156,175,0.35);flex-shrink:0">${log.time}</span><span>${log.html}</span>`;
+                div.className = 'log-line font-mono text-[0.62rem] leading-[1.8] flex gap-2 items-baseline max-md:text-[0.55rem]';
+                div.style.color = 'color-mix(in srgb, var(--slate) 55%, transparent)';
+                div.innerHTML = `<span class="log-line-time shrink-0" style="color: color-mix(in srgb, var(--slate) 35%, transparent)">${log.time}</span><span>${log.html}</span>`;
                 container.appendChild(div);
-                // Auto-scroll to bottom
                 container.scrollTop = container.scrollHeight;
               }, t);
             });
@@ -360,13 +306,21 @@
               const card = section.querySelector<HTMLElement>('.agent-card');
               if (card) {
                 card.style.transition = 'border-color 0.4s ease';
-                card.style.borderColor = 'rgba(255,189,46,0.4)';
+                card.style.borderColor = 'var(--signal-amber)';
               }
             }, loopDetectedTime);
 
             // --- Action panel slides in after loop detected ---
+            const panelWrapper = section.querySelector<HTMLElement>('.action-panel-wrapper');
             const panel = section.querySelector<HTMLElement>('.action-panel');
+            if (panelWrapper) {
+              // Expand the grid wrapper first so space grows smoothly
+              setTimeout(() => {
+                panelWrapper.style.gridTemplateRows = '1fr';
+              }, loopDetectedTime + 300);
+            }
             if (panel) {
+              // Then fade in the panel content after the space has opened
               setTimeout(() => {
                 panel.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
                 panel.style.opacity = '1';
@@ -379,7 +333,6 @@
             const promptEl = section.querySelector<HTMLElement>('.suggested-prompt-text');
             if (promptEl) {
               const promptText = '\u201cTests expect a Redis mock \u2014 use ioredis-mock in the test setup instead of connecting to a real instance.\u201d';
-              // Split into "tokens" (small word groups, like LLM streaming)
               const words = promptText.split(' ');
               const tokens: string[] = [];
               for (let i = 0; i < words.length; i += 2) {
@@ -389,22 +342,18 @@
               const streamStart = loopDetectedTime + 600;
               const streamToken = () => {
                 if (tokenIdx >= tokens.length) {
-                  // Remove cursor after streaming done
                   const cursor = promptEl.querySelector('.stream-cursor');
                   if (cursor) cursor.remove();
                   return;
                 }
                 promptEl.textContent = (promptEl.textContent || '') + (tokenIdx > 0 ? ' ' : '') + tokens[tokenIdx];
-                // Add blinking cursor at end
                 let cursor = promptEl.querySelector('.stream-cursor') as HTMLElement;
                 if (!cursor) {
                   cursor = document.createElement('span');
-                  cursor.className = 'stream-cursor';
-                  cursor.style.cssText = 'display:inline-block;width:5px;height:0.85em;background:#F5F0E8;margin-left:2px;vertical-align:text-bottom;animation:blink 0.6s step-end infinite;opacity:0.7';
+                  cursor.className = 'stream-cursor inline-block w-[5px] h-[0.85em] bg-cream ml-[2px] align-text-bottom animate-[blink_0.6s_step-end_infinite] opacity-70';
                 }
                 promptEl.appendChild(cursor);
                 tokenIdx++;
-                // Variable delay per token (20-60ms per token, like real streaming)
                 setTimeout(streamToken, 80 + Math.random() * 120);
               };
               setTimeout(streamToken, streamStart);
@@ -423,16 +372,21 @@
               }
             });
 
+            // Signal that the full demo animation is complete
+            setTimeout(() => {
+              document.dispatchEvent(new CustomEvent('dashboard-demo-complete'));
+            }, loopDetectedTime + 1100);
+
             // --- Context window bar: synced with log progression ---
             const ctxBar = section.querySelector<HTMLElement>('.context-bar');
             const ctxPct = section.querySelector<HTMLElement>('.context-pct');
             if (ctxBar && ctxPct) {
               const ctxSteps = [
-                { delay: 550,   width: '18', pct: '18%', color: '#28C840' },
-                { delay: 1100,  width: '31', pct: '31%', color: '#28C840' },
-                { delay: 1350,  width: '44', pct: '44%', color: '#FFBD2E' },
-                { delay: 1950,  width: '57', pct: '57%', color: '#FFBD2E' },
-                { delay: loopDetectedTime, width: '65', pct: '65%', color: '#FF8C42' },
+                { delay: dashboardStart + 550,  width: '18', pct: '18%', color: 'var(--signal-green)' },
+                { delay: dashboardStart + 1100, width: '31', pct: '31%', color: 'var(--signal-green)' },
+                { delay: dashboardStart + 1350, width: '44', pct: '44%', color: 'var(--signal-amber)' },
+                { delay: dashboardStart + 1950, width: '57', pct: '57%', color: 'var(--signal-amber)' },
+                { delay: loopDetectedTime,      width: '65', pct: '65%', color: 'var(--signal-orange)' },
               ];
               for (const step of ctxSteps) {
                 setTimeout(() => {
@@ -452,11 +406,11 @@
             const costEl = section.querySelector<HTMLElement>('.cost-counter');
             if (costEl) {
               const costSteps = [
-                { delay: 550,   value: '$0.40', color: '' },
-                { delay: 1100,  value: '$1.12', color: '' },
-                { delay: 1350,  value: '$2.30', color: '#FFBD2E' },
-                { delay: 1950,  value: '$3.45', color: '#FF8C42' },
-                { delay: loopDetectedTime, value: '$4.20', color: '#FF8C42' },
+                { delay: dashboardStart + 550,  value: '$0.40', color: '' },
+                { delay: dashboardStart + 1100, value: '$1.12', color: '' },
+                { delay: dashboardStart + 1350, value: '$2.30', color: 'var(--signal-amber)' },
+                { delay: dashboardStart + 1950, value: '$3.45', color: 'var(--signal-orange)' },
+                { delay: loopDetectedTime,      value: '$4.20', color: 'var(--signal-orange)' },
               ];
               for (const step of costSteps) {
                 setTimeout(() => {
