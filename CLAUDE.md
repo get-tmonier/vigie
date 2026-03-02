@@ -26,9 +26,18 @@ Real-time visibility into AI agent activity, drift detection, token cost guardra
 
 - **2 Railway services:** TanStack Start SSR (`app.tmonier.com`) + Hono+Effect+PostgreSQL (`api.tmonier.com`)
 - **Backend:** hexagonal/DDD — Effect for domain/services, Hono as HTTP adapter, Kysely+PostgreSQL for persistence
+  - **Module structure:** each module follows `domain/`, `ports/`, `commands/`, `queries/`, `adapters/primary/`, `adapters/secondary/`
+  - **CQRS:** commands (`*.command.ts`) for writes, queries (`*.query.ts`) for reads
+  - **File naming:** `*.port.ts`, `*.command.ts`, `*.query.ts`, `*.adapter.ts`
+  - **Effect patterns:** services via `ServiceMap.Service`, errors via `Data.TaggedError`, DI via `Layer`, no try/catch
+  - **Tests split:** `*.unit.test.ts` for domain/commands/queries, `*.integration.test.ts` for adapters. Tests live in `__tests__/` co-located with source
 - **Daemon:** proxy only — spawn, stream, control signals. No business logic. Separate public repo (`get-tmonier/cli`)
 - **Shared:** ts-rest contracts + Valibot schemas consumed by api + ui
 - **Frontend:** TanStack Start SSR + file-based routing
+  - **Feature-Sliced Design** in `@tmonier/ui` — layers: `app → shared → entities → features → widgets → pages → routes`
+  - Each slice organized as `api/`, `model/`, `ui/` sub-folders
+  - No cross-slice imports (features don't import from other features)
+  - State management: React hooks only (no Redux/Zustand/etc.)
 - **Auth:** Better Auth (GitHub OAuth) · **ORM:** Kysely · **Payments:** Stripe
 
 ## Verify pipeline
@@ -52,6 +61,8 @@ bun turbo test                                 # run tests
 bun run verify                                 # full pipeline: knip → check → typecheck → test → build
 bun run verify:fix                             # auto-fix then verify
 bun turbo build --filter=@tmonier/landing      # build single package
+bun test:unit                                  # run unit tests only
+bun test:integration                           # run integration tests only
 ```
 
 ## Rules
@@ -66,10 +77,30 @@ bun turbo build --filter=@tmonier/landing      # build single package
 ## Conventions
 
 - CSS vars from `@tmonier/tokens` — design tokens are the single source of truth
+- **`@tmonier/tokens` for branding** — both UI and Landing import `@tmonier/tokens/tailwind.css` + `@tmonier/tokens/tokens.css` to enforce consistent branding
 - Fonts loaded via `@fontsource/*` npm packages (self-hosted, imported in global.css via `@import`)
 - Landing page deploys to **Cloudflare Pages** — output: `packages/landing/dist/`
 - No `any` — strict TypeScript everywhere
 - **Effect** for all backend business logic (no try/catch)
 - **Valibot** for all schemas (no Zod)
+- **Valibot for env validation** — environment variables validated with Valibot schemas (see `env.ts` patterns)
 - **Biome** only (no ESLint/Prettier)
 - **ESM only** — all packages use ESM. If a dependency requires CJS, stop and alert the user (find an ESM alternative or skip it)
+- **Tailwind only** — no `style` attributes in UI/Landing (exception: CSS custom property usage in complex gradients). Never use CSS modules or `@apply`
+- **`cn()` utility** — use `cn()` from `#shared/lib/cn` (ui) or `#lib/cn` (landing) for conditional Tailwind class merging via `tailwind-merge`
+- **No barrel exports** — import from specific files, not `index.ts` re-exports
+- **No shortcuts** — never use `// @ts-ignore`, `as any`, `biome-ignore` unless truly unavoidable. Never add entries to knip's ignore lists to hide unused code — fix the root cause instead
+- **Self-documenting code** — minimal comments. Code should be self-explanatory. No JSDoc unless for public library APIs
+- **Clean code** — no dead code, no commented-out code, no TODO comments without linked issues
+- **Bun test runner** — `import { describe, expect, it } from 'bun:test'`
+
+## Subpath imports
+
+All cross-folder imports must use ESM subpath aliases (`#alias/...`), never relative paths across root-level folders. Each alias is defined in both `package.json` `"imports"` and `tsconfig.json` `"paths"` (and Vite `resolve.alias` where applicable).
+
+| Package | Aliases |
+|---|---|
+| `@tmonier/api` | `#modules/*`, `#routes/*` |
+| `@tmonier/ui` | `#app/*`, `#shared/*`, `#entities/*`, `#features/*`, `#widgets/*`, `#pages/*`, `#routes/*` |
+| `@tmonier/landing` | `#components/*`, `#layouts/*`, `#assets/*`, `#styles/*`, `#lib/*` |
+| `@tmonier/shared` | `#contracts/*`, `#schemas/*` |
