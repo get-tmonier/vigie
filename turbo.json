@@ -30,6 +30,6 @@
     "test:unit": {},
     "test:integration": {},
     "check-imports": {},
-    "knip": {}
+    "//#knip": {},
   }
 }
