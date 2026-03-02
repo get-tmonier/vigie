@@ -8,6 +8,7 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
   site: 'https://tmonier.com',
   output: 'static',
+  prefetch: false,
   integrations: [sitemap()],
 
   vite: {
