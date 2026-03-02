@@ -24,13 +24,14 @@
     "typecheck": "astro check"
   },
   "dependencies": {
+    "@astrojs/sitemap": "3.7.0",
     "@fontsource/jetbrains-mono": "5.2.8",
     "@fontsource/source-serif-4": "5.2.9",
     "@fontsource/vollkorn": "5.2.10",
     "@fontsource/vollkorn-sc": "5.2.8",
     "@tailwindcss/vite": "4.2.1",
     "@tmonier/tokens": "workspace:*",
-    "astro": "5.18.0",
+    "astro": "6.0.0-beta.17",
     "tailwind-merge": "3.5.0",
     "tailwindcss": "4.2.1"
   },
@@ -40,6 +41,6 @@
     "satori": "0.19.2",
     "sharp": "0.34.5",
     "typescript": "5.9.3",
-    "vite": "6.4.1"
+    "vite": "7.3.1"
   }
 }

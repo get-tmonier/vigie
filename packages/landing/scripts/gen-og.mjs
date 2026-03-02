@@ -38,9 +38,12 @@ const fonts = [
   },
 ];
 
-const GOLD = '#C49A2B';
-const NAVY = '#0B1A2E';
-const CREAM = '#F5F0E8';
+// Import color tokens to stay in sync with design system
+import { colors } from '@tmonier/tokens';
+
+const GOLD = colors.gold;
+const NAVY = colors.navyDeep;
+const CREAM = colors.cream;
 
 // Load mascot as base64 data URI
 const mascotPath = new URL('../src/assets/helmsman.png', import.meta.url);
