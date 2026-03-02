@@ -17,13 +17,15 @@ const allLayers = Layer.mergeAll(
 const daemonRestApp = new Hono<AuthEnv>();
 
 daemonRestApp.get('/daemons', async (c) => {
-  const user = c.get('user')!;
+  const user = c.get('user');
+  if (!user) return c.json({ error: 'Unauthorized' }, 401);
   const daemons = await Effect.runPromise(Effect.provide(listDaemons(), allLayers));
   return c.json({ daemons: daemons.filter((d) => d.userId === user.id) });
 });
 
 daemonRestApp.post('/daemons/:daemonId/exec', async (c) => {
-  const user = c.get('user')!;
+  const user = c.get('user');
+  if (!user) return c.json({ error: 'Unauthorized' }, 401);
   const daemonId = c.req.param('daemonId');
   const body = await c.req.json<{ command: string; cwd?: string }>();
 

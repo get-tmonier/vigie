@@ -12,7 +12,8 @@ const allLayers = Layer.mergeAll(InMemoryDaemonReadRepositoryLive, InMemoryEvent
 const daemonSseApp = new Hono<AuthEnv>();
 
 daemonSseApp.get('/daemons/:daemonId/events', async (c) => {
-  const user = c.get('user')!;
+  const user = c.get('user');
+  if (!user) return c.json({ error: 'Unauthorized' }, 401);
   const daemonId = c.req.param('daemonId');
 
   const daemon = await Effect.runPromise(
