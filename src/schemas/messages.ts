@@ -23,6 +23,7 @@ export const DaemonHelloSchema = v.object({
   hostname: v.string(),
   pid: v.number(),
   version: v.string(),
+  token: v.string(),
 });
 export type DaemonHello = v.InferOutput<typeof DaemonHelloSchema>;
 

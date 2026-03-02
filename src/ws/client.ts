@@ -11,6 +11,7 @@ interface WsConnection {
 
 export function connectWebSocket(
   url: string,
+  token: string,
   onMessage: (data: string, send: (msg: unknown) => void) => void
 ): WsConnection {
   let ws: WebSocket | null = null;
@@ -26,7 +27,9 @@ export function connectWebSocket(
   function connect() {
     if (closed) return;
 
-    ws = new WebSocket(url);
+    const wsUrl = new URL(url);
+    wsUrl.searchParams.set('token', token);
+    ws = new WebSocket(wsUrl.toString());
 
     ws.addEventListener('open', () => {
       console.log(`Connected to ${url}`);
@@ -37,6 +40,7 @@ export function connectWebSocket(
         hostname: hostname(),
         pid: process.pid,
         version: VERSION,
+        token,
       };
       send(hello);
     });

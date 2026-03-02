@@ -1,13 +1,21 @@
 import * as v from 'valibot';
 import { config } from '../config.js';
+import { getCredentials } from '../credentials.js';
 import { executeCommand } from '../execution/executor.js';
 import { DownstreamMessageSchema } from '../schemas/messages.js';
 import { connectWebSocket } from '../ws/client.js';
 
-export function start() {
+export async function start() {
   console.log('tmonier daemon starting...');
 
-  connectWebSocket(config.TMONIER_API_URL, (data, send) => {
+  const token = config.TMONIER_TOKEN ?? (await getCredentials())?.token;
+
+  if (!token) {
+    console.error('No API key found. Run `tmonier login` first.');
+    process.exit(1);
+  }
+
+  connectWebSocket(config.TMONIER_API_URL, token, (data, send) => {
     let parsed: unknown;
     try {
       parsed = JSON.parse(data);

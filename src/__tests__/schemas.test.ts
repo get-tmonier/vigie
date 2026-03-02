@@ -53,7 +53,13 @@ describe('downstream message schemas', () => {
 
 describe('upstream message schemas', () => {
   it('parses daemon:hello', () => {
-    const msg = { type: 'daemon:hello', hostname: 'h', pid: 1, version: '0.1.0' };
+    const msg = {
+      type: 'daemon:hello',
+      hostname: 'h',
+      pid: 1,
+      version: '0.1.0',
+      token: 'tmonier_test',
+    };
     const result = v.parse(DaemonHelloSchema, msg);
     expect(result.hostname).toBe('h');
   });
