@@ -32,7 +32,7 @@ afterEach(() => {
 describe('InMemoryDaemonWriteRepository + InMemoryDaemonReadRepository', () => {
   describe('register + get', () => {
     it('retrieves the registered session by id', async () => {
-      const session = createDaemonSession(makeHello());
+      const session = createDaemonSession(makeHello(), 'user-1');
       await run(
         Effect.gen(function* () {
           const write = yield* Effect.service(DaemonWriteRepository);
@@ -75,8 +75,8 @@ describe('InMemoryDaemonWriteRepository + InMemoryDaemonReadRepository', () => {
     });
 
     it('returns all registered sessions', async () => {
-      const s1 = createDaemonSession(makeHello({ hostname: 'host-1', pid: 1 }));
-      const s2 = createDaemonSession(makeHello({ hostname: 'host-2', pid: 2 }));
+      const s1 = createDaemonSession(makeHello({ hostname: 'host-1', pid: 1 }), 'user-1');
+      const s2 = createDaemonSession(makeHello({ hostname: 'host-2', pid: 2 }), 'user-1');
       const sessions = await run(
         Effect.gen(function* () {
           const write = yield* Effect.service(DaemonWriteRepository);
@@ -94,7 +94,7 @@ describe('InMemoryDaemonWriteRepository + InMemoryDaemonReadRepository', () => {
 
   describe('unregister', () => {
     it('removes the session from the store', async () => {
-      const session = createDaemonSession(makeHello());
+      const session = createDaemonSession(makeHello(), 'user-1');
       await run(
         Effect.gen(function* () {
           const write = yield* Effect.service(DaemonWriteRepository);
@@ -108,7 +108,7 @@ describe('InMemoryDaemonWriteRepository + InMemoryDaemonReadRepository', () => {
     });
 
     it('makes get return DaemonNotFoundError after unregister', async () => {
-      const session = createDaemonSession(makeHello());
+      const session = createDaemonSession(makeHello(), 'user-1');
       const error = await Effect.runPromise(
         Effect.provide(
           Effect.gen(function* () {
@@ -127,7 +127,7 @@ describe('InMemoryDaemonWriteRepository + InMemoryDaemonReadRepository', () => {
 
   describe('getWs', () => {
     it('returns the exact WebSocket reference passed at registration', async () => {
-      const session = createDaemonSession(makeHello());
+      const session = createDaemonSession(makeHello(), 'user-1');
       const ws = makeMockWs();
       await run(
         Effect.gen(function* () {

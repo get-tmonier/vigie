@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { type DaemonSession, listDaemons } from '../api/daemon-api';
+import { type Device, listDevices } from '../api/device-api';
 
-export function useDaemons() {
-  const [daemons, setDaemons] = useState<DaemonSession[]>([]);
+export function useDevices() {
+  const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -10,9 +10,9 @@ export function useDaemons() {
 
     const poll = async () => {
       try {
-        const result = await listDaemons();
+        const result = await listDevices();
         if (active) {
-          setDaemons(result);
+          setDevices(result);
           setLoading(false);
         }
       } catch {
@@ -22,12 +22,11 @@ export function useDaemons() {
 
     poll();
     const interval = setInterval(poll, 3000);
-
     return () => {
       active = false;
       clearInterval(interval);
     };
   }, []);
 
-  return { daemons, loading };
+  return { devices, loading };
 }
