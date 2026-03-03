@@ -68,7 +68,13 @@ daemonSseApp.get('/daemons/:daemonId/events', async (c) => {
       )
     );
 
+    stream.writeSSE({ event: 'keepalive', data: '' }).catch(() => {});
+    const keepalive = setInterval(() => {
+      stream.writeSSE({ event: 'keepalive', data: '' }).catch(() => {});
+    }, 10_000);
+
     stream.onAbort(async () => {
+      clearInterval(keepalive);
       unsubscribe();
       await Effect.runPromise(
         Effect.provide(

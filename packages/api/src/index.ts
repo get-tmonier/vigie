@@ -53,4 +53,5 @@ export default {
   port,
   fetch: app.fetch,
   websocket,
+  idleTimeout: 120,
 };

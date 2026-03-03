@@ -41,11 +41,47 @@ export const SSEDaemonDisconnectedSchema = v.object({
 });
 export type SSEDaemonDisconnected = v.InferOutput<typeof SSEDaemonDisconnectedSchema>;
 
+// ── Session SSE events ──
+
+export const SSESessionStartedSchema = v.object({
+  type: v.literal('session:started'),
+  daemonId: v.string(),
+  sessionId: v.string(),
+  agentType: v.picklist(['claude', 'opencode', 'generic']),
+  cwd: v.string(),
+  gitBranch: v.optional(v.string()),
+  repoName: v.optional(v.string()),
+  timestamp: v.number(),
+});
+export type SSESessionStarted = v.InferOutput<typeof SSESessionStartedSchema>;
+
+export const SSESessionOutputSchema = v.object({
+  type: v.literal('session:output'),
+  daemonId: v.string(),
+  sessionId: v.string(),
+  data: v.string(),
+  chunkType: v.picklist(['text', 'thinking', 'tool_use', 'tool_result', 'status', 'error']),
+  timestamp: v.number(),
+});
+export type SSESessionOutput = v.InferOutput<typeof SSESessionOutputSchema>;
+
+export const SSESessionEndedSchema = v.object({
+  type: v.literal('session:ended'),
+  daemonId: v.string(),
+  sessionId: v.string(),
+  exitCode: v.number(),
+  timestamp: v.number(),
+});
+export type SSESessionEnded = v.InferOutput<typeof SSESessionEndedSchema>;
+
 export const SSEEventSchema = v.variant('type', [
   SSECommandOutputSchema,
   SSECommandDoneSchema,
   SSECommandErrorSchema,
   SSEDaemonConnectedSchema,
   SSEDaemonDisconnectedSchema,
+  SSESessionStartedSchema,
+  SSESessionOutputSchema,
+  SSESessionEndedSchema,
 ]);
 export type SSEEvent = v.InferOutput<typeof SSEEventSchema>;

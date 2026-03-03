@@ -75,6 +75,33 @@ export function TerminalOutput({ events }: TerminalOutputProps) {
                 Daemon disconnected: {event.hostname}
               </div>
             );
+          case 'session:started':
+            return (
+              <div key={key} className="text-gold py-1">
+                Session started: {event.sessionId.slice(0, 8)} ({event.agentType})
+              </div>
+            );
+          case 'session:output':
+            return (
+              <div key={key} className="flex gap-2">
+                <span className="text-slate text-[0.6875rem] shrink-0">
+                  {new Date(event.timestamp).toLocaleTimeString()}
+                </span>
+                <span className="whitespace-pre-wrap break-all text-cream">{event.data}</span>
+              </div>
+            );
+          case 'session:ended':
+            return (
+              <div
+                key={key}
+                className={cn(
+                  'py-1 border-t border-navy-light mt-1',
+                  event.exitCode === 0 ? 'text-success' : 'text-error'
+                )}
+              >
+                Session {event.sessionId.slice(0, 8)} ended (code {event.exitCode})
+              </div>
+            );
           default:
             return null;
         }

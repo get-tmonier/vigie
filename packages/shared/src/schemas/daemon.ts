@@ -58,11 +58,53 @@ export const PongSchema = v.object({
 });
 export type Pong = v.InferOutput<typeof PongSchema>;
 
+// ── Session messages (daemon -> backend) ──
+
+export const SessionStartedSchema = v.object({
+  type: v.literal('session:started'),
+  sessionId: v.string(),
+  agentType: v.picklist(['claude', 'opencode', 'generic']),
+  cwd: v.string(),
+  gitBranch: v.optional(v.string()),
+  repoName: v.optional(v.string()),
+  timestamp: v.number(),
+});
+export type SessionStarted = v.InferOutput<typeof SessionStartedSchema>;
+
+export const SessionOutputSchema = v.object({
+  type: v.literal('session:output'),
+  sessionId: v.string(),
+  data: v.string(),
+  chunkType: v.picklist(['text', 'thinking', 'tool_use', 'tool_result', 'status', 'error']),
+  timestamp: v.number(),
+});
+export type SessionOutput = v.InferOutput<typeof SessionOutputSchema>;
+
+export const SessionEndedSchema = v.object({
+  type: v.literal('session:ended'),
+  sessionId: v.string(),
+  exitCode: v.number(),
+  timestamp: v.number(),
+});
+export type SessionEnded = v.InferOutput<typeof SessionEndedSchema>;
+
+export const SessionErrorUpstreamSchema = v.object({
+  type: v.literal('session:error'),
+  sessionId: v.string(),
+  error: v.string(),
+  timestamp: v.number(),
+});
+export type SessionErrorUpstream = v.InferOutput<typeof SessionErrorUpstreamSchema>;
+
 export const UpstreamMessageSchema = v.variant('type', [
   DaemonHelloSchema,
   CommandOutputSchema,
   CommandDoneSchema,
   CommandErrorSchema,
   PongSchema,
+  SessionStartedSchema,
+  SessionOutputSchema,
+  SessionEndedSchema,
+  SessionErrorUpstreamSchema,
 ]);
 export type UpstreamMessage = v.InferOutput<typeof UpstreamMessageSchema>;

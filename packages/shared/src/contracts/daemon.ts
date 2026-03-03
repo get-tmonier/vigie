@@ -29,4 +29,24 @@ export const daemonContract = c.router({
     },
     summary: 'Execute a command on a daemon',
   },
+  listSessions: {
+    method: 'GET',
+    path: '/daemons/:daemonId/sessions',
+    responses: {
+      200: c.type<{
+        sessions: Array<{
+          id: string;
+          daemonId: string;
+          agentType: 'claude' | 'opencode' | 'generic';
+          cwd: string;
+          gitBranch?: string;
+          repoName?: string;
+          startedAt: number;
+          status: 'active' | 'ended';
+        }>;
+      }>(),
+      404: c.type<{ error: string }>(),
+    },
+    summary: 'List sessions for a daemon',
+  },
 });

@@ -8,6 +8,7 @@ import { SupervisionLoggerLive } from '../logger';
 import { InMemoryDaemonReadRepositoryLive } from '../secondary/in-memory-daemon-read-repository';
 import { InMemoryDaemonWriteRepositoryLive } from '../secondary/in-memory-daemon-write-repository';
 import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher';
+import { sessionStore } from '../secondary/shared-state';
 
 const allLayers = Layer.mergeAll(
   InMemoryDaemonWriteRepositoryLive,
@@ -84,6 +85,31 @@ daemonRestApp.post('/daemons/:daemonId/exec', async (c) => {
   );
 
   return c.json({ commandId: result.commandId });
+});
+
+daemonRestApp.get('/daemons/:daemonId/sessions', async (c) => {
+  const user = c.get('user');
+  if (!user) return c.json({ error: 'Unauthorized' }, 401);
+  const daemonId = c.req.param('daemonId');
+
+  const daemon = await Effect.runPromise(
+    Effect.provide(
+      Effect.matchEffect(
+        Effect.service(DaemonReadRepository).pipe(Effect.flatMap((r) => r.get(daemonId))),
+        {
+          onSuccess: (d) => Effect.succeed(d),
+          onFailure: () => Effect.succeed(null),
+        }
+      ),
+      allLayers
+    )
+  );
+  if (!daemon || daemon.userId !== user.id) {
+    return c.json({ error: `Daemon not found: ${daemonId}` }, 404);
+  }
+
+  const sessions = Array.from(sessionStore.values()).filter((s) => s.daemonId === daemonId);
+  return c.json({ sessions });
 });
 
 export { daemonRestApp };

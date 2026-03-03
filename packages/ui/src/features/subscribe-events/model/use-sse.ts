@@ -37,6 +37,9 @@ export function useSSE(daemonId: string | null) {
     es.addEventListener('command:error', handleEvent);
     es.addEventListener('daemon:connected', handleEvent);
     es.addEventListener('daemon:disconnected', handleEvent);
+    es.addEventListener('session:started', handleEvent);
+    es.addEventListener('session:output', handleEvent);
+    es.addEventListener('session:ended', handleEvent);
 
     return () => {
       es.close();
