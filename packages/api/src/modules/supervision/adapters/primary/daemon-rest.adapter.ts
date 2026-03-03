@@ -4,6 +4,7 @@ import type { AuthEnv } from '#modules/auth/adapters/primary/session-middleware'
 import { executeCommand } from '#modules/supervision/commands/execute-command.command';
 import { DaemonReadRepository } from '#modules/supervision/ports/daemon-read-repository.port';
 import { listDaemons } from '#modules/supervision/queries/list-daemons.query';
+import { SupervisionLoggerLive } from '../logger';
 import { InMemoryDaemonReadRepositoryLive } from '../secondary/in-memory-daemon-read-repository';
 import { InMemoryDaemonWriteRepositoryLive } from '../secondary/in-memory-daemon-write-repository';
 import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher';
@@ -11,7 +12,8 @@ import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publish
 const allLayers = Layer.mergeAll(
   InMemoryDaemonWriteRepositoryLive,
   InMemoryDaemonReadRepositoryLive,
-  InMemoryEventPublisherLive
+  InMemoryEventPublisherLive,
+  SupervisionLoggerLive
 );
 
 const daemonRestApp = new Hono<AuthEnv>();
@@ -57,8 +59,25 @@ daemonRestApp.post('/daemons/:daemonId/exec', async (c) => {
   );
 
   if (!result.ok) {
+    await Effect.runPromise(
+      Effect.provide(
+        Effect.annotateLogs(Effect.logWarning('Command dispatch failed'), { daemonId }),
+        allLayers
+      )
+    );
     return c.json({ error: result.error }, 404);
   }
+
+  await Effect.runPromise(
+    Effect.provide(
+      Effect.annotateLogs(Effect.logInfo('Command dispatched'), {
+        daemonId,
+        commandId: result.commandId,
+        command: body.command,
+      }),
+      allLayers
+    )
+  );
 
   return c.json({ commandId: result.commandId });
 });

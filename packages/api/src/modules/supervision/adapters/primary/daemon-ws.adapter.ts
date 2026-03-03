@@ -11,6 +11,7 @@ import { registerDaemon } from '#modules/supervision/commands/register-daemon.co
 import { unregisterDaemon } from '#modules/supervision/commands/unregister-daemon.command';
 import type { DaemonSession } from '#modules/supervision/domain/daemon-session';
 import { EventPublisher } from '#modules/supervision/ports/event-publisher.port';
+import { SupervisionLoggerLive } from '../logger';
 import { InMemoryDaemonReadRepositoryLive } from '../secondary/in-memory-daemon-read-repository';
 import { InMemoryDaemonWriteRepositoryLive } from '../secondary/in-memory-daemon-write-repository';
 import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher';
@@ -18,7 +19,8 @@ import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publish
 const allLayers = Layer.mergeAll(
   InMemoryDaemonWriteRepositoryLive,
   InMemoryDaemonReadRepositoryLive,
-  InMemoryEventPublisherLive
+  InMemoryEventPublisherLive,
+  SupervisionLoggerLive
 );
 
 const daemonWsApp = new Hono<DaemonAuthEnv>();
@@ -41,11 +43,17 @@ daemonWsApp.get(
         try {
           parsed = JSON.parse(data);
         } catch {
+          await Effect.runPromise(Effect.provide(Effect.logWarning('WS: invalid JSON'), allLayers));
           return;
         }
 
         const result = v.safeParse(UpstreamMessageSchema, parsed);
-        if (!result.success) return;
+        if (!result.success) {
+          await Effect.runPromise(
+            Effect.provide(Effect.logWarning('WS: schema validation failed'), allLayers)
+          );
+          return;
+        }
 
         const msg = result.output;
 
@@ -55,6 +63,16 @@ daemonWsApp.get(
               Effect.provide(registerDaemon(msg, raw as unknown as WebSocket, userId), allLayers)
             );
             sessionByWs.set(raw, session);
+            await Effect.runPromise(
+              Effect.provide(
+                Effect.annotateLogs(Effect.logInfo('Daemon registered'), {
+                  daemonId: session.id,
+                  hostname: msg.hostname,
+                  userId,
+                }),
+                allLayers
+              )
+            );
             break;
           }
           case 'command:output':
@@ -67,6 +85,10 @@ daemonWsApp.get(
                   Effect.gen(function* () {
                     const publisher = yield* Effect.service(EventPublisher);
                     yield* publisher.publish(session.id, msg);
+                    yield* Effect.annotateLogs(Effect.logDebug('WS: event relayed'), {
+                      daemonId: session.id,
+                      eventType: msg.type,
+                    });
                   }),
                   allLayers
                 )
@@ -83,9 +105,27 @@ daemonWsApp.get(
         if (!raw) return;
         const session = sessionByWs.get(raw);
         if (session) {
-          await Effect.runPromise(Effect.provide(unregisterDaemon(session.id), allLayers)).catch(
-            () => {}
-          );
+          await Effect.runPromise(
+            Effect.provide(
+              Effect.gen(function* () {
+                yield* unregisterDaemon(session.id);
+                yield* Effect.annotateLogs(Effect.logInfo('Daemon unregistered'), {
+                  daemonId: session.id,
+                });
+              }),
+              allLayers
+            )
+          ).catch(async (error) => {
+            await Effect.runPromise(
+              Effect.provide(
+                Effect.annotateLogs(Effect.logError('Daemon unregister failed'), {
+                  daemonId: session.id,
+                  error: String(error),
+                }),
+                allLayers
+              )
+            );
+          });
           sessionByWs.delete(raw);
         }
       },

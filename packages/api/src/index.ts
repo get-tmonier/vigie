@@ -1,4 +1,4 @@
-import { Effect } from 'effect';
+import { Effect, Logger } from 'effect';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { loadConfig } from './config';
@@ -13,6 +13,7 @@ import { deviceRestApp } from './modules/supervision/adapters/primary/device-res
 import { health } from './routes/health';
 
 const { port, corsOrigin } = Effect.runSync(loadConfig);
+const loggerLayer = Logger.layer([Logger.consolePretty()]);
 
 const app = new Hono();
 
@@ -38,7 +39,12 @@ app.route('/', daemonRestApp);
 
 app.route('/', deviceRestApp);
 
-console.log(`@tmonier/api listening on http://localhost:${port}`);
+Effect.runSync(
+  Effect.provide(
+    Effect.annotateLogs(Effect.logInfo('API server started'), { port, corsOrigin }),
+    loggerLayer
+  )
+);
 
 export default {
   port,
