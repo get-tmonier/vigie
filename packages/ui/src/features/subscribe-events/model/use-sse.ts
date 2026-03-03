@@ -5,6 +5,7 @@ import { createDaemonEventSource } from '../api/event-source';
 export function useSSE(daemonId: string | null) {
   const [events, setEvents] = useState<SSEEvent[]>([]);
   const [connected, setConnected] = useState(false);
+  const [daemonOnline, setDaemonOnline] = useState(true);
   const esRef = useRef<EventSource | null>(null);
 
   useEffect(() => {
@@ -20,6 +21,11 @@ export function useSSE(daemonId: string | null) {
     const handleEvent = (event: MessageEvent) => {
       try {
         const data = JSON.parse(event.data) as SSEEvent;
+        if (data.type === 'daemon:connected') {
+          setDaemonOnline(true);
+        } else if (data.type === 'daemon:disconnected') {
+          setDaemonOnline(false);
+        }
         setEvents((prev) => [...prev, data]);
       } catch {
         // ignore invalid events
@@ -41,5 +47,5 @@ export function useSSE(daemonId: string | null) {
 
   const clear = useCallback(() => setEvents([]), []);
 
-  return { events, connected, clear };
+  return { events, connected, daemonOnline, clear };
 }

@@ -10,6 +10,7 @@ import { daemonRestApp } from './modules/supervision/adapters/primary/daemon-res
 import { daemonSseApp } from './modules/supervision/adapters/primary/daemon-sse.adapter';
 import { daemonWsApp, websocket } from './modules/supervision/adapters/primary/daemon-ws.adapter';
 import { deviceRestApp } from './modules/supervision/adapters/primary/device-rest.adapter';
+import { startHeartbeat } from './modules/supervision/adapters/primary/heartbeat';
 import { health } from './routes/health';
 
 const { port, corsOrigin } = Effect.runSync(loadConfig);
@@ -38,6 +39,8 @@ app.route('/', daemonSseApp);
 app.route('/', daemonRestApp);
 
 app.route('/', deviceRestApp);
+
+startHeartbeat();
 
 Effect.runSync(
   Effect.provide(

@@ -50,9 +50,13 @@ daemonRestApp.post('/daemons/:daemonId/exec', async (c) => {
   const result = await Effect.runPromise(
     Effect.provide(
       Effect.matchEffect(executeCommand(daemonId, body.command, body.cwd), {
-        onSuccess: (r) => Effect.succeed({ ok: true as const, commandId: r.commandId }),
+        onSuccess: (r) => Effect.succeed({ ok: true, commandId: r.commandId } as const),
         onFailure: (e) =>
-          Effect.succeed({ ok: false as const, error: `Daemon not found: ${e.id}` }),
+          Effect.succeed(
+            e._tag === 'DaemonDisconnectedError'
+              ? ({ ok: false, error: 'Daemon not connected', status: 503 } as const)
+              : ({ ok: false, error: `Daemon not found: ${e.id}`, status: 404 } as const)
+          ),
       }),
       allLayers
     )
@@ -65,7 +69,7 @@ daemonRestApp.post('/daemons/:daemonId/exec', async (c) => {
         allLayers
       )
     );
-    return c.json({ error: result.error }, 404);
+    return c.json({ error: result.error }, result.status);
   }
 
   await Effect.runPromise(

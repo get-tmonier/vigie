@@ -15,6 +15,7 @@ import { SupervisionLoggerLive } from '../logger';
 import { InMemoryDaemonReadRepositoryLive } from '../secondary/in-memory-daemon-read-repository';
 import { InMemoryDaemonWriteRepositoryLive } from '../secondary/in-memory-daemon-write-repository';
 import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher';
+import { daemonStore } from '../secondary/shared-state';
 
 const allLayers = Layer.mergeAll(
   InMemoryDaemonWriteRepositoryLive,
@@ -96,8 +97,16 @@ daemonWsApp.get(
             }
             break;
           }
-          case 'pong':
+          case 'pong': {
+            const session = sessionByWs.get(raw);
+            if (session) {
+              const entry = daemonStore.get(session.id);
+              if (entry) {
+                entry.lastPongAt = Date.now();
+              }
+            }
             break;
+          }
         }
       },
       onClose: async (_event, ws) => {

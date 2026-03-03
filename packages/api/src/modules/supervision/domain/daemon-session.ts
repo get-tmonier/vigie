@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import type { DaemonHello } from '@tmonier/shared';
 
 export interface DaemonSession {
@@ -9,8 +10,15 @@ export interface DaemonSession {
   readonly connectedAt: number;
 }
 
-export const createDaemonSession = (hello: DaemonHello, userId: string): DaemonSession => ({
-  id: crypto.randomUUID(),
+export const deriveDaemonId = (userId: string, hostname: string): string =>
+  createHash('sha256').update(`${userId}:${hostname}`).digest('hex').slice(0, 32);
+
+export const createDaemonSession = (
+  daemonId: string,
+  hello: DaemonHello,
+  userId: string
+): DaemonSession => ({
+  id: daemonId,
   userId,
   hostname: hello.hostname,
   pid: hello.pid,

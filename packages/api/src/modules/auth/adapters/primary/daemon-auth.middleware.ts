@@ -62,6 +62,25 @@ export const daemonAuthMiddleware = createMiddleware<DaemonAuthEnv>(async (c, ne
     });
     c.set('daemonUserId', result.key.referenceId);
   } catch (err) {
+    const isRateLimited =
+      err instanceof Error &&
+      'body' in err &&
+      (err as { body?: { code?: string } }).body?.code === 'RATE_LIMITED';
+    if (isRateLimited) {
+      const retryMs = (err as { body?: { details?: { tryAgainIn?: number } } }).body?.details
+        ?.tryAgainIn;
+      const retrySeconds = retryMs ? Math.ceil(retryMs / 1000) : 60;
+      log(
+        Effect.annotateLogs(Effect.logWarning('[daemon-auth] Rate limited by Better Auth'), {
+          retryInSeconds: retrySeconds,
+          tokenPrefix: token.slice(0, 12),
+        })
+      );
+      return c.json(
+        { error: 'Rate limit exceeded' },
+        { status: 429, headers: { 'Retry-After': String(retrySeconds) } }
+      );
+    }
     log(
       Effect.annotateLogs(Effect.logError('[daemon-auth] Error verifying API key'), {
         error: String(err),

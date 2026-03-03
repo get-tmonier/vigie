@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
-import { createDaemonSession } from '#modules/supervision/domain/daemon-session';
+import { createDaemonSession, deriveDaemonId } from '#modules/supervision/domain/daemon-session';
 import { DaemonReadRepository } from '#modules/supervision/ports/daemon-read-repository.port';
 import { DaemonWriteRepository } from '#modules/supervision/ports/daemon-write-repository.port';
 import { DaemonNotFoundError } from '#modules/supervision/ports/errors';
@@ -32,7 +32,11 @@ afterEach(() => {
 describe('InMemoryDaemonWriteRepository + InMemoryDaemonReadRepository', () => {
   describe('register + get', () => {
     it('retrieves the registered session by id', async () => {
-      const session = createDaemonSession(makeHello(), 'user-1');
+      const session = createDaemonSession(
+        deriveDaemonId('user-1', 'test-host'),
+        makeHello(),
+        'user-1'
+      );
       await run(
         Effect.gen(function* () {
           const write = yield* Effect.service(DaemonWriteRepository);
@@ -75,8 +79,16 @@ describe('InMemoryDaemonWriteRepository + InMemoryDaemonReadRepository', () => {
     });
 
     it('returns all registered sessions', async () => {
-      const s1 = createDaemonSession(makeHello({ hostname: 'host-1', pid: 1 }), 'user-1');
-      const s2 = createDaemonSession(makeHello({ hostname: 'host-2', pid: 2 }), 'user-1');
+      const s1 = createDaemonSession(
+        deriveDaemonId('user-1', 'host-1'),
+        makeHello({ hostname: 'host-1', pid: 1 }),
+        'user-1'
+      );
+      const s2 = createDaemonSession(
+        deriveDaemonId('user-1', 'host-2'),
+        makeHello({ hostname: 'host-2', pid: 2 }),
+        'user-1'
+      );
       const sessions = await run(
         Effect.gen(function* () {
           const write = yield* Effect.service(DaemonWriteRepository);
@@ -94,7 +106,11 @@ describe('InMemoryDaemonWriteRepository + InMemoryDaemonReadRepository', () => {
 
   describe('unregister', () => {
     it('removes the session from the store', async () => {
-      const session = createDaemonSession(makeHello(), 'user-1');
+      const session = createDaemonSession(
+        deriveDaemonId('user-1', 'test-host'),
+        makeHello(),
+        'user-1'
+      );
       await run(
         Effect.gen(function* () {
           const write = yield* Effect.service(DaemonWriteRepository);
@@ -108,7 +124,11 @@ describe('InMemoryDaemonWriteRepository + InMemoryDaemonReadRepository', () => {
     });
 
     it('makes get return DaemonNotFoundError after unregister', async () => {
-      const session = createDaemonSession(makeHello(), 'user-1');
+      const session = createDaemonSession(
+        deriveDaemonId('user-1', 'test-host'),
+        makeHello(),
+        'user-1'
+      );
       const error = await Effect.runPromise(
         Effect.provide(
           Effect.gen(function* () {
@@ -127,7 +147,11 @@ describe('InMemoryDaemonWriteRepository + InMemoryDaemonReadRepository', () => {
 
   describe('getWs', () => {
     it('returns the exact WebSocket reference passed at registration', async () => {
-      const session = createDaemonSession(makeHello(), 'user-1');
+      const session = createDaemonSession(
+        deriveDaemonId('user-1', 'test-host'),
+        makeHello(),
+        'user-1'
+      );
       const ws = makeMockWs();
       await run(
         Effect.gen(function* () {
