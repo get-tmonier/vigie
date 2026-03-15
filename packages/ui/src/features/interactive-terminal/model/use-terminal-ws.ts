@@ -4,7 +4,7 @@ import { env } from '#shared/config/env';
 interface UseTerminalWsOptions {
   sessionId: string;
   onData: (data: Uint8Array) => void;
-  onConnected?: () => void;
+  onConnected?: (helpers: { sendResizeNow: (cols: number, rows: number) => void }) => void;
 }
 
 interface UseTerminalWsResult {
@@ -36,7 +36,13 @@ export function useTerminalWs({
 
     ws.addEventListener('open', () => {
       setConnected(true);
-      onConnectedRef.current?.();
+      onConnectedRef.current?.({
+        sendResizeNow: (cols: number, rows: number) => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'resize', cols, rows }));
+          }
+        },
+      });
     });
 
     ws.addEventListener('message', (event) => {

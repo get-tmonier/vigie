@@ -21,17 +21,22 @@ export function InteractiveTerminal({ sessionId }: InteractiveTerminalProps) {
     terminal.write(data);
   }, []);
 
-  const onConnected = useCallback(() => {
-    const terminal = terminalRef.current;
-    const fitAddon = fitAddonRef.current;
-    if (!terminal || !fitAddon) return;
+  const onConnected = useCallback(
+    ({ sendResizeNow }: { sendResizeNow: (cols: number, rows: number) => void }) => {
+      const terminal = terminalRef.current;
+      const fitAddon = fitAddonRef.current;
+      if (!terminal || !fitAddon) return;
 
-    // Clean slate — discard any stale local state
-    terminal.reset();
+      // Clean slate — discard any stale local state
+      terminal.reset();
+      fitAddon.fit();
 
-    // Fit triggers onResize → sendResize → SIGWINCH → Claude Code re-renders at browser width
-    fitAddon.fit();
-  }, []);
+      // Always send dimensions on connect — fitAddon.fit() may not trigger onResize
+      // if the terminal was already sized by the initial fit before the WS was open
+      sendResizeNow(terminal.cols, terminal.rows);
+    },
+    []
+  );
 
   const { connected, send, sendResize } = useTerminalWs({ sessionId, onData, onConnected });
 
