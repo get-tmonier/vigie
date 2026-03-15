@@ -65,6 +65,16 @@ export function useSessions(daemonId: string | null, events: SSEEvent[]) {
         setSessions((prev) =>
           prev.map((s) => (s.id === event.sessionId ? { ...s, status: 'ended' } : s))
         );
+      } else if (event.type === 'session:claude-id-detected') {
+        if ('sessionId' in event && 'claudeSessionId' in event) {
+          setSessions((prev) =>
+            prev.map((s) =>
+              s.id === event.sessionId
+                ? { ...s, claudeSessionId: event.claudeSessionId as string }
+                : s
+            )
+          );
+        }
       }
     }
   }, [events]);

@@ -93,6 +93,25 @@ export const SSESessionSpawnFailedSchema = v.object({
 });
 export type SSESessionSpawnFailed = v.InferOutput<typeof SSESessionSpawnFailedSchema>;
 
+export const SSETerminalInputEchoSchema = v.object({
+  type: v.literal('terminal:input-echo'),
+  daemonId: v.string(),
+  sessionId: v.string(),
+  data: v.string(),
+  source: v.picklist(['cli', 'browser']),
+  timestamp: v.number(),
+});
+export type SSETerminalInputEcho = v.InferOutput<typeof SSETerminalInputEchoSchema>;
+
+export const SSESessionClaudeIdDetectedSchema = v.object({
+  type: v.literal('session:claude-id-detected'),
+  daemonId: v.string(),
+  sessionId: v.string(),
+  claudeSessionId: v.string(),
+  timestamp: v.number(),
+});
+export type SSESessionClaudeIdDetected = v.InferOutput<typeof SSESessionClaudeIdDetectedSchema>;
+
 export const SSEEventSchema = v.variant('type', [
   SSECommandOutputSchema,
   SSECommandDoneSchema,
@@ -104,5 +123,7 @@ export const SSEEventSchema = v.variant('type', [
   SSESessionEndedSchema,
   SSESessionErrorSchema,
   SSESessionSpawnFailedSchema,
+  SSETerminalInputEchoSchema,
+  SSESessionClaudeIdDetectedSchema,
 ]);
 export type SSEEvent = v.InferOutput<typeof SSEEventSchema>;

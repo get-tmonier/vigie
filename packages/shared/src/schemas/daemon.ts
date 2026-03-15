@@ -38,12 +38,24 @@ export const FsListDirRequestSchema = v.object({
 });
 export type FsListDirRequest = v.InferOutput<typeof FsListDirRequestSchema>;
 
+export const SessionResumeRequestSchema = v.object({
+  type: v.literal('session:resume-request'),
+  sessionId: v.string(),
+  originalSessionId: v.string(),
+  claudeSessionId: v.string(),
+  cwd: v.string(),
+  cols: v.number(),
+  rows: v.number(),
+});
+export type SessionResumeRequest = v.InferOutput<typeof SessionResumeRequestSchema>;
+
 export const DownstreamMessageSchema = v.variant('type', [
   CommandRequestSchema,
   PingSchema,
   SessionSpawnRequestSchema,
   SessionKillSchema,
   FsListDirRequestSchema,
+  SessionResumeRequestSchema,
 ]);
 export type DownstreamMessage = v.InferOutput<typeof DownstreamMessageSchema>;
 
@@ -200,6 +212,23 @@ export const DaemonSyncSchema = v.object({
 });
 export type DaemonSync = v.InferOutput<typeof DaemonSyncSchema>;
 
+export const TerminalInputEchoSchema = v.object({
+  type: v.literal('terminal:input-echo'),
+  sessionId: v.string(),
+  data: v.string(),
+  source: v.picklist(['cli', 'browser']),
+  timestamp: v.number(),
+});
+export type TerminalInputEcho = v.InferOutput<typeof TerminalInputEchoSchema>;
+
+export const SessionClaudeIdDetectedSchema = v.object({
+  type: v.literal('session:claude-id-detected'),
+  sessionId: v.string(),
+  claudeSessionId: v.string(),
+  timestamp: v.number(),
+});
+export type SessionClaudeIdDetected = v.InferOutput<typeof SessionClaudeIdDetectedSchema>;
+
 export const UpstreamMessageSchema = v.variant('type', [
   DaemonHelloSchema,
   CommandOutputSchema,
@@ -214,6 +243,8 @@ export const UpstreamMessageSchema = v.variant('type', [
   SessionSpawnFailedSchema,
   FsListDirResponseSchema,
   DaemonSyncSchema,
+  TerminalInputEchoSchema,
+  SessionClaudeIdDetectedSchema,
 ]);
 export type UpstreamMessage = v.InferOutput<typeof UpstreamMessageSchema>;
 

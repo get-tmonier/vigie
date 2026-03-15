@@ -8,6 +8,7 @@ interface SessionDetailHeaderProps {
   connected: boolean;
   historyOpen: boolean;
   onToggleHistory: () => void;
+  onResume?: () => void;
 }
 
 function formatDuration(startedAt: number): string {
@@ -64,6 +65,7 @@ export function SessionDetailHeader({
   connected,
   historyOpen,
   onToggleHistory,
+  onResume,
 }: SessionDetailHeaderProps) {
   const [, setTick] = useState(0);
   const isActive = session.status === 'active';
@@ -112,6 +114,18 @@ export function SessionDetailHeader({
           </button>
         )}
         {session.mode === 'interactive' && isActive && <AttachButton sessionId={session.id} />}
+        {session.status === 'ended' &&
+          session.agentType === 'claude' &&
+          session.claudeSessionId &&
+          onResume && (
+            <button
+              type="button"
+              onClick={onResume}
+              className="text-xs font-mono px-2 py-1 rounded transition-colors bg-gold/20 text-gold hover:bg-gold/30"
+            >
+              Resume
+            </button>
+          )}
         {isActive && <KillSessionButton daemonId={session.daemonId} sessionId={session.id} />}
         <span
           className={cn(

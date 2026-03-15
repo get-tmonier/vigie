@@ -304,6 +304,61 @@ daemonWsApp.get(
             }
             break;
           }
+          case 'terminal:input-echo': {
+            const session = sessionByWs.get(raw);
+            if (session) {
+              await Effect.runPromise(
+                Effect.provide(
+                  Effect.gen(function* () {
+                    const publisher = yield* Effect.service(EventPublisher);
+                    yield* publisher.publish(session.id, {
+                      type: 'terminal:input-echo',
+                      daemonId: session.id,
+                      sessionId: msg.sessionId,
+                      data: msg.data,
+                      source: msg.source,
+                      timestamp: msg.timestamp,
+                    });
+                  }),
+                  allLayers
+                )
+              );
+            }
+            break;
+          }
+          case 'session:claude-id-detected': {
+            const session = sessionByWs.get(raw);
+            if (session) {
+              const agentSession = sessionStore.get(msg.sessionId);
+              if (agentSession) {
+                sessionStore.set(msg.sessionId, {
+                  ...agentSession,
+                  claudeSessionId: msg.claudeSessionId,
+                });
+              }
+              await Effect.runPromise(
+                Effect.provide(
+                  Effect.gen(function* () {
+                    const publisher = yield* Effect.service(EventPublisher);
+                    yield* publisher.publish(session.id, {
+                      type: 'session:claude-id-detected',
+                      daemonId: session.id,
+                      sessionId: msg.sessionId,
+                      claudeSessionId: msg.claudeSessionId,
+                      timestamp: msg.timestamp,
+                    });
+                    yield* Effect.annotateLogs(Effect.logInfo('Claude session ID detected'), {
+                      daemonId: session.id,
+                      sessionId: msg.sessionId,
+                      claudeSessionId: msg.claudeSessionId,
+                    });
+                  }),
+                  allLayers
+                )
+              );
+            }
+            break;
+          }
           case 'daemon:sync': {
             const session = sessionByWs.get(raw);
             if (session) {

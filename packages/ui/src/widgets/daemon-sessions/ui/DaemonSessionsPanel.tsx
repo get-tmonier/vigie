@@ -1,5 +1,6 @@
 import type { SSEEvent } from '@tmonier/shared';
 import { useCallback, useEffect, useState } from 'react';
+import { resumeSession } from '#entities/session/api/session-api';
 import { useSessions } from '#entities/session/model/use-sessions';
 import { SessionCard } from '#entities/session/ui/SessionCard';
 import { useInputHistory } from '#features/input-history/model/use-input-history';
@@ -25,7 +26,7 @@ export function DaemonSessionsPanel({ daemonId, events }: DaemonSessionsPanelPro
   const [pendingSessionId, setPendingSessionId] = useState<string | null>(null);
   const [spawnError, setSpawnError] = useState<string | null>(null);
   const { chunks, accumulatedText } = useSessionStream(events, selectedSessionId);
-  const { history, trackInput } = useInputHistory();
+  const { history, trackInput, addRemoteInput } = useInputHistory();
 
   const activeSessions = sessions.filter((s) => s.status === 'active');
   const endedSessions = sessions.filter((s) => s.status === 'ended');
@@ -52,6 +53,31 @@ export function DaemonSessionsPanel({ daemonId, events }: DaemonSessionsPanelPro
       }
     }
   }, [events, pendingSessionId]);
+
+  useEffect(() => {
+    for (const event of events) {
+      if (
+        event.type === 'terminal:input-echo' &&
+        'source' in event &&
+        event.source === 'cli' &&
+        'sessionId' in event &&
+        event.sessionId === selectedSessionId
+      ) {
+        addRemoteInput(event.data, event.source);
+      }
+    }
+  }, [events, selectedSessionId, addRemoteInput]);
+
+  const handleResume = useCallback(async () => {
+    if (!daemonId || !selectedSession) return;
+    try {
+      const result = await resumeSession(daemonId, selectedSession.id);
+      setPendingSessionId(result.sessionId);
+    } catch {
+      setSpawnError('Failed to resume session');
+      setTimeout(() => setSpawnError(null), 5000);
+    }
+  }, [daemonId, selectedSession]);
 
   const handleSpawned = useCallback((sessionId: string) => {
     setPendingSessionId(sessionId);
@@ -168,6 +194,7 @@ export function DaemonSessionsPanel({ daemonId, events }: DaemonSessionsPanelPro
               connected={terminalConnected}
               historyOpen={historyOpen}
               onToggleHistory={() => setHistoryOpen(!historyOpen)}
+              onResume={handleResume}
             />
             <div className="flex-1 flex overflow-hidden">
               {selectedSession.mode === 'interactive' ? (

@@ -10,6 +10,7 @@ export interface AgentSession {
   repoName?: string;
   startedAt: number;
   status: 'active' | 'ended';
+  claudeSessionId?: string;
 }
 
 export async function listSessions(daemonId: string): Promise<AgentSession[]> {
@@ -29,6 +30,15 @@ export async function spawnSession(
   return apiFetch<{ sessionId: string }>(`/daemons/${daemonId}/sessions`, {
     method: 'POST',
     body: JSON.stringify(options),
+  });
+}
+
+export async function resumeSession(
+  daemonId: string,
+  sessionId: string
+): Promise<{ sessionId: string }> {
+  return apiFetch<{ sessionId: string }>(`/daemons/${daemonId}/sessions/${sessionId}/resume`, {
+    method: 'POST',
   });
 }
 

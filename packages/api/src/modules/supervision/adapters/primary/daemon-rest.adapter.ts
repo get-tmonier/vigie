@@ -4,6 +4,7 @@ import type { AuthEnv } from '#modules/auth/adapters/primary/session-middleware'
 import { executeCommand } from '#modules/supervision/commands/execute-command.command';
 import { killSession } from '#modules/supervision/commands/kill-session.command';
 import { listDirectory } from '#modules/supervision/commands/list-directory.command';
+import { resumeSession } from '#modules/supervision/commands/resume-session.command';
 import { spawnSession } from '#modules/supervision/commands/spawn-session.command';
 import { DaemonReadRepository } from '#modules/supervision/ports/daemon-read-repository.port';
 import { listDaemons } from '#modules/supervision/queries/list-daemons.query';
@@ -233,6 +234,78 @@ daemonRestApp.post('/daemons/:daemonId/sessions/:sessionId/kill', async (c) => {
   );
 
   return c.json({ ok: true });
+});
+
+daemonRestApp.post('/daemons/:daemonId/sessions/:sessionId/resume', async (c) => {
+  const user = c.get('user');
+  if (!user) return c.json({ error: 'Unauthorized' }, 401);
+  const daemonId = c.req.param('daemonId');
+  const sessionId = c.req.param('sessionId');
+
+  const daemon = await Effect.runPromise(
+    Effect.provide(
+      Effect.matchEffect(
+        Effect.service(DaemonReadRepository).pipe(Effect.flatMap((r) => r.get(daemonId))),
+        {
+          onSuccess: (d) => Effect.succeed(d),
+          onFailure: () => Effect.succeed(null),
+        }
+      ),
+      allLayers
+    )
+  );
+  if (!daemon || daemon.userId !== user.id) {
+    return c.json({ error: `Daemon not found: ${daemonId}` }, 404);
+  }
+
+  const agentSession = sessionStore.get(sessionId);
+  if (!agentSession) {
+    return c.json({ error: 'Session not found' }, 404);
+  }
+  if (agentSession.status !== 'ended') {
+    return c.json({ error: 'Session is not ended' }, 400);
+  }
+  if (agentSession.agentType !== 'claude') {
+    return c.json({ error: 'Only Claude sessions can be resumed' }, 400);
+  }
+  if (!agentSession.claudeSessionId) {
+    return c.json({ error: 'No Claude session ID detected for this session' }, 400);
+  }
+
+  const body = await c.req
+    .json<{ cols?: number; rows?: number }>()
+    .catch(() => ({ cols: undefined, rows: undefined }));
+
+  const result = await Effect.runPromise(
+    Effect.provide(
+      Effect.matchEffect(
+        resumeSession(
+          daemonId,
+          sessionId,
+          agentSession.claudeSessionId,
+          agentSession.cwd,
+          body.cols ?? 120,
+          body.rows ?? 30
+        ),
+        {
+          onSuccess: (r) => Effect.succeed({ ok: true, sessionId: r.sessionId } as const),
+          onFailure: (e) =>
+            Effect.succeed(
+              e._tag === 'DaemonDisconnectedError'
+                ? ({ ok: false, error: 'Daemon not connected', status: 503 } as const)
+                : ({ ok: false, error: `Daemon not found: ${e.id}`, status: 404 } as const)
+            ),
+        }
+      ),
+      allLayers
+    )
+  );
+
+  if (!result.ok) {
+    return c.json({ error: result.error }, result.status);
+  }
+
+  return c.json({ sessionId: result.sessionId });
 });
 
 daemonRestApp.post('/daemons/:daemonId/fs/list', async (c) => {

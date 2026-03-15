@@ -10,6 +10,7 @@ export interface AgentSession {
   readonly repoName?: string;
   readonly startedAt: number;
   readonly status: 'active' | 'ended';
+  readonly claudeSessionId?: string;
 }
 
 export function createAgentSession(daemonId: string, msg: SessionStarted): AgentSession {
