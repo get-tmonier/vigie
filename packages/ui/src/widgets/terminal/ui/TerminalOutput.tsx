@@ -102,6 +102,12 @@ export function TerminalOutput({ events }: TerminalOutputProps) {
                 Session {event.sessionId.slice(0, 8)} ended (code {event.exitCode})
               </div>
             );
+          case 'session:error':
+            return (
+              <div key={key} className="text-error py-1">
+                Session {event.sessionId.slice(0, 8)} error: {event.error}
+              </div>
+            );
           default:
             return null;
         }

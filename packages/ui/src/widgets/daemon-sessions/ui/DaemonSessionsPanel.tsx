@@ -11,7 +11,7 @@ interface DaemonSessionsPanelProps {
 }
 
 export function DaemonSessionsPanel({ daemonId, events }: DaemonSessionsPanelProps) {
-  const { sessions, loading } = useSessions(daemonId);
+  const { sessions, loading } = useSessions(daemonId, events);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const { chunks, accumulatedText } = useSessionStream(events, selectedSessionId);
 

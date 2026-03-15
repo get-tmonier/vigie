@@ -40,6 +40,7 @@ export function useSSE(daemonId: string | null) {
     es.addEventListener('session:started', handleEvent);
     es.addEventListener('session:output', handleEvent);
     es.addEventListener('session:ended', handleEvent);
+    es.addEventListener('session:error', handleEvent);
 
     return () => {
       es.close();

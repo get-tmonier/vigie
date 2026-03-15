@@ -200,10 +200,20 @@ daemonWsApp.get(
               }
               await Effect.runPromise(
                 Effect.provide(
-                  Effect.annotateLogs(Effect.logWarning('Session error'), {
-                    daemonId: session.id,
-                    sessionId: msg.sessionId,
-                    error: msg.error,
+                  Effect.gen(function* () {
+                    const publisher = yield* Effect.service(EventPublisher);
+                    yield* publisher.publish(session.id, {
+                      type: 'session:error',
+                      daemonId: session.id,
+                      sessionId: msg.sessionId,
+                      error: msg.error,
+                      timestamp: msg.timestamp,
+                    });
+                    yield* Effect.annotateLogs(Effect.logWarning('Session error'), {
+                      daemonId: session.id,
+                      sessionId: msg.sessionId,
+                      error: msg.error,
+                    });
                   }),
                   allLayers
                 )

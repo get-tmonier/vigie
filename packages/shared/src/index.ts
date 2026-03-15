@@ -53,6 +53,8 @@ export {
   SSEEventSchema,
   type SSESessionEnded,
   SSESessionEndedSchema,
+  type SSESessionError,
+  SSESessionErrorSchema,
   type SSESessionOutput,
   SSESessionOutputSchema,
   type SSESessionStarted,
