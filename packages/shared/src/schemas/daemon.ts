@@ -15,7 +15,36 @@ export const PingSchema = v.object({
 });
 export type Ping = v.InferOutput<typeof PingSchema>;
 
-export const DownstreamMessageSchema = v.variant('type', [CommandRequestSchema, PingSchema]);
+export const SessionSpawnRequestSchema = v.object({
+  type: v.literal('session:spawn-request'),
+  sessionId: v.string(),
+  agentType: v.picklist(['claude', 'opencode', 'generic']),
+  cwd: v.string(),
+  cols: v.number(),
+  rows: v.number(),
+});
+export type SessionSpawnRequest = v.InferOutput<typeof SessionSpawnRequestSchema>;
+
+export const SessionKillSchema = v.object({
+  type: v.literal('session:kill'),
+  sessionId: v.string(),
+});
+export type SessionKill = v.InferOutput<typeof SessionKillSchema>;
+
+export const FsListDirRequestSchema = v.object({
+  type: v.literal('fs:list-dir'),
+  requestId: v.string(),
+  path: v.string(),
+});
+export type FsListDirRequest = v.InferOutput<typeof FsListDirRequestSchema>;
+
+export const DownstreamMessageSchema = v.variant('type', [
+  CommandRequestSchema,
+  PingSchema,
+  SessionSpawnRequestSchema,
+  SessionKillSchema,
+  FsListDirRequestSchema,
+]);
 export type DownstreamMessage = v.InferOutput<typeof DownstreamMessageSchema>;
 
 // ── Upstream (daemon -> backend) ──
@@ -122,6 +151,27 @@ export const TerminalResizeSchema = v.object({
 });
 export type TerminalResize = v.InferOutput<typeof TerminalResizeSchema>;
 
+export const FsListDirResponseSchema = v.object({
+  type: v.literal('fs:list-dir-response'),
+  requestId: v.string(),
+  entries: v.array(
+    v.object({
+      name: v.string(),
+      isDirectory: v.boolean(),
+    })
+  ),
+  error: v.optional(v.string()),
+});
+export type FsListDirResponse = v.InferOutput<typeof FsListDirResponseSchema>;
+
+export const SessionSpawnFailedSchema = v.object({
+  type: v.literal('session:spawn-failed'),
+  sessionId: v.string(),
+  error: v.string(),
+  timestamp: v.number(),
+});
+export type SessionSpawnFailed = v.InferOutput<typeof SessionSpawnFailedSchema>;
+
 export const UpstreamMessageSchema = v.variant('type', [
   DaemonHelloSchema,
   CommandOutputSchema,
@@ -133,6 +183,8 @@ export const UpstreamMessageSchema = v.variant('type', [
   SessionEndedSchema,
   SessionErrorUpstreamSchema,
   TerminalOutputSchema,
+  SessionSpawnFailedSchema,
+  FsListDirResponseSchema,
 ]);
 export type UpstreamMessage = v.InferOutput<typeof UpstreamMessageSchema>;
 

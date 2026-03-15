@@ -39,7 +39,7 @@ describe('InMemoryTerminalRelay', () => {
     );
   });
 
-  it('should not replay buffered data on subscribe (live-only)', async () => {
+  it('should replay buffered data on subscribe', async () => {
     const received: string[] = [];
 
     await run(
@@ -49,12 +49,13 @@ describe('InMemoryTerminalRelay', () => {
         yield* relay.write('s3', btoa('before subscribe'));
         yield* relay.subscribe('s3', (data) => received.push(data));
 
-        // No replay — subscriber only gets live data from this point
-        expect(received.length).toBe(0);
+        // Replay — subscriber gets buffered data on subscribe
+        expect(received.length).toBe(1);
+        expect(atob(received[0])).toBe('before subscribe');
 
         yield* relay.write('s3', btoa('after subscribe'));
-        expect(received.length).toBe(1);
-        expect(atob(received[0])).toBe('after subscribe');
+        expect(received.length).toBe(2);
+        expect(atob(received[1])).toBe('after subscribe');
 
         yield* relay.destroy('s3');
       })

@@ -2,17 +2,26 @@ import { FitAddon } from '@xterm/addon-fit';
 import { Terminal } from '@xterm/xterm';
 import '@xterm/xterm/css/xterm.css';
 import { useCallback, useEffect, useRef } from 'react';
-import { cn } from '#shared/lib/cn';
 import { useTerminalWs } from '../model/use-terminal-ws';
 
 interface InteractiveTerminalProps {
   sessionId: string;
+  onConnectionChange?: (connected: boolean) => void;
+  onInput?: (data: string) => void;
 }
 
-export function InteractiveTerminal({ sessionId }: InteractiveTerminalProps) {
+export function InteractiveTerminal({
+  sessionId,
+  onConnectionChange,
+  onInput,
+}: InteractiveTerminalProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const terminalRef = useRef<Terminal | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
+  const onConnectionChangeRef = useRef(onConnectionChange);
+  onConnectionChangeRef.current = onConnectionChange;
+  const onInputRef = useRef(onInput);
+  onInputRef.current = onInput;
 
   const onData = useCallback((data: Uint8Array) => {
     const terminal = terminalRef.current;
@@ -27,18 +36,18 @@ export function InteractiveTerminal({ sessionId }: InteractiveTerminalProps) {
       const fitAddon = fitAddonRef.current;
       if (!terminal || !fitAddon) return;
 
-      // Clean slate — discard any stale local state
       terminal.reset();
       fitAddon.fit();
-
-      // Always send dimensions on connect — fitAddon.fit() may not trigger onResize
-      // if the terminal was already sized by the initial fit before the WS was open
       sendResizeNow(terminal.cols, terminal.rows);
     },
     []
   );
 
   const { connected, send, sendResize } = useTerminalWs({ sessionId, onData, onConnected });
+
+  useEffect(() => {
+    onConnectionChangeRef.current?.(connected);
+  }, [connected]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -72,6 +81,7 @@ export function InteractiveTerminal({ sessionId }: InteractiveTerminalProps) {
 
     terminal.onData((data) => {
       send(data);
+      onInputRef.current?.(data);
     });
 
     terminal.onResize(({ cols, rows }) => {
@@ -91,21 +101,5 @@ export function InteractiveTerminal({ sessionId }: InteractiveTerminalProps) {
     };
   }, [send, sendResize]);
 
-  return (
-    <div className="flex-1 flex flex-col overflow-hidden">
-      <div className="flex items-center gap-2 px-3 py-1.5 border-b border-navy-light">
-        <span
-          className={cn(
-            'w-2 h-2 rounded-full',
-            connected ? 'bg-success animate-pulse' : 'bg-slate'
-          )}
-        />
-        <span className="text-xs text-slate font-mono">
-          {connected ? 'Connected' : 'Connecting...'}
-        </span>
-        <span className="text-xs text-slate font-mono ml-auto">interactive</span>
-      </div>
-      <div ref={containerRef} className="flex-1 bg-navy-deep" />
-    </div>
-  );
+  return <div ref={containerRef} className="flex-1 bg-navy-deep" />;
 }

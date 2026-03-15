@@ -84,6 +84,15 @@ export const SSESessionErrorSchema = v.object({
 });
 export type SSESessionError = v.InferOutput<typeof SSESessionErrorSchema>;
 
+export const SSESessionSpawnFailedSchema = v.object({
+  type: v.literal('session:spawn-failed'),
+  daemonId: v.string(),
+  sessionId: v.string(),
+  error: v.string(),
+  timestamp: v.number(),
+});
+export type SSESessionSpawnFailed = v.InferOutput<typeof SSESessionSpawnFailedSchema>;
+
 export const SSEEventSchema = v.variant('type', [
   SSECommandOutputSchema,
   SSECommandDoneSchema,
@@ -94,5 +103,6 @@ export const SSEEventSchema = v.variant('type', [
   SSESessionOutputSchema,
   SSESessionEndedSchema,
   SSESessionErrorSchema,
+  SSESessionSpawnFailedSchema,
 ]);
 export type SSEEvent = v.InferOutput<typeof SSEEventSchema>;

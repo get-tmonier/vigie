@@ -3,7 +3,10 @@ import { TerminalRelay } from '#modules/supervision/ports/terminal-relay.port';
 
 interface RelayEntry {
   readonly subscribers: Set<(data: string) => void>;
+  readonly buffer: string[];
 }
+
+const MAX_BUFFER_SIZE = 500;
 
 const relays = new Map<string, RelayEntry>();
 
@@ -13,9 +16,11 @@ export const InMemoryTerminalRelayLive = Layer.succeed(TerminalRelay, {
       const existing = relays.get(sessionId);
       if (existing) {
         existing.subscribers.clear();
+        existing.buffer.length = 0;
       }
       relays.set(sessionId, {
         subscribers: new Set(),
+        buffer: [],
       });
       yield* Effect.annotateLogs(Effect.logDebug('TerminalRelay: created'), { sessionId });
     }),
@@ -25,8 +30,15 @@ export const InMemoryTerminalRelayLive = Layer.succeed(TerminalRelay, {
       const entry = relays.get(sessionId);
       if (!entry) return;
 
-      for (const cb of entry.subscribers) {
-        cb(data);
+      if (entry.subscribers.size > 0) {
+        for (const cb of entry.subscribers) {
+          cb(data);
+        }
+      } else {
+        entry.buffer.push(data);
+        if (entry.buffer.length > MAX_BUFFER_SIZE) {
+          entry.buffer.shift();
+        }
       }
     }),
 
@@ -35,6 +47,14 @@ export const InMemoryTerminalRelayLive = Layer.succeed(TerminalRelay, {
       const entry = relays.get(sessionId);
       if (!entry) {
         return () => {};
+      }
+
+      // Replay buffered data to the new subscriber
+      if (entry.buffer.length > 0) {
+        for (const chunk of entry.buffer) {
+          onData(chunk);
+        }
+        entry.buffer.length = 0;
       }
 
       entry.subscribers.add(onData);
@@ -49,7 +69,13 @@ export const InMemoryTerminalRelayLive = Layer.succeed(TerminalRelay, {
       };
     }),
 
-  clearBuffer: (_sessionId) => Effect.void,
+  clearBuffer: (sessionId) =>
+    Effect.sync(() => {
+      const entry = relays.get(sessionId);
+      if (entry) {
+        entry.buffer.length = 0;
+      }
+    }),
 
   destroy: (sessionId) =>
     Effect.gen(function* () {
@@ -57,6 +83,7 @@ export const InMemoryTerminalRelayLive = Layer.succeed(TerminalRelay, {
       if (!entry) return;
 
       entry.subscribers.clear();
+      entry.buffer.length = 0;
       relays.delete(sessionId);
 
       yield* Effect.annotateLogs(Effect.logDebug('TerminalRelay: destroyed'), { sessionId });

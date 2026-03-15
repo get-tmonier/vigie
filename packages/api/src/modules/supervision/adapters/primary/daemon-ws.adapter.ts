@@ -1,3 +1,4 @@
+import type { FsListDirResponse } from '@tmonier/shared';
 import { UpstreamMessageSchema } from '@tmonier/shared';
 import { Effect, Layer } from 'effect';
 import { Hono } from 'hono';
@@ -19,6 +20,12 @@ import { InMemoryDaemonWriteRepositoryLive } from '../secondary/in-memory-daemon
 import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher';
 import { InMemoryTerminalRelayLive } from '../secondary/in-memory-terminal-relay';
 import { daemonStore, sessionStore, sessionToDaemon } from '../secondary/shared-state';
+
+// Pending fs:list-dir requests — keyed by requestId, resolved when daemon responds
+export const pendingFsRequests = new Map<
+  string,
+  { resolve: (response: FsListDirResponse) => void; timer: ReturnType<typeof setTimeout> }
+>();
 
 const allLayers = Layer.mergeAll(
   InMemoryDaemonWriteRepositoryLive,
@@ -224,6 +231,41 @@ daemonWsApp.get(
                   allLayers
                 )
               );
+            }
+            break;
+          }
+          case 'session:spawn-failed': {
+            const session = sessionByWs.get(raw);
+            if (session) {
+              await Effect.runPromise(
+                Effect.provide(
+                  Effect.gen(function* () {
+                    const publisher = yield* Effect.service(EventPublisher);
+                    yield* publisher.publish(session.id, {
+                      type: 'session:spawn-failed',
+                      daemonId: session.id,
+                      sessionId: msg.sessionId,
+                      error: msg.error,
+                      timestamp: msg.timestamp,
+                    });
+                    yield* Effect.annotateLogs(Effect.logWarning('Session spawn failed'), {
+                      daemonId: session.id,
+                      sessionId: msg.sessionId,
+                      error: msg.error,
+                    });
+                  }),
+                  allLayers
+                )
+              );
+            }
+            break;
+          }
+          case 'fs:list-dir-response': {
+            const pending = pendingFsRequests.get(msg.requestId);
+            if (pending) {
+              clearTimeout(pending.timer);
+              pendingFsRequests.delete(msg.requestId);
+              pending.resolve(msg);
             }
             break;
           }

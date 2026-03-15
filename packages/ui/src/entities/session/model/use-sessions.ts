@@ -57,7 +57,11 @@ export function useSessions(daemonId: string | null, events: SSEEvent[]) {
           if (prev.some((s) => s.id === event.sessionId)) return prev;
           return [...prev, newSession];
         });
-      } else if (event.type === 'session:ended' || event.type === 'session:error') {
+      } else if (
+        event.type === 'session:ended' ||
+        event.type === 'session:error' ||
+        event.type === 'session:spawn-failed'
+      ) {
         setSessions((prev) =>
           prev.map((s) => (s.id === event.sessionId ? { ...s, status: 'ended' } : s))
         );
