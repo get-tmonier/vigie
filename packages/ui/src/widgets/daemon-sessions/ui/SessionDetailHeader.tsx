@@ -39,11 +39,32 @@ const AGENT_ICONS: Record<string, string> = {
   generic: 'G',
 };
 
+function CopyableId({ sessionId }: { sessionId: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(sessionId.slice(0, 8));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [sessionId]);
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className="text-sm font-mono transition-colors text-cream hover:text-gold cursor-copy"
+      title="Copy session ID"
+    >
+      {copied ? 'Copied!' : sessionId.slice(0, 8)}
+    </button>
+  );
+}
+
 function AttachButton({ sessionId }: { sessionId: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(() => {
-    const command = `tmonier session attach ${sessionId.slice(0, 8)}`;
+    const command = `tmonier session attach --id ${sessionId.slice(0, 8)}`;
     navigator.clipboard.writeText(command);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -86,7 +107,7 @@ export function SessionDetailHeader({
       >
         {AGENT_ICONS[session.agentType] ?? '?'}
       </span>
-      <span className="text-sm text-cream font-mono">{session.id.slice(0, 8)}</span>
+      <CopyableId sessionId={session.id} />
       <span className="text-[0.625rem] text-gold border border-gold/30 rounded px-1 py-0.5 leading-none">
         {session.mode}
       </span>
