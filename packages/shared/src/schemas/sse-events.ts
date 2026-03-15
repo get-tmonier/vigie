@@ -48,6 +48,7 @@ export const SSESessionStartedSchema = v.object({
   daemonId: v.string(),
   sessionId: v.string(),
   agentType: v.picklist(['claude', 'opencode', 'generic']),
+  mode: v.optional(v.picklist(['prompt', 'interactive']), 'prompt'),
   cwd: v.string(),
   gitBranch: v.optional(v.string()),
   repoName: v.optional(v.string()),

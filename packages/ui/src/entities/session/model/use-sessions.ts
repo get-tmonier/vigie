@@ -46,6 +46,7 @@ export function useSessions(daemonId: string | null, events: SSEEvent[]) {
           id: event.sessionId,
           daemonId: event.daemonId,
           agentType: event.agentType,
+          mode: event.mode ?? 'prompt',
           cwd: event.cwd,
           gitBranch: event.gitBranch,
           repoName: event.repoName,

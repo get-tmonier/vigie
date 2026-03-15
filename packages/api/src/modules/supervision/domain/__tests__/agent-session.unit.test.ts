@@ -6,6 +6,7 @@ const baseMsg: SessionStarted = {
   type: 'session:started',
   sessionId: 'session-123',
   agentType: 'claude',
+  mode: 'prompt',
   cwd: '/home/user/project',
   timestamp: 1_000_000,
 };

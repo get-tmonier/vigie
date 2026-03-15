@@ -7,8 +7,12 @@ import {
   CommandRequestSchema,
   DaemonHelloSchema,
   DownstreamMessageSchema,
+  DownstreamTerminalMessageSchema,
   PingSchema,
   PongSchema,
+  TerminalInputSchema,
+  TerminalOutputSchema,
+  TerminalResizeSchema,
   UpstreamMessageSchema,
 } from '../schemas/daemon';
 import {
@@ -146,6 +150,91 @@ describe('daemon upstream schemas', () => {
 
   it('rejects unknown upstream type', () => {
     expect(() => v.parse(UpstreamMessageSchema, { type: 'unknown' })).toThrow();
+  });
+});
+
+describe('terminal schemas', () => {
+  it('parses terminal:output', () => {
+    const msg = {
+      type: 'terminal:output',
+      sessionId: 's-1',
+      data: 'aGVsbG8=',
+      timestamp: Date.now(),
+    };
+    const result = v.parse(TerminalOutputSchema, msg);
+    expect(result.type).toBe('terminal:output');
+    expect(result.data).toBe('aGVsbG8=');
+  });
+
+  it('parses terminal:input', () => {
+    const msg = { type: 'terminal:input', sessionId: 's-1', data: 'aGk=' };
+    const result = v.parse(TerminalInputSchema, msg);
+    expect(result.type).toBe('terminal:input');
+    expect(result.sessionId).toBe('s-1');
+  });
+
+  it('parses terminal:resize', () => {
+    const msg = { type: 'terminal:resize', sessionId: 's-1', cols: 80, rows: 24 };
+    const result = v.parse(TerminalResizeSchema, msg);
+    expect(result.cols).toBe(80);
+    expect(result.rows).toBe(24);
+  });
+
+  it('terminal:output is part of upstream union', () => {
+    const result = v.parse(UpstreamMessageSchema, {
+      type: 'terminal:output',
+      sessionId: 's-1',
+      data: 'aGVsbG8=',
+      timestamp: 0,
+    });
+    expect(result.type).toBe('terminal:output');
+  });
+
+  it('parses downstream terminal discriminated union', () => {
+    const input = v.parse(DownstreamTerminalMessageSchema, {
+      type: 'terminal:input',
+      sessionId: 's-1',
+      data: 'aGk=',
+    });
+    expect(input.type).toBe('terminal:input');
+
+    const resize = v.parse(DownstreamTerminalMessageSchema, {
+      type: 'terminal:resize',
+      sessionId: 's-1',
+      cols: 120,
+      rows: 40,
+    });
+    expect(resize.type).toBe('terminal:resize');
+  });
+
+  it('session:started accepts mode field', () => {
+    const msg = {
+      type: 'session:started',
+      sessionId: 's-1',
+      agentType: 'claude',
+      mode: 'interactive',
+      cwd: '/tmp',
+      timestamp: Date.now(),
+    };
+    const result = v.parse(UpstreamMessageSchema, msg);
+    expect(result.type).toBe('session:started');
+    if (result.type === 'session:started') {
+      expect(result.mode).toBe('interactive');
+    }
+  });
+
+  it('session:started defaults mode to prompt', () => {
+    const msg = {
+      type: 'session:started',
+      sessionId: 's-1',
+      agentType: 'claude',
+      cwd: '/tmp',
+      timestamp: Date.now(),
+    };
+    const result = v.parse(UpstreamMessageSchema, msg);
+    if (result.type === 'session:started') {
+      expect(result.mode).toBe('prompt');
+    }
   });
 });
 

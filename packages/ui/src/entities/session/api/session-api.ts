@@ -4,6 +4,7 @@ export interface AgentSession {
   id: string;
   daemonId: string;
   agentType: 'claude' | 'opencode' | 'generic';
+  mode: 'prompt' | 'interactive';
   cwd: string;
   gitBranch?: string;
   repoName?: string;

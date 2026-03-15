@@ -51,6 +51,11 @@ export function SessionCard({ session, selected, onClick }: SessionCardProps) {
           {AGENT_ICONS[session.agentType] ?? '?'}
         </span>
         <span className="text-sm text-cream font-mono truncate">{session.id.slice(0, 8)}</span>
+        {session.mode === 'interactive' && (
+          <span className="text-[0.625rem] text-gold border border-gold/30 rounded px-1 py-0.5 leading-none">
+            interactive
+          </span>
+        )}
         <span
           className={cn(
             'ml-auto w-2 h-2 rounded-full',

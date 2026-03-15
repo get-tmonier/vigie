@@ -4,6 +4,7 @@ export interface AgentSession {
   readonly id: string;
   readonly daemonId: string;
   readonly agentType: 'claude' | 'opencode' | 'generic';
+  readonly mode: 'prompt' | 'interactive';
   readonly cwd: string;
   readonly gitBranch?: string;
   readonly repoName?: string;
@@ -16,6 +17,7 @@ export function createAgentSession(daemonId: string, msg: SessionStarted): Agent
     id: msg.sessionId,
     daemonId,
     agentType: msg.agentType,
+    mode: msg.mode ?? 'prompt',
     cwd: msg.cwd,
     gitBranch: msg.gitBranch,
     repoName: msg.repoName,

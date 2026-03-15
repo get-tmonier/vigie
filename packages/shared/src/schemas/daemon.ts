@@ -64,6 +64,7 @@ export const SessionStartedSchema = v.object({
   type: v.literal('session:started'),
   sessionId: v.string(),
   agentType: v.picklist(['claude', 'opencode', 'generic']),
+  mode: v.optional(v.picklist(['prompt', 'interactive']), 'prompt'),
   cwd: v.string(),
   gitBranch: v.optional(v.string()),
   repoName: v.optional(v.string()),
@@ -96,6 +97,31 @@ export const SessionErrorUpstreamSchema = v.object({
 });
 export type SessionErrorUpstream = v.InferOutput<typeof SessionErrorUpstreamSchema>;
 
+export const TerminalOutputSchema = v.object({
+  type: v.literal('terminal:output'),
+  sessionId: v.string(),
+  data: v.string(),
+  timestamp: v.number(),
+});
+export type TerminalOutput = v.InferOutput<typeof TerminalOutputSchema>;
+
+// ── Downstream terminal messages (backend -> daemon) ──
+
+export const TerminalInputSchema = v.object({
+  type: v.literal('terminal:input'),
+  sessionId: v.string(),
+  data: v.string(),
+});
+export type TerminalInput = v.InferOutput<typeof TerminalInputSchema>;
+
+export const TerminalResizeSchema = v.object({
+  type: v.literal('terminal:resize'),
+  sessionId: v.string(),
+  cols: v.number(),
+  rows: v.number(),
+});
+export type TerminalResize = v.InferOutput<typeof TerminalResizeSchema>;
+
 export const UpstreamMessageSchema = v.variant('type', [
   DaemonHelloSchema,
   CommandOutputSchema,
@@ -106,5 +132,12 @@ export const UpstreamMessageSchema = v.variant('type', [
   SessionOutputSchema,
   SessionEndedSchema,
   SessionErrorUpstreamSchema,
+  TerminalOutputSchema,
 ]);
 export type UpstreamMessage = v.InferOutput<typeof UpstreamMessageSchema>;
+
+export const DownstreamTerminalMessageSchema = v.variant('type', [
+  TerminalInputSchema,
+  TerminalResizeSchema,
+]);
+export type DownstreamTerminalMessage = v.InferOutput<typeof DownstreamTerminalMessageSchema>;

@@ -11,6 +11,7 @@ import { daemonSseApp } from './modules/supervision/adapters/primary/daemon-sse.
 import { daemonWsApp, websocket } from './modules/supervision/adapters/primary/daemon-ws.adapter';
 import { deviceRestApp } from './modules/supervision/adapters/primary/device-rest.adapter';
 import { startHeartbeat } from './modules/supervision/adapters/primary/heartbeat';
+import { terminalWsApp } from './modules/supervision/adapters/primary/terminal-ws.adapter';
 import { health } from './routes/health';
 
 const { port, corsOrigin } = Effect.runSync(loadConfig);
@@ -19,6 +20,7 @@ const loggerLayer = Logger.layer([Logger.consolePretty()]);
 const app = new Hono();
 
 app.route('/', daemonWsApp);
+app.route('/', terminalWsApp);
 
 app.use(
   '*',

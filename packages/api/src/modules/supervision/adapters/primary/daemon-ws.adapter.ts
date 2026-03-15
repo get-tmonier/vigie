@@ -12,16 +12,19 @@ import { unregisterDaemon } from '#modules/supervision/commands/unregister-daemo
 import { createAgentSession } from '#modules/supervision/domain/agent-session';
 import type { DaemonSession } from '#modules/supervision/domain/daemon-session';
 import { EventPublisher } from '#modules/supervision/ports/event-publisher.port';
+import { TerminalRelay } from '#modules/supervision/ports/terminal-relay.port';
 import { SupervisionLoggerLive } from '../logger';
 import { InMemoryDaemonReadRepositoryLive } from '../secondary/in-memory-daemon-read-repository';
 import { InMemoryDaemonWriteRepositoryLive } from '../secondary/in-memory-daemon-write-repository';
 import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher';
-import { daemonStore, sessionStore } from '../secondary/shared-state';
+import { InMemoryTerminalRelayLive } from '../secondary/in-memory-terminal-relay';
+import { daemonStore, sessionStore, sessionToDaemon } from '../secondary/shared-state';
 
 const allLayers = Layer.mergeAll(
   InMemoryDaemonWriteRepositoryLive,
   InMemoryDaemonReadRepositoryLive,
   InMemoryEventPublisherLive,
+  InMemoryTerminalRelayLive,
   SupervisionLoggerLive
 );
 
@@ -113,6 +116,7 @@ daemonWsApp.get(
             if (session) {
               const agentSession = createAgentSession(session.id, msg);
               sessionStore.set(msg.sessionId, agentSession);
+              sessionToDaemon.set(msg.sessionId, session.id);
               await Effect.runPromise(
                 Effect.provide(
                   Effect.gen(function* () {
@@ -122,6 +126,7 @@ daemonWsApp.get(
                       daemonId: session.id,
                       sessionId: msg.sessionId,
                       agentType: msg.agentType,
+                      mode: msg.mode ?? 'prompt',
                       cwd: msg.cwd,
                       gitBranch: msg.gitBranch,
                       repoName: msg.repoName,
@@ -131,6 +136,7 @@ daemonWsApp.get(
                       daemonId: session.id,
                       sessionId: msg.sessionId,
                       agentType: msg.agentType,
+                      mode: msg.mode ?? 'prompt',
                     });
                   }),
                   allLayers
@@ -168,6 +174,7 @@ daemonWsApp.get(
               if (agentSession) {
                 sessionStore.set(msg.sessionId, { ...agentSession, status: 'ended' });
               }
+              sessionToDaemon.delete(msg.sessionId);
               await Effect.runPromise(
                 Effect.provide(
                   Effect.gen(function* () {
@@ -185,6 +192,31 @@ daemonWsApp.get(
                       exitCode: String(msg.exitCode),
                     });
                   }),
+                  allLayers
+                )
+              );
+            }
+            break;
+          }
+          case 'terminal:output': {
+            const session = sessionByWs.get(raw);
+            if (session) {
+              await Effect.runPromise(
+                Effect.provide(
+                  Effect.gen(function* () {
+                    const relay = yield* Effect.service(TerminalRelay);
+                    yield* Effect.logDebug(
+                      `[API] terminal:output received, sessionId=${msg.sessionId}, bytes=${msg.data.length}`
+                    );
+                    yield* relay.publishOutput(msg.sessionId, msg.data);
+                  }),
+                  allLayers
+                )
+              );
+            } else {
+              await Effect.runPromise(
+                Effect.provide(
+                  Effect.logWarning('terminal:output: no daemon session found for WS'),
                   allLayers
                 )
               );

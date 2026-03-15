@@ -2,6 +2,7 @@ import type { SSEEvent } from '@tmonier/shared';
 import { useState } from 'react';
 import { useSessions } from '#entities/session/model/use-sessions';
 import { SessionCard } from '#entities/session/ui/SessionCard';
+import { InteractiveTerminal } from '#features/interactive-terminal/ui/InteractiveTerminal';
 import { useSessionStream } from '#features/session-stream/model/use-session-stream';
 import { TokenStream } from '#features/session-stream/ui/TokenStream';
 
@@ -76,7 +77,13 @@ export function DaemonSessionsPanel({ daemonId, events }: DaemonSessionsPanelPro
 
       <div className="flex-1 flex flex-col">
         {selectedSessionId ? (
-          <TokenStream chunks={chunks} accumulatedText={accumulatedText} />
+          (() => {
+            const selectedSession = sessions.find((s) => s.id === selectedSessionId);
+            if (selectedSession?.mode === 'interactive') {
+              return <InteractiveTerminal sessionId={selectedSessionId} />;
+            }
+            return <TokenStream chunks={chunks} accumulatedText={accumulatedText} />;
+          })()
         ) : (
           <div className="flex-1 flex items-center justify-center text-slate text-sm">
             Select a session to view output
