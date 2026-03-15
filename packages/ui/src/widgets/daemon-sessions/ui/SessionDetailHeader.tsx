@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { AgentSession } from '#entities/session/api/session-api';
 import { KillSessionButton } from '#features/kill-session/ui/KillSessionButton';
 import { cn } from '#shared/lib/cn';
@@ -37,6 +37,27 @@ const AGENT_ICONS: Record<string, string> = {
   opencode: 'O',
   generic: 'G',
 };
+
+function AttachButton({ sessionId }: { sessionId: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    const command = `tmonier session attach ${sessionId.slice(0, 8)}`;
+    navigator.clipboard.writeText(command);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [sessionId]);
+
+  return (
+    <button
+      type="button"
+      onClick={handleCopy}
+      className="text-xs font-mono px-2 py-1 rounded transition-colors text-slate hover:text-cream hover:bg-navy-light"
+    >
+      {copied ? 'Copied!' : '>_ Attach'}
+    </button>
+  );
+}
 
 export function SessionDetailHeader({
   session,
@@ -90,6 +111,7 @@ export function SessionDetailHeader({
             History
           </button>
         )}
+        {session.mode === 'interactive' && isActive && <AttachButton sessionId={session.id} />}
         {isActive && <KillSessionButton daemonId={session.daemonId} sessionId={session.id} />}
         <span
           className={cn(
