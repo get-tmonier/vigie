@@ -136,8 +136,14 @@ export const UpstreamMessageSchema = v.variant('type', [
 ]);
 export type UpstreamMessage = v.InferOutput<typeof UpstreamMessageSchema>;
 
+const TerminalBrowserDisconnectedSchema = v.object({
+  type: v.literal('terminal:browser-disconnected'),
+  sessionId: v.string(),
+});
+
 export const DownstreamTerminalMessageSchema = v.variant('type', [
   TerminalInputSchema,
   TerminalResizeSchema,
+  TerminalBrowserDisconnectedSchema,
 ]);
 export type DownstreamTerminalMessage = v.InferOutput<typeof DownstreamTerminalMessageSchema>;

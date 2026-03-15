@@ -120,6 +120,8 @@ daemonWsApp.get(
               await Effect.runPromise(
                 Effect.provide(
                   Effect.gen(function* () {
+                    const relay = yield* Effect.service(TerminalRelay);
+                    yield* relay.create(msg.sessionId);
                     const publisher = yield* Effect.service(EventPublisher);
                     yield* publisher.publish(session.id, {
                       type: 'session:started',
@@ -178,6 +180,8 @@ daemonWsApp.get(
               await Effect.runPromise(
                 Effect.provide(
                   Effect.gen(function* () {
+                    const relay = yield* Effect.service(TerminalRelay);
+                    yield* relay.destroy(msg.sessionId);
                     const publisher = yield* Effect.service(EventPublisher);
                     yield* publisher.publish(session.id, {
                       type: 'session:ended',
@@ -208,7 +212,7 @@ daemonWsApp.get(
                     yield* Effect.logDebug(
                       `[API] terminal:output received, sessionId=${msg.sessionId}, bytes=${msg.data.length}`
                     );
-                    yield* relay.publishOutput(msg.sessionId, msg.data);
+                    yield* relay.write(msg.sessionId, msg.data);
                   }),
                   allLayers
                 )
@@ -233,6 +237,8 @@ daemonWsApp.get(
               await Effect.runPromise(
                 Effect.provide(
                   Effect.gen(function* () {
+                    const relay = yield* Effect.service(TerminalRelay);
+                    yield* relay.destroy(msg.sessionId);
                     const publisher = yield* Effect.service(EventPublisher);
                     yield* publisher.publish(session.id, {
                       type: 'session:error',
@@ -260,6 +266,20 @@ daemonWsApp.get(
         if (!raw) return;
         const session = sessionByWs.get(raw);
         if (session) {
+          // Destroy terminal buffers for all sessions owned by this daemon
+          for (const [sessionId, daemonId] of sessionToDaemon.entries()) {
+            if (daemonId === session.id) {
+              await Effect.runPromise(
+                Effect.provide(
+                  Effect.gen(function* () {
+                    const relay = yield* Effect.service(TerminalRelay);
+                    yield* relay.destroy(sessionId);
+                  }),
+                  allLayers
+                )
+              );
+            }
+          }
           await Effect.runPromise(
             Effect.provide(
               Effect.gen(function* () {

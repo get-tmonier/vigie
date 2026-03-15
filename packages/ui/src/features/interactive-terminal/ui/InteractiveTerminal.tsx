@@ -15,18 +15,22 @@ export function InteractiveTerminal({ sessionId }: InteractiveTerminalProps) {
   const fitAddonRef = useRef<FitAddon | null>(null);
 
   const onData = useCallback((data: Uint8Array) => {
-    terminalRef.current?.write(data);
+    const terminal = terminalRef.current;
+    if (!terminal || data.length === 0) return;
+
+    terminal.write(data);
   }, []);
 
-  const onConnected = useCallback((ws: WebSocket) => {
+  const onConnected = useCallback(() => {
     const terminal = terminalRef.current;
-    if (terminal) {
-      // Force a size change to guarantee SIGWINCH even if dimensions match
-      ws.send(JSON.stringify({ type: 'resize', cols: terminal.cols + 1, rows: terminal.rows }));
-      setTimeout(() => {
-        ws.send(JSON.stringify({ type: 'resize', cols: terminal.cols, rows: terminal.rows }));
-      }, 50);
-    }
+    const fitAddon = fitAddonRef.current;
+    if (!terminal || !fitAddon) return;
+
+    // Clean slate — discard any stale local state
+    terminal.reset();
+
+    // Fit triggers onResize → sendResize → SIGWINCH → Claude Code re-renders at browser width
+    fitAddon.fit();
   }, []);
 
   const { connected, send, sendResize } = useTerminalWs({ sessionId, onData, onConnected });

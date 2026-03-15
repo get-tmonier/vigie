@@ -10,6 +10,15 @@ import { daemonStore, sessionStore, sessionToDaemon } from '../secondary/shared-
 
 const allLayers = Layer.mergeAll(InMemoryTerminalRelayLive, SupervisionLoggerLive);
 
+function sendResizeToDaemon(
+  daemonWs: WebSocket,
+  sessionId: string,
+  cols: number,
+  rows: number
+): void {
+  daemonWs.send(JSON.stringify({ type: 'terminal:resize', sessionId, cols, rows }));
+}
+
 const terminalWsApp = new Hono<AuthEnv>();
 
 terminalWsApp.get(
@@ -83,30 +92,27 @@ terminalWsApp.get(
           ws.close(4003, 'Forbidden');
           return;
         }
-        await Effect.runPromise(
-          Effect.provide(
-            Effect.annotateLogs(Effect.logInfo('Terminal WS: auth passed, subscribing'), {
-              sessionId,
-            }),
-            allLayers
-          )
-        );
 
+        // Subscribe to live relay — no replay, browser will trigger resize to get fresh render
         const unsubscribe = await Effect.runPromise(
           Effect.provide(
             Effect.gen(function* () {
               const relay = yield* Effect.service(TerminalRelay);
-              const unsub = yield* relay.subscribeOutput(sessionId, (data) => {
-                const raw = ws.raw;
-                if (raw && (raw as WebSocket).readyState === WebSocket.OPEN) {
-                  const bytes = Uint8Array.from(atob(data), (c) => c.charCodeAt(0));
-                  ws.send(bytes);
+              const sendChunk = (data: string) => {
+                const rawWs = ws.raw;
+                if (rawWs && (rawWs as WebSocket).readyState === WebSocket.OPEN) {
+                  const payload = Uint8Array.from(atob(data), (c) => c.charCodeAt(0));
+                  ws.send(payload);
                 }
-              });
-              yield* Effect.annotateLogs(Effect.logInfo('Terminal WS: browser connected'), {
-                sessionId,
-                userId: user.id,
-              });
+              };
+              const unsub = yield* relay.subscribe(sessionId, sendChunk);
+              yield* Effect.annotateLogs(
+                Effect.logInfo('Terminal WS: browser connected (live-only, no replay)'),
+                {
+                  sessionId,
+                  userId: user.id,
+                }
+              );
               return unsub;
             }),
             allLayers
@@ -120,15 +126,6 @@ terminalWsApp.get(
       },
 
       onMessage: async (event, _ws) => {
-        await Effect.runPromise(
-          Effect.provide(
-            Effect.annotateLogs(Effect.logDebug('Terminal WS: onMessage received'), {
-              sessionId,
-              dataType: typeof event.data,
-            }),
-            allLayers
-          )
-        );
         const daemonId = sessionToDaemon.get(sessionId);
         if (!daemonId) return;
 
@@ -148,23 +145,17 @@ terminalWsApp.get(
             typeof msg.cols === 'number' &&
             typeof msg.rows === 'number'
           ) {
-            Effect.runSync(
+            // Forward resize to daemon → CLI → PTY (triggers SIGWINCH → Ink re-render)
+            sendResizeToDaemon(daemonEntry.ws, sessionId, msg.cols, msg.rows);
+            await Effect.runPromise(
               Effect.provide(
-                Effect.annotateLogs(Effect.logInfo('Terminal WS: resize from browser'), {
+                Effect.annotateLogs(Effect.logInfo('Terminal WS: resize forwarded to daemon'), {
                   sessionId,
                   cols: String(msg.cols),
                   rows: String(msg.rows),
                 }),
                 allLayers
               )
-            );
-            daemonEntry.ws.send(
-              JSON.stringify({
-                type: 'terminal:resize',
-                sessionId,
-                cols: msg.cols,
-                rows: msg.rows,
-              })
             );
           }
         } else {
@@ -197,6 +188,20 @@ terminalWsApp.get(
             | undefined;
           unsub?.();
         }
+
+        const daemonId = sessionToDaemon.get(sessionId);
+        if (daemonId) {
+          const daemonEntry = daemonStore.get(daemonId);
+          if (daemonEntry?.ws.readyState === WebSocket.OPEN) {
+            daemonEntry.ws.send(
+              JSON.stringify({
+                type: 'terminal:browser-disconnected',
+                sessionId,
+              })
+            );
+          }
+        }
+
         await Effect.runPromise(
           Effect.provide(
             Effect.annotateLogs(Effect.logInfo('Terminal WS: browser disconnected'), { sessionId }),

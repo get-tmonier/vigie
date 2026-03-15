@@ -1,11 +1,14 @@
 import { type Effect, ServiceMap } from 'effect';
 
 interface TerminalRelayShape {
-  readonly publishOutput: (sessionId: string, data: string) => Effect.Effect<void>;
-  readonly subscribeOutput: (
+  readonly create: (sessionId: string) => Effect.Effect<void>;
+  readonly write: (sessionId: string, data: string) => Effect.Effect<void>;
+  readonly subscribe: (
     sessionId: string,
-    cb: (data: string) => void
+    onData: (data: string) => void
   ) => Effect.Effect<() => void>;
+  readonly clearBuffer: (sessionId: string) => Effect.Effect<void>;
+  readonly destroy: (sessionId: string) => Effect.Effect<void>;
 }
 
 export class TerminalRelay extends ServiceMap.Service<TerminalRelay, TerminalRelayShape>()(

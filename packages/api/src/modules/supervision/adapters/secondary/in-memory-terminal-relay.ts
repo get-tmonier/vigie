@@ -1,60 +1,64 @@
 import { Effect, Layer } from 'effect';
 import { TerminalRelay } from '#modules/supervision/ports/terminal-relay.port';
 
-const subscribers = new Map<string, Set<(data: string) => void>>();
-const buffers = new Map<string, string[]>();
+interface RelayEntry {
+  readonly subscribers: Set<(data: string) => void>;
+}
 
-const MAX_BUFFER_CHUNKS = 10000;
+const relays = new Map<string, RelayEntry>();
 
 export const InMemoryTerminalRelayLive = Layer.succeed(TerminalRelay, {
-  publishOutput: (sessionId, data) =>
+  create: (sessionId) =>
     Effect.gen(function* () {
-      let buf = buffers.get(sessionId);
-      if (!buf) {
-        buf = [];
-        buffers.set(sessionId, buf);
+      const existing = relays.get(sessionId);
+      if (existing) {
+        existing.subscribers.clear();
       }
-      buf.push(data);
-      if (buf.length > MAX_BUFFER_CHUNKS) {
-        buf.splice(0, buf.length - MAX_BUFFER_CHUNKS);
-      }
-
-      const subs = subscribers.get(sessionId);
-      if (subs) {
-        for (const cb of subs) {
-          cb(data);
-        }
-      }
-      yield* Effect.annotateLogs(Effect.logDebug('TerminalRelay: publishing output'), {
-        sessionId,
-        subscriberCount: subs?.size ?? 0,
+      relays.set(sessionId, {
+        subscribers: new Set(),
       });
+      yield* Effect.annotateLogs(Effect.logDebug('TerminalRelay: created'), { sessionId });
     }),
-  subscribeOutput: (sessionId, callback) =>
+
+  write: (sessionId, data) =>
+    Effect.sync(() => {
+      const entry = relays.get(sessionId);
+      if (!entry) return;
+
+      for (const cb of entry.subscribers) {
+        cb(data);
+      }
+    }),
+
+  subscribe: (sessionId, onData) =>
     Effect.gen(function* () {
-      const buf = buffers.get(sessionId);
-      if (buf) {
-        for (const chunk of buf) {
-          callback(chunk);
-        }
+      const entry = relays.get(sessionId);
+      if (!entry) {
+        return () => {};
       }
 
-      let subs = subscribers.get(sessionId);
-      if (!subs) {
-        subs = new Set();
-        subscribers.set(sessionId, subs);
-      }
-      subs.add(callback);
+      entry.subscribers.add(onData);
+
       yield* Effect.annotateLogs(Effect.logDebug('TerminalRelay: subscriber added'), {
         sessionId,
-        subscriberCount: subs.size,
-        replayedChunks: buf?.length ?? 0,
+        subscriberCount: String(entry.subscribers.size),
       });
+
       return () => {
-        subs.delete(callback);
-        if (subs.size === 0) {
-          subscribers.delete(sessionId);
-        }
+        entry.subscribers.delete(onData);
       };
+    }),
+
+  clearBuffer: (_sessionId) => Effect.void,
+
+  destroy: (sessionId) =>
+    Effect.gen(function* () {
+      const entry = relays.get(sessionId);
+      if (!entry) return;
+
+      entry.subscribers.clear();
+      relays.delete(sessionId);
+
+      yield* Effect.annotateLogs(Effect.logDebug('TerminalRelay: destroyed'), { sessionId });
     }),
 });

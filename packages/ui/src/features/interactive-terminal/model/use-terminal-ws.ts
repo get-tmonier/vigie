@@ -4,7 +4,7 @@ import { env } from '#shared/config/env';
 interface UseTerminalWsOptions {
   sessionId: string;
   onData: (data: Uint8Array) => void;
-  onConnected?: (ws: WebSocket) => void;
+  onConnected?: () => void;
 }
 
 interface UseTerminalWsResult {
@@ -12,6 +12,8 @@ interface UseTerminalWsResult {
   send: (data: string) => void;
   sendResize: (cols: number, rows: number) => void;
 }
+
+const RESIZE_DEBOUNCE_MS = 150;
 
 export function useTerminalWs({
   sessionId,
@@ -34,7 +36,7 @@ export function useTerminalWs({
 
     ws.addEventListener('open', () => {
       setConnected(true);
-      onConnectedRef.current?.(ws);
+      onConnectedRef.current?.();
     });
 
     ws.addEventListener('message', (event) => {
@@ -63,11 +65,16 @@ export function useTerminalWs({
     }
   }, []);
 
+  const resizeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const sendResize = useCallback((cols: number, rows: number) => {
-    const ws = wsRef.current;
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ type: 'resize', cols, rows }));
-    }
+    if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current);
+    resizeTimerRef.current = setTimeout(() => {
+      const ws = wsRef.current;
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'resize', cols, rows }));
+      }
+    }, RESIZE_DEBOUNCE_MS);
   }, []);
 
   return { connected, send, sendResize };
