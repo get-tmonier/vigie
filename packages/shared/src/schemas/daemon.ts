@@ -172,6 +172,34 @@ export const SessionSpawnFailedSchema = v.object({
 });
 export type SessionSpawnFailed = v.InferOutput<typeof SessionSpawnFailedSchema>;
 
+// ── Sync message (daemon -> backend on reconnect) ──
+
+export const DaemonSyncSessionSchema = v.object({
+  sessionId: v.string(),
+  agentType: v.picklist(['claude', 'opencode', 'generic']),
+  mode: v.optional(v.picklist(['prompt', 'interactive']), 'prompt'),
+  cwd: v.string(),
+  gitBranch: v.optional(v.string()),
+  repoName: v.optional(v.string()),
+  startedAt: v.number(),
+  status: v.picklist(['active', 'ended', 'error']),
+  exitCode: v.optional(v.number()),
+  terminalChunks: v.array(
+    v.object({
+      data: v.string(),
+      timestamp: v.number(),
+      seq: v.number(),
+    })
+  ),
+});
+export type DaemonSyncSession = v.InferOutput<typeof DaemonSyncSessionSchema>;
+
+export const DaemonSyncSchema = v.object({
+  type: v.literal('daemon:sync'),
+  sessions: v.array(DaemonSyncSessionSchema),
+});
+export type DaemonSync = v.InferOutput<typeof DaemonSyncSchema>;
+
 export const UpstreamMessageSchema = v.variant('type', [
   DaemonHelloSchema,
   CommandOutputSchema,
@@ -185,6 +213,7 @@ export const UpstreamMessageSchema = v.variant('type', [
   TerminalOutputSchema,
   SessionSpawnFailedSchema,
   FsListDirResponseSchema,
+  DaemonSyncSchema,
 ]);
 export type UpstreamMessage = v.InferOutput<typeof UpstreamMessageSchema>;
 

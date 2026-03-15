@@ -100,6 +100,39 @@ describe('InMemoryTerminalRelay', () => {
     );
   });
 
+  it('should replay full buffer on reconnect after unsubscribe', async () => {
+    const first: string[] = [];
+    const second: string[] = [];
+
+    await run(
+      Effect.gen(function* () {
+        const relay = yield* Effect.service(TerminalRelay);
+        yield* relay.create('s-reconnect');
+
+        // First browser connects and receives live data
+        const unsub1 = yield* relay.subscribe('s-reconnect', (data) => first.push(data));
+        yield* relay.write('s-reconnect', btoa('line 1'));
+        yield* relay.write('s-reconnect', btoa('line 2'));
+        expect(first.length).toBe(2);
+
+        // Browser navigates away
+        unsub1();
+
+        // More output while disconnected
+        yield* relay.write('s-reconnect', btoa('line 3'));
+
+        // Browser reconnects — should get full history
+        yield* relay.subscribe('s-reconnect', (data) => second.push(data));
+        expect(second.length).toBe(3);
+        expect(atob(second[0])).toBe('line 1');
+        expect(atob(second[1])).toBe('line 2');
+        expect(atob(second[2])).toBe('line 3');
+
+        yield* relay.destroy('s-reconnect');
+      })
+    );
+  });
+
   it('should broadcast to multiple subscribers', async () => {
     const received1: string[] = [];
     const received2: string[] = [];

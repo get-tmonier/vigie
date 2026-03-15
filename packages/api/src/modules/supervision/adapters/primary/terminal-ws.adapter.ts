@@ -93,7 +93,7 @@ terminalWsApp.get(
           return;
         }
 
-        // Subscribe to live relay — no replay, browser will trigger resize to get fresh render
+        // Subscribe to relay — replays buffered output, then streams live
         const unsubscribe = await Effect.runPromise(
           Effect.provide(
             Effect.gen(function* () {
@@ -107,7 +107,7 @@ terminalWsApp.get(
               };
               const unsub = yield* relay.subscribe(sessionId, sendChunk);
               yield* Effect.annotateLogs(
-                Effect.logInfo('Terminal WS: browser connected (live-only, no replay)'),
+                Effect.logInfo('Terminal WS: browser connected (replay + live)'),
                 {
                   sessionId,
                   userId: user.id,

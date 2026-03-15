@@ -30,15 +30,14 @@ export const InMemoryTerminalRelayLive = Layer.succeed(TerminalRelay, {
       const entry = relays.get(sessionId);
       if (!entry) return;
 
-      if (entry.subscribers.size > 0) {
-        for (const cb of entry.subscribers) {
-          cb(data);
-        }
-      } else {
-        entry.buffer.push(data);
-        if (entry.buffer.length > MAX_BUFFER_SIZE) {
-          entry.buffer.shift();
-        }
+      // Always buffer so replay works after reconnect/navigation
+      entry.buffer.push(data);
+      if (entry.buffer.length > MAX_BUFFER_SIZE) {
+        entry.buffer.shift();
+      }
+
+      for (const cb of entry.subscribers) {
+        cb(data);
       }
     }),
 
@@ -50,11 +49,8 @@ export const InMemoryTerminalRelayLive = Layer.succeed(TerminalRelay, {
       }
 
       // Replay buffered data to the new subscriber
-      if (entry.buffer.length > 0) {
-        for (const chunk of entry.buffer) {
-          onData(chunk);
-        }
-        entry.buffer.length = 0;
+      for (const chunk of entry.buffer) {
+        onData(chunk);
       }
 
       entry.subscribers.add(onData);

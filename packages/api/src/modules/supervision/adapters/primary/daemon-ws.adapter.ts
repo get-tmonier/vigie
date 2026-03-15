@@ -10,7 +10,10 @@ import {
 } from '#modules/auth/adapters/primary/daemon-auth.middleware';
 import { registerDaemon } from '#modules/supervision/commands/register-daemon.command';
 import { unregisterDaemon } from '#modules/supervision/commands/unregister-daemon.command';
-import { createAgentSession } from '#modules/supervision/domain/agent-session';
+import {
+  createAgentSession,
+  createAgentSessionFromSync,
+} from '#modules/supervision/domain/agent-session';
 import type { DaemonSession } from '#modules/supervision/domain/daemon-session';
 import { EventPublisher } from '#modules/supervision/ports/event-publisher.port';
 import { TerminalRelay } from '#modules/supervision/ports/terminal-relay.port';
@@ -293,6 +296,66 @@ daemonWsApp.get(
                       daemonId: session.id,
                       sessionId: msg.sessionId,
                       error: msg.error,
+                    });
+                  }),
+                  allLayers
+                )
+              );
+            }
+            break;
+          }
+          case 'daemon:sync': {
+            const session = sessionByWs.get(raw);
+            if (session) {
+              await Effect.runPromise(
+                Effect.provide(
+                  Effect.gen(function* () {
+                    const relay = yield* Effect.service(TerminalRelay);
+                    const publisher = yield* Effect.service(EventPublisher);
+
+                    for (const syncSession of msg.sessions) {
+                      const agentSession = createAgentSessionFromSync(session.id, syncSession);
+                      sessionStore.set(syncSession.sessionId, agentSession);
+                      sessionToDaemon.set(syncSession.sessionId, session.id);
+
+                      yield* relay.create(syncSession.sessionId);
+
+                      // Populate terminal buffer with synced chunks (sorted by seq)
+                      const sortedChunks = [...syncSession.terminalChunks].sort(
+                        (a, b) => a.seq - b.seq
+                      );
+                      for (const chunk of sortedChunks) {
+                        yield* relay.write(syncSession.sessionId, chunk.data);
+                      }
+
+                      // Notify browser via SSE so dashboard recovers
+                      yield* publisher.publish(session.id, {
+                        type: 'session:started',
+                        daemonId: session.id,
+                        sessionId: syncSession.sessionId,
+                        agentType: syncSession.agentType,
+                        mode: syncSession.mode ?? 'prompt',
+                        cwd: syncSession.cwd,
+                        gitBranch: syncSession.gitBranch,
+                        repoName: syncSession.repoName,
+                        timestamp: syncSession.startedAt,
+                      });
+
+                      // If session already ended, also publish the ended event
+                      if (syncSession.status === 'ended' || syncSession.status === 'error') {
+                        yield* publisher.publish(session.id, {
+                          type: 'session:ended',
+                          daemonId: session.id,
+                          sessionId: syncSession.sessionId,
+                          exitCode: syncSession.exitCode ?? 0,
+                          timestamp: Date.now(),
+                        });
+                      }
+                    }
+
+                    yield* Effect.annotateLogs(Effect.logInfo('Daemon sync completed'), {
+                      daemonId: session.id,
+                      sessionCount: String(msg.sessions.length),
                     });
                   }),
                   allLayers

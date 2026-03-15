@@ -1,4 +1,4 @@
-import type { SessionStarted } from '@tmonier/shared';
+import type { DaemonSyncSession, SessionStarted } from '@tmonier/shared';
 
 export interface AgentSession {
   readonly id: string;
@@ -23,5 +23,22 @@ export function createAgentSession(daemonId: string, msg: SessionStarted): Agent
     repoName: msg.repoName,
     startedAt: msg.timestamp,
     status: 'active',
+  };
+}
+
+export function createAgentSessionFromSync(
+  daemonId: string,
+  session: DaemonSyncSession
+): AgentSession {
+  return {
+    id: session.sessionId,
+    daemonId,
+    agentType: session.agentType,
+    mode: session.mode ?? 'prompt',
+    cwd: session.cwd,
+    gitBranch: session.gitBranch,
+    repoName: session.repoName,
+    startedAt: session.startedAt,
+    status: session.status === 'active' ? 'active' : 'ended',
   };
 }
