@@ -21,7 +21,11 @@ export function InteractiveTerminal({ sessionId }: InteractiveTerminalProps) {
   const onConnected = useCallback((ws: WebSocket) => {
     const terminal = terminalRef.current;
     if (terminal) {
-      ws.send(JSON.stringify({ type: 'resize', cols: terminal.cols, rows: terminal.rows }));
+      // Force a size change to guarantee SIGWINCH even if dimensions match
+      ws.send(JSON.stringify({ type: 'resize', cols: terminal.cols + 1, rows: terminal.rows }));
+      setTimeout(() => {
+        ws.send(JSON.stringify({ type: 'resize', cols: terminal.cols, rows: terminal.rows }));
+      }, 50);
     }
   }, []);
 

@@ -120,6 +120,15 @@ terminalWsApp.get(
       },
 
       onMessage: async (event, _ws) => {
+        await Effect.runPromise(
+          Effect.provide(
+            Effect.annotateLogs(Effect.logDebug('Terminal WS: onMessage received'), {
+              sessionId,
+              dataType: typeof event.data,
+            }),
+            allLayers
+          )
+        );
         const daemonId = sessionToDaemon.get(sessionId);
         if (!daemonId) return;
 
