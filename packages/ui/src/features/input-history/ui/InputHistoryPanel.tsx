@@ -32,7 +32,14 @@ export function InputHistoryPanel({ history }: InputHistoryPanelProps) {
         {history.map((entry, i) => (
           <div key={`${entry.timestamp}-${i}`} className="group">
             <div className="font-mono text-xs text-cream truncate">{entry.text}</div>
-            <div className="text-[0.625rem] text-slate">{formatRelativeTime(entry.timestamp)}</div>
+            <div className="flex items-center gap-1.5 text-[0.625rem] text-slate">
+              <span>{formatRelativeTime(entry.timestamp)}</span>
+              {entry.source && (
+                <span className="px-1 py-px rounded bg-navy-light text-[0.5625rem] uppercase tracking-wider">
+                  {entry.source}
+                </span>
+              )}
+            </div>
           </div>
         ))}
       </div>

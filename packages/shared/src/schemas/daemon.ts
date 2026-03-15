@@ -203,6 +203,15 @@ export const DaemonSyncSessionSchema = v.object({
       seq: v.number(),
     })
   ),
+  inputHistory: v.optional(
+    v.array(
+      v.object({
+        text: v.string(),
+        source: v.picklist(['cli', 'browser']),
+        timestamp: v.number(),
+      })
+    )
+  ),
 });
 export type DaemonSyncSession = v.InferOutput<typeof DaemonSyncSessionSchema>;
 
@@ -215,7 +224,7 @@ export type DaemonSync = v.InferOutput<typeof DaemonSyncSchema>;
 export const TerminalInputEchoSchema = v.object({
   type: v.literal('terminal:input-echo'),
   sessionId: v.string(),
-  data: v.string(),
+  text: v.string(),
   source: v.picklist(['cli', 'browser']),
   timestamp: v.number(),
 });

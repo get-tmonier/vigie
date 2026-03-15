@@ -97,7 +97,7 @@ export const SSETerminalInputEchoSchema = v.object({
   type: v.literal('terminal:input-echo'),
   daemonId: v.string(),
   sessionId: v.string(),
-  data: v.string(),
+  text: v.string(),
   source: v.picklist(['cli', 'browser']),
   timestamp: v.number(),
 });

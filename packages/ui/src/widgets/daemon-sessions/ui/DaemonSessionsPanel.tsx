@@ -1,5 +1,5 @@
 import type { SSEEvent } from '@tmonier/shared';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { resumeSession } from '#entities/session/api/session-api';
 import { useSessions } from '#entities/session/model/use-sessions';
 import { SessionCard } from '#entities/session/ui/SessionCard';
@@ -25,8 +25,9 @@ export function DaemonSessionsPanel({ daemonId, events }: DaemonSessionsPanelPro
   const [terminalConnected, setTerminalConnected] = useState(false);
   const [pendingSessionId, setPendingSessionId] = useState<string | null>(null);
   const [spawnError, setSpawnError] = useState<string | null>(null);
+  const lastProcessedEventIdx = useRef(0);
   const { chunks, accumulatedText } = useSessionStream(events, selectedSessionId);
-  const { history, trackInput, addRemoteInput } = useInputHistory();
+  const { getHistory, addEntry } = useInputHistory();
 
   const activeSessions = sessions.filter((s) => s.status === 'active');
   const endedSessions = sessions.filter((s) => s.status === 'ended');
@@ -55,18 +56,19 @@ export function DaemonSessionsPanel({ daemonId, events }: DaemonSessionsPanelPro
   }, [events, pendingSessionId]);
 
   useEffect(() => {
-    for (const event of events) {
-      if (
-        event.type === 'terminal:input-echo' &&
-        'source' in event &&
-        event.source === 'cli' &&
-        'sessionId' in event &&
-        event.sessionId === selectedSessionId
-      ) {
-        addRemoteInput(event.data, event.source);
+    if (events.length === 0) {
+      lastProcessedEventIdx.current = 0;
+      return;
+    }
+    const start = lastProcessedEventIdx.current;
+    for (let i = start; i < events.length; i++) {
+      const event = events[i];
+      if (event.type === 'terminal:input-echo' && 'sessionId' in event) {
+        addEntry(event.sessionId, event.text, event.source, event.timestamp);
       }
     }
-  }, [events, selectedSessionId, addRemoteInput]);
+    lastProcessedEventIdx.current = events.length;
+  }, [events, addEntry]);
 
   const handleResume = useCallback(async () => {
     if (!daemonId || !selectedSession) return;
@@ -201,13 +203,12 @@ export function DaemonSessionsPanel({ daemonId, events }: DaemonSessionsPanelPro
                 <InteractiveTerminal
                   sessionId={selectedSession.id}
                   onConnectionChange={setTerminalConnected}
-                  onInput={trackInput}
                 />
               ) : (
                 <TokenStream chunks={chunks} accumulatedText={accumulatedText} />
               )}
               {historyOpen && selectedSession.mode === 'interactive' && (
-                <InputHistoryPanel history={history} />
+                <InputHistoryPanel history={getHistory(selectedSession.id)} />
               )}
             </div>
           </>

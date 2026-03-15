@@ -315,7 +315,7 @@ daemonWsApp.get(
                       type: 'terminal:input-echo',
                       daemonId: session.id,
                       sessionId: msg.sessionId,
-                      data: msg.data,
+                      text: msg.text,
                       source: msg.source,
                       timestamp: msg.timestamp,
                     });
@@ -395,6 +395,20 @@ daemonWsApp.get(
                         repoName: syncSession.repoName,
                         timestamp: syncSession.startedAt,
                       });
+
+                      // Replay input history from sync
+                      if (syncSession.inputHistory) {
+                        for (const entry of syncSession.inputHistory) {
+                          yield* publisher.publish(session.id, {
+                            type: 'terminal:input-echo',
+                            daemonId: session.id,
+                            sessionId: syncSession.sessionId,
+                            text: entry.text,
+                            source: entry.source as 'cli' | 'browser',
+                            timestamp: entry.timestamp,
+                          });
+                        }
+                      }
 
                       // If session already ended, also publish the ended event
                       if (syncSession.status === 'ended' || syncSession.status === 'error') {
