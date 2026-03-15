@@ -159,16 +159,18 @@ terminalWsApp.get(
             );
           }
         } else {
-          const arrayBuf =
-            event.data instanceof ArrayBuffer
-              ? event.data
-              : (event.data as Blob).arrayBuffer
-                ? await (event.data as Blob).arrayBuffer()
-                : null;
+          let bytes: Uint8Array | null = null;
 
-          if (arrayBuf) {
-            const bytes = new Uint8Array(arrayBuf);
-            const base64 = btoa(String.fromCharCode(...bytes));
+          if (event.data instanceof Uint8Array) {
+            bytes = event.data;
+          } else if (event.data instanceof ArrayBuffer) {
+            bytes = new Uint8Array(event.data);
+          } else if (typeof (event.data as Blob).arrayBuffer === 'function') {
+            bytes = new Uint8Array(await (event.data as Blob).arrayBuffer());
+          }
+
+          if (bytes && bytes.length > 0) {
+            const base64 = Buffer.from(bytes).toString('base64');
             daemonEntry.ws.send(
               JSON.stringify({
                 type: 'terminal:input',

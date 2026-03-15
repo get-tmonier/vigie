@@ -52,14 +52,18 @@ export function useTerminalWs({
     });
 
     ws.addEventListener('close', () => {
-      setConnected(false);
-      wsRef.current = null;
+      if (wsRef.current === ws) {
+        setConnected(false);
+        wsRef.current = null;
+      }
     });
 
     return () => {
       ws.close();
-      wsRef.current = null;
-      setConnected(false);
+      if (wsRef.current === ws) {
+        wsRef.current = null;
+        setConnected(false);
+      }
     };
   }, [sessionId]);
 
