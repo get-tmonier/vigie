@@ -8,7 +8,13 @@
     "skipLibCheck": true,
     "outDir": "dist",
     "rootDir": "src",
-    "types": ["bun-types"]
+    "types": ["bun-types"],
+    "paths": {
+      "#modules/*": ["./src/modules/*"],
+      "#schemas/*": ["./src/schemas/*"],
+      "#terminal/*": ["./src/terminal/*"],
+      "#vterm/*": ["./src/vterm/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["dist", "node_modules"]

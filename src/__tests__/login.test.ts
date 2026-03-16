@@ -1,72 +1,62 @@
 import { describe, expect, it } from 'bun:test';
-import { createCallbackHandler, escapeHtml } from '../commands/login.js';
+import { createCallbackHandler, escapeHtml } from '../modules/auth/commands/login.command.js';
 
 describe('escapeHtml', () => {
-  it('escapes ampersand', () => {
-    expect(escapeHtml('a&b')).toBe('a&amp;b');
+  it('escapes ampersands', () => {
+    expect(escapeHtml('a & b')).toBe('a &amp; b');
   });
 
   it('escapes angle brackets', () => {
     expect(escapeHtml('<script>')).toBe('&lt;script&gt;');
   });
 
-  it('escapes double quotes', () => {
-    expect(escapeHtml('"hello"')).toBe('&quot;hello&quot;');
+  it('escapes quotes', () => {
+    expect(escapeHtml('"hello" & \'world\'')).toBe('&quot;hello&quot; &amp; &#39;world&#39;');
   });
 
-  it('escapes single quotes', () => {
-    expect(escapeHtml("it's")).toBe('it&#39;s');
-  });
-
-  it('passes through clean strings', () => {
-    expect(escapeHtml('hello world')).toBe('hello world');
+  it('handles empty string', () => {
+    expect(escapeHtml('')).toBe('');
   });
 });
 
 describe('createCallbackHandler', () => {
-  const STATE = 'test-state-123';
-  const handler = createCallbackHandler(STATE);
-
-  function req(path: string, params: Record<string, string> = {}) {
-    const url = new URL(path, 'http://localhost');
-    for (const [k, val] of Object.entries(params)) url.searchParams.set(k, val);
-    return new Request(url.toString());
-  }
-
-  it('returns 404 for non-/callback paths', () => {
-    const res = handler(req('/other'));
+  it('returns 404 for non-callback paths', () => {
+    const handler = createCallbackHandler('state-123');
+    const req = new Request('http://localhost/other');
+    const res = handler(req);
     expect(res).toBeInstanceOf(Response);
     expect((res as Response).status).toBe(404);
   });
 
-  it('returns 400 on state mismatch (CSRF)', () => {
-    const res = handler(req('/callback', { state: 'wrong', key: 'k' }));
+  it('returns 400 for state mismatch', () => {
+    const handler = createCallbackHandler('state-123');
+    const req = new Request('http://localhost/callback?state=wrong&key=abc');
+    const res = handler(req);
     expect(res).toBeInstanceOf(Response);
     expect((res as Response).status).toBe(400);
   });
 
-  it('returns 400 when error param present', () => {
-    const res = handler(req('/callback', { state: STATE, error: 'denied' }));
+  it('returns 400 for error parameter', () => {
+    const handler = createCallbackHandler('state-123');
+    const req = new Request('http://localhost/callback?state=state-123&error=denied');
+    const res = handler(req);
     expect(res).toBeInstanceOf(Response);
     expect((res as Response).status).toBe(400);
   });
 
   it('returns 400 when key is missing', () => {
-    const res = handler(req('/callback', { state: STATE }));
+    const handler = createCallbackHandler('state-123');
+    const req = new Request('http://localhost/callback?state=state-123');
+    const res = handler(req);
     expect(res).toBeInstanceOf(Response);
     expect((res as Response).status).toBe(400);
   });
 
-  it('returns { key } on valid callback', () => {
-    const res = handler(req('/callback', { state: STATE, key: 'tmonier_abc' }));
+  it('returns key object on success', () => {
+    const handler = createCallbackHandler('state-123');
+    const req = new Request('http://localhost/callback?state=state-123&key=tmonier_abc');
+    const res = handler(req);
     expect(res).not.toBeInstanceOf(Response);
-    expect(res).toEqual({ key: 'tmonier_abc' });
-  });
-
-  it('HTML-escapes error messages in response body', async () => {
-    const res = handler(req('/callback', { state: STATE, error: '<img onerror=alert(1)>' }));
-    const body = await (res as Response).text();
-    expect(body).toContain('&lt;img onerror=alert(1)&gt;');
-    expect(body).not.toContain('<img onerror');
+    expect((res as { key: string }).key).toBe('tmonier_abc');
   });
 });

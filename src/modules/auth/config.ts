@@ -1,3 +1,5 @@
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import * as v from 'valibot';
 
 const CliEnvSchema = v.object({
@@ -7,3 +9,5 @@ const CliEnvSchema = v.object({
 });
 
 export const config = v.parse(CliEnvSchema, process.env);
+
+export const TMONIER_HOME = join(homedir(), '.tmonier');

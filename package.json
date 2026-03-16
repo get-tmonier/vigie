@@ -1,13 +1,22 @@
 {
   "name": "@tmonier/cli",
-  "version": "0.0.1",
+  "version": "0.3.0",
   "type": "module",
   "bin": {
     "tmonier": "./dist/index.js"
   },
+  "imports": {
+    "#modules/*": "./src/modules/*",
+    "#schemas/*": "./src/schemas/*",
+    "#terminal/*": "./src/terminal/*",
+    "#vterm/*": "./src/vterm/*"
+  },
   "scripts": {
-    "dev": "bun run --watch src/index.ts",
-    "build": "bun build --compile --target=bun src/index.ts --outfile dist/tmonier",
+    "dev": "bun run --watch src/cli.ts",
+    "dev:claude": "bun run src/cli.ts claude",
+    "dev:daemon": "bun run src/modules/daemon/main.ts",
+    "build:pty": "sh scripts/build-pty.sh",
+    "build": "bun run build:pty && bun build --compile --target=bun src/cli.ts --outfile dist/tmonier",
     "typecheck": "bun x tsc --noEmit",
     "lint": "biome lint ./src",
     "lint:fix": "biome lint --write ./src",
@@ -26,6 +35,9 @@
     "pre-commit": "bun run verify"
   },
   "dependencies": {
+    "@effect/platform-bun": "4.0.0-beta.24",
+    "@xterm/headless": "5.5.0",
+    "effect": "4.0.0-beta.24",
     "valibot": "1.2.0"
   },
   "devDependencies": {
