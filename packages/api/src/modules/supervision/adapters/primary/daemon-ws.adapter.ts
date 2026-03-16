@@ -22,7 +22,12 @@ import { InMemoryDaemonReadRepositoryLive } from '../secondary/in-memory-daemon-
 import { InMemoryDaemonWriteRepositoryLive } from '../secondary/in-memory-daemon-write-repository';
 import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher';
 import { InMemoryTerminalRelayLive } from '../secondary/in-memory-terminal-relay';
-import { daemonStore, sessionStore, sessionToDaemon } from '../secondary/shared-state';
+import {
+  daemonStore,
+  inputHistoryStore,
+  sessionStore,
+  sessionToDaemon,
+} from '../secondary/shared-state';
 
 // Pending fs:list-dir requests — keyed by requestId, resolved when daemon responds
 export const pendingFsRequests = new Map<
@@ -318,6 +323,11 @@ daemonWsApp.get(
           case 'terminal:input-echo': {
             const session = sessionByWs.get(raw);
             if (session) {
+              const existing = inputHistoryStore.get(msg.sessionId) ?? [];
+              inputHistoryStore.set(msg.sessionId, [
+                ...existing,
+                { text: msg.text, source: msg.source, timestamp: msg.timestamp },
+              ]);
               await Effect.runPromise(
                 Effect.provide(
                   Effect.gen(function* () {
@@ -443,8 +453,16 @@ daemonWsApp.get(
                         timestamp: syncSession.startedAt,
                       });
 
-                      // Replay input history from sync
+                      // Persist and replay input history from sync
                       if (syncSession.inputHistory) {
+                        inputHistoryStore.set(
+                          syncSession.sessionId,
+                          syncSession.inputHistory.map((e) => ({
+                            text: e.text,
+                            source: e.source as 'cli' | 'browser',
+                            timestamp: e.timestamp,
+                          }))
+                        );
                         for (const entry of syncSession.inputHistory) {
                           yield* publisher.publish(session.id, {
                             type: 'terminal:input-echo',
