@@ -76,6 +76,7 @@ export function SpawnSessionDialog({ daemonId, onSpawned, onClose }: SpawnSessio
 
   const selectSuggestion = useCallback(
     (entry: FsEntry) => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
       const parentDir = cwd.endsWith('/') ? cwd : cwd.substring(0, cwd.lastIndexOf('/') + 1);
       const newPath = `${parentDir}${entry.name}/`;
       setCwd(newPath);
@@ -86,18 +87,21 @@ export function SpawnSessionDialog({ daemonId, onSpawned, onClose }: SpawnSessio
     [cwd, fetchSuggestions]
   );
 
-  const handleInputKeyDown = (e: React.KeyboardEvent) => {
-    if (!showSuggestions || suggestions.length === 0) return;
+  const handleInputKeyDown = (e: React.KeyboardEvent, filtered: FsEntry[]) => {
+    if (!showSuggestions || filtered.length === 0) return;
 
     if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setSelectedIndex((i) => Math.min(i + 1, suggestions.length - 1));
+      setSelectedIndex((i) => Math.min(i + 1, filtered.length - 1));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setSelectedIndex((i) => Math.max(i - 1, 0));
     } else if (e.key === 'Tab') {
       e.preventDefault();
-      selectSuggestion(suggestions[selectedIndex]);
+      selectSuggestion(filtered[selectedIndex]);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      setShowSuggestions(false);
     }
   };
 
@@ -120,13 +124,35 @@ export function SpawnSessionDialog({ daemonId, onSpawned, onClose }: SpawnSessio
 
   return (
     <form onSubmit={handleSubmit} className="p-2 border-b border-navy-light space-y-2">
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          disabled={loading}
+          className={cn(
+            'flex-1 text-xs font-mono py-1.5 rounded transition-colors',
+            loading
+              ? 'bg-navy-light text-slate cursor-not-allowed'
+              : 'bg-gold text-navy-deep hover:bg-gold/90'
+          )}
+        >
+          {loading ? 'Starting...' : 'Start Session'}
+        </button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-xs font-mono text-slate hover:text-cream py-1.5 px-2"
+        >
+          Cancel
+        </button>
+      </div>
+      {error && <div className="text-xs text-red-400">{error}</div>}
       <div className="relative">
         <input
           ref={inputRef}
           type="text"
           value={cwd}
           onChange={(e) => handleCwdChange(e.target.value)}
-          onKeyDown={handleInputKeyDown}
+          onKeyDown={(e) => handleInputKeyDown(e, filtered)}
           onFocus={() => filtered.length > 0 && setShowSuggestions(true)}
           placeholder="~/projects/..."
           className="w-full bg-navy-deep border border-navy-light rounded px-2 py-1.5 text-sm text-cream font-mono placeholder:text-slate focus:outline-none focus:border-gold"
@@ -156,28 +182,6 @@ export function SpawnSessionDialog({ daemonId, onSpawned, onClose }: SpawnSessio
             ))}
           </div>
         )}
-      </div>
-      {error && <div className="text-xs text-red-400">{error}</div>}
-      <div className="flex gap-2">
-        <button
-          type="submit"
-          disabled={loading}
-          className={cn(
-            'flex-1 text-xs font-mono py-1.5 rounded transition-colors',
-            loading
-              ? 'bg-navy-light text-slate cursor-not-allowed'
-              : 'bg-gold text-navy-deep hover:bg-gold/90'
-          )}
-        >
-          {loading ? 'Starting...' : 'Start Session'}
-        </button>
-        <button
-          type="button"
-          onClick={onClose}
-          className="text-xs font-mono text-slate hover:text-cream py-1.5 px-2"
-        >
-          Cancel
-        </button>
       </div>
     </form>
   );
