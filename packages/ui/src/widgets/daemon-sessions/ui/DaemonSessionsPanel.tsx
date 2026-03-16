@@ -1,10 +1,22 @@
-import type { SSEEvent } from '@tmonier/shared';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '#app/hooks';
+import {
+  selectDaemonOnline,
+  selectEvents,
+  selectReconnectCount,
+} from '#entities/connection/model/connection-slice';
+import { selectInputHistory } from '#entities/input-history/model/input-history-slice';
 import { resumeSession } from '#entities/session/api/session-api';
-import { useSessions } from '#entities/session/model/use-sessions';
+import {
+  endedSessionsCleared,
+  selectActiveSessions,
+  selectEndedSessions,
+  selectLoading,
+  selectSession,
+  sessionRemoved,
+} from '#entities/session/model/sessions-slice';
 import { SessionCard } from '#entities/session/ui/SessionCard';
 import { ClearEndedButton } from '#features/clear-ended-sessions/ui/ClearEndedButton';
-import { useInputHistory } from '#features/input-history/model/use-input-history';
 import { InputHistoryPanel } from '#features/input-history/ui/InputHistoryPanel';
 import { InteractiveTerminal } from '#features/interactive-terminal/ui/InteractiveTerminal';
 import { KillAllButton } from '#features/kill-all-sessions/ui/KillAllButton';
@@ -16,13 +28,17 @@ import { SessionDetailHeader } from './SessionDetailHeader';
 
 interface DaemonSessionsPanelProps {
   daemonId: string | null;
-  events: SSEEvent[];
-  daemonOnline: boolean;
 }
 
-export function DaemonSessionsPanel({ daemonId, events, daemonOnline }: DaemonSessionsPanelProps) {
-  const { sessions, loading, daemonReconnectCount, removeSession, removeEndedSessions } =
-    useSessions(daemonId, events);
+export function DaemonSessionsPanel({ daemonId }: DaemonSessionsPanelProps) {
+  const dispatch = useAppDispatch();
+  const activeSessions = useAppSelector(selectActiveSessions(daemonId));
+  const endedSessions = useAppSelector(selectEndedSessions(daemonId));
+  const loading = useAppSelector(selectLoading(daemonId));
+  const daemonOnline = useAppSelector(selectDaemonOnline);
+  const reconnectCount = useAppSelector(selectReconnectCount);
+  const events = useAppSelector(selectEvents);
+
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [showSpawnForm, setShowSpawnForm] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -30,35 +46,28 @@ export function DaemonSessionsPanel({ daemonId, events, daemonOnline }: DaemonSe
   const [pendingSessionId, setPendingSessionId] = useState<string | null>(null);
   const [spawnError, setSpawnError] = useState<string | null>(null);
   const [resumeFailedSessions, setResumeFailedSessions] = useState<Map<string, string>>(new Map());
-  const resumeOriginRef = useRef<string | null>(null);
-  const lastProcessedEventIdx = useRef(0);
+
+  const selectedSession = useAppSelector(selectSession(selectedSessionId));
+  const inputHistory = useAppSelector(selectInputHistory(selectedSessionId ?? '__none__'));
   const { chunks, accumulatedText } = useSessionStream(events, selectedSessionId);
-  const { getHistory, addEntry } = useInputHistory();
 
-  const activeSessions = sessions.filter((s) => s.status === 'active');
-  const endedSessions = sessions.filter((s) => s.status === 'ended');
-  const selectedSession = sessions.find((s) => s.id === selectedSessionId) ?? null;
+  const sessions = [...activeSessions, ...endedSessions];
 
-  // Auto-select spawned session when it appears via SSE
+  // Auto-select spawned session when it appears
   useEffect(() => {
     if (!pendingSessionId) return;
-    const found = sessions.find((s) => s.id === pendingSessionId);
+    const found = activeSessions.find((s) => s.id === pendingSessionId);
     if (found) {
       setSelectedSessionId(pendingSessionId);
       setPendingSessionId(null);
     }
-  }, [sessions, pendingSessionId]);
+  }, [activeSessions, pendingSessionId]);
 
   // Handle spawn-failed events
   useEffect(() => {
     for (const event of events) {
       if (event.type === 'session:spawn-failed' && event.sessionId === pendingSessionId) {
         setSpawnError(event.error);
-        if (resumeOriginRef.current) {
-          const originId = resumeOriginRef.current;
-          setResumeFailedSessions((prev) => new Map(prev).set(originId, event.error));
-          resumeOriginRef.current = null;
-        }
         setPendingSessionId(null);
         const timer = setTimeout(() => setSpawnError(null), 8000);
         return () => clearTimeout(timer);
@@ -66,32 +75,15 @@ export function DaemonSessionsPanel({ daemonId, events, daemonOnline }: DaemonSe
     }
   }, [events, pendingSessionId]);
 
-  useEffect(() => {
-    if (events.length === 0) {
-      lastProcessedEventIdx.current = 0;
-      return;
-    }
-    const start = lastProcessedEventIdx.current;
-    for (let i = start; i < events.length; i++) {
-      const event = events[i];
-      if (event.type === 'terminal:input-echo' && 'sessionId' in event) {
-        addEntry(event.sessionId, event.text, event.source, event.timestamp);
-      }
-    }
-    lastProcessedEventIdx.current = events.length;
-  }, [events, addEntry]);
-
   const handleResume = useCallback(async () => {
     if (!daemonId || !selectedSession) return;
     try {
-      resumeOriginRef.current = selectedSession.id;
       const result = await resumeSession(daemonId, selectedSession.id);
       setPendingSessionId(result.sessionId);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to resume session';
       setSpawnError(message);
       setResumeFailedSessions((prev) => new Map(prev).set(selectedSession.id, message));
-      resumeOriginRef.current = null;
       setTimeout(() => setSpawnError(null), 8000);
     }
   }, [daemonId, selectedSession]);
@@ -217,7 +209,7 @@ export function DaemonSessionsPanel({ daemonId, events, daemonOnline }: DaemonSe
                   daemonId={daemonId}
                   endedCount={endedSessions.length}
                   onCleared={() => {
-                    removeEndedSessions();
+                    dispatch(endedSessionsCleared(daemonId));
                     if (selectedSession && selectedSession.status === 'ended') {
                       setSelectedSessionId(null);
                     }
@@ -248,7 +240,7 @@ export function DaemonSessionsPanel({ daemonId, events, daemonOnline }: DaemonSe
               onToggleHistory={() => setHistoryOpen(!historyOpen)}
               onResume={handleResume}
               onDelete={() => {
-                removeSession(selectedSession.id);
+                dispatch(sessionRemoved(selectedSession.id));
                 setSelectedSessionId(null);
               }}
               resumeError={resumeFailedSessions.get(selectedSession.id) ?? null}
@@ -256,7 +248,7 @@ export function DaemonSessionsPanel({ daemonId, events, daemonOnline }: DaemonSe
             <div className="flex-1 flex overflow-hidden">
               {selectedSession.mode === 'interactive' ? (
                 <InteractiveTerminal
-                  key={`${selectedSession.id}-${daemonReconnectCount}`}
+                  key={`${selectedSession.id}-${reconnectCount}`}
                   sessionId={selectedSession.id}
                   onConnectionChange={setTerminalConnected}
                 />
@@ -264,7 +256,7 @@ export function DaemonSessionsPanel({ daemonId, events, daemonOnline }: DaemonSe
                 <TokenStream chunks={chunks} accumulatedText={accumulatedText} />
               )}
               {historyOpen && selectedSession.mode === 'interactive' && (
-                <InputHistoryPanel history={getHistory(selectedSession.id)} />
+                <InputHistoryPanel history={inputHistory} />
               )}
             </div>
           </>

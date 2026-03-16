@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useExecuteCommand } from '#features/execute-command/model/use-execute-command';
 import { useSSE } from '#features/subscribe-events/model/use-sse';
+import { useSSEDispatcher } from '#features/subscribe-events/model/use-sse-dispatcher';
 import { Header } from '#shared/ui/Header';
 import { DaemonSessionsPanel } from '#widgets/daemon-sessions/ui/DaemonSessionsPanel';
 import { DeviceSelector } from '#widgets/device-selector/ui/DeviceSelector';
@@ -11,8 +12,10 @@ type ViewMode = 'terminal' | 'sessions';
 export function DashboardPage() {
   const [selectedDaemonId, setSelectedDaemonId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('sessions');
-  const { events, daemonOnline } = useSSE(selectedDaemonId);
+  const { events } = useSSE(selectedDaemonId);
   const { execute } = useExecuteCommand(selectedDaemonId);
+
+  useSSEDispatcher(events, selectedDaemonId);
 
   return (
     <div className="flex flex-col h-screen">
@@ -45,11 +48,7 @@ export function DashboardPage() {
           </button>
         </div>
         {viewMode === 'sessions' ? (
-          <DaemonSessionsPanel
-            daemonId={selectedDaemonId}
-            events={events}
-            daemonOnline={daemonOnline}
-          />
+          <DaemonSessionsPanel daemonId={selectedDaemonId} />
         ) : (
           <Terminal events={events} onCommand={execute} disabled={!selectedDaemonId} />
         )}
