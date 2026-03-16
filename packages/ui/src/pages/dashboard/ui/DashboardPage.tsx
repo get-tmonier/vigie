@@ -11,7 +11,7 @@ type ViewMode = 'terminal' | 'sessions';
 export function DashboardPage() {
   const [selectedDaemonId, setSelectedDaemonId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('sessions');
-  const { events } = useSSE(selectedDaemonId);
+  const { events, daemonOnline } = useSSE(selectedDaemonId);
   const { execute } = useExecuteCommand(selectedDaemonId);
 
   return (
@@ -45,7 +45,11 @@ export function DashboardPage() {
           </button>
         </div>
         {viewMode === 'sessions' ? (
-          <DaemonSessionsPanel daemonId={selectedDaemonId} events={events} />
+          <DaemonSessionsPanel
+            daemonId={selectedDaemonId}
+            events={events}
+            daemonOnline={daemonOnline}
+          />
         ) : (
           <Terminal events={events} onCommand={execute} disabled={!selectedDaemonId} />
         )}

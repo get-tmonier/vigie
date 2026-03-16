@@ -9,6 +9,7 @@ interface TerminalRelayShape {
   ) => Effect.Effect<() => void>;
   readonly clearBuffer: (sessionId: string) => Effect.Effect<void>;
   readonly destroy: (sessionId: string) => Effect.Effect<void>;
+  readonly getBufferSize: (sessionId: string) => Effect.Effect<number>;
 }
 
 export class TerminalRelay extends ServiceMap.Service<TerminalRelay, TerminalRelayShape>()(

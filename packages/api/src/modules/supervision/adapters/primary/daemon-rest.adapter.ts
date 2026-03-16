@@ -15,7 +15,7 @@ import { SupervisionLoggerLive } from '../logger';
 import { InMemoryDaemonReadRepositoryLive } from '../secondary/in-memory-daemon-read-repository';
 import { InMemoryDaemonWriteRepositoryLive } from '../secondary/in-memory-daemon-write-repository';
 import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher';
-import { sessionStore } from '../secondary/shared-state';
+import { daemonStore, sessionStore } from '../secondary/shared-state';
 import { pendingFsRequests } from './daemon-ws.adapter';
 
 const allLayers = Layer.mergeAll(
@@ -268,8 +268,8 @@ daemonRestApp.post('/daemons/:daemonId/sessions/:sessionId/resume', async (c) =>
   if (agentSession.status !== 'ended') {
     return c.json({ error: 'Session is not ended' }, 400);
   }
-  if (agentSession.agentType !== 'claude') {
-    return c.json({ error: 'Only Claude sessions can be resumed' }, 400);
+  if (!agentSession.resumable) {
+    return c.json({ error: 'This session cannot be resumed' }, 400);
   }
   if (!agentSession.claudeSessionId) {
     return c.json({ error: 'No Claude session ID detected for this session' }, 400);
@@ -349,6 +349,12 @@ daemonRestApp.delete('/daemons/:daemonId/sessions/:sessionId', async (c) => {
     return c.json({ error: result.error }, result.status);
   }
 
+  // Notify daemon to delete from SQLite
+  const entry = daemonStore.get(daemonId);
+  if (entry?.ws.readyState === WebSocket.OPEN) {
+    entry.ws.send(JSON.stringify({ type: 'session:delete', sessionId }));
+  }
+
   return c.json({ ok: true });
 });
 
@@ -374,6 +380,12 @@ daemonRestApp.post('/daemons/:daemonId/sessions/clear-ended', async (c) => {
   }
 
   const { deletedCount } = await Effect.runPromise(clearEndedSessions(daemonId));
+
+  // Notify daemon to clear ended sessions from SQLite
+  const daemonEntry = daemonStore.get(daemonId);
+  if (daemonEntry?.ws.readyState === WebSocket.OPEN) {
+    daemonEntry.ws.send(JSON.stringify({ type: 'session:clear-ended' }));
+  }
 
   await Effect.runPromise(
     Effect.provide(

@@ -9,6 +9,7 @@ const baseSyncSession: DaemonSyncSession = {
   cwd: '/home/user/project',
   startedAt: 2_000_000,
   status: 'active',
+  resumable: false,
   terminalChunks: [],
 };
 
@@ -65,5 +66,32 @@ describe('createAgentSessionFromSync', () => {
     const session = createAgentSessionFromSync('daemon-xyz', baseSyncSession);
     expect(session.gitBranch).toBeUndefined();
     expect(session.repoName).toBeUndefined();
+  });
+
+  it('maps resumable true from sync data', () => {
+    const session = createAgentSessionFromSync('daemon-xyz', {
+      ...baseSyncSession,
+      status: 'ended',
+      exitCode: 0,
+      claudeSessionId: 'cs-abc',
+      resumable: true,
+    });
+    expect(session.resumable).toBe(true);
+    expect(session.claudeSessionId).toBe('cs-abc');
+  });
+
+  it('maps resumable false from sync data', () => {
+    const session = createAgentSessionFromSync('daemon-xyz', {
+      ...baseSyncSession,
+      status: 'ended',
+      exitCode: -1,
+      resumable: false,
+    });
+    expect(session.resumable).toBe(false);
+  });
+
+  it('defaults resumable to false when not provided', () => {
+    const session = createAgentSessionFromSync('daemon-xyz', baseSyncSession);
+    expect(session.resumable).toBe(false);
   });
 });

@@ -17,16 +17,20 @@ import { SessionDetailHeader } from './SessionDetailHeader';
 interface DaemonSessionsPanelProps {
   daemonId: string | null;
   events: SSEEvent[];
+  daemonOnline: boolean;
 }
 
-export function DaemonSessionsPanel({ daemonId, events }: DaemonSessionsPanelProps) {
-  const { sessions, loading, removeSession, removeEndedSessions } = useSessions(daemonId, events);
+export function DaemonSessionsPanel({ daemonId, events, daemonOnline }: DaemonSessionsPanelProps) {
+  const { sessions, loading, daemonReconnectCount, removeSession, removeEndedSessions } =
+    useSessions(daemonId, events);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [showSpawnForm, setShowSpawnForm] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [terminalConnected, setTerminalConnected] = useState(false);
   const [pendingSessionId, setPendingSessionId] = useState<string | null>(null);
   const [spawnError, setSpawnError] = useState<string | null>(null);
+  const [resumeFailedSessions, setResumeFailedSessions] = useState<Map<string, string>>(new Map());
+  const resumeOriginRef = useRef<string | null>(null);
   const lastProcessedEventIdx = useRef(0);
   const { chunks, accumulatedText } = useSessionStream(events, selectedSessionId);
   const { getHistory, addEntry } = useInputHistory();
@@ -50,8 +54,13 @@ export function DaemonSessionsPanel({ daemonId, events }: DaemonSessionsPanelPro
     for (const event of events) {
       if (event.type === 'session:spawn-failed' && event.sessionId === pendingSessionId) {
         setSpawnError(event.error);
+        if (resumeOriginRef.current) {
+          const originId = resumeOriginRef.current;
+          setResumeFailedSessions((prev) => new Map(prev).set(originId, event.error));
+          resumeOriginRef.current = null;
+        }
         setPendingSessionId(null);
-        const timer = setTimeout(() => setSpawnError(null), 5000);
+        const timer = setTimeout(() => setSpawnError(null), 8000);
         return () => clearTimeout(timer);
       }
     }
@@ -75,11 +84,15 @@ export function DaemonSessionsPanel({ daemonId, events }: DaemonSessionsPanelPro
   const handleResume = useCallback(async () => {
     if (!daemonId || !selectedSession) return;
     try {
+      resumeOriginRef.current = selectedSession.id;
       const result = await resumeSession(daemonId, selectedSession.id);
       setPendingSessionId(result.sessionId);
-    } catch {
-      setSpawnError('Failed to resume session');
-      setTimeout(() => setSpawnError(null), 5000);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to resume session';
+      setSpawnError(message);
+      setResumeFailedSessions((prev) => new Map(prev).set(selectedSession.id, message));
+      resumeOriginRef.current = null;
+      setTimeout(() => setSpawnError(null), 8000);
     }
   }, [daemonId, selectedSession]);
 
@@ -120,7 +133,27 @@ export function DaemonSessionsPanel({ daemonId, events }: DaemonSessionsPanelPro
   }
 
   return (
-    <div className="flex flex-1 overflow-hidden">
+    <div className="flex flex-1 overflow-hidden relative">
+      {/* Disconnection overlay */}
+      {daemonId && !daemonOnline && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-navy-deep/80 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-3 text-center px-6">
+            <div className="relative flex items-center justify-center">
+              <span className="absolute w-10 h-10 rounded-full border-2 border-gold/40 animate-ping" />
+              <span className="w-10 h-10 rounded-full border-2 border-gold/60 flex items-center justify-center text-gold text-lg">
+                !
+              </span>
+            </div>
+            <span className="text-cream text-sm font-mono">Device disconnected</span>
+            <span className="text-slate text-xs">Attempting to reconnect...</span>
+            <div className="flex gap-1 mt-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-gold/60 animate-bounce [animation-delay:0ms]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-gold/60 animate-bounce [animation-delay:150ms]" />
+              <span className="w-1.5 h-1.5 rounded-full bg-gold/60 animate-bounce [animation-delay:300ms]" />
+            </div>
+          </div>
+        </div>
+      )}
       {/* Sidebar */}
       <div className="w-64 border-r border-navy-light overflow-y-auto flex flex-col">
         <div className="flex items-center justify-between px-3 py-2 border-b border-navy-light">
@@ -218,10 +251,12 @@ export function DaemonSessionsPanel({ daemonId, events }: DaemonSessionsPanelPro
                 removeSession(selectedSession.id);
                 setSelectedSessionId(null);
               }}
+              resumeError={resumeFailedSessions.get(selectedSession.id) ?? null}
             />
             <div className="flex-1 flex overflow-hidden">
               {selectedSession.mode === 'interactive' ? (
                 <InteractiveTerminal
+                  key={`${selectedSession.id}-${daemonReconnectCount}`}
                   sessionId={selectedSession.id}
                   onConnectionChange={setTerminalConnected}
                 />

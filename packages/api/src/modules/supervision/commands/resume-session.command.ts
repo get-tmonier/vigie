@@ -5,7 +5,7 @@ import { DaemonDisconnectedError, type DaemonNotFoundError } from '../ports/erro
 
 export const resumeSession = (
   daemonId: string,
-  originalSessionId: string,
+  sessionId: string,
   claudeSessionId: string,
   cwd: string,
   cols: number,
@@ -21,11 +21,10 @@ export const resumeSession = (
     if (ws.readyState !== WebSocket.OPEN) {
       return yield* Effect.fail(new DaemonDisconnectedError({ id: daemonId }));
     }
-    const sessionId = crypto.randomUUID();
     const message: SessionResumeRequest = {
       type: 'session:resume-request',
       sessionId,
-      originalSessionId,
+      originalSessionId: sessionId,
       claudeSessionId,
       cwd,
       cols,

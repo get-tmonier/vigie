@@ -1,9 +1,9 @@
-import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
-import { defineConfig } from 'vite';
+import { fileURLToPath } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
-import react from '@vitejs/plugin-react';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -19,9 +19,5 @@ export default defineConfig({
       '#widgets': resolve(__dirname, 'src/widgets'),
     },
   },
-  plugins: [
-    tailwindcss(),
-    tanstackStart(),
-    react(),
-  ],
+  plugins: [tailwindcss(), tanstackStart(), react()],
 });

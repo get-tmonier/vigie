@@ -105,12 +105,14 @@ terminalWsApp.get(
                   ws.send(payload);
                 }
               };
+              const bufferSize = yield* relay.getBufferSize(sessionId);
               const unsub = yield* relay.subscribe(sessionId, sendChunk);
               yield* Effect.annotateLogs(
                 Effect.logInfo('Terminal WS: browser connected (replay + live)'),
                 {
                   sessionId,
                   userId: user.id,
+                  bufferSize: String(bufferSize),
                 }
               );
               return unsub;

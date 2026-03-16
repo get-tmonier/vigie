@@ -11,6 +11,8 @@ export interface AgentSession {
   startedAt: number;
   status: 'active' | 'ended';
   claudeSessionId?: string;
+  exitCode?: number;
+  resumable?: boolean;
 }
 
 export async function listSessions(daemonId: string): Promise<AgentSession[]> {

@@ -15,13 +15,15 @@ export const InMemoryTerminalRelayLive = Layer.succeed(TerminalRelay, {
     Effect.gen(function* () {
       const existing = relays.get(sessionId);
       if (existing) {
-        existing.subscribers.clear();
+        // Preserve subscribers (e.g. active terminal WS connections) — only
+        // clear the buffer so sync can repopulate it with fresh chunks.
         existing.buffer.length = 0;
+      } else {
+        relays.set(sessionId, {
+          subscribers: new Set(),
+          buffer: [],
+        });
       }
-      relays.set(sessionId, {
-        subscribers: new Set(),
-        buffer: [],
-      });
       yield* Effect.annotateLogs(Effect.logDebug('TerminalRelay: created'), { sessionId });
     }),
 
@@ -71,6 +73,12 @@ export const InMemoryTerminalRelayLive = Layer.succeed(TerminalRelay, {
       if (entry) {
         entry.buffer.length = 0;
       }
+    }),
+
+  getBufferSize: (sessionId) =>
+    Effect.sync(() => {
+      const entry = relays.get(sessionId);
+      return entry ? entry.buffer.length : 0;
     }),
 
   destroy: (sessionId) =>

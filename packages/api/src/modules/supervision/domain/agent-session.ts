@@ -11,6 +11,8 @@ export interface AgentSession {
   readonly startedAt: number;
   readonly status: 'active' | 'ended';
   readonly claudeSessionId?: string;
+  readonly exitCode?: number;
+  readonly resumable?: boolean;
 }
 
 export function createAgentSession(daemonId: string, msg: SessionStarted): AgentSession {
@@ -41,5 +43,8 @@ export function createAgentSessionFromSync(
     repoName: session.repoName,
     startedAt: session.startedAt,
     status: session.status === 'active' ? 'active' : 'ended',
+    claudeSessionId: session.claudeSessionId,
+    exitCode: session.exitCode,
+    resumable: session.resumable,
   };
 }

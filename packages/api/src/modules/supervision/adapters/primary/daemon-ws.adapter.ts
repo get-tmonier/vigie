@@ -183,8 +183,14 @@ daemonWsApp.get(
             const session = sessionByWs.get(raw);
             if (session) {
               const agentSession = sessionStore.get(msg.sessionId);
+              const resumable = msg.resumable ?? false;
               if (agentSession) {
-                sessionStore.set(msg.sessionId, { ...agentSession, status: 'ended' });
+                sessionStore.set(msg.sessionId, {
+                  ...agentSession,
+                  status: 'ended',
+                  exitCode: msg.exitCode,
+                  resumable,
+                });
               }
               sessionToDaemon.delete(msg.sessionId);
               await Effect.runPromise(
@@ -198,6 +204,7 @@ daemonWsApp.get(
                       daemonId: session.id,
                       sessionId: msg.sessionId,
                       exitCode: msg.exitCode,
+                      resumable,
                       timestamp: msg.timestamp,
                     });
                     yield* Effect.annotateLogs(Effect.logInfo('Session ended'), {
@@ -277,7 +284,11 @@ daemonWsApp.get(
             if (session) {
               const agentSession = sessionStore.get(msg.sessionId);
               if (agentSession) {
-                sessionStore.set(msg.sessionId, { ...agentSession, status: 'ended' });
+                sessionStore.set(msg.sessionId, {
+                  ...agentSession,
+                  status: 'ended',
+                  exitCode: -1,
+                });
               }
               await Effect.runPromise(
                 Effect.provide(
@@ -359,6 +370,31 @@ daemonWsApp.get(
             }
             break;
           }
+          case 'session:resumable-changed': {
+            const session = sessionByWs.get(raw);
+            if (session) {
+              const agentSession = sessionStore.get(msg.sessionId);
+              if (agentSession) {
+                sessionStore.set(msg.sessionId, { ...agentSession, resumable: msg.resumable });
+              }
+              await Effect.runPromise(
+                Effect.provide(
+                  Effect.gen(function* () {
+                    const publisher = yield* Effect.service(EventPublisher);
+                    yield* publisher.publish(session.id, {
+                      type: 'session:resumable-changed',
+                      daemonId: session.id,
+                      sessionId: msg.sessionId,
+                      resumable: msg.resumable,
+                      timestamp: msg.timestamp,
+                    });
+                  }),
+                  allLayers
+                )
+              );
+            }
+            break;
+          }
           case 'daemon:sync': {
             const session = sessionByWs.get(raw);
             if (session) {
@@ -383,7 +419,16 @@ daemonWsApp.get(
                         yield* relay.write(syncSession.sessionId, chunk.data);
                       }
 
-                      // Notify browser via SSE so dashboard recovers
+                      yield* Effect.annotateLogs(Effect.logInfo('Sync: session relay populated'), {
+                        sessionId: syncSession.sessionId,
+                        chunkCount: String(sortedChunks.length),
+                        mode: syncSession.mode ?? 'prompt',
+                        status: syncSession.status,
+                      });
+
+                      // Notify browser via SSE so dashboard recovers.
+                      // Include resumable + claudeSessionId directly so the UI
+                      // has the full picture in a single event (no race with later events).
                       yield* publisher.publish(session.id, {
                         type: 'session:started',
                         daemonId: session.id,
@@ -393,6 +438,8 @@ daemonWsApp.get(
                         cwd: syncSession.cwd,
                         gitBranch: syncSession.gitBranch,
                         repoName: syncSession.repoName,
+                        resumable: syncSession.resumable,
+                        claudeSessionId: syncSession.claudeSessionId,
                         timestamp: syncSession.startedAt,
                       });
 
@@ -417,9 +464,19 @@ daemonWsApp.get(
                           daemonId: session.id,
                           sessionId: syncSession.sessionId,
                           exitCode: syncSession.exitCode ?? 0,
+                          resumable: syncSession.resumable ?? false,
                           timestamp: Date.now(),
                         });
                       }
+
+                      // Always replay resumable state so UI recovers after disconnect
+                      yield* publisher.publish(session.id, {
+                        type: 'session:resumable-changed',
+                        daemonId: session.id,
+                        sessionId: syncSession.sessionId,
+                        resumable: syncSession.resumable,
+                        timestamp: Date.now(),
+                      });
                     }
 
                     yield* Effect.annotateLogs(Effect.logInfo('Daemon sync completed'), {
@@ -440,42 +497,88 @@ daemonWsApp.get(
         if (!raw) return;
         const session = sessionByWs.get(raw);
         if (session) {
-          // Destroy terminal buffers for all sessions owned by this daemon
-          for (const [sessionId, daemonId] of sessionToDaemon.entries()) {
-            if (daemonId === session.id) {
-              await Effect.runPromise(
-                Effect.provide(
-                  Effect.gen(function* () {
-                    const relay = yield* Effect.service(TerminalRelay);
-                    yield* relay.destroy(sessionId);
-                  }),
-                  allLayers
-                )
-              );
+          // Snapshot sessions to clean up synchronously BEFORE any async work.
+          // This prevents a race where daemon:sync re-adds sessions to sessionToDaemon
+          // while onClose is still iterating (the daemon can reconnect mid-cleanup).
+          const sessionsToClean: Array<{ sessionId: string; wasActive: boolean }> = [];
+          for (const [sessionId, did] of sessionToDaemon.entries()) {
+            if (did === session.id) {
+              const agentSession = sessionStore.get(sessionId);
+              const wasActive = agentSession?.status === 'active';
+              if (wasActive && agentSession) {
+                sessionStore.set(sessionId, {
+                  ...agentSession,
+                  status: 'ended',
+                  exitCode: -1,
+                  resumable: false,
+                });
+              }
+              sessionToDaemon.delete(sessionId);
+              sessionsToClean.push({ sessionId, wasActive: wasActive ?? false });
             }
           }
-          await Effect.runPromise(
-            Effect.provide(
-              Effect.gen(function* () {
-                yield* unregisterDaemon(session.id);
-                yield* Effect.annotateLogs(Effect.logInfo('Daemon unregistered'), {
-                  daemonId: session.id,
-                });
-              }),
-              allLayers
-            )
-          ).catch(async (error) => {
+          sessionByWs.delete(raw);
+
+          // Check if daemon re-registered on a new WS connection (quick reconnect).
+          // daemonStore still has the old entry (same WS) for a genuine disconnect,
+          // but a new entry (different WS) if the daemon already reconnected.
+          const hasDaemonReconnected = () => {
+            const entry = daemonStore.get(session.id);
+            return !!entry && entry.ws !== (raw as unknown as WebSocket);
+          };
+
+          // Now do async cleanup on the snapshot — safe from race with daemon:sync
+          for (const { sessionId } of sessionsToClean) {
+            // If daemon already reconnected, skip stale disconnect events
+            if (hasDaemonReconnected()) break;
+
             await Effect.runPromise(
               Effect.provide(
-                Effect.annotateLogs(Effect.logError('Daemon unregister failed'), {
-                  daemonId: session.id,
-                  error: String(error),
+                Effect.gen(function* () {
+                  const relay = yield* Effect.service(TerminalRelay);
+                  yield* relay.destroy(sessionId);
+                  const publisher = yield* Effect.service(EventPublisher);
+                  yield* publisher.publish(session.id, {
+                    type: 'session:ended',
+                    daemonId: session.id,
+                    sessionId,
+                    exitCode: -1,
+                    resumable: false,
+                    timestamp: Date.now(),
+                  });
+                  yield* Effect.annotateLogs(
+                    Effect.logInfo('Session ended (device disconnected)'),
+                    { daemonId: session.id, sessionId }
+                  );
                 }),
                 allLayers
               )
             );
-          });
-          sessionByWs.delete(raw);
+          }
+          // Only unregister if the daemon hasn't already re-registered on a new WS
+          if (!hasDaemonReconnected()) {
+            await Effect.runPromise(
+              Effect.provide(
+                Effect.gen(function* () {
+                  yield* unregisterDaemon(session.id);
+                  yield* Effect.annotateLogs(Effect.logInfo('Daemon unregistered'), {
+                    daemonId: session.id,
+                  });
+                }),
+                allLayers
+              )
+            ).catch(async (error) => {
+              await Effect.runPromise(
+                Effect.provide(
+                  Effect.annotateLogs(Effect.logError('Daemon unregister failed'), {
+                    daemonId: session.id,
+                    error: String(error),
+                  }),
+                  allLayers
+                )
+              );
+            });
+          }
         }
       },
     };

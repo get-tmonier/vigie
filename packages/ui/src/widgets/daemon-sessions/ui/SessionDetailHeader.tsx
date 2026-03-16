@@ -11,6 +11,7 @@ interface SessionDetailHeaderProps {
   onToggleHistory: () => void;
   onResume?: () => void;
   onDelete?: () => void;
+  resumeError?: string | null;
 }
 
 function formatDuration(startedAt: number): string {
@@ -83,6 +84,65 @@ function AttachButton({ sessionId }: { sessionId: string }) {
   );
 }
 
+function ResumeStatus({
+  session,
+  resumeError,
+  onResume,
+}: {
+  session: AgentSession;
+  resumeError?: string | null;
+  onResume?: () => void;
+}) {
+  if (session.status === 'active') {
+    if (session.resumable) {
+      return (
+        <span className="text-xs font-mono px-2 py-1 rounded border border-gold/20 text-gold/50 cursor-default">
+          Resumable
+        </span>
+      );
+    }
+    if (session.claudeSessionId) {
+      return (
+        <span className="text-xs font-mono px-2 py-1 rounded border border-navy-light text-slate/40 cursor-default">
+          Not resumable
+        </span>
+      );
+    }
+    return null;
+  }
+
+  if (session.resumable && onResume) {
+    if (resumeError) {
+      return (
+        <span
+          className="text-xs font-mono px-2 py-1 rounded bg-red-500/10 border border-red-500/30 text-red-400 cursor-default"
+          title={resumeError}
+        >
+          Resume failed
+        </span>
+      );
+    }
+    return (
+      <button
+        type="button"
+        onClick={onResume}
+        className="text-xs font-mono px-2 py-1 rounded transition-colors bg-gold/20 text-gold hover:bg-gold/30"
+      >
+        Resume
+      </button>
+    );
+  }
+
+  return (
+    <span
+      className="text-xs font-mono px-2 py-1 rounded text-slate/40 border border-navy-light cursor-default"
+      title="Session ended too quickly or with an error"
+    >
+      Not resumable
+    </span>
+  );
+}
+
 export function SessionDetailHeader({
   session,
   connected,
@@ -90,6 +150,7 @@ export function SessionDetailHeader({
   onToggleHistory,
   onResume,
   onDelete,
+  resumeError,
 }: SessionDetailHeaderProps) {
   const [, setTick] = useState(0);
   const isActive = session.status === 'active';
@@ -138,18 +199,9 @@ export function SessionDetailHeader({
           </button>
         )}
         {session.mode === 'interactive' && isActive && <AttachButton sessionId={session.id} />}
-        {session.status === 'ended' &&
-          session.agentType === 'claude' &&
-          session.claudeSessionId &&
-          onResume && (
-            <button
-              type="button"
-              onClick={onResume}
-              className="text-xs font-mono px-2 py-1 rounded transition-colors bg-gold/20 text-gold hover:bg-gold/30"
-            >
-              Resume
-            </button>
-          )}
+        {session.agentType === 'claude' && (
+          <ResumeStatus session={session} resumeError={resumeError} onResume={onResume} />
+        )}
         {isActive && <KillSessionButton daemonId={session.daemonId} sessionId={session.id} />}
         {session.status === 'ended' && onDelete && (
           <DeleteSessionButton

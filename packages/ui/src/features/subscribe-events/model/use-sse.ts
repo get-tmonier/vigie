@@ -44,6 +44,7 @@ export function useSSE(daemonId: string | null) {
     es.addEventListener('session:spawn-failed', handleEvent);
     es.addEventListener('terminal:input-echo', handleEvent);
     es.addEventListener('session:claude-id-detected', handleEvent);
+    es.addEventListener('session:resumable-changed', handleEvent);
 
     return () => {
       es.close();

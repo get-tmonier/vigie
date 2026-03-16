@@ -52,6 +52,8 @@ export const SSESessionStartedSchema = v.object({
   cwd: v.string(),
   gitBranch: v.optional(v.string()),
   repoName: v.optional(v.string()),
+  resumable: v.optional(v.boolean()),
+  claudeSessionId: v.optional(v.string()),
   timestamp: v.number(),
 });
 export type SSESessionStarted = v.InferOutput<typeof SSESessionStartedSchema>;
@@ -71,6 +73,7 @@ export const SSESessionEndedSchema = v.object({
   daemonId: v.string(),
   sessionId: v.string(),
   exitCode: v.number(),
+  resumable: v.optional(v.boolean(), false),
   timestamp: v.number(),
 });
 export type SSESessionEnded = v.InferOutput<typeof SSESessionEndedSchema>;
@@ -112,6 +115,13 @@ export const SSESessionClaudeIdDetectedSchema = v.object({
 });
 export type SSESessionClaudeIdDetected = v.InferOutput<typeof SSESessionClaudeIdDetectedSchema>;
 
+export const SSESessionResumableChangedSchema = v.object({
+  type: v.literal('session:resumable-changed'),
+  daemonId: v.string(),
+  sessionId: v.string(),
+  resumable: v.boolean(),
+  timestamp: v.number(),
+});
 export const SSEEventSchema = v.variant('type', [
   SSECommandOutputSchema,
   SSECommandDoneSchema,
@@ -125,5 +135,6 @@ export const SSEEventSchema = v.variant('type', [
   SSESessionSpawnFailedSchema,
   SSETerminalInputEchoSchema,
   SSESessionClaudeIdDetectedSchema,
+  SSESessionResumableChangedSchema,
 ]);
 export type SSEEvent = v.InferOutput<typeof SSEEventSchema>;

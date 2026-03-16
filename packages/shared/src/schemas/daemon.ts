@@ -49,6 +49,15 @@ export const SessionResumeRequestSchema = v.object({
 });
 export type SessionResumeRequest = v.InferOutput<typeof SessionResumeRequestSchema>;
 
+const SessionDeleteSchema = v.object({
+  type: v.literal('session:delete'),
+  sessionId: v.string(),
+});
+
+const SessionClearEndedSchema = v.object({
+  type: v.literal('session:clear-ended'),
+});
+
 export const DownstreamMessageSchema = v.variant('type', [
   CommandRequestSchema,
   PingSchema,
@@ -56,6 +65,8 @@ export const DownstreamMessageSchema = v.variant('type', [
   SessionKillSchema,
   FsListDirRequestSchema,
   SessionResumeRequestSchema,
+  SessionDeleteSchema,
+  SessionClearEndedSchema,
 ]);
 export type DownstreamMessage = v.InferOutput<typeof DownstreamMessageSchema>;
 
@@ -126,6 +137,7 @@ export const SessionEndedSchema = v.object({
   type: v.literal('session:ended'),
   sessionId: v.string(),
   exitCode: v.number(),
+  resumable: v.optional(v.boolean(), false),
   timestamp: v.number(),
 });
 export type SessionEnded = v.InferOutput<typeof SessionEndedSchema>;
@@ -196,6 +208,8 @@ export const DaemonSyncSessionSchema = v.object({
   startedAt: v.number(),
   status: v.picklist(['active', 'ended', 'error']),
   exitCode: v.optional(v.number()),
+  claudeSessionId: v.optional(v.string()),
+  resumable: v.optional(v.boolean(), false),
   terminalChunks: v.array(
     v.object({
       data: v.string(),
@@ -238,6 +252,13 @@ export const SessionClaudeIdDetectedSchema = v.object({
 });
 export type SessionClaudeIdDetected = v.InferOutput<typeof SessionClaudeIdDetectedSchema>;
 
+const SessionResumableChangedSchema = v.object({
+  type: v.literal('session:resumable-changed'),
+  sessionId: v.string(),
+  resumable: v.boolean(),
+  timestamp: v.number(),
+});
+
 export const UpstreamMessageSchema = v.variant('type', [
   DaemonHelloSchema,
   CommandOutputSchema,
@@ -254,6 +275,7 @@ export const UpstreamMessageSchema = v.variant('type', [
   DaemonSyncSchema,
   TerminalInputEchoSchema,
   SessionClaudeIdDetectedSchema,
+  SessionResumableChangedSchema,
 ]);
 export type UpstreamMessage = v.InferOutput<typeof UpstreamMessageSchema>;
 
