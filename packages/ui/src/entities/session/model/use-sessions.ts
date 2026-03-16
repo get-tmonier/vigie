@@ -1,5 +1,5 @@
 import type { SSEEvent } from '@tmonier/shared';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { AgentSession } from '../api/session-api';
 import { listSessions } from '../api/session-api';
 
@@ -79,5 +79,13 @@ export function useSessions(daemonId: string | null, events: SSEEvent[]) {
     }
   }, [events]);
 
-  return { sessions, loading };
+  const removeSession = useCallback((id: string) => {
+    setSessions((prev) => prev.filter((s) => s.id !== id));
+  }, []);
+
+  const removeEndedSessions = useCallback(() => {
+    setSessions((prev) => prev.filter((s) => s.status !== 'ended'));
+  }, []);
+
+  return { sessions, loading, removeSession, removeEndedSessions };
 }

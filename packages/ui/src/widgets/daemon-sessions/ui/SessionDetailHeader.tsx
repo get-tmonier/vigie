@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { AgentSession } from '#entities/session/api/session-api';
+import { DeleteSessionButton } from '#features/delete-session/ui/DeleteSessionButton';
 import { KillSessionButton } from '#features/kill-session/ui/KillSessionButton';
 import { cn } from '#shared/lib/cn';
 
@@ -9,6 +10,7 @@ interface SessionDetailHeaderProps {
   historyOpen: boolean;
   onToggleHistory: () => void;
   onResume?: () => void;
+  onDelete?: () => void;
 }
 
 function formatDuration(startedAt: number): string {
@@ -87,6 +89,7 @@ export function SessionDetailHeader({
   historyOpen,
   onToggleHistory,
   onResume,
+  onDelete,
 }: SessionDetailHeaderProps) {
   const [, setTick] = useState(0);
   const isActive = session.status === 'active';
@@ -148,6 +151,13 @@ export function SessionDetailHeader({
             </button>
           )}
         {isActive && <KillSessionButton daemonId={session.daemonId} sessionId={session.id} />}
+        {session.status === 'ended' && onDelete && (
+          <DeleteSessionButton
+            daemonId={session.daemonId}
+            sessionId={session.id}
+            onDeleted={onDelete}
+          />
+        )}
         <span
           className={cn(
             'w-2 h-2 rounded-full shrink-0',

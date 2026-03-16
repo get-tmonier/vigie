@@ -1,7 +1,10 @@
 import { Effect, Layer } from 'effect';
 import { Hono } from 'hono';
 import type { AuthEnv } from '#modules/auth/adapters/primary/session-middleware';
+import { clearEndedSessions } from '#modules/supervision/commands/clear-ended-sessions.command';
+import { deleteSession } from '#modules/supervision/commands/delete-session.command';
 import { executeCommand } from '#modules/supervision/commands/execute-command.command';
+import { killAllSessions } from '#modules/supervision/commands/kill-all-sessions.command';
 import { killSession } from '#modules/supervision/commands/kill-session.command';
 import { listDirectory } from '#modules/supervision/commands/list-directory.command';
 import { resumeSession } from '#modules/supervision/commands/resume-session.command';
@@ -306,6 +309,133 @@ daemonRestApp.post('/daemons/:daemonId/sessions/:sessionId/resume', async (c) =>
   }
 
   return c.json({ sessionId: result.sessionId });
+});
+
+daemonRestApp.delete('/daemons/:daemonId/sessions/:sessionId', async (c) => {
+  const user = c.get('user');
+  if (!user) return c.json({ error: 'Unauthorized' }, 401);
+  const daemonId = c.req.param('daemonId');
+  const sessionId = c.req.param('sessionId');
+
+  const daemon = await Effect.runPromise(
+    Effect.provide(
+      Effect.matchEffect(
+        Effect.service(DaemonReadRepository).pipe(Effect.flatMap((r) => r.get(daemonId))),
+        {
+          onSuccess: (d) => Effect.succeed(d),
+          onFailure: () => Effect.succeed(null),
+        }
+      ),
+      allLayers
+    )
+  );
+  if (!daemon || daemon.userId !== user.id) {
+    return c.json({ error: `Daemon not found: ${daemonId}` }, 404);
+  }
+
+  const result = await Effect.runPromise(
+    Effect.matchEffect(deleteSession(sessionId), {
+      onSuccess: () => Effect.succeed({ ok: true } as const),
+      onFailure: (e) =>
+        Effect.succeed(
+          e._tag === 'SessionNotFoundError'
+            ? ({ ok: false, error: `Session not found: ${e.id}`, status: 404 } as const)
+            : ({ ok: false, error: `Session is still active: ${e.id}`, status: 400 } as const)
+        ),
+    })
+  );
+
+  if (!result.ok) {
+    return c.json({ error: result.error }, result.status);
+  }
+
+  return c.json({ ok: true });
+});
+
+daemonRestApp.post('/daemons/:daemonId/sessions/clear-ended', async (c) => {
+  const user = c.get('user');
+  if (!user) return c.json({ error: 'Unauthorized' }, 401);
+  const daemonId = c.req.param('daemonId');
+
+  const daemon = await Effect.runPromise(
+    Effect.provide(
+      Effect.matchEffect(
+        Effect.service(DaemonReadRepository).pipe(Effect.flatMap((r) => r.get(daemonId))),
+        {
+          onSuccess: (d) => Effect.succeed(d),
+          onFailure: () => Effect.succeed(null),
+        }
+      ),
+      allLayers
+    )
+  );
+  if (!daemon || daemon.userId !== user.id) {
+    return c.json({ error: `Daemon not found: ${daemonId}` }, 404);
+  }
+
+  const { deletedCount } = await Effect.runPromise(clearEndedSessions(daemonId));
+
+  await Effect.runPromise(
+    Effect.provide(
+      Effect.annotateLogs(Effect.logInfo('Cleared ended sessions'), { daemonId, deletedCount }),
+      allLayers
+    )
+  );
+
+  return c.json({ deletedCount });
+});
+
+daemonRestApp.post('/daemons/:daemonId/sessions/kill-all', async (c) => {
+  const user = c.get('user');
+  if (!user) return c.json({ error: 'Unauthorized' }, 401);
+  const daemonId = c.req.param('daemonId');
+
+  const daemon = await Effect.runPromise(
+    Effect.provide(
+      Effect.matchEffect(
+        Effect.service(DaemonReadRepository).pipe(Effect.flatMap((r) => r.get(daemonId))),
+        {
+          onSuccess: (d) => Effect.succeed(d),
+          onFailure: () => Effect.succeed(null),
+        }
+      ),
+      allLayers
+    )
+  );
+  if (!daemon || daemon.userId !== user.id) {
+    return c.json({ error: `Daemon not found: ${daemonId}` }, 404);
+  }
+
+  const result = await Effect.runPromise(
+    Effect.provide(
+      Effect.matchEffect(killAllSessions(daemonId), {
+        onSuccess: (r) => Effect.succeed({ ok: true, killedCount: r.killedCount } as const),
+        onFailure: (e) =>
+          Effect.succeed(
+            e._tag === 'DaemonDisconnectedError'
+              ? ({ ok: false, error: 'Daemon not connected', status: 503 } as const)
+              : ({ ok: false, error: `Daemon not found: ${e.id}`, status: 404 } as const)
+          ),
+      }),
+      allLayers
+    )
+  );
+
+  if (!result.ok) {
+    return c.json({ error: result.error }, result.status);
+  }
+
+  await Effect.runPromise(
+    Effect.provide(
+      Effect.annotateLogs(Effect.logInfo('Kill all sessions requested'), {
+        daemonId,
+        killedCount: result.killedCount,
+      }),
+      allLayers
+    )
+  );
+
+  return c.json({ killedCount: result.killedCount });
 });
 
 daemonRestApp.post('/daemons/:daemonId/fs/list', async (c) => {

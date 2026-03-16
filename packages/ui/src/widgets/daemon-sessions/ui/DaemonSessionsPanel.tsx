@@ -3,9 +3,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { resumeSession } from '#entities/session/api/session-api';
 import { useSessions } from '#entities/session/model/use-sessions';
 import { SessionCard } from '#entities/session/ui/SessionCard';
+import { ClearEndedButton } from '#features/clear-ended-sessions/ui/ClearEndedButton';
 import { useInputHistory } from '#features/input-history/model/use-input-history';
 import { InputHistoryPanel } from '#features/input-history/ui/InputHistoryPanel';
 import { InteractiveTerminal } from '#features/interactive-terminal/ui/InteractiveTerminal';
+import { KillAllButton } from '#features/kill-all-sessions/ui/KillAllButton';
 import { useSessionStream } from '#features/session-stream/model/use-session-stream';
 import { TokenStream } from '#features/session-stream/ui/TokenStream';
 import { SpawnSessionDialog } from '#features/spawn-session/ui/SpawnSessionDialog';
@@ -18,7 +20,7 @@ interface DaemonSessionsPanelProps {
 }
 
 export function DaemonSessionsPanel({ daemonId, events }: DaemonSessionsPanelProps) {
-  const { sessions, loading } = useSessions(daemonId, events);
+  const { sessions, loading, removeSession, removeEndedSessions } = useSessions(daemonId, events);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [showSpawnForm, setShowSpawnForm] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -160,7 +162,10 @@ export function DaemonSessionsPanel({ daemonId, events }: DaemonSessionsPanelPro
         <div className="flex-1 overflow-y-auto p-2 space-y-2">
           {activeSessions.length > 0 && (
             <>
-              <div className="text-xs text-slate uppercase tracking-wider px-1 pt-1">Active</div>
+              <div className="flex items-center justify-between px-1 pt-1">
+                <span className="text-xs text-slate uppercase tracking-wider">Active</span>
+                <KillAllButton daemonId={daemonId} activeCount={activeSessions.length} />
+              </div>
               {activeSessions.map((session) => (
                 <SessionCard
                   key={session.id}
@@ -173,7 +178,19 @@ export function DaemonSessionsPanel({ daemonId, events }: DaemonSessionsPanelPro
           )}
           {endedSessions.length > 0 && (
             <>
-              <div className="text-xs text-slate uppercase tracking-wider px-1 pt-2">Ended</div>
+              <div className="flex items-center justify-between px-1 pt-2">
+                <span className="text-xs text-slate uppercase tracking-wider">Ended</span>
+                <ClearEndedButton
+                  daemonId={daemonId}
+                  endedCount={endedSessions.length}
+                  onCleared={() => {
+                    removeEndedSessions();
+                    if (selectedSession && selectedSession.status === 'ended') {
+                      setSelectedSessionId(null);
+                    }
+                  }}
+                />
+              </div>
               {endedSessions.map((session) => (
                 <SessionCard
                   key={session.id}
@@ -197,6 +214,10 @@ export function DaemonSessionsPanel({ daemonId, events }: DaemonSessionsPanelPro
               historyOpen={historyOpen}
               onToggleHistory={() => setHistoryOpen(!historyOpen)}
               onResume={handleResume}
+              onDelete={() => {
+                removeSession(selectedSession.id);
+                setSelectedSessionId(null);
+              }}
             />
             <div className="flex-1 flex overflow-hidden">
               {selectedSession.mode === 'interactive' ? (

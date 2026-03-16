@@ -48,6 +48,24 @@ export async function killSession(daemonId: string, sessionId: string): Promise<
   });
 }
 
+export async function deleteSession(daemonId: string, sessionId: string): Promise<void> {
+  await apiFetch(`/daemons/${daemonId}/sessions/${sessionId}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function clearEndedSessions(daemonId: string): Promise<{ deletedCount: number }> {
+  return apiFetch<{ deletedCount: number }>(`/daemons/${daemonId}/sessions/clear-ended`, {
+    method: 'POST',
+  });
+}
+
+export async function killAllSessions(daemonId: string): Promise<{ killedCount: number }> {
+  return apiFetch<{ killedCount: number }>(`/daemons/${daemonId}/sessions/kill-all`, {
+    method: 'POST',
+  });
+}
+
 export interface FsEntry {
   name: string;
   isDirectory: boolean;
