@@ -14,7 +14,7 @@
   "scripts": {
     "dev": "bun --env-file=../../.env --env-file=../../.env.local --watch src/index.ts",
     "build": "bun build src/index.ts --outdir dist --target bun",
-    "start": "bun dist/index.js",
+    "start": "bun ./dist/index.js",
     "lint": "biome lint ./src",
     "lint:fix": "biome check --write ./src",
     "format": "biome format --write ./src",
