@@ -1,8 +1,9 @@
+import { Effect } from 'effect';
 import pg from 'pg';
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
-  console.error('DATABASE_URL environment variable is required');
+  await Effect.runPromise(Effect.logError('DATABASE_URL environment variable is required'));
   process.exit(1);
 }
 
@@ -21,12 +22,13 @@ const { rows: duplicates } = await pool.query<{ id: string; name: string; create
 `);
 
 if (duplicates.length === 0) {
-  console.log('No duplicate API keys found.');
+  await Effect.runPromise(Effect.logInfo('No duplicate API keys found.'));
 } else {
-  console.log(`Deleted ${duplicates.length} duplicate API key(s):`);
-  for (const row of duplicates) {
-    console.log(`  - ${row.id} | ${row.name} | ${row.createdAt.toISOString()}`);
-  }
+  await Effect.runPromise(
+    Effect.logInfo(
+      `Deleted ${duplicates.length} duplicate API key(s): ${duplicates.map((r) => `${r.id} | ${r.name} | ${r.createdAt.toISOString()}`).join(', ')}`
+    )
+  );
 }
 
 await pool.end();

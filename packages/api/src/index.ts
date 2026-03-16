@@ -1,4 +1,4 @@
-import { Effect } from 'effect';
+import { Effect, Logger } from 'effect';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { loadConfig } from './config';
@@ -10,13 +10,17 @@ import { daemonRestApp } from './modules/supervision/adapters/primary/daemon-res
 import { daemonSseApp } from './modules/supervision/adapters/primary/daemon-sse.adapter';
 import { daemonWsApp, websocket } from './modules/supervision/adapters/primary/daemon-ws.adapter';
 import { deviceRestApp } from './modules/supervision/adapters/primary/device-rest.adapter';
+import { startHeartbeat } from './modules/supervision/adapters/primary/heartbeat';
+import { terminalWsApp } from './modules/supervision/adapters/primary/terminal-ws.adapter';
 import { health } from './routes/health';
 
 const { port, corsOrigin } = Effect.runSync(loadConfig);
+const loggerLayer = Logger.layer([Logger.consolePretty()]);
 
 const app = new Hono();
 
 app.route('/', daemonWsApp);
+app.route('/', terminalWsApp);
 
 app.use(
   '*',
@@ -38,10 +42,18 @@ app.route('/', daemonRestApp);
 
 app.route('/', deviceRestApp);
 
-console.log(`@tmonier/api listening on http://localhost:${port}`);
+startHeartbeat();
+
+Effect.runSync(
+  Effect.provide(
+    Effect.annotateLogs(Effect.logInfo('API server started'), { port, corsOrigin }),
+    loggerLayer
+  )
+);
 
 export default {
   port,
   fetch: app.fetch,
   websocket,
+  idleTimeout: 120,
 };

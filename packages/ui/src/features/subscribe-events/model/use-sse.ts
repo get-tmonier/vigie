@@ -5,6 +5,7 @@ import { createDaemonEventSource } from '../api/event-source';
 export function useSSE(daemonId: string | null) {
   const [events, setEvents] = useState<SSEEvent[]>([]);
   const [connected, setConnected] = useState(false);
+  const [daemonOnline, setDaemonOnline] = useState(true);
   const esRef = useRef<EventSource | null>(null);
 
   useEffect(() => {
@@ -20,6 +21,11 @@ export function useSSE(daemonId: string | null) {
     const handleEvent = (event: MessageEvent) => {
       try {
         const data = JSON.parse(event.data) as SSEEvent;
+        if (data.type === 'daemon:connected') {
+          setDaemonOnline(true);
+        } else if (data.type === 'daemon:disconnected') {
+          setDaemonOnline(false);
+        }
         setEvents((prev) => [...prev, data]);
       } catch {
         // ignore invalid events
@@ -31,6 +37,14 @@ export function useSSE(daemonId: string | null) {
     es.addEventListener('command:error', handleEvent);
     es.addEventListener('daemon:connected', handleEvent);
     es.addEventListener('daemon:disconnected', handleEvent);
+    es.addEventListener('session:started', handleEvent);
+    es.addEventListener('session:output', handleEvent);
+    es.addEventListener('session:ended', handleEvent);
+    es.addEventListener('session:error', handleEvent);
+    es.addEventListener('session:spawn-failed', handleEvent);
+    es.addEventListener('terminal:input-echo', handleEvent);
+    es.addEventListener('session:claude-id-detected', handleEvent);
+    es.addEventListener('session:resumable-changed', handleEvent);
 
     return () => {
       es.close();
@@ -41,5 +55,5 @@ export function useSSE(daemonId: string | null) {
 
   const clear = useCallback(() => setEvents([]), []);
 
-  return { events, connected, clear };
+  return { events, connected, daemonOnline, clear };
 }

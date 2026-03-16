@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, mock, spyOn } from 'bun:test';
+import { afterEach, describe, expect, it, mock } from 'bun:test';
 import { Hono } from 'hono';
 
 const verifyApiKey = mock();
@@ -11,7 +11,7 @@ mock.module('#modules/auth/auth-instance', () => ({
   },
 }));
 
-const { daemonAuthMiddleware } = await import('../daemon-auth.middleware');
+const { daemonAuthMiddleware, clearApiKeyCache } = await import('../daemon-auth.middleware');
 type DaemonAuthEnv = import('../daemon-auth.middleware').DaemonAuthEnv;
 
 function createApp() {
@@ -22,15 +22,9 @@ function createApp() {
 }
 
 describe('daemonAuthMiddleware', () => {
-  let consoleErrorSpy: ReturnType<typeof spyOn>;
-
-  beforeEach(() => {
-    consoleErrorSpy = spyOn(console, 'error').mockImplementation(() => {});
-  });
-
   afterEach(() => {
     verifyApiKey.mockReset();
-    consoleErrorSpy.mockRestore();
+    clearApiKeyCache();
   });
 
   it('returns 401 when token query param is missing', async () => {
@@ -69,5 +63,35 @@ describe('daemonAuthMiddleware', () => {
     expect(res.status).toBe(401);
     const body = await res.json();
     expect(body.error).toBe('Authentication failed');
+  });
+
+  it('uses cached result on second call instead of hitting Better Auth', async () => {
+    verifyApiKey.mockResolvedValue({
+      valid: true,
+      key: { referenceId: 'user-456' },
+    });
+    const app = createApp();
+
+    await app.request('/ws/daemon?token=tmonier_cachedkey');
+    expect(verifyApiKey).toHaveBeenCalledTimes(1);
+
+    await app.request('/ws/daemon?token=tmonier_cachedkey');
+    expect(verifyApiKey).toHaveBeenCalledTimes(1);
+
+    const res = await app.request('/ws/daemon?token=tmonier_cachedkey');
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.userId).toBe('user-456');
+  });
+
+  it('does not cache invalid keys', async () => {
+    verifyApiKey.mockResolvedValue({ valid: false });
+    const app = createApp();
+
+    await app.request('/ws/daemon?token=bad_token');
+    expect(verifyApiKey).toHaveBeenCalledTimes(1);
+
+    await app.request('/ws/daemon?token=bad_token');
+    expect(verifyApiKey).toHaveBeenCalledTimes(2);
   });
 });

@@ -14,7 +14,7 @@
   "scripts": {
     "dev": "bun --env-file=../../.env --env-file=../../.env.local --watch src/index.ts",
     "build": "bun build src/index.ts --outdir dist --target bun",
-    "start": "bun dist/index.js",
+    "start": "bun ./dist/index.js",
     "lint": "biome lint ./src",
     "lint:fix": "biome check --write ./src",
     "format": "biome format --write ./src",
@@ -30,8 +30,8 @@
     "fix-imports": "bun ../../scripts/fix-imports.ts"
   },
   "dependencies": {
-    "@tmonier/shared": "workspace:*",
     "@better-auth/api-key": "1.5.1",
+    "@tmonier/shared": "workspace:*",
     "better-auth": "1.5.1",
     "effect": "4.0.0-beta.21",
     "hono": "4.12.3",

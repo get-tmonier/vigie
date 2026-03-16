@@ -25,6 +25,7 @@ export const auth = betterAuth({
     apiKey({
       defaultPrefix: 'tmonier_',
       maximumNameLength: 64,
+      rateLimit: { enabled: false },
     }),
   ],
 });

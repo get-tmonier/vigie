@@ -5,7 +5,6 @@ export default {
     ".": {},
     "packages/api": {
       project: ["src/**/*.ts"],
-      ignoreBinaries: ["dist/index.js"],
     },
     "packages/ui": {
       entry: ["src/routes/**/*.tsx", "src/router.tsx"],
@@ -30,11 +29,7 @@ export default {
       ],
       project: ["src/**/*.{astro,ts,tsx}", "scripts/**/*.mjs"],
       ignoreDependencies: [
-        "@fontsource/jetbrains-mono",
-        "@fontsource/source-serif-4",
         "@fontsource/vollkorn",
-        "@fontsource/vollkorn-sc",
-        "@tmonier/tokens",
         "sharp",
         "tailwindcss",
       ],

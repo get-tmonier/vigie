@@ -1,17 +1,16 @@
+import { Effect } from 'effect';
 import { Glob } from 'bun';
 
 const suffix = process.argv[2]; // e.g. "unit" or "integration"
 if (!suffix) {
-  console.error('Usage: bun scripts/test-filter.ts <unit|integration>');
+  await Effect.runPromise(Effect.logError('Usage: bun scripts/test-filter.ts <unit|integration>'));
   process.exit(1);
 }
 
-const files = await Array.fromAsync(
-  new Glob(`**/*.${suffix}.test.ts`).scan({ cwd: 'src' })
-);
+const files = await Array.fromAsync(new Glob(`**/*.${suffix}.test.ts`).scan({ cwd: 'src' }));
 
 if (files.length === 0) {
-  console.log(`No ${suffix} test files found.`);
+  await Effect.runPromise(Effect.logInfo(`No ${suffix} test files found.`));
   process.exit(0);
 }
 

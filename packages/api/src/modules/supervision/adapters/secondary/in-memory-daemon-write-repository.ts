@@ -6,7 +6,7 @@ import { daemonStore } from './shared-state';
 export const InMemoryDaemonWriteRepositoryLive = Layer.succeed(DaemonWriteRepository, {
   register: (session, ws) =>
     Effect.sync(() => {
-      daemonStore.set(session.id, { session, ws });
+      daemonStore.set(session.id, { session, ws, lastPongAt: Date.now() });
       return session;
     }),
   unregister: (id) =>

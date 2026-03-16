@@ -4,10 +4,15 @@ import { streamSSE } from 'hono/streaming';
 import type { AuthEnv } from '#modules/auth/adapters/primary/session-middleware';
 import { DaemonReadRepository } from '#modules/supervision/ports/daemon-read-repository.port';
 import { subscribeToEvents } from '#modules/supervision/queries/subscribe-events.query';
+import { SupervisionLoggerLive } from '../logger';
 import { InMemoryDaemonReadRepositoryLive } from '../secondary/in-memory-daemon-read-repository';
 import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher';
 
-const allLayers = Layer.mergeAll(InMemoryDaemonReadRepositoryLive, InMemoryEventPublisherLive);
+const allLayers = Layer.mergeAll(
+  InMemoryDaemonReadRepositoryLive,
+  InMemoryEventPublisherLive,
+  SupervisionLoggerLive
+);
 
 const daemonSseApp = new Hono<AuthEnv>();
 
@@ -29,10 +34,26 @@ daemonSseApp.get('/daemons/:daemonId/events', async (c) => {
     )
   );
   if (!daemon || daemon.userId !== user.id) {
+    await Effect.runPromise(
+      Effect.provide(
+        Effect.annotateLogs(Effect.logWarning('SSE: daemon not found'), { daemonId }),
+        allLayers
+      )
+    );
     return c.json({ error: `Daemon not found: ${daemonId}` }, 404);
   }
 
   return streamSSE(c, async (stream) => {
+    await Effect.runPromise(
+      Effect.provide(
+        Effect.annotateLogs(Effect.logInfo('SSE: client subscribed'), {
+          daemonId,
+          userId: user.id,
+        }),
+        allLayers
+      )
+    );
+
     const unsubscribe = await Effect.runPromise(
       Effect.provide(
         subscribeToEvents(daemonId, (event) => {
@@ -47,8 +68,20 @@ daemonSseApp.get('/daemons/:daemonId/events', async (c) => {
       )
     );
 
-    stream.onAbort(() => {
+    stream.writeSSE({ event: 'keepalive', data: '' }).catch(() => {});
+    const keepalive = setInterval(() => {
+      stream.writeSSE({ event: 'keepalive', data: '' }).catch(() => {});
+    }, 10_000);
+
+    stream.onAbort(async () => {
+      clearInterval(keepalive);
       unsubscribe();
+      await Effect.runPromise(
+        Effect.provide(
+          Effect.annotateLogs(Effect.logInfo('SSE: client disconnected'), { daemonId }),
+          allLayers
+        )
+      );
     });
 
     await new Promise<void>((resolve) => {

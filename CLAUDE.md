@@ -93,6 +93,7 @@ bun test:integration                           # run integration tests only
 - **Self-documenting code** — minimal comments. Code should be self-explanatory. No JSDoc unless for public library APIs
 - **Clean code** — no dead code, no commented-out code, no TODO comments without linked issues
 - **Bun test runner** — `import { describe, expect, it } from 'bun:test'`
+- **Effect logging only in `@tmonier/api`** — use `Effect.logInfo`, `Effect.logWarning`, `Effect.logError`, `Effect.logDebug` with `Effect.annotateLogs` for structured context. `console.log` is banned by Biome in the API package. Use `Logger.consolePretty()` layer for dev output.
 
 ## Subpath imports
 
