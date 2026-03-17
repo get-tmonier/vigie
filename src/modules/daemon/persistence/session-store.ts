@@ -41,7 +41,7 @@ export function createSessionStore(db: Database) {
 
   const markEndedStmt = db.prepare(`
     UPDATE sessions SET status = $status, ended_at = $ended_at, exit_code = $exit_code,
-      resumable = (CASE WHEN agent_type = 'claude' AND claude_session_id IS NOT NULL AND $exit_code = 0 THEN 1 ELSE 0 END)
+      resumable = $resumable
     WHERE id = $id
   `);
 
@@ -58,6 +58,12 @@ export function createSessionStore(db: Database) {
     WHERE session_id = $session_id
     ORDER BY seq DESC
     LIMIT $limit
+  `);
+
+  const getAllChunksStmt = db.prepare(`
+    SELECT data, timestamp, seq FROM terminal_chunks
+    WHERE session_id = $session_id
+    ORDER BY seq ASC
   `);
 
   const appendChunkStmt = db.prepare(`
@@ -134,15 +140,20 @@ export function createSessionStore(db: Database) {
       });
     },
 
-    markSessionEnded(sessionId: string, status: 'ended' | 'error', exitCode: number): boolean {
+    markSessionEnded(
+      sessionId: string,
+      status: 'ended' | 'error',
+      exitCode: number,
+      resumable: boolean
+    ): boolean {
       markEndedStmt.run({
         $id: sessionId,
         $status: status,
         $ended_at: Date.now(),
         $exit_code: exitCode,
+        $resumable: resumable ? 1 : 0,
       });
-      const row = getSessionByIdStmt.get({ $id: sessionId }) as SessionRow | null;
-      return row?.resumable === 1;
+      return resumable;
     },
 
     appendTerminalChunk(sessionId: string, data: string, timestamp: number) {
@@ -162,6 +173,10 @@ export function createSessionStore(db: Database) {
         $limit: limit,
       }) as TerminalChunkRow[];
       return rows.reverse();
+    },
+
+    getAllTerminalChunks(sessionId: string): TerminalChunkRow[] {
+      return getAllChunksStmt.all({ $session_id: sessionId }) as TerminalChunkRow[];
     },
 
     getActiveSessions(): SessionRow[] {
@@ -259,6 +274,25 @@ export function createSessionStore(db: Database) {
           "SELECT id, claude_session_id, cwd, resumable FROM sessions WHERE status = 'active' AND agent_type = 'claude' AND claude_session_id IS NOT NULL"
         )
         .all() as Array<{ id: string; claude_session_id: string; cwd: string; resumable: number }>;
+    },
+
+    getRecentlyEndedClaudeSessionsWithId(withinMs: number): Array<{
+      id: string;
+      claude_session_id: string;
+      cwd: string;
+      resumable: number;
+    }> {
+      const cutoff = Date.now() - withinMs;
+      return db
+        .prepare(
+          "SELECT id, claude_session_id, cwd, resumable FROM sessions WHERE status = 'ended' AND agent_type = 'claude' AND claude_session_id IS NOT NULL AND ended_at > $cutoff AND resumable = 0"
+        )
+        .all({ $cutoff: cutoff }) as Array<{
+        id: string;
+        claude_session_id: string;
+        cwd: string;
+        resumable: number;
+      }>;
     },
 
     recomputeResumable(fileExists: (claudeSessionId: string, cwd: string) => boolean) {

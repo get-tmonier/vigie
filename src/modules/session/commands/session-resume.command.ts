@@ -97,7 +97,6 @@ export function sessionResumeCommand(partialId: string): Effect.Effect<void> {
     const canResume = existsSync(claudeSessionFile);
 
     const gitContext = yield* getGitContext(session.cwd);
-    const newSessionId = crypto.randomUUID();
 
     const cols = process.stdout.columns ?? 80;
     const rows_ = process.stdout.rows ?? 24;
@@ -113,7 +112,7 @@ export function sessionResumeCommand(partialId: string): Effect.Effect<void> {
     });
 
     client.onMessage((msg) => {
-      if (!('sessionId' in msg) || msg.sessionId !== newSessionId) return;
+      if (!('sessionId' in msg) || msg.sessionId !== session.id) return;
 
       switch (msg.type) {
         case 'session:spawned':
@@ -131,8 +130,7 @@ export function sessionResumeCommand(partialId: string): Effect.Effect<void> {
     if (canResume) {
       yield* client.send({
         type: 'session:resume',
-        sessionId: newSessionId,
-        originalSessionId: session.id,
+        sessionId: session.id,
         claudeSessionId: session.claude_session_id,
         cwd: session.cwd,
         cols,
@@ -144,7 +142,7 @@ export function sessionResumeCommand(partialId: string): Effect.Effect<void> {
     } else {
       yield* client.send({
         type: 'session:spawn-interactive',
-        sessionId: newSessionId,
+        sessionId: session.id,
         agentType: 'claude',
         cwd: session.cwd,
         cols,
@@ -162,7 +160,7 @@ export function sessionResumeCommand(partialId: string): Effect.Effect<void> {
       : `Previous session was too short-lived — fresh start`;
 
     const result = yield* attachPtyRelay(client, {
-      sessionId: newSessionId,
+      sessionId: session.id,
       startedAt: Date.now(),
       infoLine,
     });
@@ -170,7 +168,7 @@ export function sessionResumeCommand(partialId: string): Effect.Effect<void> {
     if (result.type === 'exit') {
       yield* Console.log(`\n[session] Resumed session ended (exit ${result.exitCode})`);
     } else if (result.type === 'detach') {
-      yield* Console.log(`\n[session] Detached from resumed session ${newSessionId.slice(0, 8)}`);
+      yield* Console.log(`\n[session] Detached from resumed session ${session.id.slice(0, 8)}`);
     }
   }).pipe(
     Effect.catchTag('DaemonNotRunningError', (e) => Console.error(e.message)),

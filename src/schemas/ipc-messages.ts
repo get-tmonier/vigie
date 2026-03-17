@@ -93,7 +93,6 @@ export const SessionAttachSchema = v.object({
 const SessionResumeSchema = v.object({
   type: v.literal('session:resume'),
   sessionId: v.string(),
-  originalSessionId: v.string(),
   claudeSessionId: v.string(),
   cwd: v.string(),
   cols: v.number(),
@@ -150,6 +149,23 @@ export const SessionSpawnedSchema = v.object({
   type: v.literal('session:spawned'),
   sessionId: v.string(),
   pid: v.number(),
+  ptyCols: v.optional(v.number()),
+  ptyRows: v.optional(v.number()),
+  // true when daemon forced a PTY resize to CLI dims (no browser connected)
+  // client must wait ~300ms for Claude Code to redraw before activating renderer
+  forcedResize: v.optional(v.boolean()),
+});
+
+const SessionReplayCompleteSchema = v.object({
+  type: v.literal('session:replay-complete'),
+  sessionId: v.string(),
+});
+
+const SessionPtyResizedSchema = v.object({
+  type: v.literal('session:pty-resized'),
+  sessionId: v.string(),
+  ptyCols: v.number(),
+  ptyRows: v.number(),
 });
 
 export const SessionSpawnFailedSchema = v.object({
@@ -179,5 +195,7 @@ export const DaemonToSessionSchema = v.variant('type', [
   SessionSpawnFailedSchema,
   SessionPtyOutputSchema,
   SessionPtyExitedSchema,
+  SessionReplayCompleteSchema,
+  SessionPtyResizedSchema,
 ]);
 export type DaemonToSession = v.InferOutput<typeof DaemonToSessionSchema>;

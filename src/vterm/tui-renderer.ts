@@ -14,6 +14,7 @@ interface TuiRenderer {
   render(screen: Screen): void;
   fullRender(screen: Screen): void;
   resize(cols: number, rows: number): void;
+  setRowOffset(n: number): void;
   setStatusBar(text: string): void;
   activate(): void;
   deactivate(): void;
@@ -57,7 +58,12 @@ const EMPTY_CELL: ScreenCell = {
   inverse: false,
 };
 
-function renderRows(screen: Screen, rows: Iterable<number>, cols: number): string {
+function renderRows(
+  screen: Screen,
+  rows: Iterable<number>,
+  cols: number,
+  rowOffset: number
+): string {
   let out = '';
   let lastSGR: ScreenCell = EMPTY_CELL;
   let firstCell = true;
@@ -65,7 +71,7 @@ function renderRows(screen: Screen, rows: Iterable<number>, cols: number): strin
   for (const row of rows) {
     if (row >= screen.rows) continue;
     const line = screen.getLine(row);
-    out += moveTo(row + 1, 1);
+    out += moveTo(row - rowOffset + 1, 1);
     firstCell = true;
 
     for (let col = 0; col < cols; col++) {
@@ -87,14 +93,6 @@ function renderRows(screen: Screen, rows: Iterable<number>, cols: number): strin
     lastSGR = EMPTY_CELL;
   }
 
-  // Position cursor
-  if (screen.cursorVisible) {
-    out += moveTo(screen.cursorY + 1, screen.cursorX + 1);
-    out += showCursor();
-  } else {
-    out += hideCursor();
-  }
-
   return out;
 }
 
@@ -110,6 +108,7 @@ export function createTuiRenderer(opts: {
   let viewportRows = rows - reservedBottom;
   const output = opts.output ?? process.stdout;
 
+  let rowOffset = 0;
   let barText = '';
   let barRendered = false;
 
@@ -128,36 +127,46 @@ export function createTuiRenderer(opts: {
       if (dirty.size === 0 && !needsBar) return;
       let result = '';
       if (dirty.size > 0) {
-        result = renderRows(screen, dirty, cols);
+        const viewportDirty: number[] = [];
+        for (const r of dirty) {
+          if (r >= rowOffset && r < rowOffset + viewportRows) viewportDirty.push(r);
+        }
+        if (viewportDirty.length > 0) {
+          result = renderRows(screen, viewportDirty, cols, rowOffset);
+        }
       }
       screen.markClean();
       if (!barRendered && reservedBottom > 0) {
         result += renderBar();
         barRendered = true;
       }
-      // Reposition cursor into viewport after bar
-      if (screen.cursorVisible) {
-        result += moveTo(screen.cursorY + 1, screen.cursorX + 1);
+      const termLine = screen.cursorY - rowOffset + 1;
+      if (screen.cursorVisible && termLine >= 1 && termLine <= viewportRows) {
+        result += moveTo(termLine, screen.cursorX + 1);
         result += showCursor();
+      } else {
+        result += hideCursor();
       }
       output.write(result);
     },
 
     fullRender(screen: Screen) {
       const allRows: number[] = [];
-      for (let i = 0; i < viewportRows; i++) {
+      for (let i = rowOffset; i < rowOffset + viewportRows; i++) {
         allRows.push(i);
       }
-      let result = renderRows(screen, allRows, cols);
+      let result = renderRows(screen, allRows, cols, rowOffset);
       screen.markClean();
       if (reservedBottom > 0) {
         result += renderBar();
         barRendered = true;
       }
-      // Reposition cursor into viewport after bar
-      if (screen.cursorVisible) {
-        result += moveTo(screen.cursorY + 1, screen.cursorX + 1);
+      const termLine = screen.cursorY - rowOffset + 1;
+      if (screen.cursorVisible && termLine >= 1 && termLine <= viewportRows) {
+        result += moveTo(termLine, screen.cursorX + 1);
         result += showCursor();
+      } else {
+        result += hideCursor();
       }
       output.write(result);
     },
@@ -166,6 +175,10 @@ export function createTuiRenderer(opts: {
       cols = newCols;
       rows = newRows;
       viewportRows = newRows - reservedBottom;
+    },
+
+    setRowOffset(n: number) {
+      rowOffset = n;
     },
 
     setStatusBar(text: string) {

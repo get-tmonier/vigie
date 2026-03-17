@@ -23,6 +23,7 @@ export const TerminalInputDownstreamSchema = v.object({
 export const TerminalResizeDownstreamSchema = v.object({
   type: v.literal('terminal:resize'),
   sessionId: v.string(),
+  browserConnId: v.string(),
   cols: v.number(),
   rows: v.number(),
 });
@@ -30,6 +31,7 @@ export const TerminalResizeDownstreamSchema = v.object({
 const TerminalBrowserDisconnectedSchema = v.object({
   type: v.literal('terminal:browser-disconnected'),
   sessionId: v.string(),
+  browserConnId: v.string(),
 });
 
 const SessionSpawnRequestSchema = v.object({
@@ -55,7 +57,6 @@ const FsListDirRequestSchema = v.object({
 const SessionResumeRequestSchema = v.object({
   type: v.literal('session:resume-request'),
   sessionId: v.string(),
-  originalSessionId: v.string(),
   claudeSessionId: v.string(),
   cwd: v.string(),
   cols: v.number(),
@@ -71,6 +72,12 @@ const SessionClearEndedSchema = v.object({
   type: v.literal('session:clear-ended'),
 });
 
+const TerminalChunksRequestSchema = v.object({
+  type: v.literal('terminal:chunks-request'),
+  requestId: v.string(),
+  sessionId: v.string(),
+});
+
 export const DownstreamMessageSchema = v.variant('type', [
   CommandRequestSchema,
   PingSchema,
@@ -83,6 +90,7 @@ export const DownstreamMessageSchema = v.variant('type', [
   SessionResumeRequestSchema,
   SessionDeleteSchema,
   SessionClearEndedSchema,
+  TerminalChunksRequestSchema,
 ]);
 
 // ── Upstream (daemon -> backend) ──

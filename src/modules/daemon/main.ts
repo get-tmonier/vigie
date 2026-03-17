@@ -20,10 +20,9 @@ import { createSessionStore } from './persistence/session-store.js';
 
 interface PtyEntry {
   handle: InteractiveRunnerHandle;
-  cliConnId: string | null;
-  cliDimensions: { cols: number; rows: number };
-  browserDimensions: { cols: number; rows: number } | null;
-  browserConnected: boolean;
+  cliChannels: Map<string, { cols: number; rows: number }>;
+  browserChannels: Map<string, { cols: number; rows: number }>;
+  ptyDimensions: { cols: number; rows: number };
 }
 
 function cleanup() {
@@ -105,15 +104,43 @@ export const runDaemon = Effect.gen(function* () {
     return resolve(p);
   }
 
-  function applyResizePriority(sessionId: string): void {
+  function applyResizePriority(sessionId: string): { cols: number; rows: number } | null {
     const entry = ptyHandles.get(sessionId);
-    if (!entry) return;
+    if (!entry) return null;
 
-    if (entry.browserConnected && entry.browserDimensions) {
-      entry.handle.resize(entry.browserDimensions.cols, entry.browserDimensions.rows);
-    } else if (entry.cliConnId && entry.cliDimensions) {
-      entry.handle.resize(entry.cliDimensions.cols, entry.cliDimensions.rows);
+    let cols: number;
+    let rows: number;
+    if (entry.browserChannels.size > 0) {
+      const first = entry.browserChannels.values().next().value;
+      if (!first) return null;
+      cols = first.cols;
+      rows = first.rows;
+    } else if (entry.cliChannels.size > 0) {
+      const first = entry.cliChannels.values().next().value;
+      if (!first) return null;
+      cols = first.cols;
+      rows = first.rows - 1;
+    } else {
+      return null;
     }
+
+    entry.handle.resize(cols, rows);
+    entry.ptyDimensions = { cols, rows };
+
+    // Notify ALL CLI channels so each can resize its VTerm to match new PTY dims
+    for (const connId of entry.cliChannels.keys()) {
+      Effect.runSync(
+        ipcServer.sendTo(
+          connId,
+          JSON.stringify({ type: 'session:pty-resized', sessionId, ptyCols: cols, ptyRows: rows })
+        )
+      );
+    }
+
+    // Notify API so it can forward to browser WS connections → xterm.js resizes
+    Effect.runSync(wsClient.send({ type: 'terminal:pty-resized', sessionId, cols, rows }));
+
+    return { cols, rows };
   }
 
   // IPC Server (created early so WS handler can reference it)
@@ -205,6 +232,26 @@ export const runDaemon = Effect.gen(function* () {
         );
       }
     }
+
+    // Safety net: recently-ended sessions not yet marked resumable
+    // (handles timing races where the file wasn't flushed at exact exit moment)
+    const recentlyEnded = store.getRecentlyEndedClaudeSessionsWithId(5 * 60 * 1000);
+    for (const row of recentlyEnded) {
+      if (checkClaudeSessionResumable(row.claude_session_id, row.cwd)) {
+        store.setResumable(row.id, true);
+        Effect.runSync(
+          wsClient.send({
+            type: 'session:resumable-changed',
+            sessionId: row.id,
+            resumable: true,
+            timestamp: Date.now(),
+          })
+        );
+        console.log(
+          `[daemon] Session ${row.id} resumable updated: false -> true (post-exit check)`
+        );
+      }
+    }
   }, 5_000);
 
   yield* Effect.addFinalizer(() =>
@@ -265,11 +312,10 @@ export const runDaemon = Effect.gen(function* () {
       case 'terminal:resize': {
         const entry = ptyHandles.get(msg.sessionId);
         if (entry) {
-          entry.browserConnected = true;
-          entry.browserDimensions = { cols: msg.cols, rows: msg.rows };
+          entry.browserChannels.set(msg.browserConnId, { cols: msg.cols, rows: msg.rows });
           applyResizePriority(msg.sessionId);
           console.log(
-            `[daemon] terminal:resize (browser) sessionId=${msg.sessionId} cols=${msg.cols} rows=${msg.rows}`
+            `[daemon] terminal:resize (browser) sessionId=${msg.sessionId} browserConnId=${msg.browserConnId} cols=${msg.cols} rows=${msg.rows}`
           );
         }
         break;
@@ -277,12 +323,24 @@ export const runDaemon = Effect.gen(function* () {
       case 'terminal:browser-disconnected': {
         const entry = ptyHandles.get(msg.sessionId);
         if (entry) {
-          entry.browserConnected = false;
+          entry.browserChannels.delete(msg.browserConnId);
           applyResizePriority(msg.sessionId);
           console.log(
-            `[daemon] Browser disconnected for session ${msg.sessionId}, reverted to CLI dimensions`
+            `[daemon] Browser channel ${msg.browserConnId} disconnected from session ${msg.sessionId}`
           );
         }
+        break;
+      }
+      case 'terminal:chunks-request': {
+        const chunks = store.getAllTerminalChunks(msg.sessionId);
+        Effect.runSync(
+          wsClient.send({
+            type: 'terminal:chunks-response',
+            requestId: msg.requestId,
+            sessionId: msg.sessionId,
+            chunks,
+          })
+        );
         break;
       }
       case 'session:spawn-request': {
@@ -308,10 +366,9 @@ export const runDaemon = Effect.gen(function* () {
           .then((handle) => {
             const entry: PtyEntry = {
               handle,
-              cliConnId: null,
-              cliDimensions: { cols: msg.cols, rows: msg.rows - 1 },
-              browserDimensions: { cols: msg.cols, rows: msg.rows },
-              browserConnected: true,
+              cliChannels: new Map(),
+              browserChannels: new Map(),
+              ptyDimensions: { cols: msg.cols, rows: msg.rows },
             };
             ptyHandles.set(msg.sessionId, entry);
 
@@ -342,11 +399,11 @@ export const runDaemon = Effect.gen(function* () {
               const ts = Date.now();
               store.appendTerminalChunk(msg.sessionId, base64, ts);
 
-              // Send to CLI if attached
-              if (entry.cliConnId) {
+              // Fan-out to all CLI channels
+              for (const connId of entry.cliChannels.keys()) {
                 Effect.runSync(
                   ipcServer.sendTo(
-                    entry.cliConnId,
+                    connId,
                     JSON.stringify({
                       type: 'session:pty-output',
                       sessionId: msg.sessionId,
@@ -369,7 +426,26 @@ export const runDaemon = Effect.gen(function* () {
 
             // Monitor for PTY exit
             handle.wait().then((exitCode: number) => {
-              const resumable = store.markSessionEnded(msg.sessionId, 'ended', exitCode);
+              const sessionRow = store.getSessionById(msg.sessionId);
+              const resumable =
+                sessionRow?.agent_type === 'claude' &&
+                sessionRow.claude_session_id != null &&
+                checkClaudeSessionResumable(sessionRow.claude_session_id, sessionRow.cwd);
+              store.markSessionEnded(msg.sessionId, 'ended', exitCode, resumable);
+
+              for (const connId of entry.cliChannels.keys()) {
+                Effect.runSync(
+                  ipcServer.sendTo(
+                    connId,
+                    JSON.stringify({
+                      type: 'session:pty-exited',
+                      sessionId: msg.sessionId,
+                      exitCode,
+                    })
+                  )
+                );
+              }
+
               Effect.runSync(
                 wsClient.send({
                   type: 'session:ended',
@@ -478,10 +554,9 @@ export const runDaemon = Effect.gen(function* () {
           .then((handle) => {
             const entry: PtyEntry = {
               handle,
-              cliConnId: null,
-              cliDimensions: { cols: msg.cols, rows: msg.rows - 1 },
-              browserDimensions: { cols: msg.cols, rows: msg.rows },
-              browserConnected: true,
+              cliChannels: new Map(),
+              browserChannels: new Map(),
+              ptyDimensions: { cols: msg.cols, rows: msg.rows },
             };
             ptyHandles.set(msg.sessionId, entry);
 
@@ -510,10 +585,10 @@ export const runDaemon = Effect.gen(function* () {
               const ts = Date.now();
               store.appendTerminalChunk(msg.sessionId, base64, ts);
 
-              if (entry.cliConnId) {
+              for (const connId of entry.cliChannels.keys()) {
                 Effect.runSync(
                   ipcServer.sendTo(
-                    entry.cliConnId,
+                    connId,
                     JSON.stringify({
                       type: 'session:pty-output',
                       sessionId: msg.sessionId,
@@ -534,7 +609,26 @@ export const runDaemon = Effect.gen(function* () {
             });
 
             handle.wait().then((exitCode: number) => {
-              const resumable = store.markSessionEnded(msg.sessionId, 'ended', exitCode);
+              const sessionRow = store.getSessionById(msg.sessionId);
+              const resumable =
+                sessionRow?.agent_type === 'claude' &&
+                sessionRow.claude_session_id != null &&
+                checkClaudeSessionResumable(sessionRow.claude_session_id, sessionRow.cwd);
+              store.markSessionEnded(msg.sessionId, 'ended', exitCode, resumable);
+
+              for (const connId of entry.cliChannels.keys()) {
+                Effect.runSync(
+                  ipcServer.sendTo(
+                    connId,
+                    JSON.stringify({
+                      type: 'session:pty-exited',
+                      sessionId: msg.sessionId,
+                      exitCode,
+                    })
+                  )
+                );
+              }
+
               Effect.runSync(
                 wsClient.send({
                   type: 'session:ended',
@@ -678,7 +772,6 @@ export const runDaemon = Effect.gen(function* () {
             yield* Ref.update(sessions, (map) => new Map([...map, [msg.sessionId, session]]));
             store.upsertSession(session, 'interactive');
             store.updateClaudeSessionId(msg.sessionId, msg.sessionId);
-            sessionConnections.set(msg.sessionId, conn.id);
             connSessions.set(conn.id, msg.sessionId);
 
             // Spawn PTY in daemon — daemon owns it
@@ -706,10 +799,9 @@ export const runDaemon = Effect.gen(function* () {
 
             const entry: PtyEntry = {
               handle,
-              cliConnId: conn.id,
-              cliDimensions: { cols: msg.cols, rows: msg.rows - 1 },
-              browserDimensions: null,
-              browserConnected: false,
+              cliChannels: new Map([[conn.id, { cols: msg.cols, rows: msg.rows }]]),
+              browserChannels: new Map(),
+              ptyDimensions: { cols: msg.cols, rows: msg.rows - 1 },
             };
             ptyHandles.set(msg.sessionId, entry);
 
@@ -753,11 +845,11 @@ export const runDaemon = Effect.gen(function* () {
               const ts = Date.now();
               store.appendTerminalChunk(msg.sessionId, base64, ts);
 
-              // Send to CLI if connected
-              if (entry.cliConnId) {
+              // Fan-out to all CLI channels
+              for (const connId of entry.cliChannels.keys()) {
                 Effect.runSync(
                   ipcServer.sendTo(
-                    entry.cliConnId,
+                    connId,
                     JSON.stringify({
                       type: 'session:pty-output',
                       sessionId: msg.sessionId,
@@ -780,12 +872,17 @@ export const runDaemon = Effect.gen(function* () {
 
             // 4. Monitor for PTY exit
             handle.wait().then((exitCode: number) => {
-              const resumable = store.markSessionEnded(msg.sessionId, 'ended', exitCode);
+              const sessionRow = store.getSessionById(msg.sessionId);
+              const resumable =
+                sessionRow?.agent_type === 'claude' &&
+                sessionRow.claude_session_id != null &&
+                checkClaudeSessionResumable(sessionRow.claude_session_id, sessionRow.cwd);
+              store.markSessionEnded(msg.sessionId, 'ended', exitCode, resumable);
 
-              if (entry.cliConnId) {
+              for (const connId of entry.cliChannels.keys()) {
                 Effect.runSync(
                   ipcServer.sendTo(
-                    entry.cliConnId,
+                    connId,
                     JSON.stringify({
                       type: 'session:pty-exited',
                       sessionId: msg.sessionId,
@@ -854,8 +951,8 @@ export const runDaemon = Effect.gen(function* () {
           }
           case 'session:cli-resize': {
             const entry = ptyHandles.get(msg.sessionId);
-            if (entry) {
-              entry.cliDimensions = { cols: msg.cols, rows: msg.rows - 1 };
+            if (entry?.cliChannels.has(conn.id)) {
+              entry.cliChannels.set(conn.id, { cols: msg.cols, rows: msg.rows });
               applyResizePriority(msg.sessionId);
               console.log(
                 `[daemon] cli-resize sessionId=${msg.sessionId} cols=${msg.cols} rows=${msg.rows}`
@@ -866,7 +963,9 @@ export const runDaemon = Effect.gen(function* () {
           case 'session:detach': {
             const entry = ptyHandles.get(msg.sessionId);
             if (entry) {
-              entry.cliConnId = null;
+              entry.cliChannels.delete(conn.id);
+              connSessions.delete(conn.id);
+              applyResizePriority(msg.sessionId);
               console.log(`[daemon] CLI detached from session ${msg.sessionId}, PTY kept alive`);
             }
             break;
@@ -874,22 +973,37 @@ export const runDaemon = Effect.gen(function* () {
           case 'session:attach': {
             const entry = ptyHandles.get(msg.sessionId);
             if (entry) {
-              entry.cliConnId = conn.id;
-              entry.cliDimensions = { cols: msg.cols, rows: msg.rows };
-              sessionConnections.set(msg.sessionId, conn.id);
+              entry.cliChannels.set(conn.id, { cols: msg.cols, rows: msg.rows });
               connSessions.set(conn.id, msg.sessionId);
-              applyResizePriority(msg.sessionId);
+
+              // Always force PTY resize to CLI dims — VTerm must match PTY must match CLI terminal.
+              // Browser's xterm.js adapts via SIGWINCH → Claude Code redraws at new size.
+              const cliRows = msg.rows - 1; // reserve 1 row for status bar
+              entry.handle.resize(msg.cols, cliRows);
+              entry.ptyDimensions = { cols: msg.cols, rows: cliRows };
+              // Notify API → browsers so xterm.js resizes to match new PTY dims immediately
+              Effect.runSync(
+                wsClient.send({
+                  type: 'terminal:pty-resized',
+                  sessionId: msg.sessionId,
+                  cols: msg.cols,
+                  rows: cliRows,
+                })
+              );
 
               conn.send(
                 JSON.stringify({
                   type: 'session:spawned',
                   sessionId: msg.sessionId,
                   pid: entry.handle.pid,
+                  ptyCols: msg.cols,
+                  ptyRows: cliRows,
+                  forcedResize: true,
                 })
               );
 
-              // Replay recent terminal history so the CLI sees the current TUI state
-              const chunks = store.getTerminalChunks(msg.sessionId, 200);
+              // Replay full terminal history so the CLI sees the current TUI state
+              const chunks = store.getAllTerminalChunks(msg.sessionId);
               for (const chunk of chunks) {
                 conn.send(
                   JSON.stringify({
@@ -899,18 +1013,15 @@ export const runDaemon = Effect.gen(function* () {
                   })
                 );
               }
-
-              // Force a resize to make the PTY application redraw its TUI.
-              // Use priority dimensions (browser wins if connected) to avoid
-              // overriding the browser's viewport with the CLI's dimensions.
-              if (entry.browserConnected && entry.browserDimensions) {
-                entry.handle.resize(entry.browserDimensions.cols, entry.browserDimensions.rows);
-              } else {
-                entry.handle.resize(msg.cols, msg.rows - 1);
-              }
+              conn.send(
+                JSON.stringify({
+                  type: 'session:replay-complete',
+                  sessionId: msg.sessionId,
+                })
+              );
 
               console.log(
-                `[daemon] CLI attached to session ${msg.sessionId} (replayed ${chunks.length} chunks)`
+                `[daemon] CLI attached to session ${msg.sessionId}, PTY forced to ${msg.cols}x${cliRows} (replayed ${chunks.length} chunks)`
               );
             } else {
               conn.send(
@@ -935,7 +1046,12 @@ export const runDaemon = Effect.gen(function* () {
             break;
           }
           case 'session:done': {
-            const resumable = store.markSessionEnded(msg.sessionId, 'ended', msg.exitCode);
+            const sessionRow = store.getSessionById(msg.sessionId);
+            const resumable =
+              sessionRow?.agent_type === 'claude' &&
+              sessionRow.claude_session_id != null &&
+              checkClaudeSessionResumable(sessionRow.claude_session_id, sessionRow.cwd);
+            store.markSessionEnded(msg.sessionId, 'ended', msg.exitCode, resumable);
             yield* Ref.update(sessions, (map) => {
               const newMap = new Map(map);
               const session = newMap.get(msg.sessionId);
@@ -958,7 +1074,7 @@ export const runDaemon = Effect.gen(function* () {
             break;
           }
           case 'session:error': {
-            store.markSessionEnded(msg.sessionId, 'error', -1);
+            store.markSessionEnded(msg.sessionId, 'error', -1, false);
             yield* Ref.update(sessions, (map) => {
               const newMap = new Map(map);
               const session = newMap.get(msg.sessionId);
@@ -993,20 +1109,22 @@ export const runDaemon = Effect.gen(function* () {
             break;
           }
           case 'session:resume': {
-            const session: AgentSession = {
-              id: msg.sessionId,
-              agentType: 'claude',
-              cwd: msg.cwd,
-              gitBranch: msg.gitBranch,
-              gitRemoteUrl: msg.gitRemoteUrl,
-              repoName: msg.repoName,
-              startedAt: Date.now(),
-              status: 'active',
-            };
+            const existingSession = store.getSession(msg.sessionId);
+            const session: AgentSession = existingSession
+              ? { ...existingSession, status: 'active' }
+              : {
+                  id: msg.sessionId,
+                  agentType: 'claude',
+                  cwd: msg.cwd,
+                  gitBranch: msg.gitBranch,
+                  gitRemoteUrl: msg.gitRemoteUrl,
+                  repoName: msg.repoName,
+                  startedAt: Date.now(),
+                  status: 'active',
+                };
 
             yield* Ref.update(sessions, (map) => new Map([...map, [msg.sessionId, session]]));
-            store.upsertSession(session, 'interactive');
-            sessionConnections.set(msg.sessionId, conn.id);
+            store.reactivateSession(msg.sessionId);
             connSessions.set(conn.id, msg.sessionId);
 
             const handleResult = yield* Effect.result(
@@ -1034,10 +1152,9 @@ export const runDaemon = Effect.gen(function* () {
 
             const entry: PtyEntry = {
               handle,
-              cliConnId: conn.id,
-              cliDimensions: { cols: msg.cols, rows: msg.rows - 1 },
-              browserDimensions: null,
-              browserConnected: false,
+              cliChannels: new Map([[conn.id, { cols: msg.cols, rows: msg.rows }]]),
+              browserChannels: new Map(),
+              ptyDimensions: { cols: msg.cols, rows: msg.rows - 1 },
             };
             ptyHandles.set(msg.sessionId, entry);
 
@@ -1072,10 +1189,11 @@ export const runDaemon = Effect.gen(function* () {
               const ts = Date.now();
               store.appendTerminalChunk(msg.sessionId, base64, ts);
 
-              if (entry.cliConnId) {
+              // Fan-out to all CLI channels
+              for (const connId of entry.cliChannels.keys()) {
                 Effect.runSync(
                   ipcServer.sendTo(
-                    entry.cliConnId,
+                    connId,
                     JSON.stringify({
                       type: 'session:pty-output',
                       sessionId: msg.sessionId,
@@ -1096,12 +1214,17 @@ export const runDaemon = Effect.gen(function* () {
             });
 
             handle.wait().then((exitCode: number) => {
-              const resumable = store.markSessionEnded(msg.sessionId, 'ended', exitCode);
+              const sessionRow = store.getSessionById(msg.sessionId);
+              const resumable =
+                sessionRow?.agent_type === 'claude' &&
+                sessionRow.claude_session_id != null &&
+                checkClaudeSessionResumable(sessionRow.claude_session_id, sessionRow.cwd);
+              store.markSessionEnded(msg.sessionId, 'ended', exitCode, resumable);
 
-              if (entry.cliConnId) {
+              for (const connId of entry.cliChannels.keys()) {
                 Effect.runSync(
                   ipcServer.sendTo(
-                    entry.cliConnId,
+                    connId,
                     JSON.stringify({
                       type: 'session:pty-exited',
                       sessionId: msg.sessionId,
@@ -1159,7 +1282,8 @@ export const runDaemon = Effect.gen(function* () {
             break;
           }
           case 'session:deregister': {
-            const resumable = store.markSessionEnded(msg.sessionId, 'ended', 0);
+            const resumable = false;
+            store.markSessionEnded(msg.sessionId, 'ended', 0, false);
             yield* Ref.update(sessions, (map) => {
               const newMap = new Map(map);
               newMap.delete(msg.sessionId);
@@ -1193,13 +1317,30 @@ export const runDaemon = Effect.gen(function* () {
 
           if (entry) {
             // Interactive session with daemon-owned PTY: just mark CLI as detached, keep PTY alive
-            entry.cliConnId = null;
+            entry.cliChannels.delete(connId);
             connSessions.delete(connId);
-            sessionConnections.delete(sessionId);
+            applyResizePriority(sessionId);
             console.log(`[daemon] CLI connection lost for session ${sessionId}, PTY kept alive`);
           } else {
-            // Non-interactive session: clean up fully
-            store.markSessionEnded(sessionId, 'ended', -1);
+            // No live PTY — check if session already ended (interactive PTY just finished)
+            // vs. still-active non-interactive session that lost its connection.
+            const sessionRow = store.getSessionById(sessionId);
+            const alreadyEnded = sessionRow?.status === 'ended' || sessionRow?.status === 'error';
+
+            if (!alreadyEnded) {
+              // Non-interactive session that lost connection before finishing
+              store.markSessionEnded(sessionId, 'ended', -1, false);
+              yield* wsClient.send({
+                type: 'session:ended',
+                sessionId,
+                exitCode: -1,
+                resumable: false,
+                timestamp: Date.now(),
+              });
+              console.log(`[daemon] Connection lost for session: ${sessionId}`);
+            }
+
+            // Always clean up in-memory state
             yield* Ref.update(sessions, (map) => {
               const newMap = new Map(map);
               newMap.delete(sessionId);
@@ -1207,16 +1348,6 @@ export const runDaemon = Effect.gen(function* () {
             });
             sessionConnections.delete(sessionId);
             connSessions.delete(connId);
-
-            yield* wsClient.send({
-              type: 'session:ended',
-              sessionId,
-              exitCode: -1,
-              resumable: false,
-              timestamp: Date.now(),
-            });
-
-            console.log(`[daemon] Connection lost for session: ${sessionId}`);
           }
         }
       })

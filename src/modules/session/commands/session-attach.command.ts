@@ -9,7 +9,6 @@ import { initStatusBar, resizeStatusBar, teardownStatusBar } from '#terminal/sta
 import { createTuiRenderer } from '#vterm/tui-renderer.js';
 import { createVTerm } from '#vterm/vterm.js';
 import { createUnixSocketClient } from '../adapters/unix-socket-client.adapter.js';
-import { sessionResumeCommand } from './session-resume.command.js';
 
 function formatDuration(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
@@ -40,6 +39,13 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
     const rows = db
       .prepare('SELECT * FROM sessions WHERE id LIKE $prefix')
       .all({ $prefix: `${partialId}%` }) as SessionRow[];
+    const inputHistory = rows[0]
+      ? (db
+          .prepare(
+            'SELECT text, source FROM input_history WHERE session_id = $id ORDER BY timestamp ASC LIMIT 50'
+          )
+          .all({ $id: rows[0].id }) as Array<{ text: string; source: string }>)
+      : [];
     db.close();
 
     if (rows.length === 0) {
@@ -58,16 +64,8 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
     const session = rows[0];
 
     if (session.status !== 'active') {
-      if (
-        session.agent_type === 'claude' &&
-        session.mode === 'interactive' &&
-        session.claude_session_id
-      ) {
-        yield* sessionResumeCommand(partialId);
-        return;
-      }
       yield* Console.error(
-        `Session ${session.id.slice(0, 8)} is ${session.status}. Session ended and cannot be resumed.`
+        `Session ${session.id.slice(0, 8)} has ended. Use \`tmonier session resume --id ${session.id.slice(0, 8)}\` to start a new session continuing from it.`
       );
       return;
     }
@@ -90,7 +88,7 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
 
     const cols = process.stdout.columns ?? 80;
     const rows_ = process.stdout.rows ?? 24;
-    const viewportRows = rows_ - 1;
+    let viewportRows = rows_ - 1;
 
     const vterm = createVTerm({ cols, rows: viewportRows });
     const renderer = createTuiRenderer({ cols, rows: rows_, reservedBottom: 1 });
@@ -124,6 +122,26 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
       resolveDisconnect = resolve;
     });
 
+    // replayDrainPromise resolves when the daemon has sent all replay chunks
+    // AND all those writes have been fully parsed by xterm (write counter hits 0).
+    let resolveReplayDrain: () => void;
+    const replayDrainPromise = new Promise<void>((resolve) => {
+      resolveReplayDrain = resolve;
+    });
+    let replayMsgReceived = false;
+    let pendingReplayWrites = 0;
+    let spawnForcedResize = false;
+    // rendererActive gates all render callbacks — set synchronously after renderer.activate()
+    let rendererActive = false;
+    // Called on each live pty-output during the forced-resize quiet window
+    let onLivePtyOutput: (() => void) | null = null;
+    // Tracks the current rowOffset so we can detect when the cursor scrolls outside the viewport
+    let currentRowOffset = 0;
+
+    function checkReplayDrain() {
+      if (replayMsgReceived && pendingReplayWrites === 0) resolveReplayDrain();
+    }
+
     client.onClose(() => {
       resolveDisconnect();
     });
@@ -133,6 +151,10 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
 
       switch (msg.type) {
         case 'session:spawned':
+          if (msg.ptyCols && msg.ptyRows) {
+            vterm.resize(msg.ptyCols, msg.ptyRows);
+          }
+          spawnForcedResize = msg.forcedResize ?? false;
           resolveSpawn();
           break;
         case 'session:spawn-failed':
@@ -141,13 +163,49 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
         case 'session:error-response':
           rejectSpawn(new Error(msg.error));
           break;
+        case 'session:replay-complete':
+          replayMsgReceived = true;
+          checkReplayDrain();
+          break;
         case 'session:pty-output': {
           const bytes = Buffer.from(msg.data, 'base64');
-          vterm.write(bytes, () => renderer.render(vterm.getScreen()));
+          if (!replayMsgReceived) {
+            // Replay write — track it so we know when xterm has processed all of them
+            pendingReplayWrites++;
+            vterm.write(bytes, () => {
+              pendingReplayWrites--;
+              checkReplayDrain();
+              if (rendererActive) renderer.render(vterm.getScreen());
+            });
+          } else {
+            onLivePtyOutput?.();
+            vterm.write(bytes, () => {
+              if (rendererActive) {
+                const screen = vterm.getScreen();
+                const newRowOffset = Math.max(0, screen.cursorY - viewportRows + 1);
+                if (newRowOffset !== currentRowOffset) {
+                  currentRowOffset = newRowOffset;
+                  renderer.setRowOffset(newRowOffset);
+                  renderer.fullRender(screen);
+                } else {
+                  renderer.render(screen);
+                }
+              }
+            });
+          }
           break;
         }
         case 'session:pty-exited':
           resolveExit(msg.exitCode);
+          break;
+        case 'session:pty-resized':
+          vterm.resize(msg.ptyCols, msg.ptyRows);
+          if (rendererActive) {
+            const screen = vterm.getScreen();
+            currentRowOffset = Math.max(0, screen.cursorY - viewportRows + 1);
+            renderer.setRowOffset(currentRowOffset);
+            renderer.fullRender(screen);
+          }
           break;
       }
     });
@@ -161,9 +219,45 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
     });
 
     yield* Effect.promise(() => spawnPromise);
+    // Wait until all replay chunks are fully parsed by xterm.
+    // 500ms fallback for daemons that predate session:replay-complete.
+    yield* Effect.promise(() =>
+      Promise.race([replayDrainPromise, new Promise<void>((r) => setTimeout(r, 500))])
+    );
+    // When the daemon forced a PTY resize (CLI-only session), Claude Code redraws
+    // its TUI in response to SIGWINCH. Those bytes arrive as live pty-output and
+    // must be fully parsed before we snapshot the screen with fullRender.
+    // Use quiet detection: wait until 300ms of silence after the last live pty-output
+    // (max 3s) so we snapshot after the redraw has fully settled.
+    if (spawnForcedResize) {
+      yield* Effect.promise(() =>
+        new Promise<void>((resolve) => {
+          let quietTimer: ReturnType<typeof setTimeout> = setTimeout(resolve, 300);
+          onLivePtyOutput = () => {
+            clearTimeout(quietTimer);
+            quietTimer = setTimeout(resolve, 300);
+          };
+          setTimeout(resolve, 3000);
+        }).finally(() => {
+          onLivePtyOutput = null;
+        })
+      );
+    }
+
+    const shortId = session.id.slice(0, 8);
+
+    // Print input history so the user can scroll up to see what happened
+    if (inputHistory.length > 0) {
+      const sep = '\u2500'.repeat(50);
+      process.stdout.write(`\x1b[2m${sep}\x1b[0m\n`);
+      for (const entry of inputHistory) {
+        const prefix = entry.source === 'browser' ? '\x1b[2m[web]\x1b[0m' : '\x1b[2m[cli]\x1b[0m';
+        process.stdout.write(`${prefix} \x1b[1m›\x1b[0m ${entry.text}\n`);
+      }
+      process.stdout.write(`\x1b[2m${sep}\x1b[0m\n`);
+    }
 
     // Pre-launch banner — visible before Claude Code's TUI takes over
-    const shortId = session.id.slice(0, 8);
     const bannerWidth = 50;
     const line1 = `  \u2699 tmonier session ${shortId}`;
     const line2 = '  Ctrl-B d: detach | dashboard: app.tmonier.com';
@@ -182,6 +276,11 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
     }
 
     renderer.activate();
+    rendererActive = true;
+    const initScreen = vterm.getScreen();
+    currentRowOffset = Math.max(0, initScreen.cursorY - viewportRows + 1);
+    renderer.setRowOffset(currentRowOffset);
+    renderer.fullRender(initScreen);
 
     const startedAt = Date.now();
     initStatusBar(renderer, session.id, startedAt);
@@ -246,9 +345,13 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
       const newCols = process.stdout.columns ?? 80;
       const newRows = process.stdout.rows ?? 24;
       const newViewportRows = newRows - 1;
-      vterm.resize(newCols, newViewportRows);
+      viewportRows = newViewportRows;
+      // VTerm stays at PTY dims — do NOT call vterm.resize()
       renderer.resize(newCols, newRows);
-      renderer.fullRender(vterm.getScreen());
+      const resizeScreen = vterm.getScreen();
+      currentRowOffset = Math.max(0, resizeScreen.cursorY - newViewportRows + 1);
+      renderer.setRowOffset(currentRowOffset);
+      renderer.fullRender(resizeScreen);
       resizeStatusBar();
       // daemon does its own rows-1, so send full newRows
       Effect.runSync(

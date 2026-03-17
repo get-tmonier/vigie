@@ -6,6 +6,7 @@ function createMockRenderer() {
     render: mock(() => {}),
     fullRender: mock(() => {}),
     resize: mock(() => {}),
+    setRowOffset: mock((_n: number) => {}),
     setStatusBar: mock((_text: string) => {}),
     activate: mock(() => {}),
     deactivate: mock(() => {}),

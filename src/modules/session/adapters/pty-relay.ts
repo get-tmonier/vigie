@@ -103,6 +103,26 @@ export function attachPtyRelay(
     renderer.activate();
     initStatusBar(renderer, sessionId, startedAt, options.infoLine);
 
+    // Restore terminal on unexpected signals — without this, the process would
+    // exit with raw mode + alt screen still active, leaving the terminal frozen.
+    const restoreTerminal = () => {
+      renderer.deactivate();
+      teardownStatusBar(false);
+      if (process.stdin.isTTY) {
+        process.stdin.setRawMode(false);
+      }
+    };
+    const onSigint = () => {
+      restoreTerminal();
+      process.exit(130);
+    };
+    const onSigterm = () => {
+      restoreTerminal();
+      process.exit(143);
+    };
+    process.once('SIGINT', onSigint);
+    process.once('SIGTERM', onSigterm);
+
     // Forward stdin to daemon via a dedicated stdin socket.
     // The main IPC socket has a Bun bug where heavy server->client writes
     // (PTY output) prevent the data handler from firing for client->server data.
@@ -192,6 +212,9 @@ export function attachPtyRelay(
     );
 
     // Cleanup
+    process.off('SIGINT', onSigint);
+    process.off('SIGTERM', onSigterm);
+
     interceptor.destroy();
     renderer.deactivate();
     vterm.dispose();

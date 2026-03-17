@@ -119,10 +119,17 @@ describe('terminal message schemas', () => {
   });
 
   it('parses terminal:resize downstream', () => {
-    const msg = { type: 'terminal:resize', sessionId: 's-1', cols: 120, rows: 40 };
+    const msg = {
+      type: 'terminal:resize',
+      sessionId: 's-1',
+      browserConnId: 'conn-1',
+      cols: 120,
+      rows: 40,
+    };
     const result = v.parse(TerminalResizeDownstreamSchema, msg);
     expect(result.cols).toBe(120);
     expect(result.rows).toBe(40);
+    expect(result.browserConnId).toBe('conn-1');
   });
 
   it('terminal:input is part of downstream union', () => {
@@ -138,6 +145,7 @@ describe('terminal message schemas', () => {
     const result = v.parse(DownstreamMessageSchema, {
       type: 'terminal:resize',
       sessionId: 's-1',
+      browserConnId: 'conn-1',
       cols: 80,
       rows: 24,
     });

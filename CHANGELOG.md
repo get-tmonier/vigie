@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Session resume (`tmonier session resume`) no longer creates a new session — it reuses the existing session ID and reactivates the DB row in-place
+- Ctrl+C to end a session no longer marks it "not resumable" — the disconnect handler now checks whether the session already ended before overwriting its resumable state
+- PTY dimensions are now forced to the CLI terminal size on attach, with an immediate resize notification sent to the backend
+- Attached CLI now correctly receives a PTY exit notification when a browser-started session ends
+- Host terminal no longer freezes after Ctrl+C or SIGTERM — raw terminal state is restored in the pty-relay before process exit
+- Terminal output is no longer duplicated when resuming a session — the TUI renderer state is cleared on resume before replaying buffered output
+
 ### Added
 
 - `tmonier claude` command for running Claude Code sessions with streaming output and session summaries

@@ -62,7 +62,7 @@ describe('session-store', () => {
   describe('markSessionEnded', () => {
     it('updates status and exit code', () => {
       store.upsertSession(baseSession, 'prompt');
-      store.markSessionEnded('session-1', 'ended', 0);
+      store.markSessionEnded('session-1', 'ended', 0, false);
       const rows = store.getAllSessions();
       expect(rows).toHaveLength(1);
       expect(rows[0].status).toBe('ended');
@@ -72,10 +72,43 @@ describe('session-store', () => {
 
     it('marks error status', () => {
       store.upsertSession(baseSession, 'prompt');
-      store.markSessionEnded('session-1', 'error', -1);
+      store.markSessionEnded('session-1', 'error', -1, false);
       const rows = store.getAllSessions();
       expect(rows[0].status).toBe('error');
       expect(rows[0].exit_code).toBe(-1);
+    });
+
+    it('stores resumable=true when passed true', () => {
+      store.upsertSession(baseSession, 'interactive');
+      const result = store.markSessionEnded('session-1', 'ended', 0, true);
+      expect(result).toBe(true);
+      const rows = store.getAllSessions();
+      expect(rows[0].resumable).toBe(1);
+    });
+
+    it('stores resumable=false when passed false', () => {
+      store.upsertSession(baseSession, 'interactive');
+      const result = store.markSessionEnded('session-1', 'ended', 143, false);
+      expect(result).toBe(false);
+      const rows = store.getAllSessions();
+      expect(rows[0].resumable).toBe(0);
+    });
+
+    it('resumable=true even with non-zero exit code (SIGTERM)', () => {
+      store.upsertSession(baseSession, 'interactive');
+      store.updateClaudeSessionId('session-1', 'claude-abc');
+      const result = store.markSessionEnded('session-1', 'ended', 143, true);
+      expect(result).toBe(true);
+      const rows = store.getAllSessions();
+      expect(rows[0].resumable).toBe(1);
+    });
+
+    it('resumable=false even with exit code 0', () => {
+      store.upsertSession(baseSession, 'interactive');
+      const result = store.markSessionEnded('session-1', 'ended', 0, false);
+      expect(result).toBe(false);
+      const rows = store.getAllSessions();
+      expect(rows[0].resumable).toBe(0);
     });
   });
 
@@ -152,10 +185,224 @@ describe('session-store', () => {
     });
   });
 
+  describe('getActiveClaudeSessionsWithId', () => {
+    it('returns only active claude sessions with a claude_session_id', () => {
+      store.upsertSession(baseSession, 'interactive');
+      store.updateClaudeSessionId('session-1', 'claude-abc');
+      store.upsertSession({ ...baseSession, id: 'session-2' }, 'interactive');
+      // session-2 has no claude_session_id
+
+      const rows = store.getActiveClaudeSessionsWithId();
+      expect(rows).toHaveLength(1);
+      expect(rows[0].id).toBe('session-1');
+      expect(rows[0].claude_session_id).toBe('claude-abc');
+    });
+
+    it('excludes ended sessions', () => {
+      store.upsertSession(baseSession, 'interactive');
+      store.updateClaudeSessionId('session-1', 'claude-abc');
+      store.markSessionEnded('session-1', 'ended', 0, true);
+
+      const rows = store.getActiveClaudeSessionsWithId();
+      expect(rows).toHaveLength(0);
+    });
+
+    it('excludes non-claude agent types', () => {
+      const nonClaude: AgentSession = { ...baseSession, id: 'session-2', agentType: 'generic' };
+      store.upsertSession(nonClaude, 'interactive');
+      db.run("UPDATE sessions SET claude_session_id = 'some-id' WHERE id = 'session-2'");
+
+      const rows = store.getActiveClaudeSessionsWithId();
+      expect(rows).toHaveLength(0);
+    });
+  });
+
+  describe('setResumable', () => {
+    it('updates resumable to true', () => {
+      store.upsertSession(baseSession, 'interactive');
+      store.markSessionEnded('session-1', 'ended', 0, false);
+      store.setResumable('session-1', true);
+
+      const row = store.getSessionById('session-1');
+      expect(row?.resumable).toBe(1);
+    });
+
+    it('updates resumable to false', () => {
+      store.upsertSession(baseSession, 'interactive');
+      store.markSessionEnded('session-1', 'ended', 0, true);
+      store.setResumable('session-1', false);
+
+      const row = store.getSessionById('session-1');
+      expect(row?.resumable).toBe(0);
+    });
+  });
+
+  describe('getRecentlyEndedClaudeSessionsWithId', () => {
+    it('returns recently ended claude sessions with resumable=0', () => {
+      store.upsertSession(baseSession, 'interactive');
+      store.updateClaudeSessionId('session-1', 'claude-abc');
+      store.markSessionEnded('session-1', 'ended', 0, false);
+
+      const rows = store.getRecentlyEndedClaudeSessionsWithId(60_000);
+      expect(rows).toHaveLength(1);
+      expect(rows[0].id).toBe('session-1');
+      expect(rows[0].claude_session_id).toBe('claude-abc');
+      expect(rows[0].resumable).toBe(0);
+    });
+
+    it('excludes sessions already marked resumable', () => {
+      store.upsertSession(baseSession, 'interactive');
+      store.updateClaudeSessionId('session-1', 'claude-abc');
+      store.markSessionEnded('session-1', 'ended', 0, true);
+
+      const rows = store.getRecentlyEndedClaudeSessionsWithId(60_000);
+      expect(rows).toHaveLength(0);
+    });
+
+    it('excludes active sessions', () => {
+      store.upsertSession(baseSession, 'interactive');
+      store.updateClaudeSessionId('session-1', 'claude-abc');
+
+      const rows = store.getRecentlyEndedClaudeSessionsWithId(60_000);
+      expect(rows).toHaveLength(0);
+    });
+
+    it('excludes sessions ended before the time window', () => {
+      store.upsertSession(baseSession, 'interactive');
+      store.updateClaudeSessionId('session-1', 'claude-abc');
+      store.markSessionEnded('session-1', 'ended', 0, false);
+      // Backdate ended_at to well outside the window
+      db.run('UPDATE sessions SET ended_at = 1 WHERE id = ?', ['session-1']);
+
+      const rows = store.getRecentlyEndedClaudeSessionsWithId(60_000);
+      expect(rows).toHaveLength(0);
+    });
+
+    it('excludes sessions with no claude_session_id', () => {
+      store.upsertSession(baseSession, 'interactive');
+      // No updateClaudeSessionId call
+      store.markSessionEnded('session-1', 'ended', 0, false);
+
+      const rows = store.getRecentlyEndedClaudeSessionsWithId(60_000);
+      expect(rows).toHaveLength(0);
+    });
+
+    it('excludes non-claude agent types', () => {
+      const nonClaude: AgentSession = { ...baseSession, id: 'session-2', agentType: 'generic' };
+      store.upsertSession(nonClaude, 'interactive');
+      db.run(
+        `UPDATE sessions SET claude_session_id = 'claude-xyz', ended_at = ${Date.now()}, status = 'ended', resumable = 0 WHERE id = 'session-2'`
+      );
+
+      const rows = store.getRecentlyEndedClaudeSessionsWithId(60_000);
+      expect(rows).toHaveLength(0);
+    });
+
+    it('only returns sessions within the specified time window', () => {
+      // Session 1: ended recently
+      store.upsertSession(baseSession, 'interactive');
+      store.updateClaudeSessionId('session-1', 'claude-abc');
+      store.markSessionEnded('session-1', 'ended', 0, false);
+
+      // Session 2: ended a long time ago
+      store.upsertSession({ ...baseSession, id: 'session-2' }, 'interactive');
+      store.updateClaudeSessionId('session-2', 'claude-def');
+      store.markSessionEnded('session-2', 'ended', 0, false);
+      db.run('UPDATE sessions SET ended_at = 1 WHERE id = ?', ['session-2']);
+
+      const rows = store.getRecentlyEndedClaudeSessionsWithId(60_000);
+      expect(rows).toHaveLength(1);
+      expect(rows[0].id).toBe('session-1');
+    });
+
+    it('returns correct cwd for resumed safety-net check', () => {
+      store.upsertSession(baseSession, 'interactive');
+      store.updateClaudeSessionId('session-1', 'claude-abc');
+      store.markSessionEnded('session-1', 'ended', 0, false);
+
+      const rows = store.getRecentlyEndedClaudeSessionsWithId(60_000);
+      expect(rows[0].cwd).toBe('/home/user/project');
+    });
+  });
+
+  describe('onDisconnect resumable guard (Bug 2 regression)', () => {
+    // These tests simulate the state transitions that exposed Bug 2:
+    // Ctrl+C → PTY exits → markSessionEnded(resumable=true) → PTY deleted
+    // → onDisconnect fires → previously overwrote resumable=true with false
+
+    it('getSessionById returns ended status after markSessionEnded', () => {
+      store.upsertSession(baseSession, 'interactive');
+      store.updateClaudeSessionId('session-1', 'claude-abc');
+      store.markSessionEnded('session-1', 'ended', 0, true);
+
+      const row = store.getSessionById('session-1');
+      expect(row?.status).toBe('ended');
+    });
+
+    it('alreadyEnded is true when session status is ended', () => {
+      store.upsertSession(baseSession, 'interactive');
+      store.markSessionEnded('session-1', 'ended', 0, true);
+
+      const row = store.getSessionById('session-1');
+      const alreadyEnded = row?.status === 'ended' || row?.status === 'error';
+      expect(alreadyEnded).toBe(true);
+    });
+
+    it('alreadyEnded is true when session status is error', () => {
+      store.upsertSession(baseSession, 'interactive');
+      store.markSessionEnded('session-1', 'error', -1, false);
+
+      const row = store.getSessionById('session-1');
+      const alreadyEnded = row?.status === 'ended' || row?.status === 'error';
+      expect(alreadyEnded).toBe(true);
+    });
+
+    it('alreadyEnded is false for active session (non-interactive disconnect path)', () => {
+      store.upsertSession(baseSession, 'interactive');
+      // Session still active — no markSessionEnded called yet
+
+      const row = store.getSessionById('session-1');
+      const alreadyEnded = row?.status === 'ended' || row?.status === 'error';
+      expect(alreadyEnded).toBe(false);
+    });
+
+    it('calling markSessionEnded with resumable=false after resumable=true overwrites it (demonstrates the bug)', () => {
+      store.upsertSession(baseSession, 'interactive');
+      store.updateClaudeSessionId('session-1', 'claude-abc');
+
+      // Step 1: PTY exits, session marked resumable=true
+      store.markSessionEnded('session-1', 'ended', 0, true);
+      expect(store.getSessionById('session-1')?.resumable).toBe(1);
+
+      // Step 2: Without the guard, onDisconnect would overwrite with resumable=false
+      store.markSessionEnded('session-1', 'ended', -1, false);
+      expect(store.getSessionById('session-1')?.resumable).toBe(0); // Bug: now wrong
+    });
+
+    it('skipping markSessionEnded when alreadyEnded preserves resumable=true (demonstrates the fix)', () => {
+      store.upsertSession(baseSession, 'interactive');
+      store.updateClaudeSessionId('session-1', 'claude-abc');
+
+      // Step 1: PTY exits, session marked resumable=true
+      store.markSessionEnded('session-1', 'ended', 0, true);
+
+      // Step 2: onDisconnect fires — check alreadyEnded before calling markSessionEnded
+      const row = store.getSessionById('session-1');
+      const alreadyEnded = row?.status === 'ended' || row?.status === 'error';
+
+      if (!alreadyEnded) {
+        store.markSessionEnded('session-1', 'ended', -1, false);
+      }
+
+      // resumable is preserved because we skipped the overwrite
+      expect(store.getSessionById('session-1')?.resumable).toBe(1);
+    });
+  });
+
   describe('pruneOldSessions', () => {
     it('removes ended sessions older than max age', () => {
       store.upsertSession(baseSession, 'prompt');
-      store.markSessionEnded('session-1', 'ended', 0);
+      store.markSessionEnded('session-1', 'ended', 0, false);
 
       // Manually set ended_at to an old timestamp
       db.run('UPDATE sessions SET ended_at = 1 WHERE id = ?', ['session-1']);
