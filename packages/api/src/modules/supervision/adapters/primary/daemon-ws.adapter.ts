@@ -136,6 +136,8 @@ daemonWsApp.get(
           case 'session:started': {
             const session = sessionByWs.get(raw);
             if (session) {
+              const existingSession = sessionStore.get(msg.sessionId);
+              const isResume = existingSession?.status === 'ended';
               const agentSession = createAgentSession(session.id, msg);
               sessionStore.set(msg.sessionId, agentSession);
               sessionToDaemon.set(msg.sessionId, session.id);
@@ -144,6 +146,15 @@ daemonWsApp.get(
                   Effect.gen(function* () {
                     const relay = yield* Effect.service(TerminalRelay);
                     yield* relay.create(msg.sessionId);
+                    // On resume, clear the terminal on all connected browser clients so
+                    // old output from the previous run is not shown alongside new output
+                    if (isResume) {
+                      const senders = browserControlSenders.get(msg.sessionId);
+                      if (senders) {
+                        const clearMsg = JSON.stringify({ type: 'terminal:clear' });
+                        for (const sendControl of senders) sendControl(clearMsg);
+                      }
+                    }
                     const publisher = yield* Effect.service(EventPublisher);
                     yield* publisher.publish(session.id, {
                       type: 'session:started',

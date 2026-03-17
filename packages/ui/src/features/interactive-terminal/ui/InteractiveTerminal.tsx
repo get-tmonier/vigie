@@ -47,11 +47,16 @@ export function InteractiveTerminal({
     terminalRef.current?.resize(cols, rows);
   }, []);
 
+  const onClear = useCallback(() => {
+    terminalRef.current?.reset();
+  }, []);
+
   const { connected, send, sendResize } = useTerminalWs({
     sessionId,
     onData,
     onConnected,
     onPtyResized,
+    onClear,
   });
 
   useEffect(() => {

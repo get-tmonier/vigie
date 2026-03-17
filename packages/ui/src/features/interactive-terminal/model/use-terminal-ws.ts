@@ -6,6 +6,7 @@ interface UseTerminalWsOptions {
   onData: (data: Uint8Array) => void;
   onConnected?: (helpers: { sendResizeNow: (cols: number, rows: number) => void }) => void;
   onPtyResized?: (cols: number, rows: number) => void;
+  onClear?: () => void;
 }
 
 interface UseTerminalWsResult {
@@ -21,6 +22,7 @@ export function useTerminalWs({
   onData,
   onConnected,
   onPtyResized,
+  onClear,
 }: UseTerminalWsOptions): UseTerminalWsResult {
   const wsRef = useRef<WebSocket | null>(null);
   const [connected, setConnected] = useState(false);
@@ -30,6 +32,8 @@ export function useTerminalWs({
   onConnectedRef.current = onConnected;
   const onPtyResizedRef = useRef(onPtyResized);
   onPtyResizedRef.current = onPtyResized;
+  const onClearRef = useRef(onClear);
+  onClearRef.current = onClear;
 
   useEffect(() => {
     const apiUrl = env.VITE_API_URL;
@@ -61,6 +65,8 @@ export function useTerminalWs({
             typeof msg.rows === 'number'
           ) {
             onPtyResizedRef.current?.(msg.cols, msg.rows);
+          } else if (msg.type === 'terminal:clear') {
+            onClearRef.current?.();
           }
         } catch {}
       }
