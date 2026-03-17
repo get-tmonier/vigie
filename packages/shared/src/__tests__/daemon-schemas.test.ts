@@ -12,6 +12,7 @@ import {
   PongSchema,
   TerminalInputSchema,
   TerminalOutputSchema,
+  TerminalPtyResizedSchema,
   TerminalResizeSchema,
   UpstreamMessageSchema,
 } from '../schemas/daemon';
@@ -174,10 +175,34 @@ describe('terminal schemas', () => {
   });
 
   it('parses terminal:resize', () => {
-    const msg = { type: 'terminal:resize', sessionId: 's-1', cols: 80, rows: 24 };
+    const msg = {
+      type: 'terminal:resize',
+      sessionId: 's-1',
+      browserConnId: 'conn-1',
+      cols: 80,
+      rows: 24,
+    };
     const result = v.parse(TerminalResizeSchema, msg);
     expect(result.cols).toBe(80);
     expect(result.rows).toBe(24);
+    expect(result.browserConnId).toBe('conn-1');
+  });
+
+  it('parses terminal:pty-resized', () => {
+    const msg = { type: 'terminal:pty-resized', sessionId: 's-1', cols: 80, rows: 23 };
+    const result = v.parse(TerminalPtyResizedSchema, msg);
+    expect(result.cols).toBe(80);
+    expect(result.rows).toBe(23);
+  });
+
+  it('terminal:pty-resized is part of upstream union', () => {
+    const result = v.parse(UpstreamMessageSchema, {
+      type: 'terminal:pty-resized',
+      sessionId: 's-1',
+      cols: 80,
+      rows: 23,
+    });
+    expect(result.type).toBe('terminal:pty-resized');
   });
 
   it('terminal:output is part of upstream union', () => {
@@ -201,6 +226,7 @@ describe('terminal schemas', () => {
     const resize = v.parse(DownstreamTerminalMessageSchema, {
       type: 'terminal:resize',
       sessionId: 's-1',
+      browserConnId: 'conn-1',
       cols: 120,
       rows: 40,
     });

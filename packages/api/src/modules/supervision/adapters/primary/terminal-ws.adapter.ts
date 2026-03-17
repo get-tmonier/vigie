@@ -6,17 +6,24 @@ import { sessionMiddleware } from '#modules/auth/adapters/primary/session-middle
 import { TerminalRelay } from '#modules/supervision/ports/terminal-relay.port';
 import { SupervisionLoggerLive } from '../logger';
 import { InMemoryTerminalRelayLive } from '../secondary/in-memory-terminal-relay';
-import { daemonStore, sessionStore, sessionToDaemon } from '../secondary/shared-state';
+import {
+  browserControlSenders,
+  daemonStore,
+  sessionStore,
+  sessionToDaemon,
+} from '../secondary/shared-state';
+import { pendingChunkRequests } from './daemon-ws.adapter';
 
 const allLayers = Layer.mergeAll(InMemoryTerminalRelayLive, SupervisionLoggerLive);
 
 function sendResizeToDaemon(
   daemonWs: WebSocket,
   sessionId: string,
+  browserConnId: string,
   cols: number,
   rows: number
 ): void {
-  daemonWs.send(JSON.stringify({ type: 'terminal:resize', sessionId, cols, rows }));
+  daemonWs.send(JSON.stringify({ type: 'terminal:resize', sessionId, browserConnId, cols, rows }));
 }
 
 const terminalWsApp = new Hono<AuthEnv>();
@@ -30,6 +37,7 @@ terminalWsApp.get(
 
     return {
       onOpen: async (_event, ws) => {
+        const browserConnId = crypto.randomUUID();
         await Effect.runPromise(
           Effect.provide(
             Effect.annotateLogs(Effect.logInfo('Terminal WS: onOpen'), {
@@ -105,7 +113,46 @@ terminalWsApp.get(
                   ws.send(payload);
                 }
               };
+
               const bufferSize = yield* relay.getBufferSize(sessionId);
+
+              // Cold relay (empty buffer) — fetch full history from daemon SQLite
+              if (bufferSize === 0) {
+                const daemonEntry = daemonStore.get(daemonId);
+                if (daemonEntry?.ws.readyState === WebSocket.OPEN) {
+                  const requestId = crypto.randomUUID();
+                  const chunks = yield* Effect.promise(
+                    () =>
+                      new Promise<Array<{ data: string; timestamp: number; seq: number }>>(
+                        (resolve) => {
+                          const timer = setTimeout(() => {
+                            pendingChunkRequests.delete(requestId);
+                            resolve([]);
+                          }, 10_000);
+                          pendingChunkRequests.set(requestId, { resolve, timer });
+                          daemonEntry.ws.send(
+                            JSON.stringify({
+                              type: 'terminal:chunks-request',
+                              requestId,
+                              sessionId,
+                            })
+                          );
+                        }
+                      )
+                  );
+
+                  const sorted = [...chunks].sort((a, b) => a.seq - b.seq);
+                  for (const chunk of sorted) {
+                    yield* relay.write(sessionId, chunk.data);
+                  }
+
+                  yield* Effect.annotateLogs(
+                    Effect.logInfo('Terminal WS: fetched chunks from daemon'),
+                    { sessionId, chunkCount: String(sorted.length) }
+                  );
+                }
+              }
+
               const unsub = yield* relay.subscribe(sessionId, sendChunk);
               yield* Effect.annotateLogs(
                 Effect.logInfo('Terminal WS: browser connected (replay + live)'),
@@ -124,10 +171,24 @@ terminalWsApp.get(
         const raw = ws.raw;
         if (raw) {
           (raw as unknown as Record<string, unknown>).__terminalUnsub = unsubscribe;
+          (raw as unknown as Record<string, unknown>).__browserConnId = browserConnId;
+        }
+
+        // Register control sender so daemon-ws can push JSON control messages (e.g. pty-resized)
+        const sendControl = (msg: string) => {
+          const rawWs = ws.raw;
+          if (rawWs && (rawWs as WebSocket).readyState === WebSocket.OPEN) {
+            ws.send(msg);
+          }
+        };
+        if (!browserControlSenders.has(sessionId)) browserControlSenders.set(sessionId, new Set());
+        browserControlSenders.get(sessionId)?.add(sendControl);
+        if (raw) {
+          (raw as unknown as Record<string, unknown>).__sendControl = sendControl;
         }
       },
 
-      onMessage: async (event, _ws) => {
+      onMessage: async (event, ws) => {
         const daemonId = sessionToDaemon.get(sessionId);
         if (!daemonId) return;
 
@@ -147,8 +208,10 @@ terminalWsApp.get(
             typeof msg.cols === 'number' &&
             typeof msg.rows === 'number'
           ) {
+            const connId =
+              ((ws.raw as unknown as Record<string, unknown>).__browserConnId as string) ?? '';
             // Forward resize to daemon → CLI → PTY (triggers SIGWINCH → Ink re-render)
-            sendResizeToDaemon(daemonEntry.ws, sessionId, msg.cols, msg.rows);
+            sendResizeToDaemon(daemonEntry.ws, sessionId, connId, msg.cols, msg.rows);
             await Effect.runPromise(
               Effect.provide(
                 Effect.annotateLogs(Effect.logInfo('Terminal WS: resize forwarded to daemon'), {
@@ -186,11 +249,19 @@ terminalWsApp.get(
 
       onClose: async (_event, ws) => {
         const raw = ws.raw;
+        const closingBrowserConnId =
+          raw !== null && raw !== undefined
+            ? ((raw as unknown as Record<string, unknown>).__browserConnId as string | undefined)
+            : undefined;
         if (raw) {
           const unsub = (raw as unknown as Record<string, unknown>).__terminalUnsub as
             | (() => void)
             | undefined;
           unsub?.();
+          const sendControl = (raw as unknown as Record<string, unknown>).__sendControl as
+            | ((msg: string) => void)
+            | undefined;
+          if (sendControl) browserControlSenders.get(sessionId)?.delete(sendControl);
         }
 
         const daemonId = sessionToDaemon.get(sessionId);
@@ -201,6 +272,7 @@ terminalWsApp.get(
               JSON.stringify({
                 type: 'terminal:browser-disconnected',
                 sessionId,
+                browserConnId: closingBrowserConnId ?? '',
               })
             );
           }

@@ -5,6 +5,7 @@ interface UseTerminalWsOptions {
   sessionId: string;
   onData: (data: Uint8Array) => void;
   onConnected?: (helpers: { sendResizeNow: (cols: number, rows: number) => void }) => void;
+  onPtyResized?: (cols: number, rows: number) => void;
 }
 
 interface UseTerminalWsResult {
@@ -19,6 +20,7 @@ export function useTerminalWs({
   sessionId,
   onData,
   onConnected,
+  onPtyResized,
 }: UseTerminalWsOptions): UseTerminalWsResult {
   const wsRef = useRef<WebSocket | null>(null);
   const [connected, setConnected] = useState(false);
@@ -26,6 +28,8 @@ export function useTerminalWs({
   onDataRef.current = onData;
   const onConnectedRef = useRef(onConnected);
   onConnectedRef.current = onConnected;
+  const onPtyResizedRef = useRef(onPtyResized);
+  onPtyResizedRef.current = onPtyResized;
 
   useEffect(() => {
     const apiUrl = env.VITE_API_URL;
@@ -48,6 +52,17 @@ export function useTerminalWs({
     ws.addEventListener('message', (event) => {
       if (event.data instanceof ArrayBuffer) {
         onDataRef.current(new Uint8Array(event.data));
+      } else if (typeof event.data === 'string') {
+        try {
+          const msg = JSON.parse(event.data) as { type: string; cols?: number; rows?: number };
+          if (
+            msg.type === 'pty-resized' &&
+            typeof msg.cols === 'number' &&
+            typeof msg.rows === 'number'
+          ) {
+            onPtyResizedRef.current?.(msg.cols, msg.rows);
+          }
+        } catch {}
       }
     });
 

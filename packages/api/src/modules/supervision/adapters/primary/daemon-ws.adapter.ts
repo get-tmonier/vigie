@@ -1,4 +1,4 @@
-import type { FsListDirResponse } from '@tmonier/shared';
+import type { FsListDirResponse, TerminalChunk } from '@tmonier/shared';
 import { UpstreamMessageSchema } from '@tmonier/shared';
 import { Effect, Layer } from 'effect';
 import { Hono } from 'hono';
@@ -23,6 +23,7 @@ import { InMemoryDaemonWriteRepositoryLive } from '../secondary/in-memory-daemon
 import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher';
 import { InMemoryTerminalRelayLive } from '../secondary/in-memory-terminal-relay';
 import {
+  browserControlSenders,
   daemonStore,
   inputHistoryStore,
   sessionStore,
@@ -33,6 +34,12 @@ import {
 export const pendingFsRequests = new Map<
   string,
   { resolve: (response: FsListDirResponse) => void; timer: ReturnType<typeof setTimeout> }
+>();
+
+// Pending terminal:chunks-request — keyed by requestId, resolved when daemon responds
+export const pendingChunkRequests = new Map<
+  string,
+  { resolve: (chunks: TerminalChunk[]) => void; timer: ReturnType<typeof setTimeout> }
 >();
 
 const allLayers = Layer.mergeAll(
@@ -281,6 +288,30 @@ daemonWsApp.get(
               clearTimeout(pending.timer);
               pendingFsRequests.delete(msg.requestId);
               pending.resolve(msg);
+            }
+            break;
+          }
+          case 'terminal:chunks-response': {
+            const pending = pendingChunkRequests.get(msg.requestId);
+            if (pending) {
+              clearTimeout(pending.timer);
+              pendingChunkRequests.delete(msg.requestId);
+              pending.resolve(msg.chunks);
+            }
+            break;
+          }
+          case 'terminal:pty-resized': {
+            // Forward to all connected browser WS for this session so xterm.js can resize
+            const senders = browserControlSenders.get(msg.sessionId);
+            if (senders) {
+              const payload = JSON.stringify({
+                type: 'pty-resized',
+                cols: msg.cols,
+                rows: msg.rows,
+              });
+              for (const sendControl of senders) {
+                sendControl(payload);
+              }
             }
             break;
           }
