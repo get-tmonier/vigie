@@ -12,7 +12,6 @@ import {
   sessionStore,
   sessionToDaemon,
 } from '../secondary/shared-state';
-import { pendingChunkRequests } from './daemon-ws.adapter';
 
 const allLayers = Layer.mergeAll(InMemoryTerminalRelayLive, SupervisionLoggerLive);
 
@@ -114,53 +113,10 @@ terminalWsApp.get(
                 }
               };
 
-              const bufferSize = yield* relay.getBufferSize(sessionId);
-
-              // Cold relay (empty buffer) — fetch full history from daemon SQLite
-              if (bufferSize === 0) {
-                const daemonEntry = daemonStore.get(daemonId);
-                if (daemonEntry?.ws.readyState === WebSocket.OPEN) {
-                  const requestId = crypto.randomUUID();
-                  const chunks = yield* Effect.promise(
-                    () =>
-                      new Promise<Array<{ data: string; timestamp: number; seq: number }>>(
-                        (resolve) => {
-                          const timer = setTimeout(() => {
-                            pendingChunkRequests.delete(requestId);
-                            resolve([]);
-                          }, 10_000);
-                          pendingChunkRequests.set(requestId, { resolve, timer });
-                          daemonEntry.ws.send(
-                            JSON.stringify({
-                              type: 'terminal:chunks-request',
-                              requestId,
-                              sessionId,
-                            })
-                          );
-                        }
-                      )
-                  );
-
-                  const sorted = [...chunks].sort((a, b) => a.seq - b.seq);
-                  for (const chunk of sorted) {
-                    yield* relay.write(sessionId, chunk.data);
-                  }
-
-                  yield* Effect.annotateLogs(
-                    Effect.logInfo('Terminal WS: fetched chunks from daemon'),
-                    { sessionId, chunkCount: String(sorted.length) }
-                  );
-                }
-              }
-
               const unsub = yield* relay.subscribe(sessionId, sendChunk);
               yield* Effect.annotateLogs(
                 Effect.logInfo('Terminal WS: browser connected (replay + live)'),
-                {
-                  sessionId,
-                  userId: user.id,
-                  bufferSize: String(bufferSize),
-                }
+                { sessionId, userId: user.id }
               );
               return unsub;
             }),

@@ -67,18 +67,15 @@ export const InMemoryTerminalRelayLive = Layer.succeed(TerminalRelay, {
       };
     }),
 
-  clearBuffer: (sessionId) =>
+  batchWrite: (sessionId, data) =>
     Effect.sync(() => {
       const entry = relays.get(sessionId);
-      if (entry) {
-        entry.buffer.length = 0;
+      if (!entry) return;
+      entry.buffer.push(data);
+      if (entry.buffer.length > MAX_BUFFER_SIZE) {
+        entry.buffer.shift();
       }
-    }),
-
-  getBufferSize: (sessionId) =>
-    Effect.sync(() => {
-      const entry = relays.get(sessionId);
-      return entry ? entry.buffer.length : 0;
+      // No subscriber broadcast — history only
     }),
 
   destroy: (sessionId) =>

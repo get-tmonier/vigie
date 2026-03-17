@@ -16,12 +16,14 @@ export interface SessionsState {
   byId: Record<string, AgentSession>;
   allIds: string[];
   loadingByDaemonId: Record<string, boolean>;
+  resumeCountById: Record<string, number>;
 }
 
 const initialState: SessionsState = {
   byId: {},
   allIds: [],
   loadingByDaemonId: {},
+  resumeCountById: {},
 };
 
 const sessionsSlice = createSlice({
@@ -52,6 +54,7 @@ const sessionsSlice = createSlice({
     sessionStarted: (state, action: PayloadAction<SSESessionStarted>) => {
       const event = action.payload;
       const existing = state.byId[event.sessionId];
+      const isResume = existing?.status === 'ended';
       const session: AgentSession = {
         id: event.sessionId,
         daemonId: event.daemonId,
@@ -74,6 +77,9 @@ const sessionsSlice = createSlice({
       } else {
         state.byId[event.sessionId] = session;
         state.allIds.push(event.sessionId);
+      }
+      if (isResume) {
+        state.resumeCountById[event.sessionId] = (state.resumeCountById[event.sessionId] ?? 0) + 1;
       }
     },
 
@@ -130,6 +136,7 @@ const sessionsSlice = createSlice({
       const toRemove = state.allIds.filter((id) => state.byId[id]?.daemonId === daemonId);
       for (const id of toRemove) {
         delete state.byId[id];
+        delete state.resumeCountById[id];
       }
       state.allIds = state.allIds.filter((id) => !toRemove.includes(id));
       delete state.loadingByDaemonId[daemonId];
@@ -185,3 +192,8 @@ export const selectLoading =
   (daemonId: string | null) =>
   (state: RootState): boolean =>
     daemonId ? (state.sessions.loadingByDaemonId[daemonId] ?? false) : false;
+
+export const selectSessionResumeCount =
+  (sessionId: string | null) =>
+  (state: RootState): number =>
+    sessionId ? (state.sessions.resumeCountById[sessionId] ?? 0) : 0;

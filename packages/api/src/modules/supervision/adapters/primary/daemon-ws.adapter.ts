@@ -37,7 +37,7 @@ export const pendingFsRequests = new Map<
 >();
 
 // Pending terminal:chunks-request — keyed by requestId, resolved when daemon responds
-export const pendingChunkRequests = new Map<
+const pendingChunkRequests = new Map<
   string,
   { resolve: (chunks: TerminalChunk[]) => void; timer: ReturnType<typeof setTimeout> }
 >();
@@ -139,7 +139,16 @@ daemonWsApp.get(
               const existingSession = sessionStore.get(msg.sessionId);
               const isResume = existingSession?.status === 'ended';
               const agentSession = createAgentSession(session.id, msg);
-              sessionStore.set(msg.sessionId, agentSession);
+              sessionStore.set(msg.sessionId, {
+                ...agentSession,
+                // Carry forward resumable from the ended session so the value is not lost
+                // between session:started and the next session:resumable-changed tick.
+                // The periodic check only fires on change, so if resumable was already true
+                // it would never re-send, leaving sessionStore.resumable as undefined forever.
+                ...(existingSession?.resumable !== undefined && {
+                  resumable: existingSession.resumable,
+                }),
+              });
               sessionToDaemon.set(msg.sessionId, session.id);
               await Effect.runPromise(
                 Effect.provide(
@@ -464,11 +473,12 @@ daemonWsApp.get(
                       yield* relay.create(syncSession.sessionId);
 
                       // Populate terminal buffer with synced chunks (sorted by seq)
+                      // Use batchWrite to avoid broadcasting history to existing subscribers
                       const sortedChunks = [...syncSession.terminalChunks].sort(
                         (a, b) => a.seq - b.seq
                       );
                       for (const chunk of sortedChunks) {
-                        yield* relay.write(syncSession.sessionId, chunk.data);
+                        yield* relay.batchWrite(syncSession.sessionId, chunk.data);
                       }
 
                       yield* Effect.annotateLogs(Effect.logInfo('Sync: session relay populated'), {

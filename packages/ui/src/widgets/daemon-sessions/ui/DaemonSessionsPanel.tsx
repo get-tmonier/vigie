@@ -13,6 +13,7 @@ import {
   selectEndedSessions,
   selectLoading,
   selectSession,
+  selectSessionResumeCount,
   sessionRemoved,
 } from '#entities/session/model/sessions-slice';
 import { SessionCard } from '#entities/session/ui/SessionCard';
@@ -48,6 +49,7 @@ export function DaemonSessionsPanel({ daemonId }: DaemonSessionsPanelProps) {
   const [resumeFailedSessions, setResumeFailedSessions] = useState<Map<string, string>>(new Map());
 
   const selectedSession = useAppSelector(selectSession(selectedSessionId));
+  const sessionResumeCount = useAppSelector(selectSessionResumeCount(selectedSessionId));
   const inputHistory = useAppSelector(selectInputHistory(selectedSessionId ?? '__none__'));
   const { chunks, accumulatedText } = useSessionStream(events, selectedSessionId);
 
@@ -248,7 +250,7 @@ export function DaemonSessionsPanel({ daemonId }: DaemonSessionsPanelProps) {
             <div className="flex-1 flex overflow-hidden">
               {selectedSession.mode === 'interactive' ? (
                 <InteractiveTerminal
-                  key={`${selectedSession.id}-${reconnectCount}`}
+                  key={`${selectedSession.id}-${reconnectCount}-${sessionResumeCount}`}
                   sessionId={selectedSession.id}
                   onConnectionChange={setTerminalConnected}
                 />

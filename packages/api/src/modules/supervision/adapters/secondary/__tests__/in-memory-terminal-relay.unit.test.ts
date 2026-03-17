@@ -180,9 +180,8 @@ describe('InMemoryTerminalRelay', () => {
 
         // Simulate session:started for resumed session — re-create clears buffer
         yield* relay.create('s-stale');
-        expect(yield* relay.getBufferSize('s-stale')).toBe(0);
 
-        // New subscriber only sees new output
+        // Buffer cleared: new subscriber gets nothing on subscribe
         const received: string[] = [];
         yield* relay.subscribe('s-stale', (data) => received.push(data));
         expect(received).toHaveLength(0);
@@ -192,6 +191,31 @@ describe('InMemoryTerminalRelay', () => {
         expect(atob(received[0])).toBe('resumed output');
 
         yield* relay.destroy('s-stale');
+      })
+    );
+  });
+
+  it('batchWrite should buffer data without broadcasting to subscribers', async () => {
+    const received: string[] = [];
+
+    await run(
+      Effect.gen(function* () {
+        const relay = yield* Effect.service(TerminalRelay);
+        yield* relay.create('s-batch');
+        const unsub = yield* relay.subscribe('s-batch', (data) => received.push(data));
+
+        // batchWrite: subscriber should NOT receive this
+        yield* relay.batchWrite('s-batch', btoa('history chunk'));
+        expect(received).toHaveLength(0);
+
+        // A new subscriber connecting afterwards should see the batched history via replay
+        const replayed: string[] = [];
+        yield* relay.subscribe('s-batch', (data) => replayed.push(data));
+        expect(replayed).toHaveLength(1);
+        expect(atob(replayed[0])).toBe('history chunk');
+
+        unsub();
+        yield* relay.destroy('s-batch');
       })
     );
   });
