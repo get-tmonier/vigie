@@ -133,6 +133,93 @@ describe('InMemoryTerminalRelay', () => {
     );
   });
 
+  it('should clear buffer on re-create (resume scenario) but preserve existing subscribers', async () => {
+    const received: string[] = [];
+
+    await run(
+      Effect.gen(function* () {
+        const relay = yield* Effect.service(TerminalRelay);
+
+        // Session runs and accumulates output
+        yield* relay.create('s-resume');
+        yield* relay.write('s-resume', btoa('old output'));
+
+        // Browser connects while session is active — subscribes and gets old output replayed
+        yield* relay.subscribe('s-resume', (data) => received.push(data));
+        expect(received).toHaveLength(1);
+        expect(atob(received[0])).toBe('old output');
+
+        // Session ends (relay destroyed), then resume starts (relay re-created)
+        yield* relay.destroy('s-resume');
+        yield* relay.create('s-resume');
+
+        // Re-subscribe after resume — buffer should be empty, no stale data replayed
+        const afterResume: string[] = [];
+        yield* relay.subscribe('s-resume', (data) => afterResume.push(data));
+        expect(afterResume).toHaveLength(0);
+
+        // New output from resumed session flows in cleanly
+        yield* relay.write('s-resume', btoa('new output'));
+        expect(afterResume).toHaveLength(1);
+        expect(atob(afterResume[0])).toBe('new output');
+
+        yield* relay.destroy('s-resume');
+      })
+    );
+  });
+
+  it('should not replay stale buffer to subscriber that connects after re-create', async () => {
+    await run(
+      Effect.gen(function* () {
+        const relay = yield* Effect.service(TerminalRelay);
+
+        // Session accumulates output
+        yield* relay.create('s-stale');
+        yield* relay.write('s-stale', btoa('chunk 1'));
+        yield* relay.write('s-stale', btoa('chunk 2'));
+
+        // Simulate session:started for resumed session — re-create clears buffer
+        yield* relay.create('s-stale');
+
+        // Buffer cleared: new subscriber gets nothing on subscribe
+        const received: string[] = [];
+        yield* relay.subscribe('s-stale', (data) => received.push(data));
+        expect(received).toHaveLength(0);
+
+        yield* relay.write('s-stale', btoa('resumed output'));
+        expect(received).toHaveLength(1);
+        expect(atob(received[0])).toBe('resumed output');
+
+        yield* relay.destroy('s-stale');
+      })
+    );
+  });
+
+  it('batchWrite should buffer data without broadcasting to subscribers', async () => {
+    const received: string[] = [];
+
+    await run(
+      Effect.gen(function* () {
+        const relay = yield* Effect.service(TerminalRelay);
+        yield* relay.create('s-batch');
+        const unsub = yield* relay.subscribe('s-batch', (data) => received.push(data));
+
+        // batchWrite: subscriber should NOT receive this
+        yield* relay.batchWrite('s-batch', btoa('history chunk'));
+        expect(received).toHaveLength(0);
+
+        // A new subscriber connecting afterwards should see the batched history via replay
+        const replayed: string[] = [];
+        yield* relay.subscribe('s-batch', (data) => replayed.push(data));
+        expect(replayed).toHaveLength(1);
+        expect(atob(replayed[0])).toBe('history chunk');
+
+        unsub();
+        yield* relay.destroy('s-batch');
+      })
+    );
+  });
+
   it('should broadcast to multiple subscribers', async () => {
     const received1: string[] = [];
     const received2: string[] = [];

@@ -1,4 +1,6 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from '@tanstack/react-router';
+import { Provider } from 'react-redux';
+import { store } from '#app/store';
 
 export const Route = createRootRoute({
   head: () => ({
@@ -29,7 +31,9 @@ function RootComponent() {
         <HeadContent />
       </head>
       <body>
-        <Outlet />
+        <Provider store={store}>
+          <Outlet />
+        </Provider>
         <Scripts />
       </body>
     </html>

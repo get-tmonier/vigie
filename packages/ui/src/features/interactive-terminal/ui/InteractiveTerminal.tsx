@@ -43,7 +43,21 @@ export function InteractiveTerminal({
     []
   );
 
-  const { connected, send, sendResize } = useTerminalWs({ sessionId, onData, onConnected });
+  const onPtyResized = useCallback((cols: number, rows: number) => {
+    terminalRef.current?.resize(cols, rows);
+  }, []);
+
+  const onClear = useCallback(() => {
+    terminalRef.current?.reset();
+  }, []);
+
+  const { connected, send, sendResize } = useTerminalWs({
+    sessionId,
+    onData,
+    onConnected,
+    onPtyResized,
+    onClear,
+  });
 
   useEffect(() => {
     onConnectionChangeRef.current?.(connected);

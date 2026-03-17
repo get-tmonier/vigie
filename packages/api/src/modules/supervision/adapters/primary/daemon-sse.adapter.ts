@@ -7,6 +7,7 @@ import { subscribeToEvents } from '#modules/supervision/queries/subscribe-events
 import { SupervisionLoggerLive } from '../logger';
 import { InMemoryDaemonReadRepositoryLive } from '../secondary/in-memory-daemon-read-repository';
 import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher';
+import { inputHistoryStore, sessionStore } from '../secondary/shared-state';
 
 const allLayers = Layer.mergeAll(
   InMemoryDaemonReadRepositoryLive,
@@ -67,6 +68,66 @@ daemonSseApp.get('/daemons/:daemonId/events', async (c) => {
         allLayers
       )
     );
+
+    // Emit current state snapshot so a new SSE client (page refresh, reconnect)
+    // immediately sees existing sessions without waiting for a daemon
+    // disconnect/reconnect cycle.
+    for (const session of sessionStore.values()) {
+      if (session.daemonId !== daemonId) continue;
+      stream
+        .writeSSE({
+          event: 'session:started',
+          data: JSON.stringify({
+            type: 'session:started',
+            daemonId: session.daemonId,
+            sessionId: session.id,
+            agentType: session.agentType,
+            mode: session.mode,
+            cwd: session.cwd,
+            ...(session.gitBranch !== undefined && { gitBranch: session.gitBranch }),
+            ...(session.repoName !== undefined && { repoName: session.repoName }),
+            ...(session.resumable !== undefined && { resumable: session.resumable }),
+            ...(session.claudeSessionId !== undefined && {
+              claudeSessionId: session.claudeSessionId,
+            }),
+            timestamp: session.startedAt,
+          }),
+        })
+        .catch(() => {});
+      if (session.status === 'ended') {
+        stream
+          .writeSSE({
+            event: 'session:ended',
+            data: JSON.stringify({
+              type: 'session:ended',
+              daemonId: session.daemonId,
+              sessionId: session.id,
+              exitCode: session.exitCode ?? 0,
+              resumable: session.resumable ?? false,
+              timestamp: Date.now(),
+            }),
+          })
+          .catch(() => {});
+      }
+      const history = inputHistoryStore.get(session.id);
+      if (history) {
+        for (const entry of history) {
+          stream
+            .writeSSE({
+              event: 'terminal:input-echo',
+              data: JSON.stringify({
+                type: 'terminal:input-echo',
+                daemonId,
+                sessionId: session.id,
+                text: entry.text,
+                source: entry.source,
+                timestamp: entry.timestamp,
+              }),
+            })
+            .catch(() => {});
+        }
+      }
+    }
 
     stream.writeSSE({ event: 'keepalive', data: '' }).catch(() => {});
     const keepalive = setInterval(() => {

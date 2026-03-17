@@ -1,4 +1,4 @@
-import type { FsListDirResponse } from '@tmonier/shared';
+import type { FsListDirResponse, TerminalChunk } from '@tmonier/shared';
 import { UpstreamMessageSchema } from '@tmonier/shared';
 import { Effect, Layer } from 'effect';
 import { Hono } from 'hono';
@@ -22,12 +22,24 @@ import { InMemoryDaemonReadRepositoryLive } from '../secondary/in-memory-daemon-
 import { InMemoryDaemonWriteRepositoryLive } from '../secondary/in-memory-daemon-write-repository';
 import { InMemoryEventPublisherLive } from '../secondary/in-memory-event-publisher';
 import { InMemoryTerminalRelayLive } from '../secondary/in-memory-terminal-relay';
-import { daemonStore, sessionStore, sessionToDaemon } from '../secondary/shared-state';
+import {
+  browserControlSenders,
+  daemonStore,
+  inputHistoryStore,
+  sessionStore,
+  sessionToDaemon,
+} from '../secondary/shared-state';
 
 // Pending fs:list-dir requests — keyed by requestId, resolved when daemon responds
 export const pendingFsRequests = new Map<
   string,
   { resolve: (response: FsListDirResponse) => void; timer: ReturnType<typeof setTimeout> }
+>();
+
+// Pending terminal:chunks-request — keyed by requestId, resolved when daemon responds
+const pendingChunkRequests = new Map<
+  string,
+  { resolve: (chunks: TerminalChunk[]) => void; timer: ReturnType<typeof setTimeout> }
 >();
 
 const allLayers = Layer.mergeAll(
@@ -124,14 +136,34 @@ daemonWsApp.get(
           case 'session:started': {
             const session = sessionByWs.get(raw);
             if (session) {
+              const existingSession = sessionStore.get(msg.sessionId);
+              const isResume = existingSession?.status === 'ended';
               const agentSession = createAgentSession(session.id, msg);
-              sessionStore.set(msg.sessionId, agentSession);
+              sessionStore.set(msg.sessionId, {
+                ...agentSession,
+                // Carry forward resumable from the ended session so the value is not lost
+                // between session:started and the next session:resumable-changed tick.
+                // The periodic check only fires on change, so if resumable was already true
+                // it would never re-send, leaving sessionStore.resumable as undefined forever.
+                ...(existingSession?.resumable !== undefined && {
+                  resumable: existingSession.resumable,
+                }),
+              });
               sessionToDaemon.set(msg.sessionId, session.id);
               await Effect.runPromise(
                 Effect.provide(
                   Effect.gen(function* () {
                     const relay = yield* Effect.service(TerminalRelay);
                     yield* relay.create(msg.sessionId);
+                    // On resume, clear the terminal on all connected browser clients so
+                    // old output from the previous run is not shown alongside new output
+                    if (isResume) {
+                      const senders = browserControlSenders.get(msg.sessionId);
+                      if (senders) {
+                        const clearMsg = JSON.stringify({ type: 'terminal:clear' });
+                        for (const sendControl of senders) sendControl(clearMsg);
+                      }
+                    }
                     const publisher = yield* Effect.service(EventPublisher);
                     yield* publisher.publish(session.id, {
                       type: 'session:started',
@@ -279,6 +311,30 @@ daemonWsApp.get(
             }
             break;
           }
+          case 'terminal:chunks-response': {
+            const pending = pendingChunkRequests.get(msg.requestId);
+            if (pending) {
+              clearTimeout(pending.timer);
+              pendingChunkRequests.delete(msg.requestId);
+              pending.resolve(msg.chunks);
+            }
+            break;
+          }
+          case 'terminal:pty-resized': {
+            // Forward to all connected browser WS for this session so xterm.js can resize
+            const senders = browserControlSenders.get(msg.sessionId);
+            if (senders) {
+              const payload = JSON.stringify({
+                type: 'pty-resized',
+                cols: msg.cols,
+                rows: msg.rows,
+              });
+              for (const sendControl of senders) {
+                sendControl(payload);
+              }
+            }
+            break;
+          }
           case 'session:error': {
             const session = sessionByWs.get(raw);
             if (session) {
@@ -318,6 +374,11 @@ daemonWsApp.get(
           case 'terminal:input-echo': {
             const session = sessionByWs.get(raw);
             if (session) {
+              const existing = inputHistoryStore.get(msg.sessionId) ?? [];
+              inputHistoryStore.set(msg.sessionId, [
+                ...existing,
+                { text: msg.text, source: msg.source, timestamp: msg.timestamp },
+              ]);
               await Effect.runPromise(
                 Effect.provide(
                   Effect.gen(function* () {
@@ -412,11 +473,12 @@ daemonWsApp.get(
                       yield* relay.create(syncSession.sessionId);
 
                       // Populate terminal buffer with synced chunks (sorted by seq)
+                      // Use batchWrite to avoid broadcasting history to existing subscribers
                       const sortedChunks = [...syncSession.terminalChunks].sort(
                         (a, b) => a.seq - b.seq
                       );
                       for (const chunk of sortedChunks) {
-                        yield* relay.write(syncSession.sessionId, chunk.data);
+                        yield* relay.batchWrite(syncSession.sessionId, chunk.data);
                       }
 
                       yield* Effect.annotateLogs(Effect.logInfo('Sync: session relay populated'), {
@@ -443,8 +505,16 @@ daemonWsApp.get(
                         timestamp: syncSession.startedAt,
                       });
 
-                      // Replay input history from sync
+                      // Persist and replay input history from sync
                       if (syncSession.inputHistory) {
+                        inputHistoryStore.set(
+                          syncSession.sessionId,
+                          syncSession.inputHistory.map((e) => ({
+                            text: e.text,
+                            source: e.source as 'cli' | 'browser',
+                            timestamp: e.timestamp,
+                          }))
+                        );
                         for (const entry of syncSession.inputHistory) {
                           yield* publisher.publish(session.id, {
                             type: 'terminal:input-echo',

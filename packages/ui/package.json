@@ -33,6 +33,7 @@
     "@fontsource/source-serif-4": "5.2.9",
     "@fontsource/vollkorn": "5.2.10",
     "@fontsource/vollkorn-sc": "5.2.8",
+    "@reduxjs/toolkit": "2.8.2",
     "@tanstack/react-router": "1.163.3",
     "@tanstack/react-start": "1.164.0",
     "@tmonier/shared": "workspace:*",
@@ -42,6 +43,7 @@
     "better-auth": "1.5.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-redux": "9.2.0",
     "tailwind-merge": "3.5.0",
     "valibot": "1.2.0"
   },

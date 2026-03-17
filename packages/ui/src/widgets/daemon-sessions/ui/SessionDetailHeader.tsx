@@ -101,7 +101,7 @@ function ResumeStatus({
         </span>
       );
     }
-    if (session.claudeSessionId) {
+    if (session.resumable === false && session.claudeSessionId) {
       return (
         <span className="text-xs font-mono px-2 py-1 rounded border border-navy-light text-slate/40 cursor-default">
           Not resumable

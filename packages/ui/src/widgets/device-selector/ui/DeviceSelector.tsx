@@ -14,7 +14,7 @@ export function DeviceSelector({ selectedId, onSelect }: DeviceSelectorProps) {
   const autoSelectedRef = useRef(false);
 
   const onlineDevices = devices.filter((d) => d.status === 'online' && d.daemonId);
-  const selected = devices.find((d) => d.daemonId === selectedId);
+  const selected = selectedId ? devices.find((d) => d.daemonId === selectedId) : undefined;
 
   useEffect(() => {
     if (autoSelectedRef.current) return;

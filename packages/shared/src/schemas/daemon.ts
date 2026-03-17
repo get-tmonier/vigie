@@ -58,6 +58,13 @@ const SessionClearEndedSchema = v.object({
   type: v.literal('session:clear-ended'),
 });
 
+export const TerminalChunksRequestSchema = v.object({
+  type: v.literal('terminal:chunks-request'),
+  requestId: v.string(),
+  sessionId: v.string(),
+});
+export type TerminalChunksRequest = v.InferOutput<typeof TerminalChunksRequestSchema>;
+
 export const DownstreamMessageSchema = v.variant('type', [
   CommandRequestSchema,
   PingSchema,
@@ -67,6 +74,7 @@ export const DownstreamMessageSchema = v.variant('type', [
   SessionResumeRequestSchema,
   SessionDeleteSchema,
   SessionClearEndedSchema,
+  TerminalChunksRequestSchema,
 ]);
 export type DownstreamMessage = v.InferOutput<typeof DownstreamMessageSchema>;
 
@@ -170,6 +178,7 @@ export type TerminalInput = v.InferOutput<typeof TerminalInputSchema>;
 export const TerminalResizeSchema = v.object({
   type: v.literal('terminal:resize'),
   sessionId: v.string(),
+  browserConnId: v.string(),
   cols: v.number(),
   rows: v.number(),
 });
@@ -259,6 +268,29 @@ const SessionResumableChangedSchema = v.object({
   timestamp: v.number(),
 });
 
+export const TerminalChunkSchema = v.object({
+  data: v.string(),
+  timestamp: v.number(),
+  seq: v.number(),
+});
+export type TerminalChunk = v.InferOutput<typeof TerminalChunkSchema>;
+
+export const TerminalChunksResponseSchema = v.object({
+  type: v.literal('terminal:chunks-response'),
+  requestId: v.string(),
+  sessionId: v.string(),
+  chunks: v.array(TerminalChunkSchema),
+});
+export type TerminalChunksResponse = v.InferOutput<typeof TerminalChunksResponseSchema>;
+
+export const TerminalPtyResizedSchema = v.object({
+  type: v.literal('terminal:pty-resized'),
+  sessionId: v.string(),
+  cols: v.number(),
+  rows: v.number(),
+});
+export type TerminalPtyResized = v.InferOutput<typeof TerminalPtyResizedSchema>;
+
 export const UpstreamMessageSchema = v.variant('type', [
   DaemonHelloSchema,
   CommandOutputSchema,
@@ -276,13 +308,17 @@ export const UpstreamMessageSchema = v.variant('type', [
   TerminalInputEchoSchema,
   SessionClaudeIdDetectedSchema,
   SessionResumableChangedSchema,
+  TerminalChunksResponseSchema,
+  TerminalPtyResizedSchema,
 ]);
 export type UpstreamMessage = v.InferOutput<typeof UpstreamMessageSchema>;
 
-const TerminalBrowserDisconnectedSchema = v.object({
+export const TerminalBrowserDisconnectedSchema = v.object({
   type: v.literal('terminal:browser-disconnected'),
   sessionId: v.string(),
+  browserConnId: v.string(),
 });
+export type TerminalBrowserDisconnected = v.InferOutput<typeof TerminalBrowserDisconnectedSchema>;
 
 export const DownstreamTerminalMessageSchema = v.variant('type', [
   TerminalInputSchema,

@@ -1,4 +1,4 @@
-import type { HistoryEntry } from '../model/use-input-history';
+import type { HistoryEntry } from '#entities/input-history/model/input-history-slice';
 
 interface InputHistoryPanelProps {
   history: HistoryEntry[];
