@@ -63,11 +63,12 @@ export interface SiteContent {
     title: string;
     badgeEmployee: string;
     badgeInternship: string;
+    badgeFounder: string;
     jobs: {
       period: string;
       company: string;
       missionAt?: string;
-      type?: 'employee' | 'internship';
+      type?: 'employee' | 'internship' | 'founder';
       role: string;
       location: string;
       description: string;
