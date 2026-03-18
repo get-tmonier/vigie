@@ -6,6 +6,8 @@ public/favicon.svg
 public/favicon.ico
 public/logo.svg
 public/logo-512.png
+# static OG image — served by og-image.png.ts dynamic route
+public/og-image.png
 # generated types
 .astro/
 
