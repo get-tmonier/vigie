@@ -1,10 +1,14 @@
 import { Resvg } from '@resvg/resvg-js';
+import { colors, helm } from '@tmonier/tokens';
 import type { APIRoute } from 'astro';
 import satori from 'satori';
 
-const GOLD = '#C49A2B';
-const NAVY = '#0B1A2E';
-const CREAM = '#F5F0E8';
+const GOLD = colors.gold;
+const NAVY = colors.navyDeep;
+const CREAM = colors.cream;
+const SLATE = `rgba(139,156,175,0.75)`;
+
+const { spokesD, handlesD } = helm;
 
 async function fetchFont(family: string, weight: number): Promise<ArrayBuffer> {
   const css = await fetch(
@@ -23,256 +27,59 @@ function h(type: string, props: Record<string, any>): VNode {
   return { type, props };
 }
 
-const wheelChildren: VNode[] = [
-  h('circle', { cx: '32', cy: '32', r: '27', fill: 'none', stroke: GOLD, strokeWidth: '2.5' }),
-  h('circle', { cx: '32', cy: '32', r: '19', fill: 'none', stroke: GOLD, strokeWidth: '2' }),
-  h('circle', { cx: '32', cy: '32', r: '5.5', fill: GOLD }),
-  h('line', {
-    x1: '32',
-    y1: '27',
-    x2: '32',
-    y2: '7',
-    stroke: GOLD,
-    strokeWidth: '2.5',
-    strokeLinecap: 'round',
-  }),
-  h('ellipse', { cx: '32', cy: '6', rx: '2.2', ry: '3', fill: GOLD }),
-  h('line', {
-    x1: '36.6',
-    y1: '29.8',
-    x2: '51.3',
-    y2: '15.1',
-    stroke: GOLD,
-    strokeWidth: '2.5',
-    strokeLinecap: 'round',
-  }),
-  h('ellipse', {
-    cx: '52.6',
-    cy: '13.8',
-    rx: '2.2',
-    ry: '3',
-    transform: 'rotate(45 52.6 13.8)',
-    fill: GOLD,
-  }),
-  h('line', {
-    x1: '37',
-    y1: '32',
-    x2: '57',
-    y2: '32',
-    stroke: GOLD,
-    strokeWidth: '2.5',
-    strokeLinecap: 'round',
-  }),
-  h('ellipse', {
-    cx: '58',
-    cy: '32',
-    rx: '2.2',
-    ry: '3',
-    transform: 'rotate(90 58 32)',
-    fill: GOLD,
-  }),
-  h('line', {
-    x1: '36.6',
-    y1: '34.2',
-    x2: '51.3',
-    y2: '48.9',
-    stroke: GOLD,
-    strokeWidth: '2.5',
-    strokeLinecap: 'round',
-  }),
-  h('ellipse', {
-    cx: '52.6',
-    cy: '50.2',
-    rx: '2.2',
-    ry: '3',
-    transform: 'rotate(135 52.6 50.2)',
-    fill: GOLD,
-  }),
-  h('line', {
-    x1: '32',
-    y1: '37',
-    x2: '32',
-    y2: '57',
-    stroke: GOLD,
-    strokeWidth: '2.5',
-    strokeLinecap: 'round',
-  }),
-  h('ellipse', { cx: '32', cy: '58', rx: '2.2', ry: '3', fill: GOLD }),
-  h('line', {
-    x1: '27.4',
-    y1: '34.2',
-    x2: '12.7',
-    y2: '48.9',
-    stroke: GOLD,
-    strokeWidth: '2.5',
-    strokeLinecap: 'round',
-  }),
-  h('ellipse', {
-    cx: '11.4',
-    cy: '50.2',
-    rx: '2.2',
-    ry: '3',
-    transform: 'rotate(45 11.4 50.2)',
-    fill: GOLD,
-  }),
-  h('line', {
-    x1: '27',
-    y1: '32',
-    x2: '7',
-    y2: '32',
-    stroke: GOLD,
-    strokeWidth: '2.5',
-    strokeLinecap: 'round',
-  }),
-  h('ellipse', { cx: '6', cy: '32', rx: '2.2', ry: '3', transform: 'rotate(90 6 32)', fill: GOLD }),
-  h('line', {
-    x1: '27.4',
-    y1: '29.8',
-    x2: '12.7',
-    y2: '15.1',
-    stroke: GOLD,
-    strokeWidth: '2.5',
-    strokeLinecap: 'round',
-  }),
-  h('ellipse', {
-    cx: '11.4',
-    cy: '13.8',
-    rx: '2.2',
-    ry: '3',
-    transform: 'rotate(135 11.4 13.8)',
-    fill: GOLD,
-  }),
-];
-
-function pill(label: string): VNode {
-  return h('span', {
-    style: {
-      fontFamily: 'JetBrains Mono',
-      fontSize: 13,
-      fontWeight: 500,
-      color: 'rgba(245,240,232,0.5)',
-      backgroundColor: 'rgba(255,255,255,0.04)',
-      border: '1px solid rgba(255,255,255,0.08)',
-      borderRadius: 4,
-      padding: '6px 14px',
-    },
-    children: label,
-  });
-}
-
 function buildTree(): VNode {
+  // Helm center: right=60+220=280 from right → x=920, y=95+220=315
+  const helmCx = 920;
+  const helmCy = 315;
+
   return h('div', {
     style: {
       width: '1200px',
       height: '630px',
-      backgroundColor: NAVY,
+      background: `radial-gradient(ellipse at 77% 50%, rgba(196,154,43,0.11) 0%, transparent 52%), ${NAVY}`,
       display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      padding: '72px 96px',
       position: 'relative',
       overflow: 'hidden',
     },
     children: [
-      // Watermark wheel (right side)
+      // Concentric rings — radar effect, centered on helm
+      ...[580, 460, 350].map((d) =>
+        h('div', {
+          style: {
+            position: 'absolute',
+            left: `${helmCx - d / 2}px`,
+            top: `${helmCy - d / 2}px`,
+            width: `${d}px`,
+            height: `${d}px`,
+            borderRadius: '50%',
+            border: `1px solid rgba(196,154,43,${d === 580 ? 0.07 : d === 460 ? 0.1 : 0.13})`,
+          },
+        })
+      ),
+      // Vertical separator line
       h('div', {
         style: {
           position: 'absolute',
-          right: '80px',
-          top: '145px',
-          width: '340px',
-          height: '340px',
-          opacity: 0.07,
-          display: 'flex',
+          left: '640px',
+          top: '60px',
+          width: '1px',
+          height: '510px',
+          background: `linear-gradient(to bottom, transparent, rgba(196,154,43,0.25) 25%, rgba(196,154,43,0.25) 75%, transparent)`,
         },
-        children: [
-          h('svg', {
-            xmlns: 'http://www.w3.org/2000/svg',
-            viewBox: '0 0 64 64',
-            width: '340',
-            height: '340',
-            children: wheelChildren,
-          }),
-        ],
       }),
-      // Brand row
-      h('div', {
-        style: {
-          display: 'flex',
-          alignItems: 'center',
-          gap: '16px',
-          marginBottom: '36px',
-        },
-        children: [
-          h('span', {
-            style: {
-              fontFamily: 'Vollkorn SC',
-              fontWeight: 900,
-              fontSize: 42,
-              color: GOLD,
-              letterSpacing: '3px',
-            },
-            children: 'Tmonier',
-          }),
-          h('span', {
-            style: {
-              fontFamily: 'JetBrains Mono',
-              fontSize: 12,
-              fontWeight: 500,
-              letterSpacing: '4px',
-              textTransform: 'uppercase',
-              color: 'rgba(139,156,175,0.5)',
-            },
-            children: 'You Keep The Helm.',
-          }),
-        ],
-      }),
-      // Headline
-      h('div', {
-        style: { display: 'flex', flexDirection: 'column', marginBottom: '28px' },
-        children: [
-          h('div', {
-            style: {
-              fontFamily: 'Vollkorn SC',
-              fontWeight: 900,
-              fontSize: 56,
-              color: CREAM,
-              lineHeight: 1.2,
-            },
-            children: 'Senior Fullstack Engineer',
-          }),
-          h('div', {
-            style: {
-              fontFamily: 'JetBrains Mono',
-              fontSize: 22,
-              fontWeight: 500,
-              color: 'rgba(139,156,175,0.7)',
-              marginTop: '12px',
-            },
-            children: 'Freelance · Brussels',
-          }),
-        ],
-      }),
-      // Pills
-      h('div', {
-        style: { display: 'flex', gap: '12px', flexWrap: 'wrap' },
-        children: ['TypeScript', 'React', 'Node.js', 'Effect-TS', 'PostgreSQL'].map(pill),
-      }),
-      // URL
+      // Left accent bar
       h('div', {
         style: {
           position: 'absolute',
-          bottom: '48px',
-          left: '96px',
-          fontFamily: 'JetBrains Mono',
-          fontSize: 14,
-          fontWeight: 500,
-          color: 'rgba(196,154,43,0.4)',
-          letterSpacing: '2px',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: '4px',
+          backgroundColor: GOLD,
+          opacity: 0.6,
         },
-        children: 'tmonier.com',
       }),
-      // Bottom border accent
+      // Bottom accent line
       h('div', {
         style: {
           position: 'absolute',
@@ -280,16 +87,217 @@ function buildTree(): VNode {
           left: 0,
           right: 0,
           height: '3px',
-          backgroundColor: 'rgba(196,154,43,0.4)',
+          backgroundColor: GOLD,
+          opacity: 0.3,
         },
+      }),
+      // Helm — right side, prominent
+      h('div', {
+        style: {
+          position: 'absolute',
+          right: '60px',
+          top: '95px',
+          width: '440px',
+          height: '440px',
+          opacity: 0.22,
+          display: 'flex',
+        },
+        children: [
+          h('svg', {
+            xmlns: 'http://www.w3.org/2000/svg',
+            viewBox: '0 0 64 64',
+            width: '440',
+            height: '440',
+            children: [
+              h('path', {
+                d: spokesD,
+                fill: 'none',
+                stroke: GOLD,
+                strokeWidth: '2',
+                strokeLinecap: 'round',
+              }),
+              h('circle', {
+                cx: '32',
+                cy: '32',
+                r: '22',
+                fill: 'none',
+                stroke: GOLD,
+                strokeWidth: '3',
+              }),
+              h('circle', {
+                cx: '32',
+                cy: '32',
+                r: '12',
+                fill: 'none',
+                stroke: GOLD,
+                strokeWidth: '2',
+              }),
+              h('circle', {
+                cx: '32',
+                cy: '32',
+                r: '6.5',
+                fill: 'none',
+                stroke: GOLD,
+                strokeWidth: '1.5',
+              }),
+              h('circle', { cx: '32', cy: '32', r: '3', fill: GOLD }),
+              h('path', {
+                d: handlesD,
+                fill: 'none',
+                stroke: GOLD,
+                strokeWidth: '4',
+                strokeLinecap: 'round',
+              }),
+            ],
+          }),
+        ],
+      }),
+      // Content
+      h('div', {
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          padding: '72px 96px',
+          width: '680px',
+        },
+        children: [
+          // Brand row: small helm + label
+          h('div', {
+            style: {
+              display: 'flex',
+              alignItems: 'center',
+              gap: '14px',
+              marginBottom: '32px',
+            },
+            children: [
+              h('svg', {
+                xmlns: 'http://www.w3.org/2000/svg',
+                viewBox: '0 0 64 64',
+                width: '48',
+                height: '48',
+                children: [
+                  h('path', {
+                    d: spokesD,
+                    fill: 'none',
+                    stroke: GOLD,
+                    strokeWidth: '2',
+                    strokeLinecap: 'round',
+                  }),
+                  h('circle', {
+                    cx: '32',
+                    cy: '32',
+                    r: '22',
+                    fill: 'none',
+                    stroke: GOLD,
+                    strokeWidth: '3',
+                  }),
+                  h('circle', {
+                    cx: '32',
+                    cy: '32',
+                    r: '12',
+                    fill: 'none',
+                    stroke: GOLD,
+                    strokeWidth: '2',
+                  }),
+                  h('circle', {
+                    cx: '32',
+                    cy: '32',
+                    r: '6.5',
+                    fill: 'none',
+                    stroke: GOLD,
+                    strokeWidth: '1.5',
+                  }),
+                  h('circle', { cx: '32', cy: '32', r: '3', fill: GOLD }),
+                  h('path', {
+                    d: handlesD,
+                    fill: 'none',
+                    stroke: GOLD,
+                    strokeWidth: '4',
+                    strokeLinecap: 'round',
+                  }),
+                ],
+              }),
+              h('div', {
+                style: {
+                  fontFamily: 'Vollkorn SC',
+                  fontSize: 30,
+                  fontWeight: 900,
+                  letterSpacing: '3px',
+                  color: GOLD,
+                },
+                children: 'Tmonier',
+              }),
+              h('div', {
+                style: {
+                  fontFamily: 'Vollkorn',
+                  fontSize: 16,
+                  fontWeight: 700,
+                  fontStyle: 'italic',
+                  color: `rgba(196,154,43,0.5)`,
+                  letterSpacing: '0.5px',
+                  marginTop: '6px',
+                },
+                children: 'You keep the helm.',
+              }),
+            ],
+          }),
+          // Name
+          h('div', {
+            style: {
+              fontFamily: 'Vollkorn',
+              fontWeight: 700,
+              fontSize: 68,
+              color: CREAM,
+              lineHeight: 1.1,
+              marginBottom: '20px',
+              letterSpacing: '-0.02em',
+              whiteSpace: 'nowrap',
+            },
+            children: 'Damien Meur',
+          }),
+          // Divider
+          h('div', {
+            style: {
+              width: '64px',
+              height: '2px',
+              backgroundColor: GOLD,
+              marginBottom: '24px',
+              opacity: 0.7,
+            },
+          }),
+          // Role
+          h('div', {
+            style: {
+              fontFamily: 'JetBrains Mono',
+              fontSize: 22,
+              fontWeight: 500,
+              color: SLATE,
+              marginBottom: '10px',
+            },
+            children: 'Senior Fullstack Engineer',
+          }),
+          // Location
+          h('div', {
+            style: {
+              fontFamily: 'JetBrains Mono',
+              fontSize: 16,
+              fontWeight: 500,
+              color: `rgba(196,154,43,0.55)`,
+              letterSpacing: '2px',
+            },
+            children: 'Freelance · Brussels',
+          }),
+        ],
       }),
     ],
   });
 }
 
 export const GET: APIRoute = async () => {
-  const [vollkornSC, jetbrainsMono] = await Promise.all([
+  const [vollkornSC, vollkorn, jetbrainsMono] = await Promise.all([
     fetchFont('Vollkorn SC', 900),
+    fetchFont('Vollkorn', 700),
     fetchFont('JetBrains Mono', 500),
   ]);
 
@@ -299,6 +307,7 @@ export const GET: APIRoute = async () => {
     height: 630,
     fonts: [
       { name: 'Vollkorn SC', data: vollkornSC, weight: 900, style: 'normal' },
+      { name: 'Vollkorn', data: vollkorn, weight: 700, style: 'normal' },
       { name: 'JetBrains Mono', data: jetbrainsMono, weight: 500, style: 'normal' },
     ],
   });

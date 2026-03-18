@@ -14,6 +14,7 @@
   "exports": {
     "./tailwind.css": "./tailwind.css",
     "./tokens.css": "./tokens.css",
+    "./assets/helm.svg": "./assets/helm.svg",
     ".": "./index.ts"
   }
 }

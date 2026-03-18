@@ -180,11 +180,11 @@ const en: SiteContent = {
         description:
           'Data-sharing platform for food industry groups and supermarket chains to exchange and process operational datasets across 4 European markets.',
         bullets: [
-          'Developed React / Next.js frontends and TypeScript backend services with hexagonal architecture and Effect-TS',
-          'Designed a Python ETL framework enabling the team to create and maintain 300+ bronze/silver/gold Medallion pipelines \u2014 clean architecture, dependency injection, and Pandera data quality checks',
-          'Built an embedded DuckDB ETL system directly in the backend \u2014 with observability, DX-friendly tooling, and auto-refresh \u2014 reducing analytics load times by up to 100x across all application pages',
-          'Mentored developers and fostered a culture of ownership, knowledge sharing, curiosity, and quality across the team',
-          'Managed Azure cloud infrastructure; set up CI/CD on Azure DevOps with automated testing and Databricks deployment',
+          'Developed React / Next.js frontends and TypeScript backend services with **hexagonal architecture** and Effect-TS',
+          'Designed a Python ETL framework enabling the team to create and maintain 300+ bronze/silver/gold Medallion pipelines — **clean architecture**, dependency injection, and Pandera data quality checks',
+          'Built an embedded DuckDB ETL system directly in the backend — with **observability**, DX-friendly tooling, and auto-refresh — reducing analytics load times by up to 100× across all application pages',
+          '**Mentored developers** and fostered a culture of ownership, knowledge sharing, curiosity, and quality across the team',
+          'Managed Azure cloud infrastructure; set up **CI/CD** on Azure DevOps with automated testing and Databricks deployment',
         ],
         tags: [
           'TypeScript',
@@ -209,7 +209,7 @@ const en: SiteContent = {
           'SaaS visitor management platform serving enterprise clients across 100+ countries.',
         bullets: [
           'Developed and maintained core platform features (Node.js, Express, Angular)',
-          'Worked within a microservices architecture with inter-service communication via Apache Pulsar message broker',
+          'Worked within a **microservices architecture** with inter-service communication via Apache Pulsar message broker',
           'Migrated frontend modules from AngularJS to Angular with TypeScript',
         ],
         tags: [
@@ -223,7 +223,7 @@ const en: SiteContent = {
         ],
       },
       {
-        period: '2020',
+        period: 'Apr 2020 – Oct 2020',
         company: 'Emisys',
         role: 'Full Stack Developer',
         location: 'Brussels',
@@ -235,20 +235,21 @@ const en: SiteContent = {
         tags: ['PHP', 'JavaScript', 'PostgreSQL'],
       },
       {
-        period: '2019 \u2013 2020',
+        period: 'Sep 2019 \u2013 Apr 2020',
         company: 'mPhase',
         role: 'Full Stack Developer',
         location: 'Montreal',
         description: 'Water treatment logistics tool for Montreal municipal operations.',
         bullets: [
-          'Built the full application from scratch \u2014 Vue.js frontend, Node.js/Express API, MongoDB',
-          'Designed geolocation-based routing and scheduling system',
+          'Built the full application from scratch — Vue.js frontend, Node.js/Express API, MongoDB',
+          'Designed **geolocation-based routing and scheduling** system',
         ],
         tags: ['Vue.js', 'Node.js', 'Express', 'MongoDB'],
       },
       {
-        period: '2018 \u2013 2019',
-        company: 'Extia \u2192 Taktik',
+        period: 'Nov 2018 \u2013 Aug 2019',
+        company: 'Extia',
+        missionAt: 'Taktik',
         role: 'Full Stack Developer',
         location: 'Brussels',
         description:
@@ -256,13 +257,14 @@ const en: SiteContent = {
         bullets: [
           'Built monitoring dashboards and alerting systems',
           'Developed backend services with Spring Boot and Kotlin',
-          'Implemented Angular frontend with real-time data visualization',
+          'Implemented Angular frontend with **real-time data visualization**',
         ],
         tags: ['Kotlin', 'Spring Boot', 'Angular', 'PostgreSQL'],
       },
       {
-        period: '2018',
-        company: 'Extia \u2192 Bewan',
+        period: 'Jul 2018 \u2013 Nov 2018',
+        company: 'Extia',
+        missionAt: 'Bewan',
         role: 'Full Stack Developer',
         location: 'Brussels',
         description:
@@ -274,7 +276,7 @@ const en: SiteContent = {
         tags: ['JavaScript', 'jQuery', 'PHP', 'Symfony', 'PostgreSQL'],
       },
       {
-        period: '2017 \u2013 2018',
+        period: 'Dec 2017 \u2013 Jul 2018',
         company: 'IoTFactory',
         role: 'Full Stack Developer',
         location: 'Brussels',
@@ -337,6 +339,7 @@ const en: SiteContent = {
     title: 'Let\u2019s work together',
     availability: 'Available May 2026 \u00b7 Remote or Brussels',
     email: 'damien.meur@tmonier.com',
+    phone: '+32 475 39 55 16',
     cta: 'Get in touch',
   },
   footer: {

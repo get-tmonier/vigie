@@ -64,6 +64,7 @@ export interface SiteContent {
     jobs: {
       period: string;
       company: string;
+      missionAt?: string;
       role: string;
       location: string;
       description: string;
@@ -103,6 +104,7 @@ export interface SiteContent {
     title: string;
     availability: string;
     email: string;
+    phone: string;
     cta: string;
   };
   footer: {
