@@ -345,6 +345,7 @@ const fr: SiteContent = {
     title: 'Travaillons ensemble',
     availability: 'Disponible mai 2026 \u00b7 Remote ou Bruxelles',
     email: 'damien.meur@tmonier.com',
+    phone: '+32 475 39 55 16',
     cta: 'Me contacter',
   },
   footer: {

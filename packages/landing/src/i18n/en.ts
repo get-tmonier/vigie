@@ -339,6 +339,7 @@ const en: SiteContent = {
     title: 'Let\u2019s work together',
     availability: 'Available May 2026 \u00b7 Remote or Brussels',
     email: 'damien.meur@tmonier.com',
+    phone: '+32 475 39 55 16',
     cta: 'Get in touch',
   },
   footer: {

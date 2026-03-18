@@ -24,12 +24,18 @@ const contactHref = locale === 'fr' ? '/fr/contact' : '/contact';
       {contact.availability}
     </div>
 
-    <div class="reveal-up flex justify-center gap-6 mb-8" style="--delay: 240ms">
+    <div class="reveal-up flex flex-col items-center gap-3 mb-8" style="--delay: 240ms">
       <a
         href={`mailto:${contact.email}`}
         class="font-mono text-slate text-[0.82rem] no-underline hover:text-gold transition-colors duration-200"
       >
         {contact.email}
+      </a>
+      <a
+        href={`tel:${contact.phone.replace(/\s/g, '')}`}
+        class="font-mono text-slate text-[0.82rem] no-underline hover:text-gold transition-colors duration-200"
+      >
+        {contact.phone}
       </a>
     </div>
 

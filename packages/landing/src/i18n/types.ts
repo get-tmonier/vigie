@@ -104,6 +104,7 @@ export interface SiteContent {
     title: string;
     availability: string;
     email: string;
+    phone: string;
     cta: string;
   };
   footer: {
