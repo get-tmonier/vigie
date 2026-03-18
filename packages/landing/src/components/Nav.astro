@@ -61,6 +61,12 @@ const altHref = locale === 'fr' ? '/' : '/fr/';
         {nav.vigie}
       </a>
       <a
+        href={isHome ? '#about' : (locale === 'fr' ? '/fr/#about' : '/#about')}
+        class="font-mono text-slate text-[0.8rem] no-underline transition-colors duration-200 hover:text-gold"
+      >
+        {nav.about}
+      </a>
+      <a
         href={isContact ? '#main' : (locale === 'fr' ? '/fr/contact' : '/contact')}
         class:list={['font-mono text-[0.8rem] no-underline transition-colors duration-200', isContact ? 'text-gold' : 'text-slate hover:text-gold']}
       >
@@ -161,6 +167,12 @@ const altHref = locale === 'fr' ? '/' : '/fr/';
         class="mobile-nav-link font-mono text-slate text-[0.85rem] no-underline block py-3 transition-colors duration-200 hover:text-gold"
       >
         {nav.vigie}
+      </a>
+      <a
+        href={isHome ? '#about' : (locale === 'fr' ? '/fr/#about' : '/#about')}
+        class="mobile-nav-link font-mono text-slate text-[0.85rem] no-underline block py-3 transition-colors duration-200 hover:text-gold"
+      >
+        {nav.about}
       </a>
       <a
         href={isContact ? '#main' : (locale === 'fr' ? '/fr/contact' : '/contact')}

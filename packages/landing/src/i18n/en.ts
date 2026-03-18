@@ -10,6 +10,7 @@ const en: SiteContent = {
   },
   nav: {
     approach: 'Approach',
+    about: 'About me',
     stack: 'Stack',
     experience: 'Experience',
     projects: 'Projects',
@@ -52,6 +53,23 @@ const en: SiteContent = {
         description:
           'I adapt to your tools, your processes, and your people \u2014 but I value pair programming over solo silos, pair reviews over async back-and-forth. Direct collaboration is where the best work happens.',
       },
+    ],
+  },
+  about: {
+    label: 'About',
+    title: 'Behind the keyboard',
+    paragraphs: [
+      "I'm Damien — a curious tinkerer since the days I was dismantling every piece of electronics at home (sorry, Mom). {{age}} years old, married to the wonderful Clara who tolerates my late-night coding sessions, and proud dad to Basile who already beats me at board games.",
+      "What drives me is the craft. Part of the SoCraTes Belgium community, I believe great software is about clean design, tight feedback loops, and the discipline to keep learning. TDD, pair programming, continuous refactoring — that's how I sleep at night knowing my code won't wake anyone up at 3 AM.",
+      "The rise of AI in development? Fascinating — but when agents write code unsupervised, things drift fast. Context window limits, hallucinated logic, quality erosion. That's why I built Vigie: the more powerful our tools, the more we need control. When I'm not coding, you'll find me losing at Terraforming Mars or chasing whatever shiny tech caught my eye.",
+    ],
+    photoAlt: 'Damien Meur — Senior Fullstack Engineer',
+    tags: [
+      'Software Craft',
+      'SoCraTes Belgium',
+      'Board Games',
+      'AI Enthusiast',
+      'Curious Tinkerer',
     ],
   },
   stack: {

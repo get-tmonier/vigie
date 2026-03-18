@@ -10,6 +10,7 @@ const fr: SiteContent = {
   },
   nav: {
     approach: 'Approche',
+    about: 'À propos de moi',
     stack: 'Stack',
     experience: 'Exp\u00e9rience',
     projects: 'Projets',
@@ -52,6 +53,23 @@ const fr: SiteContent = {
         description:
           'Je m\u2019adapte \u00e0 vos outils, vos processus et vos \u00e9quipes \u2014 mais je privil\u00e9gie le pair programming aux silos, la pair review aux aller-retours asynchrones. La collaboration directe, c\u2019est l\u00e0 que le meilleur travail se fait.',
       },
+    ],
+  },
+  about: {
+    label: 'À propos',
+    title: 'Derrière le clavier',
+    paragraphs: [
+      "Moi c'est Damien — un curieux bricoleur depuis l'époque où je démontais tout ce qui avait un circuit imprimé à la maison (pardon, Maman). {{age}} ans, marié à l'extraordinaire Clara qui supporte mes nuits de codage, et papa fier de Basile qui me bat déjà aux jeux de société.",
+      "Ce qui me passionne, c'est le craft. Proche de la communauté SoCraTes Belgium, je crois que du bon logiciel c'est du design propre, des boucles de feedback courtes, et la discipline de toujours apprendre. TDD, pair programming, refactoring continu — c'est ce qui me permet de dormir tranquille en sachant que mon code ne réveillera personne à 3h du mat'.",
+      "L'arrivée de l'IA dans le dev ? Fascinant — mais quand des agents écrivent du code sans supervision, ça dérape vite. Fenêtre de contexte, logique hallucinée, érosion de la qualité. C'est pour ça que j'ai créé Vigie : plus nos outils deviennent puissants, plus on a besoin de contrôle. Quand je ne code pas, vous me trouverez en train de perdre à Terraforming Mars ou à explorer la dernière techno du moment.",
+    ],
+    photoAlt: 'Damien Meur — Ingénieur Fullstack Senior',
+    tags: [
+      'Software Craft',
+      'SoCraTes Belgium',
+      'Jeux de société',
+      "Passionné d'IA",
+      'Bidouilleur curieux',
     ],
   },
   stack: {

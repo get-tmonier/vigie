@@ -6,6 +6,7 @@ export interface SiteContent {
   };
   nav: {
     approach: string;
+    about: string;
     stack: string;
     experience: string;
     projects: string;
@@ -34,6 +35,13 @@ export interface SiteContent {
       title: string;
       description: string;
     }[];
+  };
+  about: {
+    label: string;
+    title: string;
+    paragraphs: string[];
+    photoAlt: string;
+    tags: string[];
   };
   stack: {
     label: string;

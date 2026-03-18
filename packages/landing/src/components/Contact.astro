@@ -11,23 +11,23 @@ const { contact } = content;
 const contactHref = locale === 'fr' ? '/fr/contact' : '/contact';
 ---
 
-<section id="contact" class="bg-cream py-20 px-10 min-h-[calc(100vh-64px)] box-border flex flex-col justify-center max-md:py-12 max-md:px-5">
+<section id="contact" class="bg-navy-deep py-20 px-10 min-h-[calc(100vh-64px)] box-border flex flex-col justify-center max-md:py-12 max-md:px-5">
   <div class="max-w-[600px] mx-auto text-center">
     <p class="reveal-up font-mono text-gold-dark text-[0.75rem] tracking-[0.15em] uppercase m-0 mb-4" style="--delay: 0ms">
       {contact.label}
     </p>
-    <h2 class="reveal-up font-bitter text-navy-deep font-bold text-[clamp(1.8rem,4vw,2.8rem)] m-0 mb-6 leading-[1.2]" style="--delay: 80ms">
+    <h2 class="reveal-up font-bitter text-cream font-bold text-[clamp(1.8rem,4vw,2.8rem)] m-0 mb-6 leading-[1.2]" style="--delay: 80ms">
       {contact.title}
     </h2>
 
-    <div class="reveal-scale inline-block font-mono text-[0.75rem] text-gold-dark bg-gold/10 border border-gold/25 rounded-[20px] py-[0.4rem] px-4 mb-8" style="--delay: 160ms">
+    <div class="reveal-scale inline-block font-mono text-[0.75rem] text-gold bg-gold/10 border border-gold/25 rounded-[20px] py-[0.4rem] px-4 mb-8" style="--delay: 160ms">
       {contact.availability}
     </div>
 
     <div class="reveal-up flex justify-center gap-6 mb-8" style="--delay: 240ms">
       <a
         href={`mailto:${contact.email}`}
-        class="font-mono text-navy-mid text-[0.82rem] no-underline hover:text-gold transition-colors duration-200"
+        class="font-mono text-slate text-[0.82rem] no-underline hover:text-gold transition-colors duration-200"
       >
         {contact.email}
       </a>
@@ -38,7 +38,7 @@ const contactHref = locale === 'fr' ? '/fr/contact' : '/contact';
         href="https://www.linkedin.com/in/damien-meur/"
         target="_blank"
         rel="noopener noreferrer"
-        class="text-navy-mid hover:text-gold transition-colors duration-200"
+        class="text-slate hover:text-gold transition-colors duration-200"
         aria-label="LinkedIn"
       >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
@@ -49,7 +49,7 @@ const contactHref = locale === 'fr' ? '/fr/contact' : '/contact';
         href="https://github.com/get-tmonier"
         target="_blank"
         rel="noopener noreferrer"
-        class="text-navy-mid hover:text-gold transition-colors duration-200"
+        class="text-slate hover:text-gold transition-colors duration-200"
         aria-label="GitHub"
       >
         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">

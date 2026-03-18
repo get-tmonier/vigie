@@ -1,4 +1,5 @@
 ---
+import AboutMe from '#components/AboutMe.astro';
 import Approach from '#components/Approach.astro';
 import Contact from '#components/Contact.astro';
 import Experience from '#components/Experience.astro';
@@ -30,6 +31,7 @@ const { content, locale } = Astro.props;
     <TechStack content={content} />
     <Experience content={content} />
     <FlagshipProject content={content} />
+    <AboutMe content={content} />
     <Contact content={content} locale={locale} />
   </main>
   <Footer content={content} locale={locale} />
