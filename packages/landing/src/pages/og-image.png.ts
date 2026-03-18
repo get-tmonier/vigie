@@ -38,22 +38,6 @@ function p(r: number, deg: number) {
 const spokesD = angles.map((a) => `M${p(8, a)} L${p(22, a)}`).join(' ');
 const handlesD = angles.map((a) => `M${p(19, a)} L${p(31, a)}`).join(' ');
 
-function pill(label: string): VNode {
-  return h('span', {
-    style: {
-      fontFamily: 'JetBrains Mono',
-      fontSize: 13,
-      fontWeight: 500,
-      color: 'rgba(245,240,232,0.5)',
-      backgroundColor: 'rgba(255,255,255,0.04)',
-      border: '1px solid rgba(255,255,255,0.08)',
-      borderRadius: 4,
-      padding: '6px 14px',
-    },
-    children: label,
-  });
-}
-
 function buildTree(): VNode {
   // Helm center: right=60+220=280 from right → x=920, y=95+220=315
   const helmCx = 920;
