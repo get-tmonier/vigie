@@ -161,7 +161,14 @@ const { hero, origin } = content;
 
     // Phase 3: Role words appear with stagger
     function typeRole() {
-      const words = oneLiner.split(' ');
+      const isMobile = window.innerWidth < 768;
+      // On mobile: remove the "· Brussels" suffix and append Brussels on a new line
+      const displayText = isMobile
+        ? oneLiner.replace(/\s*·\s*([^·]+)$/, '')
+        : oneLiner;
+      const lastPart = isMobile ? oneLiner.match(/·\s*([^·]+)$/)?.[1]?.trim() : null;
+
+      const words = displayText.split(' ');
       let wordDelay = 0;
       words.forEach((word, i) => {
         setTimeout(() => {
@@ -177,6 +184,23 @@ const { hero, origin } = content;
         }, wordDelay);
         wordDelay += 60;
       });
+
+      if (lastPart) {
+        setTimeout(() => {
+          const br = document.createElement('br');
+          roleEl.appendChild(br);
+          const span = document.createElement('span');
+          span.textContent = lastPart;
+          span.style.opacity = '0';
+          span.style.display = 'inline';
+          span.style.transition = 'opacity 0.3s ease';
+          roleEl.appendChild(span);
+          requestAnimationFrame(() => {
+            span.style.opacity = '1';
+          });
+        }, wordDelay);
+        wordDelay += 60;
+      }
 
       // Phase 4: CTAs slide up after role is done
       setTimeout(() => {

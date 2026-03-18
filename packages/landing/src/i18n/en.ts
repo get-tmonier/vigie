@@ -41,17 +41,22 @@ const en: SiteContent = {
       {
         title: 'Architecture & Clarity',
         description:
-          'I help you make solid technical choices. Data modelling, API contracts, system design \u2014 I bring the expertise so your team can move fast with confidence.',
+          'I help you make solid technical choices. **Data modelling**, API contracts, **system design** \u2014 I bring the expertise so your team can move fast with confidence.',
       },
       {
         title: 'End-to-End Delivery',
         description:
-          'From requirements to production, I deliver complete features. You stay in control of the roadmap \u2014 I make sure what ships is clean, tested, and shipped on time.',
+          'From requirements to production, I deliver complete features. You stay in control of the roadmap \u2014 I make sure what ships is **clean, tested**, and shipped on time.',
       },
       {
         title: 'Your Stack, Your Team',
         description:
-          'I adapt to your tools, your processes, and your people \u2014 but I value pair programming over solo silos, pair reviews over async back-and-forth. Direct collaboration is where the best work happens.',
+          'I adapt to your tools, your processes, and your people \u2014 but I value **pair programming** over solo silos, **pair reviews** over async back-and-forth. Direct collaboration is where the best work happens.',
+      },
+      {
+        title: 'Security by Design',
+        description:
+          'Security is not an afterthought. **OAuth** with server-only cookies, strict **CSP** with nonces, XSS prevention, **least-privilege** permission models \u2014 I bake these in from day one. I maintain ongoing **CVE watch** on sensitive dependencies and treat security hygiene as a first-class engineering concern.',
       },
     ],
   },
@@ -184,6 +189,7 @@ const en: SiteContent = {
           'Designed a Python ETL framework enabling the team to create and maintain 300+ bronze/silver/gold Medallion pipelines — **clean architecture**, dependency injection, and Pandera data quality checks',
           'Built an embedded DuckDB ETL system directly in the backend — with **observability**, DX-friendly tooling, and auto-refresh — reducing analytics load times by up to 100× across all application pages',
           '**Mentored developers** and fostered a culture of ownership, knowledge sharing, curiosity, and quality across the team',
+          'Owned **dependency health**: migrated ESLint, Next.js, React across major versions, led the CJS → ESM migration, ran tech watch, and tracked **CVEs** to keep the stack secure and current',
           'Managed Azure cloud infrastructure; set up **CI/CD** on Azure DevOps with automated testing and Databricks deployment',
         ],
         tags: [

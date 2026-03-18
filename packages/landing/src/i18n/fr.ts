@@ -41,17 +41,22 @@ const fr: SiteContent = {
       {
         title: 'Architecture & Clart\u00e9',
         description:
-          'Je vous aide \u00e0 faire les bons choix techniques. Mod\u00e8le de donn\u00e9es, contrats d\u2019API, design syst\u00e8me \u2014 j\u2019apporte l\u2019expertise pour que votre \u00e9quipe avance vite en confiance.',
+          'Je vous aide \u00e0 faire les bons choix techniques. **Mod\u00e8le de donn\u00e9es**, contrats d\u2019API, **design syst\u00e8me** \u2014 j\u2019apporte l\u2019expertise pour que votre \u00e9quipe avance vite en confiance.',
       },
       {
         title: 'Livraison bout en bout',
         description:
-          'Des requirements \u00e0 la production, je livre des features compl\u00e8tes. Vous gardez le contr\u00f4le de la roadmap \u2014 je m\u2019assure que ce qui part en prod est propre, test\u00e9 et livr\u00e9 dans les temps.',
+          'Des requirements \u00e0 la production, je livre des features compl\u00e8tes. Vous gardez le contr\u00f4le de la roadmap \u2014 je m\u2019assure que ce qui part en prod est **propre, test\u00e9** et livr\u00e9 dans les temps.',
       },
       {
         title: 'Votre Stack, Votre \u00c9quipe',
         description:
-          'Je m\u2019adapte \u00e0 vos outils, vos processus et vos \u00e9quipes \u2014 mais je privil\u00e9gie le pair programming aux silos, la pair review aux aller-retours asynchrones. La collaboration directe, c\u2019est l\u00e0 que le meilleur travail se fait.',
+          'Je m\u2019adapte \u00e0 vos outils, vos processus et vos \u00e9quipes \u2014 mais je privil\u00e9gie le **pair programming** aux silos, la **pair review** aux aller-retours asynchrones. La collaboration directe, c\u2019est l\u00e0 que le meilleur travail se fait.',
+      },
+      {
+        title: 'S\u00e9curit\u00e9 d\u00e8s la Conception',
+        description:
+          'La s\u00e9curit\u00e9 n\u2019est pas une option. **OAuth** avec cookies server-only, **CSP** strict avec nonces, pr\u00e9vention XSS, mod\u00e8les de permissions en **least-privilege** \u2014 je les int\u00e8gre d\u00e8s le d\u00e9part. Je maintiens une veille active sur les **CVEs** des d\u00e9pendances sensibles et traite l\u2019hygi\u00e8ne s\u00e9curit\u00e9 comme une contrainte d\u2019ing\u00e9nierie de premier ordre.',
       },
     ],
   },
@@ -184,6 +189,7 @@ const fr: SiteContent = {
           "Conception d'un framework ETL Python permettant à l'équipe de créer et maintenir 300+ pipelines Medallion bronze/silver/gold — **architecture propre**, injection de dépendances, contrôles qualité Pandera",
           "Mise en place d'un système ETL DuckDB embarqué directement dans le backend — avec **observabilité**, tooling DX-friendly et auto-refresh — réduisant les temps de chargement des analytics jusqu'à un facteur 100× sur toutes les pages de l'application",
           "**Mentorat de développeurs** et promotion d'une culture d'ownership, de partage de connaissances, de curiosité et de qualité au sein de l'équipe",
+          "Responsable de la **santé des dépendances** : migration d'ESLint, Next.js, React sur les versions majeures, migration CJS → ESM, veille technologique et suivi des **CVEs** pour maintenir la stack sécurisée et à jour",
           "Gestion de l'infrastructure cloud Azure ; mise en place du **CI/CD** sur Azure DevOps avec tests automatisés et déploiement Databricks",
         ],
         tags: [

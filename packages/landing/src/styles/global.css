@@ -30,7 +30,7 @@ html {
 
 mark {
   background: transparent;
-  color: var(--navy-deep);
+  color: inherit;
   border-bottom: 1px solid rgba(196, 154, 43, 0.45);
   padding-bottom: 1px;
   font-style: inherit;
