@@ -1,5 +1,11 @@
 # build output
 dist/
+
+# generated brand assets (sourced from @tmonier/tokens/assets/helm.svg)
+public/favicon.svg
+public/favicon.ico
+public/logo.svg
+public/logo-512.png
 # generated types
 .astro/
 
