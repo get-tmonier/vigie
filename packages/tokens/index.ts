@@ -1,3 +1,20 @@
+// Helm (WheelMark) geometry — single source of truth for all SVG renderings
+const _helmCx = 32;
+const _helmCy = 32;
+const _helmAngles = [0, 45, 90, 135, 180, 225, 270, 315];
+function _helmPoint(r: number, deg: number): string {
+  const rad = ((deg - 90) * Math.PI) / 180;
+  return `${(_helmCx + r * Math.cos(rad)).toFixed(1)},${(_helmCy + r * Math.sin(rad)).toFixed(1)}`;
+}
+
+export const helm = {
+  viewBox: '0 0 64 64',
+  cx: _helmCx,
+  cy: _helmCy,
+  spokesD: _helmAngles.map((a) => `M${_helmPoint(8, a)} L${_helmPoint(22, a)}`).join(' '),
+  handlesD: _helmAngles.map((a) => `M${_helmPoint(19, a)} L${_helmPoint(31, a)}`).join(' '),
+} as const;
+
 export const colors = {
   navyDeep: '#0b1a2e',
   navyMid: '#1d3557',

@@ -1,11 +1,14 @@
 import { Resvg } from '@resvg/resvg-js';
+import { colors, helm } from '@tmonier/tokens';
 import type { APIRoute } from 'astro';
 import satori from 'satori';
 
-const GOLD = '#C49A2B';
-const NAVY = '#0B1A2E';
-const CREAM = '#F5F0E8';
-const SLATE = 'rgba(139,156,175,0.75)';
+const GOLD = colors.gold;
+const NAVY = colors.navyDeep;
+const CREAM = colors.cream;
+const SLATE = `rgba(139,156,175,0.75)`;
+
+const { spokesD, handlesD } = helm;
 
 async function fetchFont(family: string, weight: number): Promise<ArrayBuffer> {
   const css = await fetch(
@@ -23,20 +26,6 @@ type VNode = { type: string; props: Record<string, any> };
 function h(type: string, props: Record<string, any>): VNode {
   return { type, props };
 }
-
-// WheelMark SVG — same math as WheelMark.astro
-const cx = 32;
-const cy = 32;
-const angles = [0, 45, 90, 135, 180, 225, 270, 315];
-function toRad(deg: number) {
-  return ((deg - 90) * Math.PI) / 180;
-}
-function p(r: number, deg: number) {
-  const rad = toRad(deg);
-  return `${(cx + r * Math.cos(rad)).toFixed(1)},${(cy + r * Math.sin(rad)).toFixed(1)}`;
-}
-const spokesD = angles.map((a) => `M${p(8, a)} L${p(22, a)}`).join(' ');
-const handlesD = angles.map((a) => `M${p(19, a)} L${p(31, a)}`).join(' ');
 
 function buildTree(): VNode {
   // Helm center: right=60+220=280 from right → x=920, y=95+220=315

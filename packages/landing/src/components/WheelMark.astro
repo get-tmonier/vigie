@@ -1,4 +1,5 @@
 ---
+import { helm } from '@tmonier/tokens';
 import { cn } from '#lib/cn';
 
 interface Props {
@@ -8,25 +9,7 @@ interface Props {
 
 const { size = 24, class: className = '' } = Astro.props;
 const g = `url(#brass-${size})`;
-
-const cx = 32;
-const cy = 32;
-const angles = [0, 45, 90, 135, 180, 225, 270, 315];
-
-function toRad(deg: number) {
-  return ((deg - 90) * Math.PI) / 180;
-}
-
-function p(r: number, deg: number): string {
-  const rad = toRad(deg);
-  return `${(cx + r * Math.cos(rad)).toFixed(1)},${(cy + r * Math.sin(rad)).toFixed(1)}`;
-}
-
-// Spokes: from hub ring (r=8) to outer ring (r=22)
-const spokesD = angles.map((a) => `M${p(8, a)} L${p(22, a)}`).join(' ');
-
-// Handles: overlap outer ring and extend beyond (r=19 to r=31)
-const handlesD = angles.map((a) => `M${p(19, a)} L${p(31, a)}`).join(' ');
+const { spokesD, handlesD } = helm;
 ---
 
 <svg
