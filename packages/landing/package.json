@@ -12,7 +12,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "bun scripts/gen-favicon.mjs && bun scripts/gen-og.mjs && astro build",
+    "build": "bun scripts/gen-favicon.mjs && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "biome lint .",
