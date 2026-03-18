@@ -71,6 +71,7 @@ export interface SiteContent {
       bullets: string[];
       tags: string[];
     }[];
+    references: string;
     projectsLabel: string;
     projectsTitle: string;
     projects: {
@@ -86,6 +87,7 @@ export interface SiteContent {
     label: string;
     title: string;
     degree: string;
+    specialisation: string;
     school: string;
     period: string;
     distinction: string;

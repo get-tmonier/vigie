@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /og/
+Disallow: /fr/og/
 
 Sitemap: https://tmonier.com/sitemap-index.xml
