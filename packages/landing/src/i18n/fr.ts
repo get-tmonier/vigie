@@ -183,7 +183,7 @@ const fr: SiteContent = {
           'D\u00e9veloppement de frontends React / Next.js et services backend TypeScript avec architecture hexagonale et Effect-TS',
           'Conception d\u2019un framework ETL Python permettant \u00e0 l\u2019\u00e9quipe de cr\u00e9er et maintenir 300+ pipelines Medallion bronze/silver/gold \u2014 architecture propre, injection de d\u00e9pendances, contr\u00f4les qualit\u00e9 Pandera',
           'Mise en place d\u2019un syst\u00e8me ETL DuckDB embarqu\u00e9 directement dans le backend \u2014 avec observabilit\u00e9, tooling DX-friendly et auto-refresh \u2014 r\u00e9duisant les temps de chargement des analytics jusqu\u2019\u00e0 un facteur 100 sur toutes les pages de l\u2019application',
-          'Mentorat de d\u00e9veloppeurs juniors et promotion d\u2019une culture d\u2019ownership, de partage de connaissances, de curiosit\u00e9 et de qualit\u00e9 au sein de l\u2019\u00e9quipe',
+          'Mentorat de d\u00e9veloppeurs et promotion d\u2019une culture d\u2019ownership, de partage de connaissances, de curiosit\u00e9 et de qualit\u00e9 au sein de l\u2019\u00e9quipe',
           'Gestion de l\u2019infrastructure cloud Azure ; mise en place du CI/CD sur Azure DevOps avec tests automatis\u00e9s et d\u00e9ploiement Databricks',
         ],
         tags: [
