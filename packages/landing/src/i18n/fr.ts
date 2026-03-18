@@ -223,7 +223,7 @@ const fr: SiteContent = {
         ],
       },
       {
-        period: '2020',
+        period: 'Avr 2020 \u2013 Oct 2020',
         company: 'Emisys',
         role: 'Full Stack Developer',
         location: 'Bruxelles',
@@ -236,7 +236,7 @@ const fr: SiteContent = {
         tags: ['PHP', 'JavaScript', 'PostgreSQL'],
       },
       {
-        period: '2019 \u2013 2020',
+        period: 'Sep 2019 \u2013 Avr 2020',
         company: 'mPhase',
         role: 'Full Stack Developer',
         location: 'Montr\u00e9al',
@@ -249,7 +249,7 @@ const fr: SiteContent = {
         tags: ['Vue.js', 'Node.js', 'Express', 'MongoDB'],
       },
       {
-        period: '2018 \u2013 2019',
+        period: 'Nov 2018 \u2013 Ao\u00fbt 2019',
         company: 'Extia \u2192 Taktik',
         role: 'Full Stack Developer',
         location: 'Bruxelles',
@@ -263,7 +263,7 @@ const fr: SiteContent = {
         tags: ['Kotlin', 'Spring Boot', 'Angular', 'PostgreSQL'],
       },
       {
-        period: '2018',
+        period: 'Juil 2018 \u2013 Nov 2018',
         company: 'Extia \u2192 Bewan',
         role: 'Full Stack Developer',
         location: 'Bruxelles',
@@ -276,7 +276,7 @@ const fr: SiteContent = {
         tags: ['JavaScript', 'jQuery', 'PHP', 'Symfony', 'PostgreSQL'],
       },
       {
-        period: '2017 \u2013 2018',
+        period: 'D\u00e9c 2017 \u2013 Juil 2018',
         company: 'IoTFactory',
         role: 'Full Stack Developer',
         location: 'Bruxelles',
