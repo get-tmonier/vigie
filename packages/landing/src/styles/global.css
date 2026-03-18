@@ -28,6 +28,14 @@ html {
   scroll-behavior: smooth;
 }
 
+mark {
+  background: transparent;
+  color: var(--navy-deep);
+  border-bottom: 1px solid rgba(196, 154, 43, 0.45);
+  padding-bottom: 1px;
+  font-style: inherit;
+}
+
 [id] {
   scroll-margin-top: 80px;
 }

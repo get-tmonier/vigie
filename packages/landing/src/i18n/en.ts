@@ -180,11 +180,11 @@ const en: SiteContent = {
         description:
           'Data-sharing platform for food industry groups and supermarket chains to exchange and process operational datasets across 4 European markets.',
         bullets: [
-          'Developed React / Next.js frontends and TypeScript backend services with hexagonal architecture and Effect-TS',
-          'Designed a Python ETL framework enabling the team to create and maintain 300+ bronze/silver/gold Medallion pipelines \u2014 clean architecture, dependency injection, and Pandera data quality checks',
-          'Built an embedded DuckDB ETL system directly in the backend \u2014 with observability, DX-friendly tooling, and auto-refresh \u2014 reducing analytics load times by up to 100x across all application pages',
-          'Mentored developers and fostered a culture of ownership, knowledge sharing, curiosity, and quality across the team',
-          'Managed Azure cloud infrastructure; set up CI/CD on Azure DevOps with automated testing and Databricks deployment',
+          'Developed React / Next.js frontends and TypeScript backend services with **hexagonal architecture** and Effect-TS',
+          'Designed a Python ETL framework enabling the team to create and maintain 300+ bronze/silver/gold Medallion pipelines — **clean architecture**, dependency injection, and Pandera data quality checks',
+          'Built an embedded DuckDB ETL system directly in the backend — with **observability**, DX-friendly tooling, and auto-refresh — reducing analytics load times by up to 100× across all application pages',
+          '**Mentored developers** and fostered a culture of ownership, knowledge sharing, curiosity, and quality across the team',
+          'Managed Azure cloud infrastructure; set up **CI/CD** on Azure DevOps with automated testing and Databricks deployment',
         ],
         tags: [
           'TypeScript',
@@ -209,7 +209,7 @@ const en: SiteContent = {
           'SaaS visitor management platform serving enterprise clients across 100+ countries.',
         bullets: [
           'Developed and maintained core platform features (Node.js, Express, Angular)',
-          'Worked within a microservices architecture with inter-service communication via Apache Pulsar message broker',
+          'Worked within a **microservices architecture** with inter-service communication via Apache Pulsar message broker',
           'Migrated frontend modules from AngularJS to Angular with TypeScript',
         ],
         tags: [
@@ -241,8 +241,8 @@ const en: SiteContent = {
         location: 'Montreal',
         description: 'Water treatment logistics tool for Montreal municipal operations.',
         bullets: [
-          'Built the full application from scratch \u2014 Vue.js frontend, Node.js/Express API, MongoDB',
-          'Designed geolocation-based routing and scheduling system',
+          'Built the full application from scratch — Vue.js frontend, Node.js/Express API, MongoDB',
+          'Designed **geolocation-based routing and scheduling** system',
         ],
         tags: ['Vue.js', 'Node.js', 'Express', 'MongoDB'],
       },
@@ -256,7 +256,7 @@ const en: SiteContent = {
         bullets: [
           'Built monitoring dashboards and alerting systems',
           'Developed backend services with Spring Boot and Kotlin',
-          'Implemented Angular frontend with real-time data visualization',
+          'Implemented Angular frontend with **real-time data visualization**',
         ],
         tags: ['Kotlin', 'Spring Boot', 'Angular', 'PostgreSQL'],
       },

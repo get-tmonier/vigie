@@ -1,5 +1,5 @@
 ---
-// OG image design — open at /og, resize browser to 1200×630, screenshot → save as /public/images/og-image.png
+// OG image preview — open at /og, resize browser to 1200×630 to screenshot
 ---
 
 <!doctype html>
@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Vollkorn+SC:wght@700;900&family=JetBrains+Mono:wght@500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Vollkorn:wght@700;900&family=Vollkorn+SC:wght@700;900&family=JetBrains+Mono:wght@500;600&display=swap"
       rel="stylesheet"
     />
     <style>
@@ -20,132 +20,141 @@
       .og-wrapper {
         width: 1200px;
         height: 630px;
-        background: #0B1A2E;
+        background: radial-gradient(ellipse at 77% 50%, rgba(196,154,43,0.11) 0%, transparent 52%), #0B1A2E;
         position: relative;
+        display: flex;
+        overflow: hidden;
+      }
+
+      .og-left-bar {
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 4px;
+        background: #C49A2B;
+        opacity: 0.6;
+      }
+
+      .og-bottom-bar {
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 3px;
+        background: #C49A2B;
+        opacity: 0.3;
+      }
+
+      .og-separator {
+        position: absolute;
+        left: 640px; top: 60px;
+        width: 1px; height: 510px;
+        background: linear-gradient(to bottom, transparent, rgba(196,154,43,0.25) 25%, rgba(196,154,43,0.25) 75%, transparent);
+      }
+
+      .og-ring {
+        position: absolute;
+        border-radius: 50%;
+        border: 1px solid rgba(196,154,43,0.1);
+      }
+
+      .og-helm {
+        position: absolute;
+        right: 60px;
+        top: 95px;
+        width: 440px;
+        height: 440px;
+        opacity: 0.22;
+      }
+
+      .og-content {
         display: flex;
         flex-direction: column;
         justify-content: center;
         padding: 72px 96px;
-        overflow: hidden;
+        max-width: 720px;
       }
 
-      .og-watermark {
-        position: absolute;
-        right: 80px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 340px;
-        height: 340px;
-        opacity: 0.07;
-      }
-
-      .og-brand {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        margin-bottom: 36px;
-      }
-
-      .og-brand-name {
-        font-family: 'Vollkorn SC', serif;
-        font-weight: 900;
-        font-size: 42px;
-        color: #C49A2B;
-        letter-spacing: 3px;
-      }
-
-      .og-tagline {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 12px;
-        font-weight: 600;
-        letter-spacing: 4px;
-        text-transform: uppercase;
-        color: rgba(139,156,175,0.5);
-      }
-
-      .og-headline {
-        font-family: 'Vollkorn SC', serif;
-        font-weight: 900;
-        font-size: 56px;
-        color: #F5F0E8;
-        line-height: 1.2;
-        margin-bottom: 12px;
-      }
-
-      .og-subtitle {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 22px;
-        font-weight: 500;
-        color: rgba(139,156,175,0.7);
-        margin-bottom: 28px;
-      }
-
-      .og-pills {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-      }
-
-      .og-pill {
+      .og-label {
         font-family: 'JetBrains Mono', monospace;
         font-size: 13px;
         font-weight: 500;
-        color: rgba(245,240,232,0.5);
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 4px;
-        padding: 6px 14px;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        color: #C49A2B;
+        opacity: 0.8;
+        margin-bottom: 32px;
       }
 
-      .og-url {
-        position: absolute;
-        bottom: 48px;
-        left: 96px;
+      .og-name {
+        font-family: 'Vollkorn', serif;
+        font-weight: 700;
+        font-size: 68px;
+        color: #F5F0E8;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        white-space: nowrap;
+        margin-bottom: 20px;
+      }
+
+      .og-divider {
+        width: 64px;
+        height: 2px;
+        background: #C49A2B;
+        opacity: 0.7;
+        margin-bottom: 24px;
+      }
+
+      .og-role {
         font-family: 'JetBrains Mono', monospace;
-        font-size: 14px;
-        font-weight: 600;
-        color: rgba(196,154,43,0.4);
-        letter-spacing: 2px;
+        font-size: 22px;
+        font-weight: 500;
+        color: rgba(139,156,175,0.75);
+        margin-bottom: 10px;
       }
 
-      .og-border-accent {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, transparent, #C49A2B 30%, #C49A2B 70%, transparent);
-        opacity: 0.4;
+      .og-location {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 16px;
+        font-weight: 500;
+        color: rgba(196,154,43,0.55);
+        letter-spacing: 2px;
       }
     </style>
   </head>
   <body>
     <div class="og-wrapper">
-      <!-- Watermark wheel -->
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="og-watermark">
-        <circle cx="32" cy="32" r="27" fill="none" stroke="#C49A2B" stroke-width="2.5"/>
-        <circle cx="32" cy="32" r="19" fill="none" stroke="#C49A2B" stroke-width="2"/>
-        <circle cx="32" cy="32" r="5.5" fill="#C49A2B"/>
-        <line x1="32" y1="27" x2="32" y2="7" stroke="#C49A2B" stroke-width="2.5" stroke-linecap="round"/>
-        <ellipse cx="32" cy="6" rx="2.2" ry="3" fill="#C49A2B"/>
+      <div class="og-left-bar"></div>
+      <div class="og-bottom-bar"></div>
+      <div class="og-separator"></div>
+      <div class="og-ring" style="width:580px;height:580px;left:630px;top:25px;border-color:rgba(196,154,43,0.07)"></div>
+      <div class="og-ring" style="width:460px;height:460px;left:690px;top:85px;border-color:rgba(196,154,43,0.1)"></div>
+      <div class="og-ring" style="width:350px;height:350px;left:745px;top:140px;border-color:rgba(196,154,43,0.13)"></div>
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="og-helm">
+        <path d="M32.0,24.0 L32.0,10.0 M37.7,26.3 L47.6,16.4 M40.0,32.0 L54.0,32.0 M37.7,37.7 L47.6,47.6 M32.0,40.0 L32.0,54.0 M26.3,37.7 L16.4,47.6 M24.0,32.0 L10.0,32.0 M26.3,26.3 L16.4,16.4" fill="none" stroke="#C49A2B" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="32" cy="32" r="22" fill="none" stroke="#C49A2B" stroke-width="3"/>
+        <circle cx="32" cy="32" r="12" fill="none" stroke="#C49A2B" stroke-width="2"/>
+        <circle cx="32" cy="32" r="6.5" fill="none" stroke="#C49A2B" stroke-width="1.5"/>
+        <circle cx="32" cy="32" r="3" fill="#C49A2B"/>
+        <path d="M32.0,13.0 L32.0,1.0 M45.4,18.6 L53.9,10.1 M51.0,32.0 L63.0,32.0 M45.4,45.4 L53.9,53.9 M32.0,51.0 L32.0,63.0 M18.6,45.4 L10.1,53.9 M13.0,32.0 L1.0,32.0 M18.6,18.6 L10.1,10.1" fill="none" stroke="#C49A2B" stroke-width="4" stroke-linecap="round"/>
       </svg>
 
-      <div class="og-brand">
-        <span class="og-brand-name">Tmonier</span>
-        <span class="og-tagline">You Keep The Helm.</span>
+      <div class="og-content">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:32px">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="48" height="48">
+            <path d="M32.0,24.0 L32.0,10.0 M37.7,26.3 L47.6,16.4 M40.0,32.0 L54.0,32.0 M37.7,37.7 L47.6,47.6 M32.0,40.0 L32.0,54.0 M26.3,37.7 L16.4,47.6 M24.0,32.0 L10.0,32.0 M26.3,26.3 L16.4,16.4" fill="none" stroke="#C49A2B" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="32" cy="32" r="22" fill="none" stroke="#C49A2B" stroke-width="3"/>
+            <circle cx="32" cy="32" r="12" fill="none" stroke="#C49A2B" stroke-width="2"/>
+            <circle cx="32" cy="32" r="6.5" fill="none" stroke="#C49A2B" stroke-width="1.5"/>
+            <circle cx="32" cy="32" r="3" fill="#C49A2B"/>
+            <path d="M32.0,13.0 L32.0,1.0 M45.4,18.6 L53.9,10.1 M51.0,32.0 L63.0,32.0 M45.4,45.4 L53.9,53.9 M32.0,51.0 L32.0,63.0 M18.6,45.4 L10.1,53.9 M13.0,32.0 L1.0,32.0 M18.6,18.6 L10.1,10.1" fill="none" stroke="#C49A2B" stroke-width="4" stroke-linecap="round"/>
+          </svg>
+          <span style="font-family:'Vollkorn SC',serif;font-weight:900;font-size:30px;letter-spacing:3px;color:#C49A2B">Tmonier</span>
+          <span style="font-family:'Vollkorn',serif;font-weight:700;font-style:italic;font-size:16px;color:rgba(196,154,43,0.5);letter-spacing:0.5px;margin-top:6px">You keep the helm.</span>
+        </div>
+        <div class="og-name">Damien Meur</div>
+        <div class="og-divider"></div>
+        <div class="og-role">Senior Fullstack Engineer</div>
+        <div class="og-location">Freelance · Brussels</div>
       </div>
-
-      <h1 class="og-headline">Senior Fullstack Engineer</h1>
-      <p class="og-subtitle">Freelance · Brussels</p>
-
-      <div class="og-pills">
-        {['TypeScript', 'React', 'Node.js', 'Effect-TS', 'PostgreSQL'].map((label) => (
-          <span class="og-pill">{label}</span>
-        ))}
-      </div>
-
-      <p class="og-url">tmonier.com</p>
-      <div class="og-border-accent"></div>
     </div>
   </body>
 </html>

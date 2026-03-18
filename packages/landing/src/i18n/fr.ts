@@ -178,13 +178,13 @@ const fr: SiteContent = {
         role: 'Senior Full Stack Developer',
         location: 'Bruxelles',
         description:
-          'Plateforme de partage de donn\u00e9es pour groupes agroalimentaires et cha\u00eenes de supermarch\u00e9s, traitant des datasets op\u00e9rationnels sur 4 march\u00e9s europ\u00e9ens.',
+          'Plateforme de partage de données pour groupes agroalimentaires et chaînes de supermarchés, traitant des datasets opérationnels sur 4 marchés européens.',
         bullets: [
-          'D\u00e9veloppement de frontends React / Next.js et services backend TypeScript avec architecture hexagonale et Effect-TS',
-          'Conception d\u2019un framework ETL Python permettant \u00e0 l\u2019\u00e9quipe de cr\u00e9er et maintenir 300+ pipelines Medallion bronze/silver/gold \u2014 architecture propre, injection de d\u00e9pendances, contr\u00f4les qualit\u00e9 Pandera',
-          'Mise en place d\u2019un syst\u00e8me ETL DuckDB embarqu\u00e9 directement dans le backend \u2014 avec observabilit\u00e9, tooling DX-friendly et auto-refresh \u2014 r\u00e9duisant les temps de chargement des analytics jusqu\u2019\u00e0 un facteur 100 sur toutes les pages de l\u2019application',
-          'Mentorat de d\u00e9veloppeurs et promotion d\u2019une culture d\u2019ownership, de partage de connaissances, de curiosit\u00e9 et de qualit\u00e9 au sein de l\u2019\u00e9quipe',
-          'Gestion de l\u2019infrastructure cloud Azure ; mise en place du CI/CD sur Azure DevOps avec tests automatis\u00e9s et d\u00e9ploiement Databricks',
+          'Développement de frontends React / Next.js et services backend TypeScript avec **architecture hexagonale** et Effect-TS',
+          "Conception d'un framework ETL Python permettant à l'équipe de créer et maintenir 300+ pipelines Medallion bronze/silver/gold — **architecture propre**, injection de dépendances, contrôles qualité Pandera",
+          "Mise en place d'un système ETL DuckDB embarqué directement dans le backend — avec **observabilité**, tooling DX-friendly et auto-refresh — réduisant les temps de chargement des analytics jusqu'à un facteur 100× sur toutes les pages de l'application",
+          "**Mentorat de développeurs** et promotion d'une culture d'ownership, de partage de connaissances, de curiosité et de qualité au sein de l'équipe",
+          "Gestion de l'infrastructure cloud Azure ; mise en place du **CI/CD** sur Azure DevOps avec tests automatisés et déploiement Databricks",
         ],
         tags: [
           'TypeScript',
@@ -208,8 +208,8 @@ const fr: SiteContent = {
         description:
           'Plateforme SaaS de gestion des visiteurs pour clients entreprise dans 100+ pays.',
         bullets: [
-          'D\u00e9veloppement et maintenance des fonctionnalit\u00e9s core (Node.js, Express, Angular)',
-          'Travail au sein d\u2019une architecture microservices avec communication inter-services via le broker Apache Pulsar',
+          'Développement et maintenance des fonctionnalités core (Node.js, Express, Angular)',
+          "Travail au sein d'une **architecture microservices** avec communication inter-services via le broker Apache Pulsar",
           'Migration de modules frontend d\u2019AngularJS vers Angular avec TypeScript',
         ],
         tags: [
@@ -231,7 +231,7 @@ const fr: SiteContent = {
           'Application de gestion d\u2019\u00e9v\u00e9nements utilis\u00e9e par les grands festivals belges.',
         bullets: [
           'D\u00e9veloppement de fonctionnalit\u00e9s de billetterie et planning',
-          'Construit en PHP et JavaScript, servant des milliers d\u2019utilisateurs simultan\u00e9s pendant les \u00e9v\u00e9nements',
+          "Construit en PHP et JavaScript, servant **des milliers d'utilisateurs simultanés** pendant les événements",
         ],
         tags: ['PHP', 'JavaScript', 'PostgreSQL'],
       },
@@ -243,8 +243,8 @@ const fr: SiteContent = {
         description:
           'Outil logistique de traitement des eaux pour les op\u00e9rations municipales de Montr\u00e9al.',
         bullets: [
-          'Construction de l\u2019application compl\u00e8te from scratch \u2014 frontend Vue.js, API Node.js/Express, MongoDB',
-          'Conception du syst\u00e8me de routage et planification g\u00e9olocalis\u00e9',
+          "Construction de l'application complète from scratch — frontend Vue.js, API Node.js/Express, MongoDB",
+          'Conception du **système de routage et planification géolocalisé**',
         ],
         tags: ['Vue.js', 'Node.js', 'Express', 'MongoDB'],
       },
@@ -258,7 +258,7 @@ const fr: SiteContent = {
         bullets: [
           'Construction de dashboards de monitoring et syst\u00e8mes d\u2019alerting',
           'D\u00e9veloppement de services backend avec Spring Boot et Kotlin',
-          'Impl\u00e9mentation du frontend Angular avec visualisation de donn\u00e9es temps r\u00e9el',
+          'Implémentation du frontend Angular avec **visualisation de données temps réel**',
         ],
         tags: ['Kotlin', 'Spring Boot', 'Angular', 'PostgreSQL'],
       },

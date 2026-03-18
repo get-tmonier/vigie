@@ -38,9 +38,10 @@ function getLevel(lang: string): number {
         </div>
         <div>
           <p class="font-vollkorn-sc text-gold font-bold text-[0.9rem] m-0 leading-tight">{education.degree}</p>
-          <p class="font-source-serif text-slate text-[0.78rem] m-0">
-            {education.school} · {education.period} · <span class="text-gold/80 font-mono text-[0.65rem] font-semibold uppercase">{education.distinction}</span>
-          </p>
+          <div class="font-source-serif text-slate text-[0.78rem]">
+            <div>{education.school}</div>
+            <div>{education.period} · <span class="text-gold/80 font-mono text-[0.65rem] font-semibold uppercase">{education.distinction}</span></div>
+          </div>
         </div>
       </div>
 
