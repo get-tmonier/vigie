@@ -6,7 +6,7 @@ const fr: SiteContent = {
     description:
       'Damien Meur — Ing\u00e9nieur Fullstack Senior disponible pour des missions freelance \u00e0 Bruxelles.',
     keywords:
-      'd\u00e9veloppeur freelance, ing\u00e9nieur fullstack senior, TypeScript, React, Node.js, Effect-TS, Bruxelles, Belgique, consultant, software craft, architecture propre, supervision agents IA, Vigie',
+      'd\u00e9veloppeur freelance, ing\u00e9nieur fullstack senior, TypeScript, React, Node.js, Effect-TS, Bruxelles, Belgique, consultant, software craft, clean architecture, supervision agents IA, Vigie',
   },
   nav: {
     approach: 'Approche',
@@ -176,21 +176,24 @@ const fr: SiteContent = {
   experience: {
     label: 'Exp\u00e9rience',
     title: 'Parcours',
+    badgeEmployee: 'Employé',
+    badgeInternship: 'Stagiaire',
     jobs: [
       {
         period: 'Avr 2022 \u2013 Avr 2026',
         company: 'Aware',
+        type: 'employee' as const,
         role: 'Senior Full Stack Developer',
         location: 'Bruxelles',
         description:
           'Plateforme de partage de données pour groupes agroalimentaires et chaînes de supermarchés, traitant des datasets opérationnels sur 4 marchés européens.',
         bullets: [
-          'Développement de frontends React / Next.js et services backend TypeScript avec **architecture hexagonale** et Effect-TS',
-          "Conception d'un framework ETL Python permettant à l'équipe de créer et maintenir 300+ pipelines Medallion bronze/silver/gold — **architecture propre**, injection de dépendances, contrôles qualité Pandera",
-          "Mise en place d'un système ETL DuckDB embarqué directement dans le backend — avec **observabilité**, tooling DX-friendly et auto-refresh — réduisant les temps de chargement des analytics jusqu'à un facteur 100× sur toutes les pages de l'application",
+          'Développement frontend et backend autour des principes d\u2019**architecture hexagonale**, avec un fort accent sur la type-safety et la programmation fonctionnelle',
+          "Conception d'un framework ETL permettant à l'équipe de créer et maintenir 300+ pipelines Medallion bronze/silver/gold — **clean architecture**, injection de dépendances, contrôles qualité automatisés",
+          "Mise en place d'un système ETL **DuckDB** embarqué directement dans le backend — avec **observabilité**, tooling DX-friendly et auto-refresh — réduisant les temps de chargement analytics jusqu'à un facteur 100× sur toutes les pages",
           "**Mentorat de développeurs** et promotion d'une culture d'ownership, de partage de connaissances, de curiosité et de qualité au sein de l'équipe",
-          "Responsable de la **santé des dépendances** : migration d'ESLint, Next.js, React sur les versions majeures, migration CJS → ESM, veille technologique et suivi des **CVEs** pour maintenir la stack sécurisée et à jour",
-          "Gestion de l'infrastructure cloud Azure ; mise en place du **CI/CD** sur Azure DevOps avec tests automatisés et déploiement Databricks",
+          'Responsable de la **santé des dépendances** : montées de version majeures sur l\u2019ensemble de la stack, migration CJS → ESM, veille technologique et suivi des **CVEs**',
+          'Gestion de l\u2019infrastructure cloud ; mise en place du **CI/CD** avec tests automatisés et pipelines de déploiement Databricks',
         ],
         tags: [
           'TypeScript',
@@ -207,16 +210,18 @@ const fr: SiteContent = {
         ],
       },
       {
-        period: 'Nov 2020 \u2013 Avr 2022',
+        period: 'Oct 2020 \u2013 Avr 2022',
         company: 'Proxyclick',
+        type: 'employee' as const,
         role: 'Full Stack Developer',
         location: 'Bruxelles',
         description:
           'Plateforme SaaS de gestion des visiteurs pour clients entreprise dans 100+ pays.',
         bullets: [
-          'Développement et maintenance des fonctionnalités core (Node.js, Express, Angular)',
-          "Travail au sein d'une **architecture microservices** avec communication inter-services via le broker Apache Pulsar",
-          'Migration de modules frontend d\u2019AngularJS vers Angular avec TypeScript',
+          "Travail au sein d'une **architecture microservices** avec communication inter-services event-driven via Apache Pulsar",
+          'Réécriture complète du **système de facturation et self-service** — flows d\u2019abonnement aux modules, intégration paiement et gestion de compte',
+          'Conception et développement d\u2019un **moteur d\u2019automatisation event-based** (style IFTTT) pour simplifier la gestion et la personnalisation des workflows visiteurs',
+          '**Modernisation progressive du frontend** — migration des modules AngularJS legacy vers une stack moderne et typée',
         ],
         tags: [
           'Angular',
@@ -231,26 +236,30 @@ const fr: SiteContent = {
       {
         period: 'Avr 2020 \u2013 Oct 2020',
         company: 'Emisys',
+        type: 'employee' as const,
         role: 'Full Stack Developer',
-        location: 'Bruxelles',
+        location: 'Louvain-la-Neuve',
         description:
           'Application de gestion d\u2019\u00e9v\u00e9nements utilis\u00e9e par les grands festivals belges.',
         bullets: [
-          'D\u00e9veloppement de fonctionnalit\u00e9s de billetterie et planning',
-          "Construit en PHP et JavaScript, servant **des milliers d'utilisateurs simultanés** pendant les événements",
+          'Développement de fonctionnalités de billetterie et planning',
+          'Mise en place des **systèmes de paiement et remboursement** — traitement des transactions, flows d\u2019annulation et réconciliation financière pour les opérations festival',
+          'Maintenance d\u2019une plateforme servant **des milliers d\u2019utilisateurs simultanés** lors des événements en live',
         ],
         tags: ['PHP', 'JavaScript', 'PostgreSQL'],
       },
       {
         period: 'Sep 2019 \u2013 Avr 2020',
         company: 'mPhase',
+        type: 'employee' as const,
         role: 'Full Stack Developer',
         location: 'Montr\u00e9al',
         description:
           'Outil logistique de traitement des eaux pour les op\u00e9rations municipales de Montr\u00e9al.',
         bullets: [
-          "Construction de l'application complète from scratch — frontend Vue.js, API Node.js/Express, MongoDB",
+          'Construction de l\u2019**application complète from scratch** — développeur unique, ownership total du modèle de données à l\u2019interface',
           'Conception du **système de routage et planification géolocalisé**',
+          'Architecture d\u2019un **DSL de formulaires générique** — moteur déclaratif piloté par schéma permettant aux techniciens de terrain de créer et personnaliser leurs propres formulaires d\u2019inspection sans toucher au code',
         ],
         tags: ['Vue.js', 'Node.js', 'Express', 'MongoDB'],
       },
@@ -258,14 +267,15 @@ const fr: SiteContent = {
         period: 'Nov 2018 \u2013 Ao\u00fbt 2019',
         company: 'Extia',
         missionAt: 'Taktik',
+        type: 'employee' as const,
         role: 'Full Stack Developer',
         location: 'Bruxelles',
         description:
           'Plateforme logicielle d\u2019exp\u00e9riences personnalis\u00e9es via IPTV et affichage digital.',
         bullets: [
-          'Construction de dashboards de monitoring et syst\u00e8mes d\u2019alerting',
-          'D\u00e9veloppement de services backend avec Spring Boot et Kotlin',
-          'Implémentation du frontend Angular avec **visualisation de données temps réel**',
+          'Construction de dashboards de monitoring et systèmes d\u2019alerting',
+          'Maintenance du **backend média haute intensité** gérant la distribution des flux vidéo et multimédia à travers l\u2019infrastructure IPTV',
+          'Implémentation de la **visualisation de données temps réel** sur le dashboard frontend',
         ],
         tags: ['Kotlin', 'Spring Boot', 'Angular', 'PostgreSQL'],
       },
@@ -273,28 +283,31 @@ const fr: SiteContent = {
         period: 'Juil 2018 \u2013 Nov 2018',
         company: 'Extia',
         missionAt: 'Bewan',
+        type: 'employee' as const,
         role: 'Full Stack Developer',
         location: 'Bruxelles',
         description:
           'Plateforme CRM et gestion d\u2019\u00e9v\u00e9nements pour un expert en transition digitale dans l\u2019horeca.',
         bullets: [
-          'Construction de fonctionnalit\u00e9s CRM et modules de gestion d\u2019\u00e9v\u00e9nements',
-          'D\u00e9veloppement frontend en JavaScript vanilla/jQuery et backend PHP/Symfony',
+          'Construction de fonctionnalités CRM et modules de gestion d\u2019événements',
+          'Conception de **Diserv from scratch** — plateforme de collecte et stockage de métriques (**InfluxDB**) avec un **moteur de facturation flexible** : forfaits fixes, dépassements et facturation à la métrique',
         ],
-        tags: ['JavaScript', 'jQuery', 'PHP', 'Symfony', 'PostgreSQL'],
+        tags: ['JavaScript', 'jQuery', 'PHP', 'Symfony', 'PostgreSQL', 'InfluxDB'],
       },
       {
-        period: 'D\u00e9c 2017 \u2013 Juil 2018',
+        period: 'Janv 2018 \u2013 Mars 2018',
         company: 'IoTFactory',
+        type: 'internship' as const,
         role: 'Full Stack Developer',
         location: 'Bruxelles',
         description: 'Gateway IoT Bluetooth/LoRa pour le tracking d\u2019assets sur site.',
         bullets: [
-          'D\u00e9veloppement de services Python sur devices embarqu\u00e9s pour la communication temps r\u00e9el',
+          'Déployé sur gateways **Raspberry Pi** avec une architecture **local-first** — données persistées sur l\u2019appareil et réconciliées automatiquement avec le backend au retour de la connexion',
+          'Implémentation du **geofencing et de la géolocalisation indoor** par triangulation de balises Bluetooth pour le positionnement précis des assets en l\u2019absence de GPS',
           'Construction du dashboard de gestion des devices et outils de monitoring',
-          'D\u00e9ploiement et gestion des services sur Kubernetes',
+          'Mise en place d\u2019un **portail captif** pour le provisionnement WiFi sans friction des nouveaux devices sur chantier',
         ],
-        tags: ['Python', 'IoT', 'Bluetooth', 'LoRa', 'Kubernetes'],
+        tags: ['Python', 'IoT', 'Bluetooth', 'LoRa', 'Kubernetes', 'Raspberry Pi', 'Linux'],
       },
     ],
     references: 'Références, preuves de travail & diplômes disponibles sur demande.',
@@ -303,7 +316,8 @@ const fr: SiteContent = {
     projects: [
       {
         period: '2026',
-        name: 'Vigie (Tmonier)',
+        name: 'Vigie',
+        builtAt: 'Tmonier',
         type: 'Fondateur \u00b7 Solo',
         description:
           'Supervision local-first d\u2019agents IA \u2014 monitoring temps r\u00e9el, d\u00e9tection de boucles, contr\u00f4le human-in-the-loop sur Claude Code. Bun daemon, Hono + Effect-TS, TanStack Start, PostgreSQL.',
