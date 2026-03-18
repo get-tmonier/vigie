@@ -1,6 +1,7 @@
 ---
 import '#styles/global.css';
 
+import bitter600 from '@fontsource/bitter/files/bitter-latin-600-normal.woff2?url';
 import jbMono400 from '@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2?url';
 import sourceSerif400 from '@fontsource/source-serif-4/files/source-serif-4-latin-400-normal.woff2?url';
 import vollkornSc700 from '@fontsource/vollkorn-sc/files/vollkorn-sc-latin-700-normal.woff2?url';
@@ -9,14 +10,36 @@ import vollkornSc900 from '@fontsource/vollkorn-sc/files/vollkorn-sc-latin-900-n
 interface Props {
   title?: string;
   description?: string;
+  locale?: string;
 }
 
 const {
-  title = 'Tmonier — Your crew. Under your watch.',
-  description = "You launched the agent. Now what? Tmonier shows you — in real time. When something's off, you're the one who catches it.",
+  title = 'Tmonier — Senior Fullstack Engineer · Freelance · Brussels',
+  description = 'Damien Meur — Senior Fullstack Engineer available for freelance missions. TypeScript, React, Node.js, Effect-TS, PostgreSQL. Based in Brussels.',
+  locale = 'en',
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const altLocale = locale === 'fr' ? 'en' : 'fr';
+const altPath =
+  locale === 'fr'
+    ? Astro.url.pathname.replace(/^\/fr\//, '/').replace(/^\/fr$/, '/')
+    : `/fr${Astro.url.pathname === '/' ? '/' : Astro.url.pathname}`;
+const altURL = new URL(altPath, Astro.site);
+
+const personJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Damien Meur',
+  jobTitle: 'Senior Fullstack Engineer',
+  url: 'https://tmonier.com',
+  sameAs: ['https://www.linkedin.com/in/damien-meur/', 'https://github.com/get-tmonier'],
+  worksFor: {
+    '@type': 'Organization',
+    name: 'Tmonier',
+    url: 'https://tmonier.com',
+  },
+};
 
 const organizationJsonLd = {
   '@context': 'https://schema.org',
@@ -24,18 +47,12 @@ const organizationJsonLd = {
   name: 'Tmonier',
   url: 'https://tmonier.com',
   logo: 'https://tmonier.com/favicon.svg',
-};
-
-const websiteJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebSite',
-  name: 'Tmonier',
-  url: 'https://tmonier.com',
+  sameAs: ['https://www.linkedin.com/in/damien-meur/', 'https://github.com/get-tmonier'],
 };
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={locale}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -44,13 +61,12 @@ const websiteJsonLd = {
     <!-- Primary Meta -->
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta
-      name="keywords"
-      content="AI workflow orchestration, LLM context management, drift detection, project memory, developer tools, AI coding assistant"
-    />
 
-    <!-- Canonical -->
+    <!-- Canonical + hreflang -->
     <link rel="canonical" href={canonicalURL} />
+    <link rel="alternate" hreflang={locale} href={canonicalURL} />
+    <link rel="alternate" hreflang={altLocale} href={altURL} />
+    <link rel="alternate" hreflang="x-default" href={new URL('/', Astro.site)} />
 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -60,9 +76,7 @@ const websiteJsonLd = {
     <link rel="preload" href={vollkornSc700} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={jbMono400} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={sourceSerif400} as="font" type="font/woff2" crossorigin />
-
-    <!-- DNS prefetch for external APIs -->
-    <link rel="dns-prefetch" href="https://app.loops.so" />
+    <link rel="preload" href={bitter600} as="font" type="font/woff2" crossorigin />
 
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
@@ -73,7 +87,7 @@ const websiteJsonLd = {
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Tmonier" />
-    <meta property="og:locale" content="en_US" />
+    <meta property="og:locale" content={locale === 'fr' ? 'fr_BE' : 'en_US'} />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -82,8 +96,8 @@ const websiteJsonLd = {
     <meta name="twitter:image" content="https://tmonier.com/og-image.png" />
 
     <!-- Structured data -->
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(personJsonLd)} />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} />
     <slot name="head" />
   </head>
   <body>

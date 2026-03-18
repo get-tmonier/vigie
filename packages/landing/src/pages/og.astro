@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Vollkorn+SC:wght@700;900&family=Vollkorn:wght@400;700&family=JetBrains+Mono:wght@500;600&family=Source+Serif+4:wght@400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Vollkorn+SC:wght@700;900&family=JetBrains+Mono:wght@500;600&display=swap"
       rel="stylesheet"
     />
     <style>
@@ -27,16 +27,6 @@
         justify-content: center;
         padding: 72px 96px;
         overflow: hidden;
-      }
-
-      .og-glow {
-        position: absolute;
-        top: -100px;
-        right: -80px;
-        width: 600px;
-        height: 600px;
-        background: radial-gradient(ellipse, rgba(196,154,43,0.07) 0%, transparent 65%);
-        pointer-events: none;
       }
 
       .og-watermark {
@@ -71,17 +61,23 @@
         letter-spacing: 4px;
         text-transform: uppercase;
         color: rgba(139,156,175,0.5);
-        align-self: center;
       }
 
       .og-headline {
         font-family: 'Vollkorn SC', serif;
         font-weight: 900;
-        font-size: 64px;
+        font-size: 56px;
         color: #F5F0E8;
-        line-height: 1.1;
-        letter-spacing: -0.01em;
-        margin-bottom: 0;
+        line-height: 1.2;
+        margin-bottom: 12px;
+      }
+
+      .og-subtitle {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 22px;
+        font-weight: 500;
+        color: rgba(139,156,175,0.7);
+        margin-bottom: 28px;
       }
 
       .og-pills {
@@ -125,85 +121,30 @@
   </head>
   <body>
     <div class="og-wrapper">
-
-      <!-- Background glow -->
-      <div class="og-glow"></div>
-
-      <!-- Large watermark wheel (right side) -->
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 64 64"
-        class="og-watermark"
-      >
+      <!-- Watermark wheel -->
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="og-watermark">
         <circle cx="32" cy="32" r="27" fill="none" stroke="#C49A2B" stroke-width="2.5"/>
         <circle cx="32" cy="32" r="19" fill="none" stroke="#C49A2B" stroke-width="2"/>
         <circle cx="32" cy="32" r="5.5" fill="#C49A2B"/>
         <line x1="32" y1="27" x2="32" y2="7" stroke="#C49A2B" stroke-width="2.5" stroke-linecap="round"/>
         <ellipse cx="32" cy="6" rx="2.2" ry="3" fill="#C49A2B"/>
-        <line x1="36.6" y1="29.8" x2="51.3" y2="15.1" stroke="#C49A2B" stroke-width="2.5" stroke-linecap="round"/>
-        <ellipse cx="52.6" cy="13.8" rx="2.2" ry="3" transform="rotate(45 52.6 13.8)" fill="#C49A2B"/>
-        <line x1="37" y1="32" x2="57" y2="32" stroke="#C49A2B" stroke-width="2.5" stroke-linecap="round"/>
-        <ellipse cx="58" cy="32" rx="2.2" ry="3" transform="rotate(90 58 32)" fill="#C49A2B"/>
-        <line x1="36.6" y1="34.2" x2="51.3" y2="48.9" stroke="#C49A2B" stroke-width="2.5" stroke-linecap="round"/>
-        <ellipse cx="52.6" cy="50.2" rx="2.2" ry="3" transform="rotate(135 52.6 50.2)" fill="#C49A2B"/>
-        <line x1="32" y1="37" x2="32" y2="57" stroke="#C49A2B" stroke-width="2.5" stroke-linecap="round"/>
-        <ellipse cx="32" cy="58" rx="2.2" ry="3" fill="#C49A2B"/>
-        <line x1="27.4" y1="34.2" x2="12.7" y2="48.9" stroke="#C49A2B" stroke-width="2.5" stroke-linecap="round"/>
-        <ellipse cx="11.4" cy="50.2" rx="2.2" ry="3" transform="rotate(45 11.4 50.2)" fill="#C49A2B"/>
-        <line x1="27" y1="32" x2="7" y2="32" stroke="#C49A2B" stroke-width="2.5" stroke-linecap="round"/>
-        <ellipse cx="6" cy="32" rx="2.2" ry="3" transform="rotate(90 6 32)" fill="#C49A2B"/>
-        <line x1="27.4" y1="29.8" x2="12.7" y2="15.1" stroke="#C49A2B" stroke-width="2.5" stroke-linecap="round"/>
-        <ellipse cx="11.4" cy="13.8" rx="2.2" ry="3" transform="rotate(135 11.4 13.8)" fill="#C49A2B"/>
       </svg>
 
-      <!-- Brand name -->
       <div class="og-brand">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="44" height="44">
-          <defs>
-            <linearGradient id="og-brass" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#D4AA3C"/>
-              <stop offset="45%" stop-color="#C49A2B"/>
-              <stop offset="100%" stop-color="#A67C1A"/>
-            </linearGradient>
-          </defs>
-          <circle cx="32" cy="32" r="27" fill="none" stroke="url(#og-brass)" stroke-width="2.5"/>
-          <circle cx="32" cy="32" r="19" fill="none" stroke="url(#og-brass)" stroke-width="2"/>
-          <circle cx="32" cy="32" r="5.5" fill="url(#og-brass)"/>
-          <line x1="32" y1="27" x2="32" y2="7" stroke="url(#og-brass)" stroke-width="2.5" stroke-linecap="round"/>
-          <ellipse cx="32" cy="6" rx="2.2" ry="3" fill="url(#og-brass)"/>
-          <line x1="36.6" y1="29.8" x2="51.3" y2="15.1" stroke="url(#og-brass)" stroke-width="2.5" stroke-linecap="round"/>
-          <ellipse cx="52.6" cy="13.8" rx="2.2" ry="3" transform="rotate(45 52.6 13.8)" fill="url(#og-brass)"/>
-          <line x1="37" y1="32" x2="57" y2="32" stroke="url(#og-brass)" stroke-width="2.5" stroke-linecap="round"/>
-          <ellipse cx="58" cy="32" rx="2.2" ry="3" transform="rotate(90 58 32)" fill="url(#og-brass)"/>
-          <line x1="36.6" y1="34.2" x2="51.3" y2="48.9" stroke="url(#og-brass)" stroke-width="2.5" stroke-linecap="round"/>
-          <ellipse cx="52.6" cy="50.2" rx="2.2" ry="3" transform="rotate(135 52.6 50.2)" fill="url(#og-brass)"/>
-          <line x1="32" y1="37" x2="32" y2="57" stroke="url(#og-brass)" stroke-width="2.5" stroke-linecap="round"/>
-          <ellipse cx="32" cy="58" rx="2.2" ry="3" fill="url(#og-brass)"/>
-          <line x1="27.4" y1="34.2" x2="12.7" y2="48.9" stroke="url(#og-brass)" stroke-width="2.5" stroke-linecap="round"/>
-          <ellipse cx="11.4" cy="50.2" rx="2.2" ry="3" transform="rotate(45 11.4 50.2)" fill="url(#og-brass)"/>
-          <line x1="27" y1="32" x2="7" y2="32" stroke="url(#og-brass)" stroke-width="2.5" stroke-linecap="round"/>
-          <ellipse cx="6" cy="32" rx="2.2" ry="3" transform="rotate(90 6 32)" fill="url(#og-brass)"/>
-          <line x1="27.4" y1="29.8" x2="12.7" y2="15.1" stroke="url(#og-brass)" stroke-width="2.5" stroke-linecap="round"/>
-          <ellipse cx="11.4" cy="13.8" rx="2.2" ry="3" transform="rotate(135 11.4 13.8)" fill="url(#og-brass)"/>
-        </svg>
         <span class="og-brand-name">Tmonier</span>
-        <span class="og-tagline">You hold the helm.</span>
+        <span class="og-tagline">You Keep The Helm.</span>
       </div>
 
-      <!-- Main headline -->
-      <h1 class="og-headline">Your crew.<br/>Under your watch.</h1>
+      <h1 class="og-headline">Senior Fullstack Engineer</h1>
+      <p class="og-subtitle">Freelance · Brussels</p>
 
-      <!-- Pills row -->
       <div class="og-pills">
-        {['Real-time monitoring', 'Human-in-the-loop', 'Local-first', 'Zero markup'].map((label) => (
+        {['TypeScript', 'React', 'Node.js', 'Effect-TS', 'PostgreSQL'].map((label) => (
           <span class="og-pill">{label}</span>
         ))}
       </div>
 
-      <!-- Bottom: URL -->
       <p class="og-url">tmonier.com</p>
-
-      <!-- Bottom border accent -->
       <div class="og-border-accent"></div>
     </div>
   </body>

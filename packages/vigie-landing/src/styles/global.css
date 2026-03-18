@@ -2,23 +2,14 @@
 @import "@tmonier/tokens/tailwind.css";
 @import "@tmonier/tokens/tokens.css";
 
-/* Vollkorn SC — only used weights */
 @import "@fontsource/vollkorn-sc/latin-700.css";
 @import "@fontsource/vollkorn-sc/latin-900.css";
-
-/* Vollkorn — only used weights */
 @import "@fontsource/vollkorn/latin-400.css";
 @import "@fontsource/vollkorn/latin-600.css";
 @import "@fontsource/vollkorn/latin-700.css";
-
-/* Source Serif 4 — only used weight */
 @import "@fontsource/source-serif-4/latin-400.css";
-
-/* Bitter — headings */
 @import "@fontsource/bitter/latin-600.css";
 @import "@fontsource/bitter/latin-700.css";
-
-/* JetBrains Mono — only used weights */
 @import "@fontsource/jetbrains-mono/latin-400.css";
 @import "@fontsource/jetbrains-mono/latin-500.css";
 @import "@fontsource/jetbrains-mono/latin-600.css";
@@ -26,10 +17,6 @@
 
 html {
   scroll-behavior: smooth;
-}
-
-[id] {
-  scroll-margin-top: 80px;
 }
 
 *,
@@ -67,51 +54,6 @@ body {
     transform: translateY(0);
   }
 }
-@keyframes spin-slow {
-  to {
-    rotate: 360deg;
-  }
-}
-@keyframes shimmer {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 200px 200px;
-  }
-}
-@keyframes pulse-soft {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.3;
-  }
-}
-@keyframes scroll-stripe {
-  to {
-    background-position: 0 8px;
-  }
-}
-@keyframes pulse-amber {
-  0%,
-  100% {
-    border-color: color-mix(in srgb, var(--signal-amber) 30%, transparent);
-  }
-  50% {
-    border-color: color-mix(in srgb, var(--signal-amber) 60%, transparent);
-    box-shadow: 0 0 12px 0 color-mix(in srgb, var(--signal-amber) 10%, transparent);
-  }
-}
-@keyframes draw-line {
-  from {
-    width: 0;
-  }
-  to {
-    width: 100%;
-  }
-}
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -120,7 +62,6 @@ body {
     animation: none;
     transition: none;
   }
-
   html {
     scroll-behavior: auto;
   }

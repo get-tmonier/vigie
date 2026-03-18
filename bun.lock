@@ -36,6 +36,7 @@
       "version": "0.0.1",
       "dependencies": {
         "@astrojs/sitemap": "3.7.0",
+        "@fontsource/bitter": "5.2.10",
         "@fontsource/jetbrains-mono": "5.2.8",
         "@fontsource/source-serif-4": "5.2.9",
         "@fontsource/vollkorn": "5.2.10",
@@ -100,6 +101,28 @@
         "@types/react-dom": "19.2.3",
         "@vitejs/plugin-react": "5.1.4",
         "tailwindcss": "4.2.1",
+        "typescript": "5.9.3",
+        "vite": "7.3.1",
+      },
+    },
+    "packages/vigie-landing": {
+      "name": "@tmonier/vigie-landing",
+      "version": "0.0.1",
+      "dependencies": {
+        "@astrojs/sitemap": "3.7.0",
+        "@fontsource/bitter": "5.2.10",
+        "@fontsource/jetbrains-mono": "5.2.8",
+        "@fontsource/source-serif-4": "5.2.9",
+        "@fontsource/vollkorn": "5.2.10",
+        "@fontsource/vollkorn-sc": "5.2.8",
+        "@tailwindcss/vite": "4.2.1",
+        "@tmonier/tokens": "workspace:*",
+        "astro": "6.0.0-beta.17",
+        "tailwind-merge": "3.5.0",
+        "tailwindcss": "4.2.1",
+      },
+      "devDependencies": {
+        "@astrojs/check": "0.9.6",
         "typescript": "5.9.3",
         "vite": "7.3.1",
       },
@@ -298,6 +321,8 @@
     "@esbuild/win32-ia32": ["@esbuild/win32-ia32@0.27.3", "", { "os": "win32", "cpu": "ia32" }, "sha512-QLKSFeXNS8+tHW7tZpMtjlNb7HKau0QDpwm49u0vUp9y1WOF+PEzkU84y9GqYaAVW8aH8f3GcBck26jh54cX4Q=="],
 
     "@esbuild/win32-x64": ["@esbuild/win32-x64@0.27.3", "", { "os": "win32", "cpu": "x64" }, "sha512-4uJGhsxuptu3OcpVAzli+/gWusVGwZZHTlS63hh++ehExkVT8SgiEf7/uC/PclrPPkLhZqGgCTjd0VWLo6xMqA=="],
+
+    "@fontsource/bitter": ["@fontsource/bitter@5.2.10", "", {}, "sha512-oqQgWAp+lgoGX7iFbVSbTkKyz0k8EK8+bLdUKDTqGTjW0HqrCue70v4jwbZvyNV/3DZol/b/L/WpdXfuQXKBUg=="],
 
     "@fontsource/jetbrains-mono": ["@fontsource/jetbrains-mono@5.2.8", "", {}, "sha512-6w8/SG4kqvIMu7xd7wt6x3idn1Qux3p9N62s6G3rfldOUYHpWcc2FKrqf+Vo44jRvqWj2oAtTHrZXEP23oSKwQ=="],
 
@@ -648,6 +673,8 @@
     "@tmonier/tokens": ["@tmonier/tokens@workspace:packages/tokens"],
 
     "@tmonier/ui": ["@tmonier/ui@workspace:packages/ui"],
+
+    "@tmonier/vigie-landing": ["@tmonier/vigie-landing@workspace:packages/vigie-landing"],
 
     "@ts-rest/core": ["@ts-rest/core@3.52.1", "", { "peerDependencies": { "@types/node": "^18.18.7 || >=20.8.4", "zod": "^3.22.3" }, "optionalPeers": ["@types/node", "zod"] }, "sha512-tAjz7Kxq/grJodcTA1Anop4AVRDlD40fkksEV5Mmal88VoZeRKAG8oMHsDwdwPZz+B/zgnz0q2sF+cm5M7Bc7g=="],
 

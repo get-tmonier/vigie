@@ -1,5 +1,5 @@
 {
-  "name": "@tmonier/landing",
+  "name": "@tmonier/vigie-landing",
   "type": "module",
   "version": "0.0.1",
   "private": true,
@@ -11,8 +11,8 @@
     "#lib/*": "./src/lib/*"
   },
   "scripts": {
-    "dev": "astro dev",
-    "build": "bun scripts/gen-favicon.mjs && bun scripts/gen-og.mjs && astro build",
+    "dev": "astro dev --port 4322",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "biome lint .",
@@ -38,9 +38,6 @@
   },
   "devDependencies": {
     "@astrojs/check": "0.9.6",
-    "@resvg/resvg-js": "2.6.2",
-    "satori": "0.19.2",
-    "sharp": "0.34.5",
     "typescript": "5.9.3",
     "vite": "7.3.1"
   }

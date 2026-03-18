@@ -1,6 +1,4 @@
 ---
-import Footer from '#components/Footer.astro';
-import Nav from '#components/Nav.astro';
 import Waitlist from '#components/Waitlist.astro';
 import Base from '#layouts/Base.astro';
 
@@ -177,9 +175,8 @@ const faqJsonLd = {
 };
 ---
 
-<Base title="FAQ — Tmonier" description="Frequently asked questions about Tmonier — the local-first monitoring daemon for Claude Code.">
+<Base title="FAQ — Vigie" description="Frequently asked questions about Vigie — the local-first monitoring daemon for Claude Code.">
   <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
-  <Nav currentPage="faq" />
   <main id="main">
     <!-- Mini hero -->
     <section class="bg-navy-deep pt-20 px-10 pb-12 text-center">
@@ -191,7 +188,7 @@ const faqJsonLd = {
           Frequently asked questions
         </h1>
         <p class="font-source-serif text-slate text-[1.05rem] leading-[1.8] m-0 max-w-[600px] mx-auto">
-          Everything you need to know about Tmonier — from getting started to privacy and pricing.
+          Everything you need to know about Vigie — from getting started to privacy and pricing.
         </p>
       </div>
     </section>
@@ -228,7 +225,6 @@ const faqJsonLd = {
 
     <Waitlist />
   </main>
-  <Footer />
 </Base>
 
 <script>
