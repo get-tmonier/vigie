@@ -178,7 +178,19 @@ const en: SiteContent = {
     title: 'Track Record',
     badgeEmployee: 'Employee',
     badgeInternship: 'Intern',
+    badgeFounder: 'Founder',
     jobs: [
+      {
+        period: 'May 2026 – Present',
+        company: 'Tmonier SRL',
+        type: 'founder' as const,
+        role: 'Founder & Freelance Software Engineer',
+        location: 'Brussels',
+        description:
+          'Founded Tmonier SRL to bring senior full-stack engineering and AI expertise to ambitious product teams — as an independent consultant.',
+        bullets: [],
+        tags: [],
+      },
       {
         period: 'Apr 2022 \u2013 Apr 2026',
         company: 'Aware',

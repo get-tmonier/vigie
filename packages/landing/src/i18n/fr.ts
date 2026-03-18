@@ -178,7 +178,19 @@ const fr: SiteContent = {
     title: 'Parcours',
     badgeEmployee: 'Employé',
     badgeInternship: 'Stagiaire',
+    badgeFounder: 'Fondateur',
     jobs: [
+      {
+        period: 'Mai 2026 – Présent',
+        company: 'Tmonier SRL',
+        type: 'founder' as const,
+        role: 'Fondateur & Consultant Freelance',
+        location: 'Bruxelles',
+        description:
+          'Création de Tmonier SRL pour exercer en tant que consultant freelance senior — développement full-stack et expertise IA.',
+        bullets: [],
+        tags: [],
+      },
       {
         period: 'Avr 2022 \u2013 Avr 2026',
         company: 'Aware',
