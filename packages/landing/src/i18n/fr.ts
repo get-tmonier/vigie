@@ -6,7 +6,7 @@ const fr: SiteContent = {
     description:
       'Damien Meur — Ing\u00e9nieur Fullstack Senior disponible pour des missions freelance \u00e0 Bruxelles.',
     keywords:
-      'd\u00e9veloppeur freelance, ing\u00e9nieur fullstack senior, TypeScript, React, Node.js, Effect-TS, Bruxelles, Belgique, consultant, software craft, architecture propre, supervision agents IA, Vigie',
+      'd\u00e9veloppeur freelance, ing\u00e9nieur fullstack senior, TypeScript, React, Node.js, Effect-TS, Bruxelles, Belgique, consultant, software craft, clean architecture, supervision agents IA, Vigie',
   },
   nav: {
     approach: 'Approche',
@@ -189,7 +189,7 @@ const fr: SiteContent = {
           'Plateforme de partage de données pour groupes agroalimentaires et chaînes de supermarchés, traitant des datasets opérationnels sur 4 marchés européens.',
         bullets: [
           'Développement frontend et backend autour des principes d\u2019**architecture hexagonale**, avec un fort accent sur la type-safety et la programmation fonctionnelle',
-          "Conception d'un framework ETL permettant à l'équipe de créer et maintenir 300+ pipelines Medallion bronze/silver/gold — **architecture propre**, injection de dépendances, contrôles qualité automatisés",
+          "Conception d'un framework ETL permettant à l'équipe de créer et maintenir 300+ pipelines Medallion bronze/silver/gold — **clean architecture**, injection de dépendances, contrôles qualité automatisés",
           "Mise en place d'un système ETL **DuckDB** embarqué directement dans le backend — avec **observabilité**, tooling DX-friendly et auto-refresh — réduisant les temps de chargement analytics jusqu'à un facteur 100× sur toutes les pages",
           "**Mentorat de développeurs** et promotion d'une culture d'ownership, de partage de connaissances, de curiosité et de qualité au sein de l'équipe",
           'Responsable de la **santé des dépendances** : montées de version majeures sur l\u2019ensemble de la stack, migration CJS → ESM, veille technologique et suivi des **CVEs**',
