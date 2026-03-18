@@ -26,7 +26,7 @@ const fr: SiteContent = {
   },
   origin: {
     pronunciation: '/ti.m\u0254.nje/',
-    grammar: 'n. fran\u00e7ais',
+    grammar: '',
     alt: 'alt. Timonier',
     definition:
       'Le timonier \u2014 celui qui lit le vent, tient le cap et garde le navire sur sa route.',
@@ -212,7 +212,7 @@ const fr: SiteContent = {
         description:
           'Application de gestion d\u2019\u00e9v\u00e9nements utilis\u00e9e par les grands festivals belges.',
         bullets: [
-          'D\u00e9veloppement de fonctionnalit\u00e9s de billetterie, planning et gestion des artistes',
+          'D\u00e9veloppement de fonctionnalit\u00e9s de billetterie et planning',
           'Construit en PHP et JavaScript, servant des milliers d\u2019utilisateurs simultan\u00e9s pendant les \u00e9v\u00e9nements',
         ],
         tags: ['PHP', 'JavaScript', 'PostgreSQL'],
@@ -236,7 +236,7 @@ const fr: SiteContent = {
         role: 'Full Stack Developer',
         location: 'Bruxelles',
         description:
-          'Plateforme logicielle d\u2019exp\u00e9riences personnalis\u00e9es via IPTV, affichage digital et solutions pour blocs op\u00e9ratoires.',
+          'Plateforme logicielle d\u2019exp\u00e9riences personnalis\u00e9es via IPTV et affichage digital.',
         bullets: [
           'Construction de dashboards de monitoring et syst\u00e8mes d\u2019alerting',
           'D\u00e9veloppement de services backend avec Spring Boot et Kotlin',

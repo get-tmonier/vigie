@@ -26,7 +26,7 @@ const en: SiteContent = {
   },
   origin: {
     pronunciation: '/ti.m\u0254.nje/',
-    grammar: 'n. French',
+    grammar: '',
     alt: 'alt. Timonier',
     definition:
       'The helmsman \u2014 the one who reads the wind, holds the course, and keeps the ship on track.',
@@ -211,7 +211,7 @@ const en: SiteContent = {
         location: 'Brussels',
         description: 'Event management application used by major Belgian festivals.',
         bullets: [
-          'Developed ticketing, scheduling, and artist management features',
+          'Developed ticketing and scheduling features',
           'Built with PHP and JavaScript, serving thousands of concurrent users during events',
         ],
         tags: ['PHP', 'JavaScript', 'PostgreSQL'],
@@ -234,7 +234,7 @@ const en: SiteContent = {
         role: 'Full Stack Developer',
         location: 'Brussels',
         description:
-          'Software platform delivering personalized experiences through IPTV, digital signage, and operating room solutions.',
+          'Software platform delivering personalized experiences through IPTV and digital signage solutions.',
         bullets: [
           'Built monitoring dashboards and alerting systems',
           'Developed backend services with Spring Boot and Kotlin',

@@ -95,10 +95,27 @@ const altHref = locale === 'fr' ? '/' : '/fr/';
       </a>
     </div>
 
-    <!-- Mobile hamburger button -->
+    <!-- Mobile language toggle + hamburger -->
+    <div class="lg:hidden flex items-center gap-3">
+      <div class="flex items-center bg-navy-mid/50 rounded-[16px] p-[2px] gap-[2px]">
+        <a
+          href={locale === 'en' ? '#' : '/'}
+          class:list={[
+            'font-mono text-[0.6rem] font-semibold py-[3px] px-[0.5rem] rounded-[12px] no-underline transition-all duration-150',
+            locale === 'en' ? 'bg-gold text-navy-deep' : 'bg-transparent text-slate',
+          ]}
+        >EN</a>
+        <a
+          href={locale === 'fr' ? '#' : '/fr/'}
+          class:list={[
+            'font-mono text-[0.6rem] font-semibold py-[3px] px-[0.5rem] rounded-[12px] no-underline transition-all duration-150',
+            locale === 'fr' ? 'bg-gold text-navy-deep' : 'bg-transparent text-slate',
+          ]}
+        >FR</a>
+      </div>
     <button
       id="hamburger-btn"
-      class="lg:hidden bg-transparent border-none cursor-pointer p-2 flex flex-col gap-[5px]"
+      class="bg-transparent border-none cursor-pointer p-2 flex flex-col gap-[5px]"
       aria-label="Menu"
       aria-expanded="false"
     >
@@ -106,6 +123,7 @@ const altHref = locale === 'fr' ? '/' : '/fr/';
       <span class="hamburger-bar block w-[22px] h-0.5 bg-gold rounded-[1px] transition-[transform,opacity] duration-300 ease-in-out"></span>
       <span class="hamburger-bar block w-[22px] h-0.5 bg-gold rounded-[1px] transition-[transform,opacity] duration-300 ease-in-out"></span>
     </button>
+    </div>
   </div>
 
   <!-- Mobile menu panel -->
@@ -151,24 +169,7 @@ const altHref = locale === 'fr' ? '/' : '/fr/';
         {nav.contact}
       </a>
 
-      <!-- Mobile language toggle -->
-      <div class="flex items-center gap-3 py-3">
-        <a
-          href={locale === 'en' ? '#' : '/'}
-          class:list={[
-            'font-mono text-[0.8rem] font-semibold no-underline',
-            locale === 'en' ? 'text-gold' : 'text-slate hover:text-cream',
-          ]}
-        >EN</a>
-        <span class="text-slate/30">|</span>
-        <a
-          href={locale === 'fr' ? '#' : '/fr/'}
-          class:list={[
-            'font-mono text-[0.8rem] font-semibold no-underline',
-            locale === 'fr' ? 'text-gold' : 'text-slate hover:text-cream',
-          ]}
-        >FR</a>
-      </div>
+
 
       <div class="border-t border-gold/15 mt-2 pt-3">
         <a
