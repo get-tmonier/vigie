@@ -71,9 +71,16 @@ function getLevel(lang: string): number {
             {/* Card */}
             <div class="bg-white rounded-xl p-6 border border-cream-dark shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-shadow duration-300 max-md:p-4">
               <div class="flex items-baseline justify-between flex-wrap gap-2 mb-1">
-                <h3 class="font-vollkorn-sc text-navy-deep font-bold text-[1.15rem] m-0">
-                  {job.company}
-                </h3>
+                <div>
+                  <h3 class="font-vollkorn-sc text-navy-deep font-bold text-[1.15rem] m-0 leading-none">
+                    {job.company}
+                  </h3>
+                  {job.missionAt && (
+                    <p class="font-mono text-slate text-[0.62rem] m-0 mt-[0.2rem]">
+                      <span class="text-gold/50">↳</span> mission @ {job.missionAt}
+                    </p>
+                  )}
+                </div>
                 <span class="font-mono text-slate text-[0.65rem]">
                   {job.location}
                 </span>

@@ -248,7 +248,8 @@ const en: SiteContent = {
       },
       {
         period: 'Nov 2018 \u2013 Aug 2019',
-        company: 'Extia \u2192 Taktik',
+        company: 'Extia',
+        missionAt: 'Taktik',
         role: 'Full Stack Developer',
         location: 'Brussels',
         description:
@@ -262,7 +263,8 @@ const en: SiteContent = {
       },
       {
         period: 'Jul 2018 \u2013 Nov 2018',
-        company: 'Extia \u2192 Bewan',
+        company: 'Extia',
+        missionAt: 'Bewan',
         role: 'Full Stack Developer',
         location: 'Brussels',
         description:

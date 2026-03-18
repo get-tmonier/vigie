@@ -64,6 +64,7 @@ export interface SiteContent {
     jobs: {
       period: string;
       company: string;
+      missionAt?: string;
       role: string;
       location: string;
       description: string;
