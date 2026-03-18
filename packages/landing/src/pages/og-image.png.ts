@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { Resvg } from '@resvg/resvg-js';
 import { colors, helm } from '@tmonier/tokens';
 import type { APIRoute } from 'astro';
@@ -10,14 +12,9 @@ const SLATE = `rgba(139,156,175,0.75)`;
 
 const { spokesD, handlesD } = helm;
 
-async function fetchFont(family: string, weight: number): Promise<ArrayBuffer> {
-  const css = await fetch(
-    `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}`,
-    { headers: { 'User-Agent': 'curl/7.54.0' } }
-  ).then((r) => r.text());
-  const url = css.match(/src: url\(([^)]+)\)/)?.[1];
-  if (!url) throw new Error(`Font URL not found for ${family}:${weight}`);
-  return fetch(url).then((r) => r.arrayBuffer());
+const _require = createRequire(import.meta.url);
+function localFont(pkg: string, file: string): Buffer {
+  return readFileSync(_require.resolve(`${pkg}/files/${file}`));
 }
 
 // biome-ignore lint/suspicious/noExplicitAny: Satori VNode
@@ -295,11 +292,12 @@ function buildTree(): VNode {
 }
 
 export const GET: APIRoute = async () => {
-  const [vollkornSC, vollkorn, jetbrainsMono] = await Promise.all([
-    fetchFont('Vollkorn SC', 900),
-    fetchFont('Vollkorn', 700),
-    fetchFont('JetBrains Mono', 500),
-  ]);
+  const vollkornSC = localFont('@fontsource/vollkorn-sc', 'vollkorn-sc-latin-900-normal.woff');
+  const vollkorn = localFont('@fontsource/vollkorn', 'vollkorn-latin-700-normal.woff');
+  const jetbrainsMono = localFont(
+    '@fontsource/jetbrains-mono',
+    'jetbrains-mono-latin-500-normal.woff'
+  );
 
   // biome-ignore lint/suspicious/noExplicitAny: Satori accepts our VNode structure
   const svg = await satori(buildTree() as any, {

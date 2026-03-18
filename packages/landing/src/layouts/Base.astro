@@ -15,7 +15,7 @@ interface Props {
 
 const {
   title = 'Damien Meur — Senior Fullstack Engineer · Freelance · Brussels',
-  description = 'Damien Meur — Senior Fullstack Engineer available for freelance missions. TypeScript, React, Node.js, Effect-TS, PostgreSQL. Based in Brussels.',
+  description = 'Damien Meur — Senior Fullstack Engineer available for freelance missions in Brussels.',
   locale = 'en',
 } = Astro.props;
 
@@ -32,8 +32,26 @@ const personJsonLd = {
   '@type': 'Person',
   name: 'Damien Meur',
   jobTitle: 'Senior Fullstack Engineer',
+  description:
+    'Freelance Senior Fullstack Engineer based in Brussels. 8+ years building production software with TypeScript, React, and Effect-TS. Creator of Vigie.',
   url: 'https://tmonier.com',
+  email: 'damien.meur@tmonier.com',
   sameAs: ['https://www.linkedin.com/in/damien-meur/', 'https://github.com/get-tmonier'],
+  knowsAbout: [
+    'TypeScript',
+    'React',
+    'Node.js',
+    'Effect-TS',
+    'PostgreSQL',
+    'Clean Architecture',
+    'Software Craft',
+    'AI Agent Supervision',
+  ],
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Brussels',
+    addressCountry: 'BE',
+  },
   worksFor: {
     '@type': 'Organization',
     name: 'Tmonier',
@@ -48,6 +66,22 @@ const organizationJsonLd = {
   url: 'https://tmonier.com',
   logo: 'https://tmonier.com/favicon.svg',
   sameAs: ['https://www.linkedin.com/in/damien-meur/', 'https://github.com/get-tmonier'],
+};
+
+const vigieJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Vigie',
+  url: 'https://vigie.tmonier.com',
+  description:
+    'Local-first supervision layer for AI coding agents. Real-time monitoring, loop detection, token cost guardrails, and human-in-the-loop control over Claude Code.',
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'macOS, Linux, Windows',
+  author: {
+    '@type': 'Person',
+    name: 'Damien Meur',
+    url: 'https://tmonier.com',
+  },
 };
 ---
 
@@ -85,7 +119,9 @@ const organizationJsonLd = {
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:url" content={canonicalURL} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content="profile" />
+    <meta property="profile:first_name" content="Damien" />
+    <meta property="profile:last_name" content="Meur" />
     <meta property="og:site_name" content="Tmonier" />
     <meta property="og:locale" content={locale === 'fr' ? 'fr_BE' : 'en_US'} />
 
@@ -98,6 +134,7 @@ const organizationJsonLd = {
     <!-- Structured data -->
     <script is:inline type="application/ld+json" set:html={JSON.stringify(personJsonLd)} />
     <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(vigieJsonLd)} />
     <slot name="head" />
   </head>
   <body>

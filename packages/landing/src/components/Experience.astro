@@ -122,7 +122,13 @@ function getLevel(lang: string): number {
           </svg>
         </div>
         <div>
-          <p class="font-vollkorn-sc text-navy-deep font-bold text-[0.9rem] m-0 leading-tight">{education.degree}</p>
+          <div class="flex items-center gap-2 flex-wrap">
+            <p class="font-vollkorn-sc text-navy-deep font-bold text-[0.9rem] m-0 leading-tight">{education.degree}</p>
+            <span class="inline-flex items-center gap-1 font-mono text-[0.58rem] text-gold-dark bg-gold/8 border border-gold/20 rounded-full px-2 py-[2px] leading-none">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4"/><path d="M12 10c-4 0-7 2-7 5v1h14v-1c0-3-3-5-7-5"/><path d="M9 17v4"/><path d="M15 17v4"/><path d="M5 21h14"/></svg>
+              {education.specialisation}
+            </span>
+          </div>
           <div class="font-source-serif text-slate text-[0.78rem]">
             <div>{education.school}</div>
             <div>{education.period} · <span class="text-gold-dark font-mono text-[0.65rem] font-semibold uppercase">{education.distinction}</span></div>
@@ -143,7 +149,11 @@ function getLevel(lang: string): number {
           );
         })}
       </div>
-    </div>
+    <!-- References note -->
+    <p class="reveal-up font-source-serif text-slate/55 text-[0.72rem] italic text-center mt-6 m-0" style="--delay: 80ms">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="inline-block mr-1 opacity-50" style="vertical-align: -1px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      {experience.references}
+    </p>
   </div>
 </section>
 

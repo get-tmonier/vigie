@@ -4,9 +4,9 @@ const en: SiteContent = {
   meta: {
     title: 'Damien Meur — Senior Fullstack Engineer · Freelance · Brussels',
     description:
-      'Damien Meur — Senior Fullstack Engineer available for freelance missions. Based in Brussels.',
+      'Damien Meur — Senior Fullstack Engineer available for freelance missions in Brussels.',
     keywords:
-      'freelance developer, senior fullstack engineer, TypeScript, React, Node.js, Brussels, Belgium, consultant',
+      'freelance developer, senior fullstack engineer, TypeScript, React, Node.js, Effect-TS, Brussels, Belgium, consultant, software craft, clean architecture, AI agent supervision, Vigie',
   },
   nav: {
     approach: 'Approach',
@@ -209,7 +209,7 @@ const en: SiteContent = {
       {
         period: 'Nov 2020 \u2013 Apr 2022',
         company: 'Proxyclick',
-        role: 'Full Stack Web Developer',
+        role: 'Full Stack Developer',
         location: 'Brussels',
         description:
           'SaaS visitor management platform serving enterprise clients across 100+ countries.',
@@ -295,6 +295,7 @@ const en: SiteContent = {
         tags: ['Python', 'IoT', 'Bluetooth', 'LoRa', 'Kubernetes'],
       },
     ],
+    references: 'References, work samples & credentials available on request.',
     projectsLabel: 'Projects',
     projectsTitle: 'Side Projects',
     projects: [
@@ -321,6 +322,7 @@ const en: SiteContent = {
     label: 'Education',
     title: 'Education & Languages',
     degree: 'Bachelor in Computer Science',
+    specialisation: 'AI specialisation',
     school: 'Institut Paul Lambin, Brussels',
     period: '2015 \u2013 2018',
     distinction: 'Cum Laude',

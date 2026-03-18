@@ -9,7 +9,7 @@ export default defineConfig({
   site: 'https://tmonier.com',
   output: 'static',
   prefetch: false,
-  integrations: [sitemap()],
+  integrations: [sitemap({ filter: (page) => !page.includes('/og/') })],
   i18n: {
     defaultLocale: 'en',
     locales: ['en', 'fr'],

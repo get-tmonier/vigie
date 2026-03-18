@@ -4,9 +4,9 @@ const fr: SiteContent = {
   meta: {
     title: 'Damien Meur — Ing\u00e9nieur Fullstack Senior \u00b7 Freelance \u00b7 Bruxelles',
     description:
-      'Damien Meur — Ing\u00e9nieur Fullstack Senior disponible pour des missions freelance. Bas\u00e9 \u00e0 Bruxelles.',
+      'Damien Meur — Ing\u00e9nieur Fullstack Senior disponible pour des missions freelance \u00e0 Bruxelles.',
     keywords:
-      'd\u00e9veloppeur freelance, ing\u00e9nieur fullstack senior, TypeScript, React, Node.js, Bruxelles, Belgique, consultant',
+      'd\u00e9veloppeur freelance, ing\u00e9nieur fullstack senior, TypeScript, React, Node.js, Effect-TS, Bruxelles, Belgique, consultant, software craft, architecture propre, supervision agents IA, Vigie',
   },
   nav: {
     approach: 'Approche',
@@ -209,7 +209,7 @@ const fr: SiteContent = {
       {
         period: 'Nov 2020 \u2013 Avr 2022',
         company: 'Proxyclick',
-        role: 'Full Stack Web Developer',
+        role: 'Full Stack Developer',
         location: 'Bruxelles',
         description:
           'Plateforme SaaS de gestion des visiteurs pour clients entreprise dans 100+ pays.',
@@ -297,6 +297,7 @@ const fr: SiteContent = {
         tags: ['Python', 'IoT', 'Bluetooth', 'LoRa', 'Kubernetes'],
       },
     ],
+    references: 'Références, preuves de travail & diplômes disponibles sur demande.',
     projectsLabel: 'Projets',
     projectsTitle: 'Projets perso',
     projects: [
@@ -323,6 +324,7 @@ const fr: SiteContent = {
     label: 'Formation',
     title: 'Formation & Langues',
     degree: 'Bachelier en Informatique',
+    specialisation: 'option Intelligence Artificielle',
     school: 'Institut Paul Lambin, Bruxelles',
     period: '2015 \u2013 2018',
     distinction: 'Cum Laude',
