@@ -1,86 +1,215 @@
 ---
 import { Picture } from 'astro:assets';
 import helmsmanImg from '#assets/helmsman.jpg';
+import WheelMark from '#components/WheelMark.astro';
+import type { SiteContent } from '../i18n/types';
+
+interface Props {
+  content: SiteContent;
+  locale: string;
+}
+
+const { content, locale } = Astro.props;
+const { hero, origin } = content;
 ---
 
 <section
-  class="hero-section min-h-[calc(100vh-64px)] box-border flex flex-col justify-center py-20 px-10 pb-24 max-md:h-[calc(100dvh-64px)] max-md:py-4 max-md:px-5 max-md:pb-3 max-md:overflow-hidden"
-  style="background: radial-gradient(ellipse at 60% 110%, color-mix(in srgb, var(--gold) 8%, transparent) 0%, transparent 60%), var(--navy-deep)"
+  class="relative min-h-[calc(100vh-64px)] box-border flex flex-col justify-center py-10 px-10 overflow-hidden max-md:py-4 max-md:px-5 max-md:min-h-[calc(100dvh-64px)]"
+  style="background: radial-gradient(ellipse at 60% 110%, color-mix(in srgb, var(--gold) 6%, transparent) 0%, transparent 60%), var(--navy-deep)"
 >
-  <div
-    class="hero-grid max-w-[1200px] mx-auto grid grid-cols-2 gap-16 items-center max-md:flex max-md:flex-col max-md:flex-1 max-md:gap-7 max-md:min-h-0 max-md:justify-center max-md:items-stretch"
-  >
-    <!-- Left: text -->
-    <div class="hero-left max-md:shrink-0">
-      <p
-        class="hero-tagline font-mono font-medium text-[0.7rem] tracking-[4px] text-gold/80 uppercase m-0 mb-6 max-md:m-0 max-md:mb-[0.8rem]"
-      >
-        You hold the helm.
-      </p>
-
-      <h1
-        class="hero-heading font-vollkorn-sc text-gold font-black text-[clamp(2.2rem,4.5vw,3.2rem)] m-0 mb-5 leading-[1.15] tracking-[-0.01em] max-md:m-0 max-md:mb-[0.35rem] max-md:text-[1.7rem]"
-      >
-        Your crew.<br />Under your watch.
-      </h1>
-
-      <p
-        class="hero-subtitle font-mono text-slate font-medium text-[0.85rem] m-0 mb-5 max-md:m-0 max-md:mb-2 max-md:text-[0.72rem]"
-      >
-        You launched the agent. Now what?
-      </p>
-
-      <div class="hero-body m-0 mb-10 max-w-[500px] max-md:m-0 max-md:mb-5">
-        <div class="border-l-2 border-gold/30 pl-4 m-0 mb-5 flex flex-col gap-[0.4rem]">
-          <p class="font-source-serif font-normal text-[1.05rem] text-slate/60 leading-[1.4] m-0 max-md:text-[0.78rem] max-md:leading-[1.4]">Looping for an hour. You had no idea.</p>
-          <p class="font-source-serif font-normal text-[1.05rem] text-slate/60 leading-[1.4] m-0 max-md:text-[0.78rem] max-md:leading-[1.4]">It opened your auth layer. You never asked.</p>
-          <p class="font-source-serif font-normal text-[1.05rem] text-slate/60 leading-[1.4] m-0 max-md:text-[0.78rem] max-md:leading-[1.4]">$180 in token usage. Still not done.</p>
+  <div class="max-w-[920px] mx-auto w-full grid grid-cols-[1fr_280px] gap-5 items-center max-md:flex max-md:flex-col max-md:gap-5 max-md:text-center">
+    <!-- Left: text content — dominant -->
+    <div>
+      <!-- WheelMark + company name — fades in first -->
+      <div id="hero-brand" class="flex items-center gap-3 mb-5 opacity-0 max-md:justify-center">
+        <div class="animate-[spin-slow_30s_linear_infinite]">
+          <WheelMark size={42} />
         </div>
-        <p class="font-source-serif text-slate font-normal text-[1.05rem] leading-[1.6] m-0 max-md:text-[0.78rem] max-md:leading-[1.4]">Tmonier shows you — in real time. When something's off, you're the one who catches it.</p>
+        <span class="font-vollkorn-sc text-gold font-bold text-[1.4rem] tracking-[0.03em]">
+          {hero.name}
+        </span>
+        <span class="font-mono text-gold/50 font-medium text-[0.72rem] tracking-[3px] uppercase max-md:hidden">
+          {hero.tagline}
+        </span>
       </div>
 
-      <div class="hero-buttons flex gap-4 items-center flex-wrap max-md:flex-col max-md:items-stretch max-md:gap-[0.45rem]">
+      <!-- Full name — typed letter by letter -->
+      <h1 class="font-vollkorn text-cream font-bold text-[clamp(3rem,6vw,4.5rem)] m-0 mb-3 leading-[1.05] tracking-[-0.02em] min-h-[1.15em] max-md:min-h-[1.2em] max-md:mb-1">
+        <span id="hero-name"></span><span id="hero-name-cursor" class="inline-block w-[3px] bg-gold opacity-0 animate-[blink_0.8s_step-end_infinite] align-middle" style="height: 0.75em; margin-left: 10px; margin-bottom: 0.05em;"></span>
+      </h1>
+
+      <!-- Role — typed with mono effect -->
+      <p class="font-source-serif text-slate text-[clamp(1.1rem,2.2vw,1.4rem)] m-0 mb-8 leading-[1.5] min-h-[1.5em] max-md:min-h-[3em]">
+        <span id="hero-role"></span>
+      </p>
+
+      <!-- CTAs — slide up -->
+      <div id="hero-ctas" class="flex gap-4 items-center flex-wrap opacity-0 max-md:justify-center max-md:flex-col max-md:items-stretch max-md:gap-3" style="transition: opacity 0.5s ease;">
         <a
-          class="hero-btn font-mono bg-gold text-navy-deep font-semibold text-sm py-[0.85rem] px-[1.8rem] rounded-[4px] no-underline transition-colors duration-200 inline-block hover:bg-gold-light max-md:block max-md:w-full max-md:text-center max-md:py-[0.65rem] max-md:px-[1.2rem] max-md:text-[0.78rem]"
-          href="#waitlist"
+          href={locale === 'fr' ? '/fr/contact' : '/contact'}
+          class="font-mono bg-gold text-navy-deep font-semibold text-[0.85rem] py-3.5 px-7 rounded-[4px] no-underline transition-colors duration-200 inline-block hover:bg-gold-light max-md:block max-md:text-center"
         >
-          Claim your spot
+          {hero.ctaPrimary}
+        </a>
+        <a
+          href="#experience"
+          class="font-mono text-gold font-semibold text-[0.85rem] py-3.5 px-7 rounded-[4px] no-underline border border-gold/40 transition-all duration-200 inline-block hover:bg-gold/10 hover:border-gold/60 max-md:block max-md:text-center"
+        >
+          {hero.ctaSecondary}
         </a>
       </div>
     </div>
 
     <!-- Right: mascotte + definition plaque -->
-    <div class="hero-right flex flex-col items-center gap-0 max-md:shrink-0 max-md:flex-row max-md:items-stretch max-md:justify-center max-md:gap-0 max-md:m-0 max-md:p-0 max-md:h-[180px]">
+    <div class="flex flex-col items-center gap-0 max-md:flex-row max-md:items-stretch max-md:gap-0 max-md:h-[150px] max-md:w-full max-md:max-w-[380px] max-md:mx-auto">
+      <!-- Image — reveals with clip-path from top -->
       <div
-        class="hero-mascotte-frame relative inline-block rounded-t-xl border-2 border-b-0 border-gold/20 overflow-hidden max-w-[320px] w-full aspect-[1568/2000] max-md:w-[140px] max-md:max-w-[140px] max-md:shrink-0 max-md:rounded-l-xl max-md:rounded-tr-none max-md:rounded-br-none max-md:border-r-0 max-md:border-b-2 max-md:border-b-gold/20 max-md:bg-navy-deep max-md:aspect-auto"
+        id="hero-image"
+        class="relative inline-block rounded-t-xl border-2 border-b-0 border-gold/20 overflow-hidden w-full max-h-[300px] max-md:w-[120px] max-md:max-h-none max-md:rounded-l-xl max-md:rounded-tr-none max-md:border-r-0 max-md:border-b-2 max-md:border-b-gold/20 max-md:shrink-0"
+        style="clip-path: inset(100% 0 0 0); transition: clip-path 0.8s cubic-bezier(0.16, 1, 0.3, 1);"
       >
         <Picture
           src={helmsmanImg}
           alt="The Helmsman — Tmonier mascotte"
           formats={['avif', 'webp']}
-          widths={[280, 440, 640]}
-          sizes="(max-width: 768px) 140px, 320px"
+          widths={[280, 440]}
+          sizes="(max-width: 768px) 120px, 280px"
           quality={80}
           loading="eager"
           fetchpriority="high"
-          class="block w-full h-full object-cover scale-[1.15] origin-[center_20%] max-md:h-full max-md:w-full max-md:object-cover max-md:object-[center_15%] max-md:scale-[1.3] max-md:origin-[center_20%]"
+          class="block w-full h-full object-cover scale-[1.15] origin-[center_20%] max-md:scale-[1.3] max-md:object-[center_15%]"
         />
       </div>
 
-      <!-- Definition plaque -->
+      <!-- Definition plaque — slides up + fades in after image -->
       <div
-        class="hero-plaque max-w-[320px] w-full border-2 border-gold/20 border-t border-t-gold/10 rounded-b-xl bg-gold/4 pt-[1.1rem] px-[1.4rem] pb-[1.2rem] max-md:max-w-none max-md:w-auto max-md:flex-1 max-md:min-w-0 max-md:rounded-r-xl max-md:rounded-tl-none max-md:rounded-bl-none max-md:py-[0.6rem] max-md:px-3 max-md:flex max-md:flex-col max-md:justify-center max-md:border-t-2 max-md:border-t-gold/20 max-md:border-l max-md:border-l-gold/10"
+        id="hero-plaque"
+        class="w-full border-2 border-gold/20 border-t border-t-gold/10 rounded-b-xl bg-gold/4 pt-2.5 px-3.5 pb-2.5 opacity-0 max-md:max-w-none max-md:w-auto max-md:flex-1 max-md:min-w-0 max-md:rounded-r-xl max-md:rounded-tl-none max-md:rounded-bl-none max-md:py-2 max-md:px-3 max-md:flex max-md:flex-col max-md:justify-center max-md:border-t-2 max-md:border-t-gold/20 max-md:border-l max-md:border-l-gold/10"
+        style="transform: translateY(12px); transition: opacity 0.5s ease 0s, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0s;"
       >
-        <div class="flex items-baseline gap-[0.65rem] flex-wrap mb-1">
-          <span class="font-vollkorn-sc text-gold font-black text-[1.05rem] max-md:text-[0.7rem]">tmonier</span>
-          <span class="font-mono text-[0.72rem] text-slate/60 max-md:text-[0.7rem]">/ti.mɔ.nje/</span>
-          <span class="font-mono text-[0.65rem] text-gold/45 tracking-[0.1em] uppercase max-md:text-[0.7rem]">n. French</span>
+        <div id="hero-plaque-name" class="flex items-baseline gap-2 flex-wrap mb-1 opacity-0" style="transition: opacity 0.3s ease;">
+          <span class="font-vollkorn-sc text-gold font-black text-[1rem]">tmonier</span>
+          <span class="font-mono text-[0.65rem] text-slate/60">{origin.pronunciation}</span>
         </div>
-        <p class="font-mono text-[0.6rem] text-slate/50 m-0 mb-[0.4rem] tracking-[0.02em] max-md:hidden">alt. Timonier</p>
-        <p class="font-source-serif text-[0.82rem] text-slate/80 leading-[1.65] m-0 max-md:text-[0.65rem] max-md:leading-[1.45] max-md:m-0">
-          The helmsman — the person at the helm who steers the ship while the crew executes.
+        {origin.grammar && <p id="hero-plaque-grammar" class="font-mono text-[0.52rem] text-gold/40 tracking-[0.1em] uppercase m-0 mb-1 opacity-0" style="transition: opacity 0.3s ease;">{origin.grammar}</p>}
+        <p id="hero-plaque-def" class="font-source-serif text-[0.78rem] text-slate/75 leading-[1.55] m-0 opacity-0" style="transition: opacity 0.4s ease;">
+          {origin.definition}
         </p>
       </div>
     </div>
   </div>
 </section>
+
+<script is:inline define:vars={{ fullName: hero.fullName, oneLiner: hero.oneLiner }}>
+  // Orchestrated hero entrance animation
+  const brand = document.getElementById('hero-brand');
+  const nameEl = document.getElementById('hero-name');
+  const nameCursor = document.getElementById('hero-name-cursor');
+  const roleEl = document.getElementById('hero-role');
+  const ctas = document.getElementById('hero-ctas');
+
+  if (brand && nameEl && nameCursor && roleEl && ctas) {
+    let t = 300;
+
+    // Phase 1: Brand line fades in (WheelMark + Tmonier + tagline)
+    setTimeout(() => {
+      brand.style.transition = 'opacity 0.6s ease';
+      brand.style.opacity = '1';
+    }, t);
+    t += 500;
+
+    // Phase 2: Name types letter by letter with variable speed
+    nameCursor.style.opacity = '1';
+    let charIdx = 0;
+    function typeName() {
+      if (charIdx < fullName.length) {
+        const ch = fullName[charIdx];
+        const span = document.createElement('span');
+        if (ch === ' ') {
+          span.innerHTML = '&nbsp;';
+        } else {
+          span.textContent = ch;
+        }
+        span.style.opacity = '0';
+        span.style.display = 'inline-block';
+        span.style.transform = ch === ' ' ? 'none' : 'translateY(8px)';
+        span.style.transition = 'opacity 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
+        nameEl.appendChild(span);
+        // Trigger animation next frame
+        requestAnimationFrame(() => {
+          span.style.opacity = '1';
+          span.style.transform = 'translateY(0)';
+        });
+        charIdx++;
+        // Variable timing: space = pause, otherwise random
+        const delay = ch === ' ' ? 120 : (30 + Math.random() * 50);
+        setTimeout(typeName, delay);
+      } else {
+        // Name complete — brief pause then hide cursor
+        setTimeout(() => {
+          nameCursor.style.transition = 'opacity 0.3s ease';
+          nameCursor.style.opacity = '0';
+          typeRole();
+        }, 400);
+      }
+    }
+    setTimeout(typeName, t);
+    t += fullName.length * 55 + 500;
+
+    // Phase 3: Role words appear with stagger
+    function typeRole() {
+      const words = oneLiner.split(' ');
+      let wordDelay = 0;
+      words.forEach((word, i) => {
+        setTimeout(() => {
+          const span = document.createElement('span');
+          span.textContent = (i > 0 ? ' ' : '') + word;
+          span.style.opacity = '0';
+          span.style.display = 'inline';
+          span.style.transition = 'opacity 0.3s ease';
+          roleEl.appendChild(span);
+          requestAnimationFrame(() => {
+            span.style.opacity = '1';
+          });
+        }, wordDelay);
+        wordDelay += 60;
+      });
+
+      // Phase 4: CTAs slide up after role is done
+      setTimeout(() => {
+        ctas.style.opacity = '1';
+      }, wordDelay + 200);
+    }
+
+    // Phase 5: Image reveals with clip-path curtain (overlaps with name typing)
+    const heroImage = document.getElementById('hero-image');
+    const heroPlaque = document.getElementById('hero-plaque');
+    const plaqueName = document.getElementById('hero-plaque-name');
+    const plaqueGrammar = document.getElementById('hero-plaque-grammar');
+    const plaqueDef = document.getElementById('hero-plaque-def');
+
+    // Image curtain reveal
+    setTimeout(() => {
+      if (heroImage) heroImage.style.clipPath = 'inset(0 0 0 0)';
+    }, 800);
+
+    // Plaque slides up
+    setTimeout(() => {
+      if (heroPlaque) {
+        heroPlaque.style.opacity = '1';
+        heroPlaque.style.transform = 'translateY(0)';
+      }
+    }, 1500);
+
+    // Plaque content cascades
+    setTimeout(() => {
+      if (plaqueName) plaqueName.style.opacity = '1';
+    }, 1700);
+    setTimeout(() => {
+      if (plaqueGrammar) plaqueGrammar.style.opacity = '1';
+    }, 1850);
+    setTimeout(() => {
+      if (plaqueDef) plaqueDef.style.opacity = '1';
+    }, 2000);
+  }
+</script>

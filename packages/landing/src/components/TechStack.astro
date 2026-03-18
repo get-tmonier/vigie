@@ -1,0 +1,266 @@
+---
+import Terminal from '#components/Terminal.astro';
+import type { SiteContent } from '../i18n/types';
+
+interface Props {
+  content: SiteContent;
+}
+
+const { content } = Astro.props;
+const { stack } = content;
+
+const leftCats = stack.categories.slice(0, 3);
+const rightCats = stack.categories.slice(3);
+---
+
+<section id="stack" class="bg-navy-deep py-10 px-10 min-h-[calc(100vh-64px)] box-border flex flex-col justify-center max-md:py-8 max-md:px-5 max-md:min-h-0">
+  <div class="max-w-[1100px] mx-auto w-full">
+    <p class="font-mono text-gold text-[0.75rem] tracking-[0.15em] uppercase m-0 mb-3 text-center">
+      {stack.label}
+    </p>
+    <h2 class="font-bitter text-cream font-bold text-[clamp(1.6rem,3.5vw,2.4rem)] m-0 mb-6 leading-[1.2] text-center">
+      {stack.title}
+    </h2>
+
+    <div class="grid grid-cols-[1fr_1fr] gap-5 items-stretch max-md:grid-cols-1">
+      <!-- Left: Interactive terminal with 2-col layout inside -->
+      {/* Desktop: animated terminal */}
+      <div class="max-md:hidden">
+        <Terminal title={stack.terminalTitle}>
+          <div id="stack-terminal" class="h-[420px] overflow-hidden">
+            <div id="stack-cmd" class="mb-2 flex items-center justify-between">
+              <div>
+                <span class="text-gold">$</span>
+                <span id="stack-cmd-text" class="text-gold-pale ml-1"></span>
+                <span id="stack-cursor" class="inline-block w-[7px] h-[1em] bg-gold ml-0.5 align-text-bottom animate-[blink_1.2s_step-end_infinite]"></span>
+              </div>
+              <div id="stack-badge" class="flex items-center gap-1.5 opacity-0" style="transition: opacity 0.4s ease;">
+                <span class="text-gold font-bold text-[0.85rem] font-vollkorn">10yr</span>
+                <span class="text-slate/40 text-[0.4rem]">·</span>
+                <span class="inline-block w-[6px] h-[3px] rounded-sm bg-signal-green"></span><span class="text-[0.38rem] text-slate/35">6+</span>
+                <span class="inline-block w-[6px] h-[3px] rounded-sm" style="background:#5b9bd5"></span><span class="text-[0.38rem] text-slate/35">3-5</span>
+                <span class="inline-block w-[6px] h-[3px] rounded-sm bg-slate"></span><span class="text-[0.38rem] text-slate/35">1-2</span>
+              </div>
+            </div>
+            <div id="stack-output" class="grid grid-cols-2 gap-x-5 gap-y-0"></div>
+          </div>
+        </Terminal>
+      </div>
+
+      {/* Mobile: pre-rendered with animated bars (fixed height, no layout shift) */}
+      <div class="hidden max-md:block">
+        <Terminal title={stack.terminalTitle}>
+          <div id="stack-mobile" class="overflow-hidden">
+            <div class="flex items-center justify-between mb-2">
+              <div>
+                <span class="text-gold">$</span>
+                <span class="text-gold-pale ml-1">{stack.command}</span>
+              </div>
+              <span class="text-gold font-bold text-[0.85rem] font-vollkorn">10yr</span>
+            </div>
+            {stack.categories.map((cat) => (
+              <div class="mt-2 mb-1">
+                <span class="text-gold font-semibold tracking-[0.08em] uppercase text-[0.6rem]">{cat.name}/</span>
+                {cat.items.map((item) => {
+                  const pct = Math.round((item.years / 10) * 100);
+                  const color = item.years >= 6 ? 'var(--signal-green)' : item.years >= 3 ? '#5b9bd5' : 'var(--slate)';
+                  return (
+                    <div class="mob-row flex items-center gap-2 h-[18px] opacity-0" style="transition: opacity 0.2s ease;">
+                      <span class="min-w-[80px] text-cream/85 text-[0.62rem]">{item.name}</span>
+                      <div class="flex-1 h-[5px] rounded-sm overflow-hidden" style="background: color-mix(in srgb, var(--slate) 15%, transparent)">
+                        <div class="mob-bar h-full rounded-sm" style={`width: 0%; background: ${color}; transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);`} data-width={`${pct}%`}></div>
+                      </div>
+                      <span class="min-w-[24px] text-right text-[0.55rem]" style={`color: ${color}`}>{item.years}yr</span>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </Terminal>
+      </div>
+
+      <!-- Right: 2x2 practice cards -->
+      <div class="grid grid-cols-2 gap-3 max-md:grid-cols-1">
+        {stack.practices.map((practice, i) => (
+          <div
+            class="practice-card opacity-0 translate-y-4 bg-navy-mid/25 border border-gold/15 rounded-lg p-4 flex flex-col transition-all duration-500 ease-out hover:border-gold/30 hover:bg-navy-mid/35"
+            style={`transition-delay: ${i * 120}ms`}
+          >
+            <h3 class="font-vollkorn-sc text-gold font-bold text-[0.85rem] m-0 mb-2 leading-[1.3]">
+              {practice.title}
+            </h3>
+            <p class="font-source-serif text-slate text-[0.75rem] m-0 mb-3 leading-[1.55] flex-1">
+              {practice.description}
+            </p>
+            <div class="flex flex-wrap gap-1.5">
+              {practice.tags.map((tag) => (
+                <span class="font-mono text-[0.55rem] text-gold/70 bg-gold/8 border border-gold/15 rounded-[3px] py-[0.1rem] px-[0.4rem]">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline define:vars={{ leftCats, rightCats, command: stack.command }}>
+  const terminal = document.getElementById('stack-terminal');
+  if (terminal) {
+    let started = false;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !started) {
+          started = true;
+          observer.disconnect();
+          runAnimation();
+        }
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(terminal);
+  }
+
+  function runAnimation() {
+    const badge = document.getElementById('stack-badge');
+    const cmdText = document.getElementById('stack-cmd-text');
+    const cursor = document.getElementById('stack-cursor');
+    const output = document.getElementById('stack-output');
+    if (!cmdText || !cursor || !output) return;
+
+    // Badge fades in with the command
+    setTimeout(() => {
+      if (badge) badge.style.opacity = '1';
+    }, 200);
+
+    let charIdx = 0;
+    const typeCmd = () => {
+      if (charIdx < command.length) {
+        cmdText.textContent += command[charIdx];
+        charIdx++;
+        setTimeout(typeCmd, 40 + Math.random() * 60);
+      } else {
+        setTimeout(() => {
+          cursor.style.display = 'none';
+          renderColumns();
+        }, 300);
+      }
+    };
+    setTimeout(typeCmd, 400);
+
+    function renderColumns() {
+      // Left column
+      const leftCol = document.createElement('div');
+      leftCol.className = 'flex flex-col';
+      output.appendChild(leftCol);
+
+      // Right column
+      const rightCol = document.createElement('div');
+      rightCol.className = 'flex flex-col';
+      output.appendChild(rightCol);
+
+      let delay = 0;
+      const maxYears = 10;
+
+      function renderCatsInto(container, cats) {
+        for (const cat of cats) {
+          const header = document.createElement('div');
+          header.className = 'mt-2 mb-1';
+          header.style.opacity = '0';
+          header.innerHTML =
+            '<span style="color: var(--gold); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; font-size: 0.6rem;">' +
+            cat.name + '/</span>';
+          container.appendChild(header);
+
+          const hDelay = delay;
+          setTimeout(() => {
+            header.style.transition = 'opacity 0.3s ease';
+            header.style.opacity = '1';
+          }, hDelay);
+          delay += 80;
+
+          for (const item of cat.items) {
+            const row = document.createElement('div');
+            row.className = 'flex items-center gap-2 h-[18px]';
+            row.style.opacity = '0';
+
+            const pct = Math.round((item.years / maxYears) * 100);
+            const color =
+              item.years >= 6 ? 'var(--signal-green)'
+              : item.years >= 3 ? '#5b9bd5'
+              : 'var(--slate)';
+
+            row.innerHTML =
+              '<span style="min-width: 80px; color: color-mix(in srgb, var(--cream) 85%, transparent); font-size: 0.62rem; white-space: nowrap;">' + item.name + '</span>' +
+              '<div style="flex: 1; height: 5px; background: color-mix(in srgb, var(--slate) 12%, transparent); border-radius: 2px; overflow: hidden;">' +
+              '<div class="stack-bar" style="width: 0%; height: 100%; border-radius: 2px; background: ' + color + ';" data-width="' + pct + '"></div></div>' +
+              '<span style="min-width: 24px; text-align: right; font-size: 0.55rem; color: ' + color + ';">' + item.years + 'yr</span>';
+
+            container.appendChild(row);
+
+            const rDelay = delay;
+            setTimeout(() => {
+              row.style.transition = 'opacity 0.2s ease';
+              row.style.opacity = '1';
+              const bar = row.querySelector('.stack-bar');
+              if (bar) {
+                setTimeout(() => {
+                  bar.style.transition = 'width 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+                  bar.style.width = bar.dataset.width + '%';
+                }, 60);
+              }
+            }, rDelay);
+            delay += 40;
+          }
+        }
+      }
+
+      renderCatsInto(leftCol, leftCats);
+      renderCatsInto(rightCol, rightCats);
+    }
+  }
+
+  // Practice cards staggered reveal
+  const cards = document.querySelectorAll('.practice-card');
+  const cardObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.remove('opacity-0', 'translate-y-4');
+          cardObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.1 }
+  );
+  cards.forEach((card) => cardObserver.observe(card));
+
+  // Mobile: fast staggered row reveal + bar fill
+  const mobTerminal = document.getElementById('stack-mobile');
+  if (mobTerminal) {
+    const mobRows = mobTerminal.querySelectorAll('.mob-row');
+    let mobStarted = false;
+    const mobObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !mobStarted) {
+          mobStarted = true;
+          mobObserver.disconnect();
+          mobRows.forEach((row, i) => {
+            setTimeout(() => {
+              row.style.opacity = '1';
+              const bar = row.querySelector('.mob-bar');
+              if (bar) {
+                setTimeout(() => { bar.style.width = bar.dataset.width; }, 50);
+              }
+            }, i * 30);
+          });
+        }
+      },
+      { threshold: 0.1 }
+    );
+    mobObserver.observe(mobTerminal);
+  }
+</script>

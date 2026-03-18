@@ -1,14 +1,19 @@
 ---
 import WheelMark from '#components/WheelMark.astro';
+import type { SiteContent } from '../i18n/types';
 
 interface Props {
+  locale: string;
+  content: SiteContent;
   currentPage?: string;
 }
 
-const { currentPage = 'home' } = Astro.props;
+const { locale, content, currentPage = 'home' } = Astro.props;
+const { nav } = content;
 const isHome = currentPage === 'home';
-const isFaq = currentPage === 'faq';
 const isContact = currentPage === 'contact';
+const altLocale = locale === 'fr' ? 'en' : 'fr';
+const altHref = locale === 'fr' ? '/' : '/fr/';
 ---
 
 <nav
@@ -16,7 +21,7 @@ const isContact = currentPage === 'contact';
 >
   <div class="flex items-center justify-between px-6 py-4 md:px-10">
     <!-- Logo -->
-    <a href="/" class="flex items-center gap-3 no-underline">
+    <a href={locale === 'fr' ? '/fr/' : '/'} class="flex items-center gap-3 no-underline">
       <WheelMark size={24} />
       <span class="font-vollkorn-sc text-gold font-bold text-[1.15rem] tracking-[0.03em]">
         Tmonier
@@ -26,41 +31,97 @@ const isContact = currentPage === 'contact';
     <!-- Desktop nav links -->
     <div class="hidden lg:flex items-center gap-8">
       <a
-        href={isHome ? '#how-it-works' : '/#how-it-works'}
+        href={isHome ? '#approach' : (locale === 'fr' ? '/fr/#approach' : '/#approach')}
         class="font-mono text-slate text-[0.8rem] no-underline transition-colors duration-200 hover:text-gold"
       >
-        How it works
+        {nav.approach}
       </a>
       <a
-        href={isHome ? '#pricing' : '/#pricing'}
+        href={isHome ? '#stack' : (locale === 'fr' ? '/fr/#stack' : '/#stack')}
         class="font-mono text-slate text-[0.8rem] no-underline transition-colors duration-200 hover:text-gold"
       >
-        Pricing
+        {nav.stack}
       </a>
       <a
-        href="/faq"
-        class:list={['font-mono text-[0.8rem] no-underline transition-colors duration-200', isFaq ? 'text-gold' : 'text-slate hover:text-gold']}
+        href={isHome ? '#experience' : (locale === 'fr' ? '/fr/#experience' : '/#experience')}
+        class="font-mono text-slate text-[0.8rem] no-underline transition-colors duration-200 hover:text-gold"
       >
-        FAQ
+        {nav.experience}
       </a>
       <a
-        href="/contact"
+        href={isHome ? '#projects' : (locale === 'fr' ? '/fr/#projects' : '/#projects')}
+        class="font-mono text-slate text-[0.8rem] no-underline transition-colors duration-200 hover:text-gold"
+      >
+        {nav.projects}
+      </a>
+      <a
+        href={isHome ? '#project' : (locale === 'fr' ? '/fr/#project' : '/#project')}
+        class="font-mono text-slate text-[0.8rem] no-underline transition-colors duration-200 hover:text-gold"
+      >
+        {nav.vigie}
+      </a>
+      <a
+        href={isHome ? '#about' : (locale === 'fr' ? '/fr/#about' : '/#about')}
+        class="font-mono text-slate text-[0.8rem] no-underline transition-colors duration-200 hover:text-gold"
+      >
+        {nav.about}
+      </a>
+      <a
+        href={isContact ? '#main' : (locale === 'fr' ? '/fr/contact' : '/contact')}
         class:list={['font-mono text-[0.8rem] no-underline transition-colors duration-200', isContact ? 'text-gold' : 'text-slate hover:text-gold']}
       >
-        Contact
+        {nav.contact}
       </a>
+
+      <!-- Language toggle -->
+      <div class="flex items-center bg-navy-mid/50 rounded-[20px] p-[3px] gap-[2px]">
+        <a
+          href={locale === 'en' ? '#' : '/'}
+          class:list={[
+            'font-mono text-[0.7rem] font-semibold py-1 px-[0.65rem] rounded-[16px] no-underline transition-all duration-150',
+            locale === 'en' ? 'bg-gold text-navy-deep' : 'bg-transparent text-slate hover:text-cream',
+          ]}
+          aria-current={locale === 'en' ? 'true' : undefined}
+        >EN</a>
+        <a
+          href={locale === 'fr' ? '#' : '/fr/'}
+          class:list={[
+            'font-mono text-[0.7rem] font-semibold py-1 px-[0.65rem] rounded-[16px] no-underline transition-all duration-150',
+            locale === 'fr' ? 'bg-gold text-navy-deep' : 'bg-transparent text-slate hover:text-cream',
+          ]}
+          aria-current={locale === 'fr' ? 'true' : undefined}
+        >FR</a>
+      </div>
+
       <a
-        href={isHome ? '#waitlist' : '/#waitlist'}
+        href={locale === 'fr' ? '/fr/contact' : '/contact'}
         class="font-mono bg-gold text-navy-deep font-semibold text-[0.8rem] py-2 px-[1.1rem] rounded-[4px] no-underline transition-colors duration-200 hover:bg-gold-light"
       >
-        Claim your spot
+        {content.hero.ctaPrimary}
       </a>
     </div>
 
-    <!-- Mobile hamburger button -->
+    <!-- Mobile language toggle + hamburger -->
+    <div class="lg:hidden flex items-center gap-3">
+      <div class="flex items-center bg-navy-mid/50 rounded-[16px] p-[2px] gap-[2px]">
+        <a
+          href={locale === 'en' ? '#' : '/'}
+          class:list={[
+            'font-mono text-[0.6rem] font-semibold py-[3px] px-[0.5rem] rounded-[12px] no-underline transition-all duration-150',
+            locale === 'en' ? 'bg-gold text-navy-deep' : 'bg-transparent text-slate',
+          ]}
+        >EN</a>
+        <a
+          href={locale === 'fr' ? '#' : '/fr/'}
+          class:list={[
+            'font-mono text-[0.6rem] font-semibold py-[3px] px-[0.5rem] rounded-[12px] no-underline transition-all duration-150',
+            locale === 'fr' ? 'bg-gold text-navy-deep' : 'bg-transparent text-slate',
+          ]}
+        >FR</a>
+      </div>
     <button
       id="hamburger-btn"
-      class="lg:hidden bg-transparent border-none cursor-pointer p-2 flex flex-col gap-[5px]"
+      class="bg-transparent border-none cursor-pointer p-2 flex flex-col gap-[5px]"
       aria-label="Menu"
       aria-expanded="false"
     >
@@ -68,6 +129,7 @@ const isContact = currentPage === 'contact';
       <span class="hamburger-bar block w-[22px] h-0.5 bg-gold rounded-[1px] transition-[transform,opacity] duration-300 ease-in-out"></span>
       <span class="hamburger-bar block w-[22px] h-0.5 bg-gold rounded-[1px] transition-[transform,opacity] duration-300 ease-in-out"></span>
     </button>
+    </div>
   </div>
 
   <!-- Mobile menu panel -->
@@ -77,35 +139,56 @@ const isContact = currentPage === 'contact';
   >
     <div class="pt-2 px-6 pb-6">
       <a
-        href={isHome ? '#how-it-works' : '/#how-it-works'}
+        href={isHome ? '#approach' : (locale === 'fr' ? '/fr/#approach' : '/#approach')}
         class="mobile-nav-link font-mono text-slate text-[0.85rem] no-underline block py-3 transition-colors duration-200 hover:text-gold"
       >
-        How it works
+        {nav.approach}
       </a>
       <a
-        href={isHome ? '#pricing' : '/#pricing'}
+        href={isHome ? '#stack' : (locale === 'fr' ? '/fr/#stack' : '/#stack')}
         class="mobile-nav-link font-mono text-slate text-[0.85rem] no-underline block py-3 transition-colors duration-200 hover:text-gold"
       >
-        Pricing
+        {nav.stack}
       </a>
       <a
-        href="/faq"
-        class:list={['mobile-nav-link font-mono text-[0.85rem] no-underline block py-3 transition-colors duration-200', isFaq ? 'text-gold' : 'text-slate hover:text-gold']}
+        href={isHome ? '#experience' : (locale === 'fr' ? '/fr/#experience' : '/#experience')}
+        class="mobile-nav-link font-mono text-slate text-[0.85rem] no-underline block py-3 transition-colors duration-200 hover:text-gold"
       >
-        FAQ
+        {nav.experience}
       </a>
       <a
-        href="/contact"
+        href={isHome ? '#projects' : (locale === 'fr' ? '/fr/#projects' : '/#projects')}
+        class="mobile-nav-link font-mono text-slate text-[0.85rem] no-underline block py-3 transition-colors duration-200 hover:text-gold"
+      >
+        {nav.projects}
+      </a>
+      <a
+        href={isHome ? '#project' : (locale === 'fr' ? '/fr/#project' : '/#project')}
+        class="mobile-nav-link font-mono text-slate text-[0.85rem] no-underline block py-3 transition-colors duration-200 hover:text-gold"
+      >
+        {nav.vigie}
+      </a>
+      <a
+        href={isHome ? '#about' : (locale === 'fr' ? '/fr/#about' : '/#about')}
+        class="mobile-nav-link font-mono text-slate text-[0.85rem] no-underline block py-3 transition-colors duration-200 hover:text-gold"
+      >
+        {nav.about}
+      </a>
+      <a
+        href={isContact ? '#main' : (locale === 'fr' ? '/fr/contact' : '/contact')}
         class:list={['mobile-nav-link font-mono text-[0.85rem] no-underline block py-3 transition-colors duration-200', isContact ? 'text-gold' : 'text-slate hover:text-gold']}
       >
-        Contact
+        {nav.contact}
       </a>
+
+
+
       <div class="border-t border-gold/15 mt-2 pt-3">
         <a
-          href={isHome ? '#waitlist' : '/#waitlist'}
+          href={locale === 'fr' ? '/fr/contact' : '/contact'}
           class="mobile-nav-link font-mono bg-gold text-navy-deep font-semibold text-[0.85rem] py-[0.65rem] px-[1.1rem] rounded-[4px] no-underline block text-center transition-colors duration-200 hover:bg-gold-light"
         >
-          Claim your spot
+          {content.hero.ctaPrimary}
         </a>
       </div>
     </div>
@@ -137,7 +220,6 @@ const isContact = currentPage === 'contact';
       setOpen(isOpen);
     });
 
-    // Close menu when a link is clicked
     mobileMenu.querySelectorAll('a').forEach((link) => {
       link.addEventListener('click', () => {
         isOpen = false;
@@ -145,7 +227,6 @@ const isContact = currentPage === 'contact';
       });
     });
 
-    // Close menu on resize to desktop
     const mediaQuery = window.matchMedia('(min-width: 1024px)');
     mediaQuery.addEventListener('change', (e) => {
       if (e.matches) {

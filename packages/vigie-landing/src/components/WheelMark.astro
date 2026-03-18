@@ -1,0 +1,54 @@
+---
+import { cn } from '#lib/cn';
+
+interface Props {
+  size?: number;
+  class?: string;
+}
+
+const { size = 24, class: className = '' } = Astro.props;
+---
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 64 64"
+  width={size}
+  height={size}
+  class={cn(className)}
+  aria-hidden="true"
+>
+  <defs>
+    <linearGradient id={`brass-${size}`} x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D4AA3C" />
+      <stop offset="45%" stop-color="#C49A2B" />
+      <stop offset="100%" stop-color="#A67C1A" />
+    </linearGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="none" stroke={`url(#brass-${size})`} stroke-width="2.5" />
+  <circle cx="32" cy="32" r="22" fill="none" stroke={`url(#brass-${size})`} stroke-width="2" />
+  <circle cx="32" cy="32" r="6" fill={`url(#brass-${size})`} />
+  <!-- Top -->
+  <line x1="32" y1="26" x2="32" y2="4" stroke={`url(#brass-${size})`} stroke-width="2.5" stroke-linecap="round" />
+  <ellipse cx="32" cy="4" rx="2.5" ry="3.5" fill={`url(#brass-${size})`} />
+  <!-- Top-right -->
+  <line x1="37.66" y1="29.66" x2="53.73" y2="13.59" stroke={`url(#brass-${size})`} stroke-width="2.5" stroke-linecap="round" />
+  <ellipse cx="55.49" cy="11.83" rx="2.5" ry="3.5" transform="rotate(45 55.49 11.83)" fill={`url(#brass-${size})`} />
+  <!-- Right -->
+  <line x1="38" y1="32" x2="60" y2="32" stroke={`url(#brass-${size})`} stroke-width="2.5" stroke-linecap="round" />
+  <ellipse cx="60" cy="32" rx="2.5" ry="3.5" transform="rotate(90 60 32)" fill={`url(#brass-${size})`} />
+  <!-- Bottom-right -->
+  <line x1="37.66" y1="34.34" x2="53.73" y2="50.41" stroke={`url(#brass-${size})`} stroke-width="2.5" stroke-linecap="round" />
+  <ellipse cx="55.49" cy="52.17" rx="2.5" ry="3.5" transform="rotate(135 55.49 52.17)" fill={`url(#brass-${size})`} />
+  <!-- Bottom -->
+  <line x1="32" y1="38" x2="32" y2="60" stroke={`url(#brass-${size})`} stroke-width="2.5" stroke-linecap="round" />
+  <ellipse cx="32" cy="60" rx="2.5" ry="3.5" fill={`url(#brass-${size})`} />
+  <!-- Bottom-left -->
+  <line x1="26.34" y1="34.34" x2="10.27" y2="50.41" stroke={`url(#brass-${size})`} stroke-width="2.5" stroke-linecap="round" />
+  <ellipse cx="8.51" cy="52.17" rx="2.5" ry="3.5" transform="rotate(45 8.51 52.17)" fill={`url(#brass-${size})`} />
+  <!-- Left -->
+  <line x1="26" y1="32" x2="4" y2="32" stroke={`url(#brass-${size})`} stroke-width="2.5" stroke-linecap="round" />
+  <ellipse cx="4" cy="32" rx="2.5" ry="3.5" transform="rotate(90 4 32)" fill={`url(#brass-${size})`} />
+  <!-- Top-left -->
+  <line x1="26.34" y1="29.66" x2="10.27" y2="13.59" stroke={`url(#brass-${size})`} stroke-width="2.5" stroke-linecap="round" />
+  <ellipse cx="8.51" cy="11.83" rx="2.5" ry="3.5" transform="rotate(135 8.51 11.83)" fill={`url(#brass-${size})`} />
+</svg>

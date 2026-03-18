@@ -223,7 +223,7 @@ function buildTree(): VNode {
               textTransform: 'uppercase',
               color: 'rgba(139,156,175,0.5)',
             },
-            children: 'You hold the helm.',
+            children: 'You Keep The Helm.',
           }),
         ],
       }),
@@ -235,30 +235,28 @@ function buildTree(): VNode {
             style: {
               fontFamily: 'Vollkorn SC',
               fontWeight: 900,
-              fontSize: 64,
+              fontSize: 56,
               color: CREAM,
-              lineHeight: 1.1,
+              lineHeight: 1.2,
             },
-            children: 'Your crew.',
+            children: 'Senior Fullstack Engineer',
           }),
           h('div', {
             style: {
-              fontFamily: 'Vollkorn SC',
-              fontWeight: 900,
-              fontSize: 64,
-              color: CREAM,
-              lineHeight: 1.1,
+              fontFamily: 'JetBrains Mono',
+              fontSize: 22,
+              fontWeight: 500,
+              color: 'rgba(139,156,175,0.7)',
+              marginTop: '12px',
             },
-            children: 'Under your watch.',
+            children: 'Freelance · Brussels',
           }),
         ],
       }),
       // Pills
       h('div', {
         style: { display: 'flex', gap: '12px', flexWrap: 'wrap' },
-        children: ['Real-time monitoring', 'Human-in-the-loop', 'Local-first', 'Zero markup'].map(
-          pill
-        ),
+        children: ['TypeScript', 'React', 'Node.js', 'Effect-TS', 'PostgreSQL'].map(pill),
       }),
       // URL
       h('div', {

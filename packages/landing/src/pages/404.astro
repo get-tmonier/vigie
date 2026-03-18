@@ -2,10 +2,11 @@
 import Footer from '#components/Footer.astro';
 import Nav from '#components/Nav.astro';
 import Base from '#layouts/Base.astro';
+import en from '../i18n/en';
 ---
 
-<Base title="Page not found — Tmonier" description="The page you're looking for doesn't exist.">
-  <Nav />
+<Base title="Page not found — Tmonier" description="The page you're looking for doesn't exist." locale="en">
+  <Nav locale="en" content={en} />
   <main id="main">
     <section class="bg-navy-deep min-h-[calc(100vh-64px-60px)] flex flex-col items-center justify-center px-10 text-center">
       <p class="font-mono text-[0.75rem] tracking-[0.15em] uppercase text-gold/60 m-0 mb-4">
@@ -25,5 +26,5 @@ import Base from '#layouts/Base.astro';
       </a>
     </section>
   </main>
-  <Footer />
+  <Footer content={en} locale="en" />
 </Base>

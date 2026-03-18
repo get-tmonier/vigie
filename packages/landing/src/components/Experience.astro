@@ -1,0 +1,278 @@
+---
+import type { SiteContent } from '../i18n/types';
+
+interface Props {
+  content: SiteContent;
+}
+
+const { content } = Astro.props;
+const { experience, education } = content;
+
+const langLevels: Record<string, number> = {
+  native: 100,
+  'langue maternelle': 100,
+  fluent: 85,
+  courant: 85,
+  intermediate: 50,
+  'interm\u00e9diaire': 50,
+};
+
+function getLevel(lang: string): number {
+  const lower = lang.toLowerCase();
+  for (const [key, val] of Object.entries(langLevels)) {
+    if (lower.includes(key)) return val;
+  }
+  return 30;
+}
+---
+
+<!-- Professional Experience -->
+<section id="experience" class="bg-cream py-16 px-10 max-md:py-10 max-md:px-5">
+  <div class="max-w-[1000px] mx-auto">
+    <p class="font-mono text-gold-dark text-[0.75rem] tracking-[0.15em] uppercase m-0 mb-3 text-center">
+      {experience.label}
+    </p>
+    <h2 class="font-bitter text-navy-deep font-bold text-[clamp(1.8rem,4vw,2.8rem)] m-0 mb-10 leading-[1.2] text-center">
+      {experience.title}
+    </h2>
+
+    <div class="exp-timeline relative">
+      <!-- Timeline line (grows with scroll) -->
+      <div class="absolute left-[20px] top-6 bottom-0 w-[2px] max-md:left-[12px]">
+        <div class="exp-line-fill w-full bg-gold/30 origin-top" style="height: 0%; transition: height 0.15s linear;"></div>
+      </div>
+
+      {experience.jobs.map((job, i) => (
+        <div class="exp-card relative pl-14 pb-10 last:pb-0 max-md:pl-10">
+          {/* Timeline dot — starts hidden, pops in */}
+          <div
+            class="exp-dot absolute left-[11px] top-1 size-[20px] rounded-full border-[3px] border-gold bg-cream z-10 max-md:left-[3px] scale-0 opacity-0"
+            style="transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease, box-shadow 0.6s ease;"
+          >
+          </div>
+
+          {/* Horizontal connector line — draws from dot to card */}
+          <div
+            class="exp-connector absolute left-[31px] top-[11px] h-[2px] bg-gold/30 max-md:left-[23px] origin-left scale-x-0"
+            style="width: 25px; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-md:width: 17px;"
+          ></div>
+
+          {/* Card content — slides in */}
+          <div
+            class="exp-content opacity-0"
+            style="transform: translateX(-12px) translateY(4px); transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);"
+          >
+            {/* Period badge */}
+            <div class="font-mono text-[0.68rem] text-gold-dark font-semibold tracking-[0.03em] mb-1">
+              {job.period}
+            </div>
+
+            {/* Card */}
+            <div class="bg-white rounded-xl p-6 border border-cream-dark shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-shadow duration-300 max-md:p-4">
+              <div class="flex items-baseline justify-between flex-wrap gap-2 mb-1">
+                <h3 class="font-vollkorn-sc text-navy-deep font-bold text-[1.15rem] m-0">
+                  {job.company}
+                </h3>
+                <span class="font-mono text-slate text-[0.65rem]">
+                  {job.location}
+                </span>
+              </div>
+              <p class="font-mono text-gold-dark text-[0.72rem] font-semibold m-0 mb-2">
+                {job.role}
+              </p>
+              <p class="font-source-serif text-navy-mid/70 text-[0.82rem] m-0 mb-3 leading-[1.5] italic">
+                {job.description}
+              </p>
+              <ul class="list-none p-0 m-0 mb-3">
+                {job.bullets.map((bullet) => (
+                  <li class="font-source-serif text-navy-mid text-[0.85rem] leading-[1.55] py-[0.15rem] flex items-start gap-2">
+                    <span class="text-gold text-[0.65rem] shrink-0 mt-[0.4rem]">&#9654;</span>
+                    {bullet}
+                  </li>
+                ))}
+              </ul>
+              {/* Tags cascade in */}
+              <div class="exp-tags flex flex-wrap gap-[0.3rem]">
+                {job.tags.map((tag, j) => (
+                  <span
+                    class="exp-tag font-mono text-[0.55rem] text-navy-mid/60 bg-cream-dark/80 rounded-[3px] py-[0.12rem] px-[0.45rem] opacity-0 translate-y-1"
+                    style={`transition: opacity 0.25s ease, transform 0.25s ease; transition-delay: ${j * 40}ms;`}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+    <!-- Education strip inline -->
+    <div class="reveal-up mt-10 flex items-center justify-between flex-wrap gap-6 bg-white rounded-xl p-5 border border-cream-dark max-md:flex-col max-md:gap-4" style="--delay: 0ms">
+      <div class="flex items-center gap-4">
+        <div class="size-10 rounded-lg bg-gold/10 border border-gold/20 flex items-center justify-center shrink-0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-gold">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5"/>
+          </svg>
+        </div>
+        <div>
+          <p class="font-vollkorn-sc text-navy-deep font-bold text-[0.9rem] m-0 leading-tight">{education.degree}</p>
+          <p class="font-source-serif text-slate text-[0.78rem] m-0">
+            {education.school} · {education.period} · <span class="text-gold-dark font-mono text-[0.65rem] font-semibold uppercase">{education.distinction}</span>
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        {education.languages.map((lang) => {
+          const name = lang.split('(')[0].trim();
+          const level = getLevel(lang);
+          return (
+            <div class="flex items-center gap-1.5">
+              <span class="font-mono text-[0.65rem] text-navy-mid">{name}</span>
+              <div class="w-[32px] h-[4px] bg-cream-dark rounded-sm overflow-hidden">
+                <div class="h-full rounded-sm bg-gold" style={`width: ${level}%`}></div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Projects -->
+<section id="projects" class="bg-cream pt-6 pb-16 px-10 max-md:pt-4 max-md:pb-10 max-md:px-5">
+  <div class="max-w-[1000px] mx-auto">
+    <p class="font-mono text-gold-dark text-[0.75rem] tracking-[0.15em] uppercase m-0 mb-3 text-center">
+      {experience.projectsLabel}
+    </p>
+    <h2 class="font-bitter text-navy-deep font-bold text-[clamp(1.6rem,3.5vw,2.2rem)] m-0 mb-8 leading-[1.2] text-center">
+      {experience.projectsTitle}
+    </h2>
+
+    <div class="grid grid-cols-2 gap-5 max-w-[700px] mx-auto max-md:grid-cols-1">
+      {experience.projects.map((project, i) => (
+        <div
+          class="project-card opacity-0 translate-y-4 bg-white border border-cream-dark rounded-xl p-5 flex flex-col hover:border-gold/30 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300"
+          style={`transition-delay: ${i * 120}ms`}
+        >
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-mono text-gold-dark text-[0.6rem] font-semibold">{project.period}</span>
+            <span class="font-mono text-slate text-[0.55rem]">{project.type}</span>
+          </div>
+          <h3 class="font-vollkorn-sc text-navy-deep font-bold text-[1.05rem] m-0 mb-2">
+            {project.name}
+          </h3>
+          <p class="font-source-serif text-navy-mid text-[0.82rem] m-0 mb-4 leading-[1.6] flex-1">
+            {project.description}
+          </p>
+          <div class="flex flex-wrap gap-[0.3rem] mb-3">
+            {project.tags.map((tag) => (
+              <span class="font-mono text-[0.52rem] text-navy-mid/60 bg-cream-dark/80 rounded-[3px] py-[0.1rem] px-[0.4rem]">
+                {tag}
+              </span>
+            ))}
+          </div>
+          {project.link && (
+            <a
+              href={project.link}
+              class="font-mono text-gold-dark text-[0.72rem] font-semibold no-underline hover:text-gold transition-colors duration-200 self-start"
+            >
+              {project.link.replace('https://', '')} &rarr;
+            </a>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  // Timeline line grows with scroll progress
+  const timeline = document.querySelector('.exp-timeline') as HTMLElement;
+  const lineFill = document.querySelector('.exp-line-fill') as HTMLElement;
+
+  if (timeline && lineFill) {
+    function updateLine() {
+      const rect = timeline.getBoundingClientRect();
+      const viewH = window.innerHeight;
+      // How far the viewport has scrolled into the timeline
+      const scrolled = viewH - rect.top;
+      const total = rect.height;
+      const pct = Math.max(0, Math.min(100, (scrolled / total) * 100));
+      lineFill.style.height = pct + '%';
+    }
+    window.addEventListener('scroll', updateLine, { passive: true });
+    updateLine();
+  }
+
+  // Cards: dot pops → connector draws → content slides in → tags cascade
+  const expCards = document.querySelectorAll('.exp-card');
+  const expObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const card = entry.target as HTMLElement;
+
+          // 1. Dot pops in with spring + gold glow
+          const dot = card.querySelector('.exp-dot') as HTMLElement;
+          if (dot) {
+            dot.style.transform = 'scale(1)';
+            dot.style.opacity = '1';
+            dot.style.boxShadow = '0 0 12px 2px rgba(196, 154, 43, 0.35)';
+            // Glow fades after a moment
+            setTimeout(() => {
+              dot.style.boxShadow = '0 0 0 0 transparent';
+            }, 800);
+          }
+
+          // 2. Connector line draws
+          const connector = card.querySelector('.exp-connector') as HTMLElement;
+          if (connector) {
+            setTimeout(() => {
+              connector.style.transform = 'scaleX(1)';
+            }, 200);
+          }
+
+          // 3. Content slides in
+          const content = card.querySelector('.exp-content') as HTMLElement;
+          if (content) {
+            setTimeout(() => {
+              content.style.opacity = '1';
+              content.style.transform = 'translateX(0) translateY(0)';
+            }, 350);
+          }
+
+          // 4. Tags cascade
+          const tags = card.querySelectorAll('.exp-tag');
+          tags.forEach((tag) => {
+            setTimeout(() => {
+              (tag as HTMLElement).style.opacity = '1';
+              (tag as HTMLElement).style.transform = 'translateY(0)';
+            }, 700);
+          });
+
+          expObserver.unobserve(card);
+        }
+      });
+    },
+    { threshold: 0.2, rootMargin: '0px 0px -60px 0px' }
+  );
+  expCards.forEach((card) => expObserver.observe(card));
+
+  // Project cards
+  const projCards = document.querySelectorAll('.project-card');
+  const projObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          (entry.target as HTMLElement).style.opacity = '1';
+          (entry.target as HTMLElement).style.transform = 'translateY(0)';
+          projObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.1 }
+  );
+  projCards.forEach((card) => projObserver.observe(card));
+</script>

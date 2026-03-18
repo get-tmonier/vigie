@@ -2,17 +2,17 @@
 import Footer from '#components/Footer.astro';
 import Nav from '#components/Nav.astro';
 import Base from '#layouts/Base.astro';
-import en from '../i18n/en';
+import fr from '../../i18n/fr';
 
-const { contactPage } = en;
+const { contactPage } = fr;
 ---
 
 <Base
   title={contactPage.title}
   description={contactPage.subtitle}
-  locale="en"
+  locale="fr"
 >
-  <Nav locale="en" content={en} currentPage="contact" />
+  <Nav locale="fr" content={fr} currentPage="contact" />
   <main id="main">
     <!-- Mini hero -->
     <section class="bg-navy-deep pt-20 px-10 pb-12 text-center max-md:pt-12 max-md:px-5 max-md:pb-8">
@@ -129,5 +129,5 @@ const { contactPage } = en;
       </div>
     </section>
   </main>
-  <Footer content={en} locale="en" />
+  <Footer content={fr} locale="fr" />
 </Base>
