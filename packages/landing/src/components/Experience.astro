@@ -48,20 +48,20 @@ function getLevel(lang: string): number {
           {/* Timeline dot — starts hidden, pops in */}
           <div
             class="exp-dot absolute left-[11px] top-1 size-[20px] rounded-full border-[3px] border-gold bg-cream z-10 max-md:left-[3px] scale-0 opacity-0"
-            style="transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease, box-shadow 0.6s ease;"
+            style="transition: transform 0.5s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.4s ease, box-shadow 0.7s ease;"
           >
           </div>
 
           {/* Horizontal connector line — draws from dot to card */}
           <div
             class="exp-connector absolute left-[31px] top-[11px] h-[2px] bg-gold/30 max-md:left-[23px] origin-left scale-x-0"
-            style="width: 25px; transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); max-md:width: 17px;"
+            style="width: 25px; transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1); max-md:width: 17px;"
           ></div>
 
           {/* Card content — slides in */}
           <div
             class="exp-content opacity-0"
-            style="transform: translateX(-12px) translateY(4px); transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);"
+            style="transform: translateX(-8px) translateY(4px); transition: opacity 0.65s ease, transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);"
           >
             {/* Period badge */}
             <div class="font-mono text-[0.68rem] text-gold-dark font-semibold tracking-[0.03em] mb-1">
@@ -115,7 +115,7 @@ function getLevel(lang: string): number {
                 {job.tags.map((tag, j) => (
                   <span
                     class="exp-tag font-mono text-[0.55rem] text-navy-mid/60 bg-cream-dark/80 rounded-[3px] py-[0.12rem] px-[0.45rem] opacity-0 translate-y-1"
-                    style={`transition: opacity 0.25s ease, transform 0.25s ease; transition-delay: ${j * 40}ms;`}
+                    style={`transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); transition-delay: ${j * 35}ms;`}
                   >
                     {tag}
                   </span>
@@ -183,7 +183,7 @@ function getLevel(lang: string): number {
     <div class="grid grid-cols-2 gap-5 max-w-[700px] mx-auto max-md:grid-cols-1">
       {experience.projects.map((project, i) => (
         <div
-          class="project-card opacity-0 translate-y-4 bg-white border border-cream-dark rounded-xl p-5 flex flex-col hover:border-gold/30 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300"
+          class="project-card opacity-0 translate-y-3 bg-white border border-cream-dark rounded-xl p-5 flex flex-col hover:border-gold/30 hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-500"
           style={`transition-delay: ${i * 120}ms`}
         >
           <div class="flex items-center justify-between mb-2">

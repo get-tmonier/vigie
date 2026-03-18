@@ -188,12 +188,12 @@ const en: SiteContent = {
         description:
           'Data-sharing platform for food industry groups and supermarket chains to exchange and process operational datasets across 4 European markets.',
         bullets: [
-          'Developed React / Next.js frontends and TypeScript backend services with **hexagonal architecture** and Effect-TS',
-          'Designed a Python ETL framework enabling the team to create and maintain 300+ bronze/silver/gold Medallion pipelines — **clean architecture**, dependency injection, and Pandera data quality checks',
-          'Built an embedded DuckDB ETL system directly in the backend — with **observability**, DX-friendly tooling, and auto-refresh — reducing analytics load times by up to 100× across all application pages',
+          'Built frontend and backend services around **hexagonal architecture** principles, with a strong emphasis on type-safety and functional programming',
+          'Designed an ETL framework enabling the team to create and maintain 300+ bronze/silver/gold Medallion pipelines — **clean architecture**, dependency injection, and automated data quality checks',
+          'Built an embedded **DuckDB** ETL system directly in the backend — with **observability**, DX-friendly tooling, and auto-refresh — reducing analytics load times by up to 100× across all pages',
           '**Mentored developers** and fostered a culture of ownership, knowledge sharing, curiosity, and quality across the team',
-          'Owned **dependency health**: migrated ESLint, Next.js, React across major versions, led the CJS → ESM migration, ran tech watch, and tracked **CVEs** to keep the stack secure and current',
-          'Managed Azure cloud infrastructure; set up **CI/CD** on Azure DevOps with automated testing and Databricks deployment',
+          'Owned **dependency health**: drove major version upgrades across the stack, led the CJS → ESM migration, ran tech watch, and tracked **CVEs** to keep the stack secure and current',
+          'Managed cloud infrastructure; set up **CI/CD** with automated testing and Databricks deployment pipelines',
         ],
         tags: [
           'TypeScript',
@@ -218,11 +218,10 @@ const en: SiteContent = {
         description:
           'SaaS visitor management platform serving enterprise clients across 100+ countries.',
         bullets: [
-          'Developed and maintained core platform features (Node.js, Express, Angular)',
-          'Worked within a **microservices architecture** with inter-service communication via Apache Pulsar message broker',
+          'Worked within a **microservices architecture** with event-driven inter-service communication via Apache Pulsar',
           'Rewrote the entire **billing and self-service system** — module subscription flows, payment integration, and account management',
           'Designed and built an **event-based automation engine** (IFTTT-style) to simplify the management and customisation of complex visitor workflows',
-          'Migrated frontend modules from AngularJS to Angular with TypeScript',
+          'Led a progressive **frontend modernisation** — migrating legacy AngularJS modules to a modern typed stack',
         ],
         tags: [
           'Angular',
@@ -244,7 +243,7 @@ const en: SiteContent = {
         bullets: [
           'Developed ticketing and scheduling features',
           'Implemented **payment and refund systems** — transaction processing, cancellation flows, and financial reconciliation for festival operations',
-          'Built with PHP and JavaScript, serving thousands of concurrent users during events',
+          'Maintained a platform serving **thousands of concurrent users** during live festival events',
         ],
         tags: ['PHP', 'JavaScript', 'PostgreSQL'],
       },
@@ -256,7 +255,7 @@ const en: SiteContent = {
         location: 'Montreal',
         description: 'Water treatment logistics tool for Montreal municipal operations.',
         bullets: [
-          'Built the full application from scratch — Vue.js frontend, Node.js/Express API, MongoDB',
+          'Built the **full application from scratch** — sole developer, end-to-end ownership from data model to UI',
           'Designed **geolocation-based routing and scheduling** system',
           'Architected a **generic form DSL** — a declarative schema-driven engine letting field technicians build and customise their own inspection forms without touching code',
         ],
@@ -274,8 +273,7 @@ const en: SiteContent = {
         bullets: [
           'Built monitoring dashboards and alerting systems',
           'Maintained the **high-throughput media backend** handling video and multimedia stream distribution across the IPTV infrastructure',
-          'Developed backend services with Spring Boot and Kotlin',
-          'Implemented Angular frontend with **real-time data visualization**',
+          'Implemented **real-time data visualization** on the frontend dashboard',
         ],
         tags: ['Kotlin', 'Spring Boot', 'Angular', 'PostgreSQL'],
       },
@@ -290,8 +288,7 @@ const en: SiteContent = {
           'CRM and event management platform for a digital transition expert in the hospitality industry.',
         bullets: [
           'Built CRM features and event management modules',
-          'Developed frontend with vanilla JavaScript/jQuery and backend with PHP/Symfony',
-          'Built **Disserv from scratch** — a metric collection and storage platform (InfluxDB) with a **flexible billing engine** supporting flat-rate plans, overage-based pricing, and per-metric charging',
+          'Built **Diserv from scratch** — a metric collection and storage platform (**InfluxDB**) with a **flexible billing engine** supporting flat-rate plans, overage-based pricing, and per-metric charging',
         ],
         tags: ['JavaScript', 'jQuery', 'PHP', 'Symfony', 'PostgreSQL', 'InfluxDB'],
       },
@@ -303,13 +300,12 @@ const en: SiteContent = {
         location: 'Brussels',
         description: 'Bluetooth/LoRa IoT gateway for on-site asset tracking.',
         bullets: [
-          'Developed Python services on **Raspberry Pi** gateways for real-time device communication, with a **local-first architecture** — data persisted on-device and automatically reconciled with the backend when connectivity was restored',
+          'Deployed on **Raspberry Pi** gateways with a **local-first architecture** — data persisted on-device and automatically reconciled with the backend when connectivity was restored',
           'Implemented **geofencing and indoor geolocation** via Bluetooth beacon triangulation for precise asset positioning in GPS-denied environments',
           'Built device management dashboard and monitoring tools',
-          'Managed Linux system administration including a **captive portal** for frictionless WiFi onboarding of new devices on-site',
-          'Deployed and managed services on Kubernetes',
+          'Set up a **captive portal** for frictionless WiFi onboarding of new devices on-site',
         ],
-        tags: ['Python', 'IoT', 'Bluetooth', 'LoRa', 'Kubernetes'],
+        tags: ['Python', 'IoT', 'Bluetooth', 'LoRa', 'Kubernetes', 'Raspberry Pi', 'Linux'],
       },
     ],
     references: 'References, work samples & credentials available on request.',

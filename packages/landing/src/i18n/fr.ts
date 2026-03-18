@@ -188,12 +188,12 @@ const fr: SiteContent = {
         description:
           'Plateforme de partage de données pour groupes agroalimentaires et chaînes de supermarchés, traitant des datasets opérationnels sur 4 marchés européens.',
         bullets: [
-          'Développement de frontends React / Next.js et services backend TypeScript avec **architecture hexagonale** et Effect-TS',
-          "Conception d'un framework ETL Python permettant à l'équipe de créer et maintenir 300+ pipelines Medallion bronze/silver/gold — **architecture propre**, injection de dépendances, contrôles qualité Pandera",
-          "Mise en place d'un système ETL DuckDB embarqué directement dans le backend — avec **observabilité**, tooling DX-friendly et auto-refresh — réduisant les temps de chargement des analytics jusqu'à un facteur 100× sur toutes les pages de l'application",
+          'Développement frontend et backend autour des principes d\u2019**architecture hexagonale**, avec un fort accent sur la type-safety et la programmation fonctionnelle',
+          "Conception d'un framework ETL permettant à l'équipe de créer et maintenir 300+ pipelines Medallion bronze/silver/gold — **architecture propre**, injection de dépendances, contrôles qualité automatisés",
+          "Mise en place d'un système ETL **DuckDB** embarqué directement dans le backend — avec **observabilité**, tooling DX-friendly et auto-refresh — réduisant les temps de chargement analytics jusqu'à un facteur 100× sur toutes les pages",
           "**Mentorat de développeurs** et promotion d'une culture d'ownership, de partage de connaissances, de curiosité et de qualité au sein de l'équipe",
-          "Responsable de la **santé des dépendances** : migration d'ESLint, Next.js, React sur les versions majeures, migration CJS → ESM, veille technologique et suivi des **CVEs** pour maintenir la stack sécurisée et à jour",
-          "Gestion de l'infrastructure cloud Azure ; mise en place du **CI/CD** sur Azure DevOps avec tests automatisés et déploiement Databricks",
+          'Responsable de la **santé des dépendances** : montées de version majeures sur l\u2019ensemble de la stack, migration CJS → ESM, veille technologique et suivi des **CVEs**',
+          'Gestion de l\u2019infrastructure cloud ; mise en place du **CI/CD** avec tests automatisés et pipelines de déploiement Databricks',
         ],
         tags: [
           'TypeScript',
@@ -218,11 +218,10 @@ const fr: SiteContent = {
         description:
           'Plateforme SaaS de gestion des visiteurs pour clients entreprise dans 100+ pays.',
         bullets: [
-          'Développement et maintenance des fonctionnalités core (Node.js, Express, Angular)',
-          "Travail au sein d'une **architecture microservices** avec communication inter-services via le broker Apache Pulsar",
+          "Travail au sein d'une **architecture microservices** avec communication inter-services event-driven via Apache Pulsar",
           'Réécriture complète du **système de facturation et self-service** — flows d\u2019abonnement aux modules, intégration paiement et gestion de compte',
           'Conception et développement d\u2019un **moteur d\u2019automatisation event-based** (style IFTTT) pour simplifier la gestion et la personnalisation des workflows visiteurs',
-          'Migration de modules frontend d\u2019AngularJS vers Angular avec TypeScript',
+          '**Modernisation progressive du frontend** — migration des modules AngularJS legacy vers une stack moderne et typée',
         ],
         tags: [
           'Angular',
@@ -243,9 +242,9 @@ const fr: SiteContent = {
         description:
           'Application de gestion d\u2019\u00e9v\u00e9nements utilis\u00e9e par les grands festivals belges.',
         bullets: [
-          'D\u00e9veloppement de fonctionnalit\u00e9s de billetterie et planning',
-          'Mise en place des **syst\u00e8mes de paiement et remboursement** \u2014 traitement des transactions, flows d\u2019annulation et r\u00e9conciliation financi\u00e8re pour les op\u00e9rations festival',
-          "Construit en PHP et JavaScript, servant **des milliers d'utilisateurs simultanés** pendant les événements",
+          'Développement de fonctionnalités de billetterie et planning',
+          'Mise en place des **systèmes de paiement et remboursement** — traitement des transactions, flows d\u2019annulation et réconciliation financière pour les opérations festival',
+          'Maintenance d\u2019une plateforme servant **des milliers d\u2019utilisateurs simultanés** lors des événements en live',
         ],
         tags: ['PHP', 'JavaScript', 'PostgreSQL'],
       },
@@ -258,7 +257,7 @@ const fr: SiteContent = {
         description:
           'Outil logistique de traitement des eaux pour les op\u00e9rations municipales de Montr\u00e9al.',
         bullets: [
-          "Construction de l'application complète from scratch — frontend Vue.js, API Node.js/Express, MongoDB",
+          'Construction de l\u2019**application complète from scratch** — développeur unique, ownership total du modèle de données à l\u2019interface',
           'Conception du **système de routage et planification géolocalisé**',
           'Architecture d\u2019un **DSL de formulaires générique** — moteur déclaratif piloté par schéma permettant aux techniciens de terrain de créer et personnaliser leurs propres formulaires d\u2019inspection sans toucher au code',
         ],
@@ -274,10 +273,9 @@ const fr: SiteContent = {
         description:
           'Plateforme logicielle d\u2019exp\u00e9riences personnalis\u00e9es via IPTV et affichage digital.',
         bullets: [
-          'Construction de dashboards de monitoring et syst\u00e8mes d\u2019alerting',
-          'Maintenance du **backend m\u00e9dia haute intensit\u00e9** g\u00e9rant la distribution des flux vid\u00e9o et multim\u00e9dia \u00e0 travers l\u2019infrastructure IPTV',
-          'D\u00e9veloppement de services backend avec Spring Boot et Kotlin',
-          'Implémentation du frontend Angular avec **visualisation de données temps réel**',
+          'Construction de dashboards de monitoring et systèmes d\u2019alerting',
+          'Maintenance du **backend média haute intensité** gérant la distribution des flux vidéo et multimédia à travers l\u2019infrastructure IPTV',
+          'Implémentation de la **visualisation de données temps réel** sur le dashboard frontend',
         ],
         tags: ['Kotlin', 'Spring Boot', 'Angular', 'PostgreSQL'],
       },
@@ -291,9 +289,8 @@ const fr: SiteContent = {
         description:
           'Plateforme CRM et gestion d\u2019\u00e9v\u00e9nements pour un expert en transition digitale dans l\u2019horeca.',
         bullets: [
-          'Construction de fonctionnalit\u00e9s CRM et modules de gestion d\u2019\u00e9v\u00e9nements',
-          'D\u00e9veloppement frontend en JavaScript vanilla/jQuery et backend PHP/Symfony',
-          'Conception de **Disserv from scratch** \u2014 plateforme de collecte et stockage de m\u00e9triques (InfluxDB) avec un **moteur de facturation flexible** : forfaits fixes, d\u00e9passements et facturation \u00e0 la m\u00e9trique',
+          'Construction de fonctionnalités CRM et modules de gestion d\u2019événements',
+          'Conception de **Diserv from scratch** — plateforme de collecte et stockage de métriques (**InfluxDB**) avec un **moteur de facturation flexible** : forfaits fixes, dépassements et facturation à la métrique',
         ],
         tags: ['JavaScript', 'jQuery', 'PHP', 'Symfony', 'PostgreSQL', 'InfluxDB'],
       },
@@ -305,13 +302,12 @@ const fr: SiteContent = {
         location: 'Bruxelles',
         description: 'Gateway IoT Bluetooth/LoRa pour le tracking d\u2019assets sur site.',
         bullets: [
-          'D\u00e9veloppement de services Python sur gateways **Raspberry Pi** pour la communication temps r\u00e9el, avec une architecture **local-first** \u2014 donn\u00e9es persist\u00e9es sur l\u2019appareil et r\u00e9concili\u00e9es automatiquement avec le backend au retour de la connexion',
-          'Impl\u00e9mentation du **geofencing et de la g\u00e9olocalisation indoor** par triangulation de balises Bluetooth pour le positionnement pr\u00e9cis des assets en l\u2019absence de GPS',
+          'Déployé sur gateways **Raspberry Pi** avec une architecture **local-first** — données persistées sur l\u2019appareil et réconciliées automatiquement avec le backend au retour de la connexion',
+          'Implémentation du **geofencing et de la géolocalisation indoor** par triangulation de balises Bluetooth pour le positionnement précis des assets en l\u2019absence de GPS',
           'Construction du dashboard de gestion des devices et outils de monitoring',
-          'Administration syst\u00e8me Linux incluant un **portail captif** pour le provisionnement WiFi sans friction des nouveaux devices sur chantier',
-          'D\u00e9ploiement et gestion des services sur Kubernetes',
+          'Mise en place d\u2019un **portail captif** pour le provisionnement WiFi sans friction des nouveaux devices sur chantier',
         ],
-        tags: ['Python', 'IoT', 'Bluetooth', 'LoRa', 'Kubernetes'],
+        tags: ['Python', 'IoT', 'Bluetooth', 'LoRa', 'Kubernetes', 'Raspberry Pi', 'Linux'],
       },
     ],
     references: 'Références, preuves de travail & diplômes disponibles sur demande.',
