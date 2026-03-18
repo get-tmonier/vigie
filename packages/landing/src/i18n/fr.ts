@@ -176,10 +176,13 @@ const fr: SiteContent = {
   experience: {
     label: 'Exp\u00e9rience',
     title: 'Parcours',
+    badgeEmployee: 'Employé',
+    badgeInternship: 'Stagiaire',
     jobs: [
       {
         period: 'Avr 2022 \u2013 Avr 2026',
         company: 'Aware',
+        type: 'employee' as const,
         role: 'Senior Full Stack Developer',
         location: 'Bruxelles',
         description:
@@ -207,8 +210,9 @@ const fr: SiteContent = {
         ],
       },
       {
-        period: 'Nov 2020 \u2013 Avr 2022',
+        period: 'Oct 2020 \u2013 Avr 2022',
         company: 'Proxyclick',
+        type: 'employee' as const,
         role: 'Full Stack Developer',
         location: 'Bruxelles',
         description:
@@ -216,6 +220,8 @@ const fr: SiteContent = {
         bullets: [
           'Développement et maintenance des fonctionnalités core (Node.js, Express, Angular)',
           "Travail au sein d'une **architecture microservices** avec communication inter-services via le broker Apache Pulsar",
+          'Réécriture complète du **système de facturation et self-service** — flows d\u2019abonnement aux modules, intégration paiement et gestion de compte',
+          'Conception et développement d\u2019un **moteur d\u2019automatisation event-based** (style IFTTT) pour simplifier la gestion et la personnalisation des workflows visiteurs',
           'Migration de modules frontend d\u2019AngularJS vers Angular avec TypeScript',
         ],
         tags: [
@@ -231,12 +237,14 @@ const fr: SiteContent = {
       {
         period: 'Avr 2020 \u2013 Oct 2020',
         company: 'Emisys',
+        type: 'employee' as const,
         role: 'Full Stack Developer',
-        location: 'Bruxelles',
+        location: 'Louvain-la-Neuve',
         description:
           'Application de gestion d\u2019\u00e9v\u00e9nements utilis\u00e9e par les grands festivals belges.',
         bullets: [
           'D\u00e9veloppement de fonctionnalit\u00e9s de billetterie et planning',
+          'Mise en place des **syst\u00e8mes de paiement et remboursement** \u2014 traitement des transactions, flows d\u2019annulation et r\u00e9conciliation financi\u00e8re pour les op\u00e9rations festival',
           "Construit en PHP et JavaScript, servant **des milliers d'utilisateurs simultanés** pendant les événements",
         ],
         tags: ['PHP', 'JavaScript', 'PostgreSQL'],
@@ -244,6 +252,7 @@ const fr: SiteContent = {
       {
         period: 'Sep 2019 \u2013 Avr 2020',
         company: 'mPhase',
+        type: 'employee' as const,
         role: 'Full Stack Developer',
         location: 'Montr\u00e9al',
         description:
@@ -251,6 +260,7 @@ const fr: SiteContent = {
         bullets: [
           "Construction de l'application complète from scratch — frontend Vue.js, API Node.js/Express, MongoDB",
           'Conception du **système de routage et planification géolocalisé**',
+          'Architecture d\u2019un **DSL de formulaires générique** — moteur déclaratif piloté par schéma permettant aux techniciens de terrain de créer et personnaliser leurs propres formulaires d\u2019inspection sans toucher au code',
         ],
         tags: ['Vue.js', 'Node.js', 'Express', 'MongoDB'],
       },
@@ -258,12 +268,14 @@ const fr: SiteContent = {
         period: 'Nov 2018 \u2013 Ao\u00fbt 2019',
         company: 'Extia',
         missionAt: 'Taktik',
+        type: 'employee' as const,
         role: 'Full Stack Developer',
         location: 'Bruxelles',
         description:
           'Plateforme logicielle d\u2019exp\u00e9riences personnalis\u00e9es via IPTV et affichage digital.',
         bullets: [
           'Construction de dashboards de monitoring et syst\u00e8mes d\u2019alerting',
+          'Maintenance du **backend m\u00e9dia haute intensit\u00e9** g\u00e9rant la distribution des flux vid\u00e9o et multim\u00e9dia \u00e0 travers l\u2019infrastructure IPTV',
           'D\u00e9veloppement de services backend avec Spring Boot et Kotlin',
           'Implémentation du frontend Angular avec **visualisation de données temps réel**',
         ],
@@ -273,6 +285,7 @@ const fr: SiteContent = {
         period: 'Juil 2018 \u2013 Nov 2018',
         company: 'Extia',
         missionAt: 'Bewan',
+        type: 'employee' as const,
         role: 'Full Stack Developer',
         location: 'Bruxelles',
         description:
@@ -280,18 +293,22 @@ const fr: SiteContent = {
         bullets: [
           'Construction de fonctionnalit\u00e9s CRM et modules de gestion d\u2019\u00e9v\u00e9nements',
           'D\u00e9veloppement frontend en JavaScript vanilla/jQuery et backend PHP/Symfony',
+          'Conception de **Disserv from scratch** \u2014 plateforme de collecte et stockage de m\u00e9triques (InfluxDB) avec un **moteur de facturation flexible** : forfaits fixes, d\u00e9passements et facturation \u00e0 la m\u00e9trique',
         ],
-        tags: ['JavaScript', 'jQuery', 'PHP', 'Symfony', 'PostgreSQL'],
+        tags: ['JavaScript', 'jQuery', 'PHP', 'Symfony', 'PostgreSQL', 'InfluxDB'],
       },
       {
-        period: 'D\u00e9c 2017 \u2013 Juil 2018',
+        period: 'Janv 2018 \u2013 Mars 2018',
         company: 'IoTFactory',
+        type: 'internship' as const,
         role: 'Full Stack Developer',
         location: 'Bruxelles',
         description: 'Gateway IoT Bluetooth/LoRa pour le tracking d\u2019assets sur site.',
         bullets: [
-          'D\u00e9veloppement de services Python sur devices embarqu\u00e9s pour la communication temps r\u00e9el',
+          'D\u00e9veloppement de services Python sur gateways **Raspberry Pi** pour la communication temps r\u00e9el, avec une architecture **local-first** \u2014 donn\u00e9es persist\u00e9es sur l\u2019appareil et r\u00e9concili\u00e9es automatiquement avec le backend au retour de la connexion',
+          'Impl\u00e9mentation du **geofencing et de la g\u00e9olocalisation indoor** par triangulation de balises Bluetooth pour le positionnement pr\u00e9cis des assets en l\u2019absence de GPS',
           'Construction du dashboard de gestion des devices et outils de monitoring',
+          'Administration syst\u00e8me Linux incluant un **portail captif** pour le provisionnement WiFi sans friction des nouveaux devices sur chantier',
           'D\u00e9ploiement et gestion des services sur Kubernetes',
         ],
         tags: ['Python', 'IoT', 'Bluetooth', 'LoRa', 'Kubernetes'],
@@ -303,7 +320,8 @@ const fr: SiteContent = {
     projects: [
       {
         period: '2026',
-        name: 'Vigie (Tmonier)',
+        name: 'Vigie',
+        builtAt: 'Tmonier',
         type: 'Fondateur \u00b7 Solo',
         description:
           'Supervision local-first d\u2019agents IA \u2014 monitoring temps r\u00e9el, d\u00e9tection de boucles, contr\u00f4le human-in-the-loop sur Claude Code. Bun daemon, Hono + Effect-TS, TanStack Start, PostgreSQL.',

@@ -35,11 +35,14 @@ const rightCats = stack.categories.slice(3);
                 <span id="stack-cursor" class="inline-block w-[7px] h-[1em] bg-gold ml-0.5 align-text-bottom animate-[blink_1.2s_step-end_infinite]"></span>
               </div>
               <div id="stack-badge" class="flex items-center gap-1.5 opacity-0" style="transition: opacity 0.4s ease;">
-                <span class="text-gold font-bold text-[0.85rem] font-vollkorn">10yr</span>
+                <div class="flex flex-col items-end">
+                  <span class="text-gold font-bold text-[0.85rem] font-vollkorn leading-none">10yr</span>
+                  <span class="text-slate/50 text-[0.42rem] font-mono leading-none mt-[1px]">total exp.</span>
+                </div>
                 <span class="text-slate/40 text-[0.4rem]">·</span>
-                <span class="inline-block w-[6px] h-[3px] rounded-sm bg-signal-green"></span><span class="text-[0.38rem] text-slate/35">6+</span>
-                <span class="inline-block w-[6px] h-[3px] rounded-sm" style="background:#5b9bd5"></span><span class="text-[0.38rem] text-slate/35">3-5</span>
-                <span class="inline-block w-[6px] h-[3px] rounded-sm bg-slate"></span><span class="text-[0.38rem] text-slate/35">1-2</span>
+                <span class="inline-block w-[7px] h-[3px] rounded-sm bg-signal-green"></span><span class="text-[0.52rem] text-slate/70">6+</span>
+                <span class="inline-block w-[7px] h-[3px] rounded-sm" style="background:#5b9bd5"></span><span class="text-[0.52rem] text-slate/70">3-5</span>
+                <span class="inline-block w-[7px] h-[3px] rounded-sm bg-slate"></span><span class="text-[0.52rem] text-slate/70">1-2</span>
               </div>
             </div>
             <div id="stack-output" class="grid grid-cols-2 gap-x-5 gap-y-0"></div>
@@ -56,7 +59,10 @@ const rightCats = stack.categories.slice(3);
                 <span class="text-gold">$</span>
                 <span class="text-gold-pale ml-1">{stack.command}</span>
               </div>
-              <span class="text-gold font-bold text-[0.85rem] font-vollkorn">10yr</span>
+              <div class="flex flex-col items-end">
+                <span class="text-gold font-bold text-[0.85rem] font-vollkorn leading-none">10yr</span>
+                <span class="text-slate/50 text-[0.42rem] font-mono leading-none mt-[1px]">total exp.</span>
+              </div>
             </div>
             {stack.categories.map((cat) => (
               <div class="mt-2 mb-1">

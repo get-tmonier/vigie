@@ -61,10 +61,13 @@ export interface SiteContent {
   experience: {
     label: string;
     title: string;
+    badgeEmployee: string;
+    badgeInternship: string;
     jobs: {
       period: string;
       company: string;
       missionAt?: string;
+      type?: 'employee' | 'internship';
       role: string;
       location: string;
       description: string;
@@ -77,6 +80,7 @@ export interface SiteContent {
     projects: {
       period: string;
       name: string;
+      builtAt?: string;
       type: string;
       description: string;
       tags: string[];

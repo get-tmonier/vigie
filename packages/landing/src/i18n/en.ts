@@ -176,10 +176,13 @@ const en: SiteContent = {
   experience: {
     label: 'Experience',
     title: 'Track Record',
+    badgeEmployee: 'Employee',
+    badgeInternship: 'Intern',
     jobs: [
       {
         period: 'Apr 2022 \u2013 Apr 2026',
         company: 'Aware',
+        type: 'employee' as const,
         role: 'Senior Full Stack Developer',
         location: 'Brussels',
         description:
@@ -207,8 +210,9 @@ const en: SiteContent = {
         ],
       },
       {
-        period: 'Nov 2020 \u2013 Apr 2022',
+        period: 'Oct 2020 \u2013 Apr 2022',
         company: 'Proxyclick',
+        type: 'employee' as const,
         role: 'Full Stack Developer',
         location: 'Brussels',
         description:
@@ -216,6 +220,8 @@ const en: SiteContent = {
         bullets: [
           'Developed and maintained core platform features (Node.js, Express, Angular)',
           'Worked within a **microservices architecture** with inter-service communication via Apache Pulsar message broker',
+          'Rewrote the entire **billing and self-service system** — module subscription flows, payment integration, and account management',
+          'Designed and built an **event-based automation engine** (IFTTT-style) to simplify the management and customisation of complex visitor workflows',
           'Migrated frontend modules from AngularJS to Angular with TypeScript',
         ],
         tags: [
@@ -231,11 +237,13 @@ const en: SiteContent = {
       {
         period: 'Apr 2020 – Oct 2020',
         company: 'Emisys',
+        type: 'employee' as const,
         role: 'Full Stack Developer',
-        location: 'Brussels',
+        location: 'Louvain-la-Neuve',
         description: 'Event management application used by major Belgian festivals.',
         bullets: [
           'Developed ticketing and scheduling features',
+          'Implemented **payment and refund systems** — transaction processing, cancellation flows, and financial reconciliation for festival operations',
           'Built with PHP and JavaScript, serving thousands of concurrent users during events',
         ],
         tags: ['PHP', 'JavaScript', 'PostgreSQL'],
@@ -243,12 +251,14 @@ const en: SiteContent = {
       {
         period: 'Sep 2019 \u2013 Apr 2020',
         company: 'mPhase',
+        type: 'employee' as const,
         role: 'Full Stack Developer',
         location: 'Montreal',
         description: 'Water treatment logistics tool for Montreal municipal operations.',
         bullets: [
           'Built the full application from scratch — Vue.js frontend, Node.js/Express API, MongoDB',
           'Designed **geolocation-based routing and scheduling** system',
+          'Architected a **generic form DSL** — a declarative schema-driven engine letting field technicians build and customise their own inspection forms without touching code',
         ],
         tags: ['Vue.js', 'Node.js', 'Express', 'MongoDB'],
       },
@@ -256,12 +266,14 @@ const en: SiteContent = {
         period: 'Nov 2018 \u2013 Aug 2019',
         company: 'Extia',
         missionAt: 'Taktik',
+        type: 'employee' as const,
         role: 'Full Stack Developer',
         location: 'Brussels',
         description:
           'Software platform delivering personalized experiences through IPTV and digital signage solutions.',
         bullets: [
           'Built monitoring dashboards and alerting systems',
+          'Maintained the **high-throughput media backend** handling video and multimedia stream distribution across the IPTV infrastructure',
           'Developed backend services with Spring Boot and Kotlin',
           'Implemented Angular frontend with **real-time data visualization**',
         ],
@@ -271,6 +283,7 @@ const en: SiteContent = {
         period: 'Jul 2018 \u2013 Nov 2018',
         company: 'Extia',
         missionAt: 'Bewan',
+        type: 'employee' as const,
         role: 'Full Stack Developer',
         location: 'Brussels',
         description:
@@ -278,18 +291,22 @@ const en: SiteContent = {
         bullets: [
           'Built CRM features and event management modules',
           'Developed frontend with vanilla JavaScript/jQuery and backend with PHP/Symfony',
+          'Built **Disserv from scratch** — a metric collection and storage platform (InfluxDB) with a **flexible billing engine** supporting flat-rate plans, overage-based pricing, and per-metric charging',
         ],
-        tags: ['JavaScript', 'jQuery', 'PHP', 'Symfony', 'PostgreSQL'],
+        tags: ['JavaScript', 'jQuery', 'PHP', 'Symfony', 'PostgreSQL', 'InfluxDB'],
       },
       {
-        period: 'Dec 2017 \u2013 Jul 2018',
+        period: 'Jan 2018 \u2013 Mar 2018',
         company: 'IoTFactory',
+        type: 'internship' as const,
         role: 'Full Stack Developer',
         location: 'Brussels',
         description: 'Bluetooth/LoRa IoT gateway for on-site asset tracking.',
         bullets: [
-          'Developed Python services on embedded devices for real-time device communication',
+          'Developed Python services on **Raspberry Pi** gateways for real-time device communication, with a **local-first architecture** — data persisted on-device and automatically reconciled with the backend when connectivity was restored',
+          'Implemented **geofencing and indoor geolocation** via Bluetooth beacon triangulation for precise asset positioning in GPS-denied environments',
           'Built device management dashboard and monitoring tools',
+          'Managed Linux system administration including a **captive portal** for frictionless WiFi onboarding of new devices on-site',
           'Deployed and managed services on Kubernetes',
         ],
         tags: ['Python', 'IoT', 'Bluetooth', 'LoRa', 'Kubernetes'],
@@ -301,7 +318,8 @@ const en: SiteContent = {
     projects: [
       {
         period: '2026',
-        name: 'Vigie (Tmonier)',
+        name: 'Vigie',
+        builtAt: 'Tmonier',
         type: 'Founder \u00b7 Solo',
         description:
           'Local-first AI agent supervision \u2014 real-time monitoring, loop detection, human-in-the-loop control over Claude Code. Built with Bun daemon, Hono + Effect-TS, TanStack Start, PostgreSQL.',
