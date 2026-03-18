@@ -2,9 +2,9 @@ import type { SiteContent } from './types';
 
 const en: SiteContent = {
   meta: {
-    title: 'Tmonier — Senior Fullstack Engineer · Freelance · Brussels',
+    title: 'Damien Meur — Senior Fullstack Engineer · Freelance · Brussels',
     description:
-      'Damien Meur — Senior Fullstack Engineer available for freelance missions. TypeScript, React, Node.js, Effect-TS, PostgreSQL. Based in Brussels.',
+      'Damien Meur — Senior Fullstack Engineer available for freelance missions. Based in Brussels.',
     keywords:
       'freelance developer, senior fullstack engineer, TypeScript, React, Node.js, Brussels, Belgium, consultant',
   },
