@@ -5,7 +5,9 @@
 
 Real-time visibility into AI agent activity, loop/drift detection, token cost guardrails, checkpoints & rollback — all running locally. Bring Your Own AI (BYOA).
 
-[vigie.tmonier.com](https://vigie.tmonier.com)
+**Website:** [vigie.tmonier.com](https://vigie.tmonier.com)
+
+Built by [Tmonier SRL](https://tmonier.com).
 
 ## Architecture
 
@@ -51,4 +53,4 @@ Runs automatically as a pre-commit hook via `simple-git-hooks`.
 
 ## License
 
-[GPL-3.0](./LICENSE)
+[MIT](./LICENSE)
