@@ -20,7 +20,7 @@ export default {
       ],
       vite: { config: 'vite.config.ts' },
     },
-    'packages/vigie-landing': {
+    'packages/landing': {
       entry: ['src/pages/**/*.astro', 'src/layouts/**/*.astro', 'src/components/**/*.astro'],
       project: ['src/**/*.{astro,ts,tsx}'],
       ignoreDependencies: [

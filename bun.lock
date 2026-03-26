@@ -31,6 +31,28 @@
         "typescript": "5.9.3",
       },
     },
+    "packages/landing": {
+      "name": "@vigie/landing",
+      "version": "0.0.1",
+      "dependencies": {
+        "@astrojs/sitemap": "3.7.0",
+        "@fontsource/bitter": "5.2.10",
+        "@fontsource/jetbrains-mono": "5.2.8",
+        "@fontsource/source-serif-4": "5.2.9",
+        "@fontsource/vollkorn": "5.2.10",
+        "@fontsource/vollkorn-sc": "5.2.8",
+        "@tailwindcss/vite": "4.2.1",
+        "@vigie/tokens": "workspace:*",
+        "astro": "6.0.0-beta.17",
+        "tailwind-merge": "3.5.0",
+        "tailwindcss": "4.2.1",
+      },
+      "devDependencies": {
+        "@astrojs/check": "0.9.6",
+        "typescript": "5.9.3",
+        "vite": "7.3.1",
+      },
+    },
     "packages/shared": {
       "name": "@vigie/shared",
       "version": "0.0.1",
@@ -76,28 +98,6 @@
         "@types/react-dom": "19.2.3",
         "@vitejs/plugin-react": "5.1.4",
         "tailwindcss": "4.2.1",
-        "typescript": "5.9.3",
-        "vite": "7.3.1",
-      },
-    },
-    "packages/vigie-landing": {
-      "name": "@vigie/landing",
-      "version": "0.0.1",
-      "dependencies": {
-        "@astrojs/sitemap": "3.7.0",
-        "@fontsource/bitter": "5.2.10",
-        "@fontsource/jetbrains-mono": "5.2.8",
-        "@fontsource/source-serif-4": "5.2.9",
-        "@fontsource/vollkorn": "5.2.10",
-        "@fontsource/vollkorn-sc": "5.2.8",
-        "@tailwindcss/vite": "4.2.1",
-        "@vigie/tokens": "workspace:*",
-        "astro": "6.0.0-beta.17",
-        "tailwind-merge": "3.5.0",
-        "tailwindcss": "4.2.1",
-      },
-      "devDependencies": {
-        "@astrojs/check": "0.9.6",
         "typescript": "5.9.3",
         "vite": "7.3.1",
       },
@@ -659,7 +659,7 @@
 
     "@vigie/api": ["@vigie/api@workspace:packages/api"],
 
-    "@vigie/landing": ["@vigie/landing@workspace:packages/vigie-landing"],
+    "@vigie/landing": ["@vigie/landing@workspace:packages/landing"],
 
     "@vigie/shared": ["@vigie/shared@workspace:packages/shared"],
 
