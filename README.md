@@ -20,6 +20,12 @@
   Local-first. BYOA (Bring Your Own AI).
 </p>
 
+<p align="center">
+  <br/>
+  <a href="https://vigie.tmonier.com/#in-action"><strong>Watch it in action on vigie.tmonier.com &rarr;</strong></a><br/>
+  <sub>8 feature clips. No signup. See loop detection, scope drift, cost guardrails, checkpoints & pair programming — all in motion.</sub>
+</p>
+
 ---
 
 ## Architecture
