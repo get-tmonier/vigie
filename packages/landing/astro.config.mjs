@@ -13,11 +13,18 @@ export default defineConfig({
     locales: ['en', 'fr'],
     routing: { prefixDefaultLocale: false },
   },
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      filter: (page) => !page.includes('/og'),
+    }),
+  ],
   build: {
     inlineStylesheets: 'always',
   },
   vite: {
     plugins: [tailwindcss()],
+    ssr: {
+      external: ['@resvg/resvg-js'],
+    },
   },
 });
