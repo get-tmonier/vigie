@@ -53,11 +53,9 @@
       "version": "0.0.1",
       "dependencies": {
         "@astrojs/sitemap": "3.7.0",
-        "@fontsource/bitter": "5.2.10",
+        "@fontsource-variable/dm-sans": "5.2.8",
+        "@fontsource/instrument-serif": "5.2.8",
         "@fontsource/jetbrains-mono": "5.2.8",
-        "@fontsource/source-serif-4": "5.2.9",
-        "@fontsource/vollkorn": "5.2.10",
-        "@fontsource/vollkorn-sc": "5.2.8",
         "@tailwindcss/vite": "4.2.1",
         "@vigie/tokens": "workspace:*",
         "astro": "6.0.0-beta.17",
@@ -90,10 +88,9 @@
       "version": "0.0.1",
       "dependencies": {
         "@better-auth/api-key": "1.5.1",
+        "@fontsource-variable/dm-sans": "5.2.8",
+        "@fontsource/instrument-serif": "5.2.8",
         "@fontsource/jetbrains-mono": "5.2.8",
-        "@fontsource/source-serif-4": "5.2.9",
-        "@fontsource/vollkorn": "5.2.10",
-        "@fontsource/vollkorn-sc": "5.2.8",
         "@reduxjs/toolkit": "2.8.2",
         "@tanstack/react-router": "1.163.3",
         "@tanstack/react-start": "1.164.0",
@@ -318,15 +315,11 @@
 
     "@esbuild/win32-x64": ["@esbuild/win32-x64@0.27.4", "", { "os": "win32", "cpu": "x64" }, "sha512-+knoa0BDoeXgkNvvV1vvbZX4+hizelrkwmGJBdT17t8FNPwG2lKemmuMZlmaNQ3ws3DKKCxpb4zRZEIp3UxFCg=="],
 
-    "@fontsource/bitter": ["@fontsource/bitter@5.2.10", "", {}, "sha512-oqQgWAp+lgoGX7iFbVSbTkKyz0k8EK8+bLdUKDTqGTjW0HqrCue70v4jwbZvyNV/3DZol/b/L/WpdXfuQXKBUg=="],
+    "@fontsource-variable/dm-sans": ["@fontsource-variable/dm-sans@5.2.8", "", {}, "sha512-AxkvMTvNWgfrmlyjiV05vlHYJa+nRQCf1EfvIrQAPBpFJW0O9VTz7oAFr9S3lvbWdmnFoBk7yFqQL86u64nl2g=="],
+
+    "@fontsource/instrument-serif": ["@fontsource/instrument-serif@5.2.8", "", {}, "sha512-s+bkz+syj2rO00Rmq9g0P+PwuLig33DR1xDR8pTWmovH1pUjwnncrFk++q9mmOex8fUQ7oW80gPpPDaw7V1MMw=="],
 
     "@fontsource/jetbrains-mono": ["@fontsource/jetbrains-mono@5.2.8", "", {}, "sha512-6w8/SG4kqvIMu7xd7wt6x3idn1Qux3p9N62s6G3rfldOUYHpWcc2FKrqf+Vo44jRvqWj2oAtTHrZXEP23oSKwQ=="],
-
-    "@fontsource/source-serif-4": ["@fontsource/source-serif-4@5.2.9", "", {}, "sha512-er/Pym9emsEVJNf947umJ4kXarXfsiN6CN7kTYinefKRaHLwiquiiHOZvKvxWgkV8JMCf3pV3g0NcsPFpVCH9w=="],
-
-    "@fontsource/vollkorn": ["@fontsource/vollkorn@5.2.10", "", {}, "sha512-gSlz1yYmGkpSnfchXwbdkCnGFGnV2lKhA0Wc87kF95kA5ziOGLHCriQvDKZhExVC4/heeB6MdmVdyIW/e9Ab6A=="],
-
-    "@fontsource/vollkorn-sc": ["@fontsource/vollkorn-sc@5.2.8", "", {}, "sha512-WSSG0PWybgj6amn9lj0aeg3yKXWskBlgsLMiMRiobmFGE262mJRrg4p7bnH8RYPphl8Pu7A4Kwbtk5l2E4U67A=="],
 
     "@hono/node-server": ["@hono/node-server@1.19.9", "", { "peerDependencies": { "hono": "^4" } }, "sha512-vHL6w3ecZsky+8P5MD+eFfaGTyCeOHUIFYMGpQGbrBTSmNNoxv0if69rEZ5giu36weC5saFuznL411gRX7bJDw=="],
 

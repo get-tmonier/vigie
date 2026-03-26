@@ -1,0 +1,31 @@
+---
+import type { SiteContent } from '../i18n/types';
+
+interface Props {
+  content: SiteContent;
+  locale: string;
+}
+const { content, locale } = Astro.props;
+const { footer } = content;
+---
+
+<footer class="bg-navy-900 border-t border-navy-700/50 py-5 px-6">
+  <div class="max-w-[1200px] mx-auto flex flex-col items-center gap-2 text-center">
+    <!-- Built by -->
+    <p class="font-body text-[0.8rem] text-cream-200/50 m-0">
+      {footer.builtBy} <a href="https://tmonier.com" class="text-brass-400/70 no-underline hover:text-brass-400 transition-colors">Tmonier</a> — {footer.tagline}
+    </p>
+
+    <!-- Links -->
+    <div class="flex items-center gap-6 flex-wrap justify-center">
+      <a href="https://tmonier.com" class="font-mono text-[0.7rem] text-cream-200/35 no-underline hover:text-cream-200/60 transition-colors">tmonier.com</a>
+      <a href="https://github.com/get-tmonier/core" class="font-mono text-[0.7rem] text-cream-200/35 no-underline hover:text-cream-200/60 transition-colors">GitHub</a>
+      <a href={locale === 'fr' ? '/fr/faq' : '/faq'} class="font-mono text-[0.7rem] text-cream-200/35 no-underline hover:text-cream-200/60 transition-colors">FAQ</a>
+    </div>
+
+    <!-- Legal -->
+    <p class="font-mono text-[0.6rem] text-cream-200/25 m-0">
+      {footer.legal} · <a href="https://tmonier.com/#contact" class="text-cream-200/25 no-underline hover:text-cream-200/40 transition-colors">damien.meur@tmonier.com</a>
+    </p>
+  </div>
+</footer>

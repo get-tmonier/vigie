@@ -1,29 +1,36 @@
 ---
-import WheelMark from '#components/WheelMark.astro';
+import RadarMark from '#components/RadarMark.astro';
+import type { SiteContent } from '../i18n/types';
+
+interface Props {
+  content: SiteContent;
+}
+const { content } = Astro.props;
+const { waitlist } = content;
 ---
 
-<section id="waitlist" class="bg-navy-deep py-24 px-10 text-center min-h-[calc(100vh-64px-60px)] box-border flex flex-col justify-center max-md:min-h-[calc(100dvh-64px-52px)] max-md:py-8 max-md:px-5 max-md:pb-6">
+<section id="waitlist" class="bg-navy-900 py-24 px-10 text-center min-h-screen box-border flex flex-col justify-center max-md:py-8 max-md:px-5 max-md:pb-6">
   <div class="max-w-[600px] mx-auto">
     <div class="flex justify-center mb-10">
-      <WheelMark size={80} />
+      <RadarMark size={80} />
     </div>
 
     <h2
-      class="font-vollkorn text-slate font-bold text-[clamp(1.4rem,3vw,1.9rem)] m-0 mb-4 leading-[1.35]"
+      class="font-display text-cream-200 text-[clamp(1.4rem,3vw,1.9rem)] m-0 mb-4 leading-[1.35] [text-wrap:balance]"
     >
-      AI writes the code.
+      {waitlist.heading1}
     </h2>
 
     <p
-      class="font-vollkorn-sc text-gold font-bold text-[clamp(1.3rem,3vw,1.8rem)] m-0 mb-6 leading-[1.3]"
+      class="font-display text-vigie-400 text-[clamp(1.3rem,3vw,1.8rem)] m-0 mb-6 leading-[1.3]"
     >
-      You hold the helm.
+      {waitlist.heading2}
     </p>
 
     <p
-      class="font-mono text-cream text-[0.82rem] m-0 mb-8 leading-[1.6]"
+      class="font-mono text-cream-50 text-[0.82rem] m-0 mb-8 leading-[1.6]"
     >
-      Early adopters get their <span class="text-gold font-semibold">first month free</span> on the Solo plan.
+      {waitlist.description} <a href="https://github.com/get-tmonier/core" class="text-vigie-400 no-underline hover:underline">{waitlist.githubLinkText}</a>.
     </p>
 
     <div class="newsletter-form-container">
@@ -32,76 +39,76 @@ import WheelMark from '#components/WheelMark.astro';
         action="https://app.loops.so/api/newsletter-form/cmm61m1au0ws70i1mpmh6f87r"
         method="POST"
       >
-        <label for="waitlist-email" class="sr-only">Email address</label>
+        <label for="waitlist-email" class="sr-only">{waitlist.emailLabel}</label>
         <input
           id="waitlist-email"
-          class="newsletter-form-input font-mono text-cream flex-1 text-[0.85rem] bg-navy-mid/50 border border-gold/25 rounded-[4px] py-[0.8rem] px-4 outline-none min-w-0 transition-colors duration-200 focus:border-gold/60"
+          class="newsletter-form-input font-mono text-cream-50 flex-1 text-[0.85rem] bg-navy-800/50 rounded-lg py-[0.8rem] px-4 outline-none min-w-0 shadow-[inset_0_0_0_1px_rgba(38,192,154,0.2)] transition-all duration-200 focus:shadow-[inset_0_0_0_1px_rgba(38,192,154,0.5),0_0_0_3px_rgba(38,192,154,0.1)]"
           type="email"
           name="newsletter-form-input"
-          placeholder="your@email.com"
+          placeholder={waitlist.emailPlaceholder}
           required
           autocomplete="email"
           aria-describedby="waitlist-error-msg"
         />
         <button
           type="submit"
-          class="newsletter-form-button font-mono bg-gold text-navy-deep font-semibold text-[0.85rem] border-none rounded-[4px] py-[0.8rem] px-[1.4rem] cursor-pointer whitespace-nowrap transition-colors duration-200 hover:bg-gold-light"
+          class="newsletter-form-button font-mono bg-vigie-400 text-navy-900 font-semibold text-[0.85rem] border-none rounded-lg py-[0.8rem] px-[1.4rem] cursor-pointer whitespace-nowrap shadow-[0_1px_2px_rgba(0,0,0,0.15),0_4px_12px_rgba(38,192,154,0.2)] transition-all duration-200 hover:bg-vigie-500 hover:shadow-[0_2px_4px_rgba(0,0,0,0.2),0_8px_24px_rgba(38,192,154,0.25)]"
         >
-          Claim your spot
+          {waitlist.ctaSubmit}
         </button>
         <button
           type="button"
-          class="newsletter-loading-button hidden font-mono bg-gold text-navy-deep font-semibold text-[0.85rem] border-none rounded-[4px] py-[0.8rem] px-[1.4rem] whitespace-nowrap opacity-70 cursor-not-allowed"
+          class="newsletter-loading-button hidden font-mono bg-vigie-400 text-navy-900 font-semibold text-[0.85rem] border-none rounded-[4px] py-[0.8rem] px-[1.4rem] whitespace-nowrap opacity-70 cursor-not-allowed"
         >
-          Sending…
+          {waitlist.ctaLoading}
         </button>
       </form>
 
       <div class="newsletter-success hidden justify-center items-center p-[0.8rem] mb-4" aria-live="polite">
-        <p class="font-mono text-gold text-[0.82rem] m-0">
-          &#10003; You're on the list. We'll be in touch when the beta opens.
+        <p class="font-mono text-vigie-400 text-[0.82rem] m-0">
+          {waitlist.successMessage}
         </p>
       </div>
 
       <div class="newsletter-error hidden justify-center items-center p-[0.8rem] mb-4" aria-live="polite">
         <p id="waitlist-error-msg" class="newsletter-error-message font-mono text-[0.82rem] text-[#c0392b] m-0">
-          Oops! Something went wrong, please try again
+          {waitlist.errorMessage}
         </p>
       </div>
 
       <button
-        class="newsletter-back-button hidden font-mono text-slate text-[0.75rem] bg-transparent border-none cursor-pointer mx-auto mt-2 hover:underline"
+        class="newsletter-back-button hidden font-mono text-cream-200 text-[0.75rem] bg-transparent border-none cursor-pointer mx-auto mt-2 hover:underline"
         type="button"
       >
-        &larr; Back
+        {waitlist.backButton}
       </button>
     </div>
 
-    <p class="font-mono text-[0.72rem] text-slate/60 m-0">
-      Limited spots — no spam, just your invite when the beta opens.
+    <p class="font-mono text-[0.72rem] text-cream-200/60 m-0">
+      {waitlist.footerText}
     </p>
   </div>
 </section>
 
-<script>
-  function submitHandler(event: SubmitEvent) {
+<script define:vars={{ errorMsg: waitlist.errorMessage, rateLimitMsg: waitlist.errorRateLimit }}>
+  function submitHandler(event) {
     event.preventDefault();
-    const container = (event.target as HTMLElement).parentNode as HTMLElement;
-    const form = container.querySelector<HTMLFormElement>('.newsletter-form')!;
-    const formInput = container.querySelector<HTMLInputElement>('.newsletter-form-input')!;
-    const success = container.querySelector<HTMLElement>('.newsletter-success')!;
-    const errorContainer = container.querySelector<HTMLElement>('.newsletter-error')!;
-    const errorMessage = container.querySelector<HTMLElement>('.newsletter-error-message')!;
-    const backButton = container.querySelector<HTMLButtonElement>('.newsletter-back-button')!;
-    const submitButton = container.querySelector<HTMLButtonElement>('.newsletter-form-button')!;
-    const loadingButton = container.querySelector<HTMLButtonElement>('.newsletter-loading-button')!;
+    const container = event.target.parentNode;
+    const form = container.querySelector('.newsletter-form');
+    const formInput = container.querySelector('.newsletter-form-input');
+    const success = container.querySelector('.newsletter-success');
+    const errorContainer = container.querySelector('.newsletter-error');
+    const errorMessage = container.querySelector('.newsletter-error-message');
+    const backButton = container.querySelector('.newsletter-back-button');
+    const submitButton = container.querySelector('.newsletter-form-button');
+    const loadingButton = container.querySelector('.newsletter-loading-button');
 
-    const show = (el: HTMLElement) => el.classList.remove('hidden');
-    const hide = (el: HTMLElement) => el.classList.add('hidden');
+    const show = (el) => el.classList.remove('hidden');
+    const hide = (el) => el.classList.add('hidden');
 
     const rateLimit = () => {
       show(errorContainer);
-      errorMessage.innerText = 'Too many signups, please try again in a little while';
+      errorMessage.innerText = rateLimitMsg;
       hide(submitButton);
       hide(formInput);
       show(backButton);
@@ -121,7 +128,7 @@ import WheelMark from '#components/WheelMark.astro';
 
     const formBody = 'userGroup=&mailingLists=&email=' + encodeURIComponent(formInput.value);
 
-    fetch((event.target as HTMLFormElement).action, {
+    fetch(event.target.action, {
       method: 'POST',
       body: formBody,
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -133,10 +140,10 @@ import WheelMark from '#components/WheelMark.astro';
           form.reset();
         } else {
           show(errorContainer);
-          errorMessage.innerText = data.message ?? 'Something went wrong';
+          errorMessage.innerText = data.message ?? errorMsg;
         }
       })
-      .catch((error: Error) => {
+      .catch((error) => {
         if (error.message === 'Failed to fetch') { rateLimit(); return; }
         show(errorContainer);
         if (error.message) errorMessage.innerText = error.message;
@@ -149,21 +156,21 @@ import WheelMark from '#components/WheelMark.astro';
       });
   }
 
-  function resetFormHandler(event: MouseEvent) {
-    const container = (event.target as HTMLElement).parentNode as HTMLElement;
-    const formInput = container.querySelector<HTMLInputElement>('.newsletter-form-input')!;
-    const success = container.querySelector<HTMLElement>('.newsletter-success')!;
-    const errorContainer = container.querySelector<HTMLElement>('.newsletter-error')!;
-    const errorMessage = container.querySelector<HTMLElement>('.newsletter-error-message')!;
-    const backButton = container.querySelector<HTMLButtonElement>('.newsletter-back-button')!;
-    const submitButton = container.querySelector<HTMLButtonElement>('.newsletter-form-button')!;
+  function resetFormHandler(event) {
+    const container = event.target.parentNode;
+    const formInput = container.querySelector('.newsletter-form-input');
+    const success = container.querySelector('.newsletter-success');
+    const errorContainer = container.querySelector('.newsletter-error');
+    const errorMessage = container.querySelector('.newsletter-error-message');
+    const backButton = container.querySelector('.newsletter-back-button');
+    const submitButton = container.querySelector('.newsletter-form-button');
 
-    const show = (el: HTMLElement) => el.classList.remove('hidden');
-    const hide = (el: HTMLElement) => el.classList.add('hidden');
+    const show = (el) => el.classList.remove('hidden');
+    const hide = (el) => el.classList.add('hidden');
 
     hide(success);
     hide(errorContainer);
-    errorMessage.innerText = 'Oops! Something went wrong, please try again';
+    errorMessage.innerText = errorMsg;
     hide(backButton);
     show(formInput);
     show(submitButton);
@@ -173,8 +180,8 @@ import WheelMark from '#components/WheelMark.astro';
   for (let i = 0; i < formContainers.length; i++) {
     const container = formContainers[i];
     if (container.classList.contains('newsletter-handlers-added')) continue;
-    container.querySelector('.newsletter-form')!.addEventListener('submit', submitHandler as EventListener);
-    container.querySelector('.newsletter-back-button')!.addEventListener('click', resetFormHandler as EventListener);
+    container.querySelector('.newsletter-form').addEventListener('submit', submitHandler);
+    container.querySelector('.newsletter-back-button').addEventListener('click', resetFormHandler);
     container.classList.add('newsletter-handlers-added');
   }
 </script>

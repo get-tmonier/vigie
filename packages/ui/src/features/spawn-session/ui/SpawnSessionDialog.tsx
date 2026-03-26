@@ -123,7 +123,7 @@ export function SpawnSessionDialog({ daemonId, onSpawned, onClose }: SpawnSessio
     : suggestions;
 
   return (
-    <form onSubmit={handleSubmit} className="p-2 border-b border-navy-light space-y-2">
+    <form onSubmit={handleSubmit} className="p-2 shadow-[0_1px_0_0_rgba(22,45,74,0.6)] space-y-2">
       <div className="flex gap-2">
         <button
           type="submit"
@@ -131,8 +131,8 @@ export function SpawnSessionDialog({ daemonId, onSpawned, onClose }: SpawnSessio
           className={cn(
             'flex-1 text-xs font-mono py-1.5 rounded transition-colors',
             loading
-              ? 'bg-navy-light text-slate cursor-not-allowed'
-              : 'bg-gold text-navy-deep hover:bg-gold/90'
+              ? 'bg-navy-700 text-cream-200 cursor-not-allowed'
+              : 'bg-vigie-400 text-navy-900 hover:bg-vigie-500 shadow-[0_1px_2px_rgba(0,0,0,0.15),0_4px_8px_rgba(38,192,154,0.15)]'
           )}
         >
           {loading ? 'Starting...' : 'Start Session'}
@@ -140,7 +140,7 @@ export function SpawnSessionDialog({ daemonId, onSpawned, onClose }: SpawnSessio
         <button
           type="button"
           onClick={onClose}
-          className="text-xs font-mono text-slate hover:text-cream py-1.5 px-2"
+          className="text-xs font-mono text-cream-200 hover:text-cream-50 py-1.5 px-2"
         >
           Cancel
         </button>
@@ -155,15 +155,15 @@ export function SpawnSessionDialog({ daemonId, onSpawned, onClose }: SpawnSessio
           onKeyDown={(e) => handleInputKeyDown(e, filtered)}
           onFocus={() => filtered.length > 0 && setShowSuggestions(true)}
           placeholder="~/projects/..."
-          className="w-full bg-navy-deep border border-navy-light rounded px-2 py-1.5 text-sm text-cream font-mono placeholder:text-slate focus:outline-none focus:border-gold"
+          className="w-full bg-navy-900 border-none shadow-[inset_0_0_0_1px_rgba(22,45,74,0.6)] rounded px-2 py-1.5 text-sm text-cream-50 font-mono placeholder:text-cream-200 focus:outline-none focus:shadow-[inset_0_0_0_1px_rgba(38,192,154,0.5),0_0_0_3px_rgba(38,192,154,0.1)]"
         />
         {loadingSuggestions && (
-          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[0.625rem] text-slate">
+          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[0.625rem] text-cream-200">
             ...
           </span>
         )}
         {showSuggestions && filtered.length > 0 && (
-          <div className="absolute z-10 left-0 right-0 top-full mt-1 max-h-40 overflow-y-auto bg-navy-deep border border-navy-light rounded shadow-lg">
+          <div className="absolute z-10 left-0 right-0 top-full mt-1 max-h-40 overflow-y-auto bg-navy-900 border-none rounded-lg shadow-[0_0_0_1px_rgba(22,45,74,0.6),0_8px_24px_rgba(0,0,0,0.3)]">
             {filtered.map((entry, i) => (
               <button
                 key={entry.name}
@@ -172,11 +172,11 @@ export function SpawnSessionDialog({ daemonId, onSpawned, onClose }: SpawnSessio
                 className={cn(
                   'w-full text-left px-2 py-1 text-xs font-mono flex items-center gap-2',
                   i === selectedIndex
-                    ? 'bg-navy-mid text-cream'
-                    : 'text-slate hover:bg-navy-mid hover:text-cream'
+                    ? 'bg-navy-800 text-cream-50'
+                    : 'text-cream-200 hover:bg-navy-800 hover:text-cream-50'
                 )}
               >
-                <span className="text-gold/60">{'/'}</span>
+                <span className="text-vigie-400/60">{'/'}</span>
                 {entry.name}
               </button>
             ))}

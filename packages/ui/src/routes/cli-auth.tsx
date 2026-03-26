@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as v from 'valibot';
 import { createApiKey, deleteApiKey, listApiKeys } from '#shared/api/api-keys-api';
 import { useSession } from '#shared/api/auth-client';
+import { RadarIcon } from '#shared/ui/RadarIcon';
 
 const CliAuthSearchSchema = v.object({
   port: v.pipe(
@@ -57,9 +58,16 @@ function CliAuthPage() {
   }, [isPending, session, port, state, hostname]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4">
-      <h1 className="font-vollkorn-sc text-2xl font-bold text-gold">vigie</h1>
-      <p className="font-source-serif text-cream/80">{status}</p>
+    <div
+      className="flex min-h-screen flex-col items-center justify-center gap-4"
+      style={{
+        background:
+          'radial-gradient(ellipse at 50% 40%, rgba(38,192,154,0.05) 0%, transparent 55%)',
+      }}
+    >
+      <RadarIcon size={48} />
+      <h1 className="font-display text-2xl text-vigie-400">vigie</h1>
+      <p className="font-body text-cream-50/80">{status}</p>
     </div>
   );
 }

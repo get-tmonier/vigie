@@ -1,235 +1,61 @@
 ---
-import WheelMark from '#components/WheelMark.astro';
+import RadarMark from '#components/RadarMark.astro';
+import type { SiteContent } from '../i18n/types';
 
-const plans = [
-  {
-    name: 'Free',
-    price: 'Free',
-    priceEur: null,
-    priceUsd: null,
-    priceNote: 'forever',
-    tagline: 'For engineers who want to see what their agent is actually doing.',
-    features: [
-      'Local-first — your code stays on your machine, we never store it',
-      'Real-time activity — every file touched, every command run',
-      'Loop & scope detection — flagged before they burn your session',
-      '1 supervised agent',
-    ],
-    cta: 'Claim your spot',
-    ctaHref: '#waitlist',
-    featured: false,
-  },
-  {
-    name: 'Solo',
-    price: '€4.99',
-    priceEur: '€4.99',
-    priceUsd: '$5.99',
-    priceNote: '/month',
-    badge: 'Best value',
-    tagline:
-      'For power users who want memory that survives compaction and costs that stay under control.',
-    features: [
-      'Everything in Free, plus:',
-      'Checkpoints & rollback — revert to the last clean state and resume with full context, no reprompting',
-      'Budget guardrails — alerts before costs spike, never a surprise bill',
-      'Compaction-proof memory — decisions persisted locally across context resets',
-      'Up to 5 supervised agents',
-    ],
-    cta: 'Claim your spot',
-    ctaHref: '#waitlist',
-    featured: true,
-  },
-  {
-    name: 'Team',
-    price: '€6.99',
-    priceEur: '€6.99',
-    priceUsd: '$7.49',
-    priceNote: '/seat/month',
-    tagline: 'For teams where one agent going off-script affects everyone.',
-    features: [
-      'Everything in Solo, plus:',
-      'Team activity dashboard — who ran what, across the whole team',
-      'Cross-agent conflict detection — breaking changes surfaced before review',
-      'Shared guardrails — team-wide constraints on every agent, every session',
-    ],
-    cta: 'Claim your spot',
-    ctaHref: '#waitlist',
-    featured: false,
-  },
-  {
-    name: 'Enterprise',
-    price: 'Custom',
-    priceEur: null,
-    priceUsd: null,
-    priceNote: '',
-    tagline: 'For organizations that need full control, compliance & dedicated support.',
-    features: [
-      'Everything in Team, plus:',
-      'Self-hosted — your infrastructure, your network, your rules',
-      'SLA & dedicated support',
-      'SOC2 Type II + DPA',
-    ],
-    cta: 'Contact us',
-    ctaHref: '/contact',
-    featured: false,
-  },
-];
+interface Props {
+  content: SiteContent;
+}
+const { content } = Astro.props;
+const { openSource } = content;
 ---
 
-<section id="pricing" class="bg-cream py-20 px-10 min-h-screen box-border flex flex-col justify-center">
-  <div class="max-w-[1400px] mx-auto">
-    <div class="flex items-center gap-5 mb-6 flex-wrap">
-      <h2
-        class="font-vollkorn text-navy-deep font-bold text-[clamp(1.6rem,3vw,2.2rem)] m-0"
-      >
-        Simple pricing
-      </h2>
-      <div
-        id="currency-toggle"
-        class="flex items-center bg-cream-dark rounded-[20px] p-[3px] gap-[2px] cursor-pointer"
-        role="group"
-        aria-label="Currency selector"
-      >
-        <button
-          id="btn-eur"
-          data-currency="eur"
-          class="currency-btn font-mono text-[0.7rem] font-semibold py-1 px-[0.65rem] rounded-[16px] border-none cursor-pointer transition-all duration-150 bg-navy-deep text-cream"
-        >€ EUR</button>
-        <button
-          id="btn-usd"
-          data-currency="usd"
-          class="currency-btn font-mono text-[0.7rem] font-semibold py-1 px-[0.65rem] rounded-[16px] border-none cursor-pointer transition-all duration-150 bg-transparent text-slate"
-        >$ USD</button>
+<section id="open-source" class="bg-navy-800 py-20 px-10 min-h-screen box-border flex flex-col justify-center">
+  <div class="max-w-[720px] mx-auto text-center">
+    <h2
+      class="font-display text-cream-50 text-[clamp(1.6rem,3vw,2.4rem)] m-0 mb-6 [text-wrap:balance]"
+    >
+      {openSource.heading}
+    </h2>
+
+    <div class="bg-navy-900 rounded-2xl py-10 px-8 mb-10 shadow-[0_2px_4px_rgba(0,0,0,0.1),0_12px_40px_rgba(0,0,0,0.3)]">
+      <div class="flex justify-center mb-6">
+        <RadarMark size={56} />
       </div>
+
+      <div class="flex items-center justify-center gap-3 mb-4">
+        <span class="font-mono text-vigie-400 text-[0.75rem] font-semibold tracking-[0.1em] uppercase bg-vigie-400/10 border border-vigie-400/25 rounded-[4px] py-1 px-3">{openSource.licenseBadge}</span>
+      </div>
+
+      <p class="font-display text-cream-50 text-[1.15rem] m-0 mb-3 leading-[1.6] [text-wrap:balance]">
+        {openSource.headline}
+      </p>
+      <p class="font-display text-cream-200 text-[0.95rem] m-0 mb-8 leading-[1.7] max-w-[520px] mx-auto [text-wrap:balance]">
+        {openSource.description}
+      </p>
+
+      <a
+        href="https://github.com/get-tmonier/core"
+        class="inline-block font-mono bg-vigie-400 text-navy-900 font-semibold text-[0.85rem] py-3 px-8 rounded-lg no-underline shadow-[0_1px_2px_rgba(0,0,0,0.15),0_4px_12px_rgba(38,192,154,0.2)] transition-all duration-200 hover:bg-vigie-500 hover:shadow-[0_2px_4px_rgba(0,0,0,0.2),0_8px_24px_rgba(38,192,154,0.25)]"
+      >
+        {openSource.ctaGithub}
+      </a>
     </div>
 
     <!-- BYOA callout -->
-    <div class="bg-navy-deep rounded-lg py-5 px-7 mb-12 flex items-center gap-6 flex-wrap">
+    <div class="bg-navy-900 rounded-lg py-5 px-7 mb-8 flex items-center gap-6 flex-wrap justify-center text-left">
       <div>
-        <p class="font-vollkorn text-cream font-bold text-[1.05rem] m-0 mb-1 leading-[1.3] flex items-center gap-[0.6rem]">
-          <WheelMark size={20} />
-          No AI token markup — ever.
+        <p class="font-display text-cream-50 text-[1.05rem] m-0 mb-1 leading-[1.3] flex items-center gap-[0.6rem]">
+          <RadarMark size={20} />
+          {openSource.byoaHeadline}
         </p>
-        <p class="font-source-serif text-slate text-[0.9rem] m-0 leading-[1.6]">
-          Your AI subscription. Your machine. Zero middlemen.
+        <p class="font-display text-cream-200 text-[0.9rem] m-0 leading-[1.6]">
+          {openSource.byoaDescription}
         </p>
       </div>
     </div>
 
-    <div class="pricing-grid grid grid-cols-4 gap-6 items-start max-lg:grid-cols-2 max-md:grid-cols-1">
-      {
-        plans.map((plan) => (
-          <div
-            class:list={['reveal-pricing opacity-0 translate-y-[30px] scale-[0.97] transition-[opacity,transform] duration-500 ease-in-out bg-white rounded-lg p-8 relative', plan.featured ? 'border-2 border-gold shadow-[0_8px_32px_rgba(196,154,43,0.15)]' : 'border border-cream-dark']}
-          >
-            {plan.badge && (
-              <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-gold text-navy-deep font-mono text-[0.65rem] font-semibold py-1 px-3 rounded-[20px] whitespace-nowrap uppercase tracking-[1px]">
-                {plan.badge}
-              </div>
-            )}
-
-            <div class="mb-6">
-              <h3
-                class="font-vollkorn-sc text-navy-deep font-bold text-base m-0 mb-3 tracking-[0.05em]"
-              >
-                {plan.name}
-              </h3>
-              <div class="flex items-baseline gap-[0.3rem] mb-[0.6rem]">
-                <span
-                  class="price-display font-vollkorn text-navy-deep font-bold text-3xl"
-                  data-eur={plan.priceEur ?? plan.price}
-                  data-usd={plan.priceUsd ?? plan.price}
-                >
-                  {plan.price}
-                </span>
-                {plan.priceNote && (
-                  <span class="font-mono text-slate text-[0.75rem]">
-                    {plan.priceNote}
-                  </span>
-                )}
-              </div>
-              {plan.priceEur && (
-                <p class="font-mono text-[0.65rem] text-[#B0A898] -mt-[0.3rem] mb-[0.6rem] tracking-[0.03em]">
-                  excl. VAT
-                </p>
-              )}
-              <p class="font-source-serif text-slate text-[0.85rem] m-0 leading-[1.5]">
-                {plan.tagline}
-              </p>
-            </div>
-
-            <ul class="list-none p-0 m-0 mb-8">
-              {plan.features.map((f) => {
-                const isHeader = f.startsWith('Everything in');
-                return (
-                  <li
-                    class:list={[
-                      'py-[0.4rem] flex items-start gap-2',
-                      isHeader
-                        ? 'font-mono text-[0.72rem] font-semibold text-gold uppercase tracking-[0.08em] pb-[0.2rem]'
-                        : 'font-source-serif text-sm text-navy-mid border-b border-cream',
-                    ]}
-                  >
-                    {!isHeader && <span class="text-gold text-[0.75rem] shrink-0 mt-[0.2rem]">&#10003;</span>}
-                    {f}
-                  </li>
-                );
-              })}
-            </ul>
-
-            <a
-              href={plan.ctaHref}
-              class:list={[
-                'block text-center font-mono font-semibold text-[0.8rem] py-3 rounded-[4px] no-underline transition-all duration-200 text-navy-deep',
-                plan.featured
-                  ? 'bg-gold hover:bg-gold-light'
-                  : 'bg-transparent border border-gold hover:bg-gold/10',
-              ]}
-            >
-              {plan.cta}
-            </a>
-          </div>
-        ))
-      }
-    </div>
+    <p class="font-mono text-cream-200/40 text-[0.7rem] m-0 italic">
+      {openSource.agplJoke}
+    </p>
   </div>
 </section>
-
-<script>
-  const btnEur = document.getElementById('btn-eur') as HTMLButtonElement;
-  const btnUsd = document.getElementById('btn-usd') as HTMLButtonElement;
-  const prices = document.querySelectorAll<HTMLElement>('.price-display');
-
-  function setCurrency(currency: 'eur' | 'usd') {
-    const isEur = currency === 'eur';
-    const active = isEur ? btnEur : btnUsd;
-    const inactive = isEur ? btnUsd : btnEur;
-    active.classList.add('bg-navy-deep', 'text-cream');
-    active.classList.remove('bg-transparent', 'text-slate');
-    inactive.classList.add('bg-transparent', 'text-slate');
-    inactive.classList.remove('bg-navy-deep', 'text-cream');
-    prices.forEach((el) => {
-      el.textContent = el.dataset[currency] ?? el.textContent;
-    });
-  }
-
-  btnEur.addEventListener('click', () => setCurrency('eur'));
-  btnUsd.addEventListener('click', () => setCurrency('usd'));
-</script>
-
-<script>
-  const pricingCards = document.querySelectorAll('.reveal-pricing');
-  const pricingObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const card = entry.target as HTMLElement;
-        const allCards = Array.from(document.querySelectorAll('.reveal-pricing'));
-        const index = allCards.indexOf(card);
-        card.style.transitionDelay = `${index * 100}ms`;
-        card.classList.remove('opacity-0', 'translate-y-[30px]', 'scale-[0.97]');
-        pricingObserver.unobserve(card);
-      }
-    });
-  }, { threshold: 0.2, rootMargin: '0px 0px -60px 0px' });
-  pricingCards.forEach((card) => pricingObserver.observe(card));
-</script>

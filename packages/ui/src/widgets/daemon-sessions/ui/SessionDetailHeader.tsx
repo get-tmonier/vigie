@@ -55,7 +55,7 @@ function CopyableId({ sessionId }: { sessionId: string }) {
     <button
       type="button"
       onClick={handleCopy}
-      className="text-sm font-mono transition-colors text-cream hover:text-gold cursor-copy"
+      className="text-sm font-mono transition-colors text-cream-50 hover:text-vigie-400 cursor-copy"
       title="Copy session ID"
     >
       {copied ? 'Copied!' : sessionId.slice(0, 8)}
@@ -77,7 +77,7 @@ function AttachButton({ sessionId }: { sessionId: string }) {
     <button
       type="button"
       onClick={handleCopy}
-      className="text-xs font-mono px-2 py-1 rounded transition-colors text-slate hover:text-cream hover:bg-navy-light"
+      className="text-xs font-mono px-2 py-1 rounded transition-colors text-cream-200 hover:text-cream-50 hover:bg-navy-700"
     >
       {copied ? 'Copied!' : '>_ Attach'}
     </button>
@@ -96,14 +96,14 @@ function ResumeStatus({
   if (session.status === 'active') {
     if (session.resumable) {
       return (
-        <span className="text-xs font-mono px-2 py-1 rounded border border-gold/20 text-gold/50 cursor-default">
+        <span className="text-xs font-mono px-2 py-1 rounded border border-vigie-400/20 text-vigie-400/50 cursor-default">
           Resumable
         </span>
       );
     }
     if (session.resumable === false && session.claudeSessionId) {
       return (
-        <span className="text-xs font-mono px-2 py-1 rounded border border-navy-light text-slate/40 cursor-default">
+        <span className="text-xs font-mono px-2 py-1 rounded border border-navy-700 text-cream-200/40 cursor-default">
           Not resumable
         </span>
       );
@@ -126,7 +126,7 @@ function ResumeStatus({
       <button
         type="button"
         onClick={onResume}
-        className="text-xs font-mono px-2 py-1 rounded transition-colors bg-gold/20 text-gold hover:bg-gold/30"
+        className="text-xs font-mono px-2 py-1 rounded transition-colors bg-vigie-400/20 text-vigie-400 hover:bg-vigie-400/30"
       >
         Resume
       </button>
@@ -135,7 +135,7 @@ function ResumeStatus({
 
   return (
     <span
-      className="text-xs font-mono px-2 py-1 rounded text-slate/40 border border-navy-light cursor-default"
+      className="text-xs font-mono px-2 py-1 rounded text-cream-200/40 border border-navy-700 cursor-default"
       title="Session ended too quickly or with an error"
     >
       Not resumable
@@ -162,26 +162,31 @@ export function SessionDetailHeader({
   }, [isActive]);
 
   return (
-    <div className="flex items-center gap-3 px-4 py-2 border-b border-navy-light bg-navy-deep">
+    <div className="flex items-center gap-3 px-4 py-2 shadow-[0_1px_0_0_rgba(22,45,74,0.8)] bg-navy-900">
       <span
         className={cn(
-          'w-6 h-6 rounded flex items-center justify-center text-xs font-bold shrink-0',
-          isActive ? 'bg-gold text-navy-deep' : 'bg-navy-light text-slate'
+          'w-7 h-7 rounded flex items-center justify-center text-xs font-bold shrink-0',
+          isActive ? 'bg-vigie-400 text-navy-900' : 'bg-navy-700 text-cream-200'
         )}
       >
         {AGENT_ICONS[session.agentType] ?? '?'}
       </span>
       <CopyableId sessionId={session.id} />
-      <span className="text-[0.625rem] text-gold border border-gold/30 rounded px-1 py-0.5 leading-none">
+      <span className="text-[0.625rem] text-vigie-400 border border-vigie-400/30 rounded px-1 py-0.5 leading-none">
         {session.mode}
       </span>
-      <span className="text-xs text-slate font-mono truncate">{shortenPath(session.cwd)}</span>
+      <span className="text-xs text-cream-200 font-mono truncate">{shortenPath(session.cwd)}</span>
       {session.gitBranch && (
-        <span className="text-xs text-slate font-mono">({session.gitBranch})</span>
+        <span className="text-xs text-cream-200 font-mono">({session.gitBranch})</span>
       )}
 
       <div className="ml-auto flex items-center gap-2">
-        <span className="text-xs text-slate font-mono tabular-nums">
+        {!isActive && (
+          <span className="text-xs font-mono px-2 py-0.5 rounded bg-cream-200/10 text-cream-200">
+            Ended
+          </span>
+        )}
+        <span className="text-xs text-cream-200 font-mono tabular-nums [font-variant-numeric:tabular-nums]">
           {formatDuration(session.startedAt)}
         </span>
         {session.mode === 'interactive' && (
@@ -191,8 +196,8 @@ export function SessionDetailHeader({
             className={cn(
               'text-xs font-mono px-2 py-1 rounded transition-colors',
               historyOpen
-                ? 'bg-navy-light text-cream'
-                : 'text-slate hover:text-cream hover:bg-navy-light'
+                ? 'bg-navy-700 text-cream-50'
+                : 'text-cream-200 hover:text-cream-50 hover:bg-navy-700'
             )}
           >
             History
@@ -213,7 +218,7 @@ export function SessionDetailHeader({
         <span
           className={cn(
             'w-2 h-2 rounded-full shrink-0',
-            isActive ? (connected ? 'bg-success animate-pulse' : 'bg-yellow-500') : 'bg-slate'
+            isActive ? (connected ? 'bg-success animate-pulse' : 'bg-yellow-500') : 'bg-cream-200'
           )}
         />
       </div>

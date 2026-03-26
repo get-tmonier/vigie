@@ -1,6 +1,6 @@
 # Vigie
 
-Local-first agent supervisor for software engineers. "You Keep The Helm."
+Local-first agent supervisor for software engineers. "Eyes on the horizon."
 Real-time visibility into AI agent activity, drift detection, token cost guardrails, checkpoints & rollback. BYOA (Bring Your Own AI). Currently in Phase 0 (foundation).
 
 Vigie is built by **Tmonier SRL** (Damien Meur's freelance company). The freelance portfolio lives at `tmonier.com`; Vigie lives at `vigie.tmonier.com`.

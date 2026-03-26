@@ -24,7 +24,7 @@ export function TerminalOutput({ events }: TerminalOutputProps) {
   return (
     <div
       ref={containerRef}
-      className="flex-1 font-mono text-[0.8125rem] leading-relaxed bg-navy-deep p-4 overflow-y-auto"
+      className="flex-1 font-mono text-[0.8125rem] leading-relaxed bg-navy-900 p-4 overflow-y-auto"
     >
       {events.map((event, i) => {
         const key = eventKey(event, i);
@@ -32,13 +32,13 @@ export function TerminalOutput({ events }: TerminalOutputProps) {
           case 'command:output':
             return (
               <div key={key} className="flex gap-2">
-                <span className="text-slate text-[0.6875rem] shrink-0">
+                <span className="text-cream-50-200 text-[0.6875rem] shrink-0">
                   {new Date(event.timestamp).toLocaleTimeString()}
                 </span>
                 <span
                   className={cn(
                     'whitespace-pre-wrap break-all',
-                    event.stream === 'stderr' ? 'text-error' : 'text-cream'
+                    event.stream === 'stderr' ? 'text-danger' : 'text-cream-50'
                   )}
                 >
                   {event.data}
@@ -50,8 +50,8 @@ export function TerminalOutput({ events }: TerminalOutputProps) {
               <div
                 key={key}
                 className={cn(
-                  'py-1 border-t border-navy-light mt-1',
-                  event.exitCode === 0 ? 'text-success' : 'text-error'
+                  'py-1 shadow-[0_-1px_0_0_rgba(22,45,74,0.6)] mt-1',
+                  event.exitCode === 0 ? 'text-success' : 'text-danger'
                 )}
               >
                 Process exited with code {event.exitCode}
@@ -59,7 +59,7 @@ export function TerminalOutput({ events }: TerminalOutputProps) {
             );
           case 'command:error':
             return (
-              <div key={key} className="text-error py-1">
+              <div key={key} className="text-danger py-1">
                 Error: {event.error}
               </div>
             );
@@ -71,23 +71,23 @@ export function TerminalOutput({ events }: TerminalOutputProps) {
             );
           case 'daemon:disconnected':
             return (
-              <div key={key} className="text-error py-1">
+              <div key={key} className="text-danger py-1">
                 Daemon disconnected: {event.hostname}
               </div>
             );
           case 'session:started':
             return (
-              <div key={key} className="text-gold py-1">
+              <div key={key} className="text-vigie-400 py-1">
                 Session started: {event.sessionId.slice(0, 8)} ({event.agentType})
               </div>
             );
           case 'session:output':
             return (
               <div key={key} className="flex gap-2">
-                <span className="text-slate text-[0.6875rem] shrink-0">
+                <span className="text-cream-50-200 text-[0.6875rem] shrink-0">
                   {new Date(event.timestamp).toLocaleTimeString()}
                 </span>
-                <span className="whitespace-pre-wrap break-all text-cream">{event.data}</span>
+                <span className="whitespace-pre-wrap break-all text-cream-50">{event.data}</span>
               </div>
             );
           case 'session:ended':
@@ -95,8 +95,8 @@ export function TerminalOutput({ events }: TerminalOutputProps) {
               <div
                 key={key}
                 className={cn(
-                  'py-1 border-t border-navy-light mt-1',
-                  event.exitCode === 0 ? 'text-success' : 'text-error'
+                  'py-1 shadow-[0_-1px_0_0_rgba(22,45,74,0.6)] mt-1',
+                  event.exitCode === 0 ? 'text-success' : 'text-danger'
                 )}
               >
                 Session {event.sessionId.slice(0, 8)} ended (code {event.exitCode})
@@ -104,7 +104,7 @@ export function TerminalOutput({ events }: TerminalOutputProps) {
             );
           case 'session:error':
             return (
-              <div key={key} className="text-error py-1">
+              <div key={key} className="text-danger py-1">
                 Session {event.sessionId.slice(0, 8)} error: {event.error}
               </div>
             );

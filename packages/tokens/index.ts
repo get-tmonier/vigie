@@ -1,42 +1,46 @@
-// Helm (WheelMark) geometry — single source of truth for all SVG renderings
-const _helmCx = 32;
-const _helmCy = 32;
-const _helmAngles = [0, 45, 90, 135, 180, 225, 270, 315];
-function _helmPoint(r: number, deg: number): string {
-  const rad = ((deg - 90) * Math.PI) / 180;
-  return `${(_helmCx + r * Math.cos(rad)).toFixed(1)},${(_helmCy + r * Math.sin(rad)).toFixed(1)}`;
-}
-
-export const helm = {
+// Radar mark geometry — single source of truth for all SVG renderings
+export const radar = {
   viewBox: '0 0 64 64',
-  cx: _helmCx,
-  cy: _helmCy,
-  spokesD: _helmAngles.map((a) => `M${_helmPoint(8, a)} L${_helmPoint(22, a)}`).join(' '),
-  handlesD: _helmAngles.map((a) => `M${_helmPoint(19, a)} L${_helmPoint(31, a)}`).join(' '),
+  cx: 32,
+  cy: 32,
+  outerR: 24,
+  middleR: 16,
+  innerR: 8,
+  centerR: 3.5,
+  rays: [
+    { x1: 32, y1: 8, x2: 32, y2: 2 },
+    { x1: 52.8, y1: 20, x2: 57.4, y2: 16.4 },
+    { x1: 52.8, y1: 44, x2: 57.4, y2: 47.6 },
+  ],
+  gradient: { start: '#4ECFB0', end: '#178A6A' },
 } as const;
 
 export const colors = {
-  navyDeep: '#0b1a2e',
-  navyMid: '#1d3557',
-  navyLight: '#2a4a7f',
-  gold: '#c49a2b',
-  goldLight: '#d4aa3c',
-  goldPale: '#e0bc5a',
-  goldDark: '#a67c1a',
-  cream: '#f5f0e8',
-  creamDark: '#e8e0d0',
-  slate: '#8b9caf',
-  success: '#22c55e',
-  error: '#ef4444',
-  signalGreen: '#28c840',
-  signalRed: '#ff5f57',
-  signalAmber: '#ffbd2e',
-  signalOrange: '#ff8c42',
+  navy900: '#0A1628',
+  navy800: '#0F2035',
+  navy700: '#162D4A',
+  navy600: '#1E3A5F',
+  brass400: '#D4AA3C',
+  cream50: '#FDF8F0',
+  cream100: '#F5EDE0',
+  cream200: '#E8DCC8',
+  vigie50: '#E8F8F5',
+  vigie100: '#B2EBE0',
+  vigie200: '#7DDDC8',
+  vigie300: '#4ECFB0',
+  vigie400: '#26C09A',
+  vigie500: '#1FA882',
+  vigie600: '#178A6A',
+  vigie700: '#106B52',
+  vigie800: '#094D3B',
+  warning: '#F0A030',
+  danger: '#E24B4A',
+  success: '#26C09A',
+  idle: '#162D4A',
 } as const;
 
 export const fonts = {
-  vollkornSc: '"Vollkorn SC", serif',
-  vollkorn: '"Vollkorn", serif',
-  sourceSerif: '"Source Serif 4", serif',
+  display: '"Instrument Serif", serif',
+  body: '"DM Sans", sans-serif',
   mono: '"JetBrains Mono", monospace',
 } as const;
