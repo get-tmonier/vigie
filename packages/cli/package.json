@@ -1,0 +1,50 @@
+{
+  "name": "@tmonier/cli",
+  "version": "0.3.0",
+  "type": "module",
+  "bin": {
+    "tmonier": "./dist/index.js"
+  },
+  "imports": {
+    "#modules/*": "./src/modules/*",
+    "#schemas/*": "./src/schemas/*",
+    "#terminal/*": "./src/terminal/*",
+    "#vterm/*": "./src/vterm/*"
+  },
+  "scripts": {
+    "dev": "bun run --watch src/cli.ts",
+    "dev:claude": "bun run src/cli.ts claude",
+    "dev:daemon": "bun run src/modules/daemon/main.ts",
+    "build:pty": "sh scripts/build-pty.sh",
+    "build": "bun run build:pty && bun build --compile --target=bun src/cli.ts --outfile dist/tmonier",
+    "typecheck": "bun x tsc --noEmit",
+    "lint": "biome lint ./src",
+    "lint:fix": "biome lint --write ./src",
+    "format": "biome format --write ./src",
+    "format:fix": "biome format --write ./src",
+    "check": "biome check ./src",
+    "check:fix": "biome check --write ./src",
+    "test": "bun test",
+    "knip": "knip",
+    "knip:fix": "knip --fix",
+    "verify": "bun run knip && bun run check && bun run typecheck && bun run test && bun run build",
+    "verify:fix": "bun run knip:fix && bun run check:fix && bun run typecheck && bun run test && bun run build",
+    "prepare": "simple-git-hooks"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "bun run verify"
+  },
+  "dependencies": {
+    "@effect/platform-bun": "4.0.0-beta.24",
+    "@xterm/headless": "5.5.0",
+    "effect": "4.0.0-beta.24",
+    "valibot": "1.2.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.4",
+    "@types/bun": "1.3.9",
+    "knip": "^5.85.0",
+    "simple-git-hooks": "^2.13.1",
+    "typescript": "5.9.3"
+  }
+}
