@@ -7,14 +7,14 @@ const categories = [
     title: 'Getting started',
     items: [
       {
-        question: 'What is Tmonier?',
+        question: 'What is Vigie?',
         answer:
-          'Tmonier is a local-first monitoring daemon for Claude Code. It watches every file change, every command, every dollar spent. It catches loops, scope drift, and context bloat before they waste your time. Checkpoints let you roll back before anything ships.',
+          'Vigie is a local-first monitoring daemon for Claude Code. It watches every file change, every command, every dollar spent. It catches loops, scope drift, and context bloat before they waste your time. Checkpoints let you roll back before anything ships.',
       },
       {
         question: 'How does it work?',
         answer:
-          'Run tmonier start in your project. A lightweight daemon spawns Claude Code, captures every event — file edits, shell commands, token usage — and streams them to a real-time dashboard. No code leaves your machine.',
+          'Run vigie start in your project. A lightweight daemon spawns Claude Code, captures every event — file edits, shell commands, token usage — and streams them to a real-time dashboard. No code leaves your machine.',
       },
       {
         question: 'What does "local-first" mean?',
@@ -22,14 +22,14 @@ const categories = [
           'The daemon runs entirely on your machine. It observes session metadata — files touched, commands run, token counts — but never reads or stores your source code. The dashboard connects via a local websocket and just streams command output — your codebase stays on your machine.',
       },
       {
-        question: 'How do I install Tmonier?',
+        question: 'How do I install Vigie?',
         answer:
-          "Tmonier is currently in private beta. Join the waitlist to get early access — you'll receive install instructions as soon as the beta opens. Installation is a single command.",
+          "Vigie is currently in private beta. Join the waitlist to get early access — you'll receive install instructions as soon as the beta opens. Installation is a single command.",
       },
       {
-        question: 'Which AI tools does Tmonier support?',
+        question: 'Which AI tools does Vigie support?',
         answer:
-          'Claude Code at launch. OpenCode (which supports Copilot licenses), Codex CLI, Aider, and Cline are on the roadmap. The architecture is CLI-agnostic by design — if your tool has a CLI, Tmonier can monitor it.',
+          'Claude Code at launch. OpenCode (which supports Copilot licenses), Codex CLI, Aider, and Cline are on the roadmap. The architecture is CLI-agnostic by design — if your tool has a CLI, Vigie can monitor it.',
       },
       {
         question: 'What are the system requirements?',
@@ -42,24 +42,24 @@ const categories = [
     title: 'Features',
     items: [
       {
-        question: 'What does Tmonier monitor in real time?',
+        question: 'What does Vigie monitor in real time?',
         answer:
           'Every file read, created, or edited. Every shell command. Token usage, context window percentage, and running cost. All streamed live to your dashboard as events happen.',
       },
       {
         question: 'What is loop detection?',
         answer:
-          'Tmonier detects edit\u2009\u2192\u2009test\u2009\u2192\u2009fail\u2009\u2192\u2009edit cycles where the agent is stuck repeating the same pattern. It flags the loop in your dashboard and suggests a prompt to help the agent break out.',
+          'Vigie detects edit\u2009\u2192\u2009test\u2009\u2192\u2009fail\u2009\u2192\u2009edit cycles where the agent is stuck repeating the same pattern. It flags the loop in your dashboard and suggests a prompt to help the agent break out.',
       },
       {
         question: 'What is scope drift?',
         answer:
-          'When your agent starts touching files outside the scope you declared for the task, Tmonier flags it immediately. You see exactly which files were accessed outside scope so you can course-correct before the agent goes further off track.',
+          'When your agent starts touching files outside the scope you declared for the task, Vigie flags it immediately. You see exactly which files were accessed outside scope so you can course-correct before the agent goes further off track.',
       },
       {
         question: 'How does context window monitoring work?',
         answer:
-          'A live gauge shows how much of the context window is consumed. At 65%+ Tmonier warns that the agent may start losing early instructions and suggests opening a fresh window from your last checkpoint.',
+          'A live gauge shows how much of the context window is consumed. At 65%+ Vigie warns that the agent may start losing early instructions and suggests opening a fresh window from your last checkpoint.',
       },
       {
         question: 'What are checkpoints & rollback?',
@@ -74,7 +74,7 @@ const categories = [
       {
         question: 'How does cost awareness work?',
         answer:
-          'A live cost counter tracks spending in real time. Tmonier hints when a cheaper model would suffice for the current task. On Solo and above, you can set budget guardrails that pause the session before exceeding a threshold.',
+          'A live cost counter tracks spending in real time. Vigie hints when a cheaper model would suffice for the current task. On Solo and above, you can set budget guardrails that pause the session before exceeding a threshold.',
       },
     ],
   },
@@ -84,7 +84,7 @@ const categories = [
       {
         question: 'What does BYOA (Bring Your Own AI) mean?',
         answer:
-          "Tmonier never marks up your AI tokens. You pay Claude (or any supported provider) directly at their standard rates. Tmonier only charges for the monitoring layer — there's no hidden per-token fee and no vendor lock-in.",
+          "Vigie never marks up your AI tokens. You pay Claude (or any supported provider) directly at their standard rates. Vigie only charges for the monitoring layer — there's no hidden per-token fee and no vendor lock-in.",
       },
       {
         question: 'Is the Free plan really free?',
@@ -117,27 +117,27 @@ const categories = [
     title: 'Privacy & security',
     items: [
       {
-        question: 'Does Tmonier access my source code?',
+        question: 'Does Vigie access my source code?',
         answer:
-          'No. Tmonier observes session metadata only — file-change counts, token usage, context window percentage, session duration. It never reads, parses, or stores your source code.',
+          'No. Vigie observes session metadata only — file-change counts, token usage, context window percentage, session duration. It never reads, parses, or stores your source code.',
       },
       {
-        question: 'What data does Tmonier collect?',
+        question: 'What data does Vigie collect?',
         answer:
           'Token counts, context window utilisation percentages, session durations, file-change counts (not contents), and checkpoint events. Never file contents, diffs, prompts, or AI responses.',
       },
       {
-        question: 'Is Tmonier GDPR compliant?',
+        question: 'Is Vigie GDPR compliant?',
         answer:
           'Yes. All data is processed and stored in EU-based infrastructure. Enterprise customers get a Data Processing Agreement (DPA) and SOC 2 Type II certification.',
       },
       {
-        question: 'Can I self-host Tmonier?',
+        question: 'Can I self-host Vigie?',
         answer:
-          'Yes, on the Enterprise plan. You deploy Tmonier on your own infrastructure for full control over data residency, access policies, and integration with internal systems.',
+          'Yes, on the Enterprise plan. You deploy Vigie on your own infrastructure for full control over data residency, access policies, and integration with internal systems.',
       },
       {
-        question: 'Does Tmonier work with local models?',
+        question: 'Does Vigie work with local models?',
         answer:
           'Ollama support is on our roadmap. Once available, you\u2019ll be able to run fully private coding sessions where everything stays on your machine.',
       },
@@ -147,14 +147,14 @@ const categories = [
     title: 'How it compares',
     items: [
       {
-        question: 'How is Tmonier different from just using Claude Code?',
+        question: 'How is Vigie different from just using Claude Code?',
         answer:
-          'Claude Code gives you raw agent output. Tmonier adds a real-time dashboard, loop detection, scope drift alerts, context window monitoring, cost tracking, checkpoints & rollback, and suggested prompts to unblock your agent. It\u2019s the visibility layer that makes Claude Code predictable.',
+          'Claude Code gives you raw agent output. Vigie adds a real-time dashboard, loop detection, scope drift alerts, context window monitoring, cost tracking, checkpoints & rollback, and suggested prompts to unblock your agent. It\u2019s the visibility layer that makes Claude Code predictable.',
       },
       {
-        question: 'Does Tmonier replace my IDE or terminal?',
+        question: 'Does Vigie replace my IDE or terminal?',
         answer:
-          'No. Tmonier is an additive monitoring layer that runs alongside your existing tools. You keep using your IDE, terminal, and Claude Code exactly as before. Tmonier just watches and alerts.',
+          'No. Vigie is an additive monitoring layer that runs alongside your existing tools. You keep using your IDE, terminal, and Claude Code exactly as before. Vigie just watches and alerts.',
       },
     ],
   },

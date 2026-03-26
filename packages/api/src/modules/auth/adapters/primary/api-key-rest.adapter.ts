@@ -29,7 +29,7 @@ apiKeyApp.post('/api/keys', async (c) => {
   const key = await auth.api.createApiKey({
     body: {
       name: result.output.name,
-      prefix: 'tmonier_',
+      prefix: 'vigie_',
     },
     headers: c.req.raw.headers,
   });

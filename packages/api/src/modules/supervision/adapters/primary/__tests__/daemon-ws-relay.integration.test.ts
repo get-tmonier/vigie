@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'bun:test';
-import type { CommandOutput, SSEEvent } from '@tmonier/shared';
+import type { CommandOutput, SSEEvent } from '@vigie/shared';
 import { Effect, Layer } from 'effect';
 import { InMemoryDaemonReadRepositoryLive } from '#modules/supervision/adapters/secondary/in-memory-daemon-read-repository';
 import { InMemoryDaemonWriteRepositoryLive } from '#modules/supervision/adapters/secondary/in-memory-daemon-write-repository';

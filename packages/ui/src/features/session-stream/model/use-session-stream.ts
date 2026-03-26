@@ -1,4 +1,4 @@
-import type { SSEEvent } from '@tmonier/shared';
+import type { SSEEvent } from '@vigie/shared';
 import { useMemo } from 'react';
 
 export type SessionChunk =

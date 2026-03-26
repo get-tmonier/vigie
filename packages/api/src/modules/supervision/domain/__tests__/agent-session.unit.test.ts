@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import type { SessionStarted } from '@tmonier/shared';
+import type { SessionStarted } from '@vigie/shared';
 import { createAgentSession } from '../agent-session';
 
 const baseMsg: SessionStarted = {

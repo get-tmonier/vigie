@@ -40,7 +40,7 @@ function LoginPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8">
       <div className="flex flex-col items-center gap-2">
-        <h1 className="font-vollkorn-sc text-4xl font-bold text-gold">tmonier</h1>
+        <h1 className="font-vollkorn-sc text-4xl font-bold text-gold">vigie</h1>
         <p className="font-source-serif text-lg text-cream/80">Your crew. Under your watch.</p>
       </div>
       <button

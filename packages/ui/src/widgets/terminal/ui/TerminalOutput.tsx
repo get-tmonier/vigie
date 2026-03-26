@@ -1,4 +1,4 @@
-import type { SSEEvent } from '@tmonier/shared';
+import type { SSEEvent } from '@vigie/shared';
 import { useEffect, useRef } from 'react';
 import { cn } from '#shared/lib/cn';
 

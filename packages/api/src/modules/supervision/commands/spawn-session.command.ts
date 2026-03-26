@@ -1,4 +1,4 @@
-import type { SessionSpawnRequest } from '@tmonier/shared';
+import type { SessionSpawnRequest } from '@vigie/shared';
 import { Effect } from 'effect';
 import { DaemonWriteRepository } from '../ports/daemon-write-repository.port';
 import { DaemonDisconnectedError, type DaemonNotFoundError } from '../ports/errors';

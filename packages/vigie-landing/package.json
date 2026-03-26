@@ -1,5 +1,5 @@
 {
-  "name": "@tmonier/vigie-landing",
+  "name": "@vigie/landing",
   "type": "module",
   "version": "0.0.1",
   "private": true,
@@ -31,7 +31,7 @@
     "@fontsource/vollkorn": "5.2.10",
     "@fontsource/vollkorn-sc": "5.2.8",
     "@tailwindcss/vite": "4.2.1",
-    "@tmonier/tokens": "workspace:*",
+    "@vigie/tokens": "workspace:*",
     "astro": "6.0.0-beta.17",
     "tailwind-merge": "3.5.0",
     "tailwindcss": "4.2.1"

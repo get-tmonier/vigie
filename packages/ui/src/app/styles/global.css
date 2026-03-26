@@ -1,6 +1,6 @@
 @import "tailwindcss";
-@import "@tmonier/tokens/tailwind.css";
-@import "@tmonier/tokens/tokens.css";
+@import "@vigie/tokens/tailwind.css";
+@import "@vigie/tokens/tokens.css";
 
 /* Vollkorn SC — only used weights */
 @import "@fontsource/vollkorn-sc/latin-700.css";

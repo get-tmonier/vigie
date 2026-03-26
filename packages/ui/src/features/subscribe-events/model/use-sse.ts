@@ -1,4 +1,4 @@
-import type { SSEEvent } from '@tmonier/shared';
+import type { SSEEvent } from '@vigie/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createDaemonEventSource } from '../api/event-source';
 

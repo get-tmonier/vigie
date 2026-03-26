@@ -1,4 +1,4 @@
-import type { DaemonSyncSession, SessionStarted } from '@tmonier/shared';
+import type { DaemonSyncSession, SessionStarted } from '@vigie/shared';
 
 export interface AgentSession {
   readonly id: string;

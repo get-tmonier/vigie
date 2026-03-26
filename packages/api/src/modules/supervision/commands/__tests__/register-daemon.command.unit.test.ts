@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import type { SSEEvent } from '@tmonier/shared';
+import type { SSEEvent } from '@vigie/shared';
 import { Effect, Layer } from 'effect';
 import { deriveDaemonId } from '#modules/supervision/domain/daemon-session';
 import { DaemonWriteRepository } from '#modules/supervision/ports/daemon-write-repository.port';

@@ -26,7 +26,7 @@ describe('ApiKeyResponseSchema', () => {
     const result = v.parse(ApiKeyResponseSchema, {
       id: 'key-1',
       name: 'My Key',
-      prefix: 'tmonier_',
+      prefix: 'vigie_',
       createdAt: '2025-01-01T00:00:00Z',
     });
     expect(result.id).toBe('key-1');
@@ -48,7 +48,7 @@ describe('ApiKeyResponseSchema', () => {
     expect(() =>
       v.parse(ApiKeyResponseSchema, {
         name: 'test',
-        prefix: 'tmonier_',
+        prefix: 'vigie_',
         createdAt: '2025-01-01T00:00:00Z',
       })
     ).toThrow();
@@ -60,11 +60,11 @@ describe('ApiKeyCreatedResponseSchema', () => {
     const result = v.parse(ApiKeyCreatedResponseSchema, {
       id: 'key-1',
       name: 'My Key',
-      prefix: 'tmonier_',
+      prefix: 'vigie_',
       createdAt: '2025-01-01T00:00:00Z',
-      key: 'tmonier_abc123',
+      key: 'vigie_abc123',
     });
-    expect(result.key).toBe('tmonier_abc123');
+    expect(result.key).toBe('vigie_abc123');
   });
 
   it('rejects missing key field', () => {
@@ -72,7 +72,7 @@ describe('ApiKeyCreatedResponseSchema', () => {
       v.parse(ApiKeyCreatedResponseSchema, {
         id: 'key-1',
         name: 'My Key',
-        prefix: 'tmonier_',
+        prefix: 'vigie_',
         createdAt: '2025-01-01T00:00:00Z',
       })
     ).toThrow();

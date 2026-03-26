@@ -67,7 +67,7 @@ function AttachButton({ sessionId }: { sessionId: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(() => {
-    const command = `tmonier session attach --id ${sessionId.slice(0, 8)}`;
+    const command = `vigie session attach --id ${sessionId.slice(0, 8)}`;
     navigator.clipboard.writeText(command);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);

@@ -1,5 +1,5 @@
-import type { FsListDirResponse, TerminalChunk } from '@tmonier/shared';
-import { UpstreamMessageSchema } from '@tmonier/shared';
+import type { FsListDirResponse, TerminalChunk } from '@vigie/shared';
+import { UpstreamMessageSchema } from '@vigie/shared';
 import { Effect, Layer } from 'effect';
 import { Hono } from 'hono';
 import { upgradeWebSocket, websocket } from 'hono/bun';

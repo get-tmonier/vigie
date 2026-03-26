@@ -1,4 +1,4 @@
-import type { SessionKill } from '@tmonier/shared';
+import type { SessionKill } from '@vigie/shared';
 import { Effect } from 'effect';
 import { DaemonWriteRepository } from '../ports/daemon-write-repository.port';
 import { DaemonDisconnectedError, type DaemonNotFoundError } from '../ports/errors';

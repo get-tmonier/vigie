@@ -58,7 +58,7 @@ function CliAuthPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4">
-      <h1 className="font-vollkorn-sc text-2xl font-bold text-gold">tmonier</h1>
+      <h1 className="font-vollkorn-sc text-2xl font-bold text-gold">vigie</h1>
       <p className="font-source-serif text-cream/80">{status}</p>
     </div>
   );

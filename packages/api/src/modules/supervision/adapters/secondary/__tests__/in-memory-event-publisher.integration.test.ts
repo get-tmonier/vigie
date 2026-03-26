@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'bun:test';
-import type { SSEDaemonConnected, SSEDaemonDisconnected } from '@tmonier/shared';
+import type { SSEDaemonConnected, SSEDaemonDisconnected } from '@vigie/shared';
 import { Effect } from 'effect';
 import { EventPublisher } from '#modules/supervision/ports/event-publisher.port';
 import { InMemoryEventPublisherLive } from '../in-memory-event-publisher';

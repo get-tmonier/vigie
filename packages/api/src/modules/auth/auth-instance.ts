@@ -23,7 +23,7 @@ export const auth = betterAuth({
   plugins: [
     bearer(),
     apiKey({
-      defaultPrefix: 'tmonier_',
+      defaultPrefix: 'vigie_',
       maximumNameLength: 64,
       rateLimit: { enabled: false },
     }),

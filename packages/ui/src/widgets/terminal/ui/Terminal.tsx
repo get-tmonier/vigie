@@ -1,4 +1,4 @@
-import type { SSEEvent } from '@tmonier/shared';
+import type { SSEEvent } from '@vigie/shared';
 import { CommandInput } from './CommandInput';
 import { TerminalOutput } from './TerminalOutput';
 

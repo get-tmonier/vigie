@@ -7,7 +7,7 @@ export function Header() {
 
   return (
     <header className="flex items-center justify-between px-6 py-3 bg-navy-mid border-b border-navy-light">
-      <h1 className="font-vollkorn-sc text-xl font-bold text-gold m-0">tmonier</h1>
+      <h1 className="font-vollkorn-sc text-xl font-bold text-gold m-0">vigie</h1>
       {session?.user && (
         <div className="flex items-center gap-4">
           <span className="font-mono text-sm text-cream/70">{session.user.email}</span>

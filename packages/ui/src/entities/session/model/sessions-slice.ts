@@ -6,7 +6,7 @@ import type {
   SSESessionError,
   SSESessionSpawnFailed,
   SSESessionStarted,
-} from '@tmonier/shared';
+} from '@vigie/shared';
 import type { RootState } from '#app/store';
 import type { AgentSession } from '../api/session-api';
 
