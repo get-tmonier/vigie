@@ -1,4 +1,4 @@
-# Vigie
+# vigie
 
 **Local-first agent supervisor for software engineers.**
 *You Keep The Helm.*

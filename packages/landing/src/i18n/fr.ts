@@ -2,7 +2,7 @@ import type { SiteContent } from './types';
 
 const fr: SiteContent = {
   meta: {
-    title: 'Vigie — Supervision IA Open Source · par Tmonier',
+    title: 'vigie — Supervision IA Open Source · par Tmonier',
     description:
       'Superviseur local d\u2019agents IA pour ingénieurs. Visibilité en temps réel, détection de dérive, garde-fous de coûts, checkpoints & rollback.',
   },
@@ -102,7 +102,7 @@ const fr: SiteContent = {
   openSource: {
     heading: 'Gratuit & open source',
     licenseBadge: 'Licence MIT',
-    headline: 'Vigie est open source. Utilisez-le, forkez-le, livrez-le.',
+    headline: 'vigie est open source. Utilisez-le, forkez-le, livrez-le.',
     description:
       'Monitoring local, détection de boucles, dérive de scope, garde-fous de coûts, checkpoints & rollback. Pas de paywall, pas de tier premium, pas de vendor lock-in. Votre machine, vos données, vos règles.',
     ctaGithub: 'Voir sur GitHub',
@@ -130,15 +130,15 @@ const fr: SiteContent = {
     pageLabel: 'Questions & réponses',
     pageHeading: 'Foire aux questions',
     pageDescription:
-      'Tout ce qu\u2019il faut savoir sur Vigie — de la prise en main à la confidentialité et la licence.',
+      'Tout ce qu\u2019il faut savoir sur vigie — de la prise en main à la confidentialité et la licence.',
     categories: [
       {
         title: 'Prise en main',
         items: [
           {
-            question: 'Qu\u2019est-ce que Vigie\u00A0?',
+            question: 'Qu\u2019est-ce que vigie\u00A0?',
             answer:
-              'Vigie est un daemon de monitoring local pour Claude Code. Il surveille chaque fichier modifié, chaque commande, chaque dollar dépensé. Il détecte les boucles, les dérives de scope et la surcharge de contexte avant qu\u2019elles ne vous coûtent du temps. Les checkpoints permettent de revenir en arrière avant tout déploiement.',
+              'vigie est un daemon de monitoring local pour Claude Code. Il surveille chaque fichier modifié, chaque commande, chaque dollar dépensé. Il détecte les boucles, les dérives de scope et la surcharge de contexte avant qu\u2019elles ne vous coûtent du temps. Les checkpoints permettent de revenir en arrière avant tout déploiement.',
           },
           {
             question: 'Comment ça fonctionne\u00A0?',
@@ -151,14 +151,14 @@ const fr: SiteContent = {
               'Le daemon tourne entièrement sur votre machine. Il observe les métadonnées de session — fichiers touchés, commandes exécutées, nombre de tokens — mais ne lit ni ne stocke jamais votre code source. Le dashboard se connecte via un websocket local et ne fait que diffuser la sortie des commandes — votre code reste chez vous.',
           },
           {
-            question: 'Comment installer Vigie\u00A0?',
+            question: 'Comment installer vigie\u00A0?',
             answer:
-              'Vigie est actuellement en bêta privée. Inscrivez-vous sur la liste d\u2019attente pour un accès anticipé — vous recevrez les instructions d\u2019installation dès l\u2019ouverture de la bêta. L\u2019installation se fait en une seule commande.',
+              'vigie est actuellement en bêta privée. Inscrivez-vous sur la liste d\u2019attente pour un accès anticipé — vous recevrez les instructions d\u2019installation dès l\u2019ouverture de la bêta. L\u2019installation se fait en une seule commande.',
           },
           {
-            question: 'Quels outils IA Vigie supporte-t-il\u00A0?',
+            question: 'Quels outils IA vigie supporte-t-il\u00A0?',
             answer:
-              'Claude Code au lancement. OpenCode (qui supporte les licences Copilot), Codex CLI, Aider et Cline sont sur la roadmap. L\u2019architecture est agnostique par conception — si votre outil a un CLI, Vigie peut le surveiller.',
+              'Claude Code au lancement. OpenCode (qui supporte les licences Copilot), Codex CLI, Aider et Cline sont sur la roadmap. L\u2019architecture est agnostique par conception — si votre outil a un CLI, vigie peut le surveiller.',
           },
           {
             question: 'Quels sont les prérequis système\u00A0?',
@@ -171,24 +171,24 @@ const fr: SiteContent = {
         title: 'Fonctionnalités',
         items: [
           {
-            question: 'Que surveille Vigie en temps réel\u00A0?',
+            question: 'Que surveille vigie en temps réel\u00A0?',
             answer:
               'Chaque fichier lu, créé ou modifié. Chaque commande shell. La consommation de tokens, le pourcentage de fenêtre de contexte et le coût en cours. Le tout diffusé en direct dans votre dashboard.',
           },
           {
             question: 'Qu\u2019est-ce que la détection de boucle\u00A0?',
             answer:
-              'Vigie détecte les cycles édition\u2009→\u2009test\u2009→\u2009échec\u2009→\u2009édition où l\u2019agent répète le même pattern. Il signale la boucle dans le dashboard et suggère un prompt pour aider l\u2019agent à en sortir.',
+              'vigie détecte les cycles édition\u2009→\u2009test\u2009→\u2009échec\u2009→\u2009édition où l\u2019agent répète le même pattern. Il signale la boucle dans le dashboard et suggère un prompt pour aider l\u2019agent à en sortir.',
           },
           {
             question: 'Qu\u2019est-ce que la dérive de scope\u00A0?',
             answer:
-              'Quand votre agent commence à toucher des fichiers en dehors du périmètre déclaré pour la tâche, Vigie le signale immédiatement. Vous voyez exactement quels fichiers ont été accédés hors scope pour corriger le tir avant que l\u2019agent ne dérive davantage.',
+              'Quand votre agent commence à toucher des fichiers en dehors du périmètre déclaré pour la tâche, vigie le signale immédiatement. Vous voyez exactement quels fichiers ont été accédés hors scope pour corriger le tir avant que l\u2019agent ne dérive davantage.',
           },
           {
             question: 'Comment fonctionne le monitoring de fenêtre de contexte\u00A0?',
             answer:
-              'Une jauge en direct montre la consommation de la fenêtre de contexte. À 65%+, Vigie avertit que l\u2019agent risque de perdre les instructions initiales et suggère d\u2019ouvrir une nouvelle fenêtre depuis le dernier checkpoint.',
+              'Une jauge en direct montre la consommation de la fenêtre de contexte. À 65%+, vigie avertit que l\u2019agent risque de perdre les instructions initiales et suggère d\u2019ouvrir une nouvelle fenêtre depuis le dernier checkpoint.',
           },
           {
             question: 'Que sont les checkpoints & rollback\u00A0?',
@@ -198,12 +198,12 @@ const fr: SiteContent = {
           {
             question: 'Peut-on surveiller plusieurs agents en parallèle\u00A0?',
             answer:
-              'Oui. Vigie supporte le monitoring de plusieurs agents simultanés, chacun avec son propre flux d\u2019activité dans le dashboard.',
+              'Oui. vigie supporte le monitoring de plusieurs agents simultanés, chacun avec son propre flux d\u2019activité dans le dashboard.',
           },
           {
             question: 'Comment fonctionne la conscience des coûts\u00A0?',
             answer:
-              'Un compteur de coûts en direct suit les dépenses en temps réel. Vigie suggère quand un modèle moins cher suffirait pour la tâche en cours. Vous pouvez définir des garde-fous budgétaires qui mettent la session en pause avant de dépasser un seuil.',
+              'Un compteur de coûts en direct suit les dépenses en temps réel. vigie suggère quand un modèle moins cher suffirait pour la tâche en cours. Vous pouvez définir des garde-fous budgétaires qui mettent la session en pause avant de dépasser un seuil.',
           },
         ],
       },
@@ -211,14 +211,14 @@ const fr: SiteContent = {
         title: 'Licence & open source',
         items: [
           {
-            question: 'Vigie est-il vraiment gratuit\u00A0?',
+            question: 'vigie est-il vraiment gratuit\u00A0?',
             answer:
-              'Oui. Vigie est open source sous licence MIT. Toutes les fonctionnalités — monitoring, détection de boucle, dérive de scope, checkpoints, rollback, garde-fous de coûts — sont gratuites et le resteront. Pas de paywall, pas de tier premium.',
+              'Oui. vigie est open source sous licence MIT. Toutes les fonctionnalités — monitoring, détection de boucle, dérive de scope, checkpoints, rollback, garde-fous de coûts — sont gratuites et le resteront. Pas de paywall, pas de tier premium.',
           },
           {
             question: 'Que signifie BYOA (Bring Your Own AI)\u00A0?',
             answer:
-              'Vigie ne touche jamais à vos tokens IA. Vous payez Claude (ou tout fournisseur supporté) directement à leurs tarifs standard. Vigie est une couche de monitoring — pas de frais cachés par token et pas de vendor lock-in.',
+              'vigie ne touche jamais à vos tokens IA. Vous payez Claude (ou tout fournisseur supporté) directement à leurs tarifs standard. vigie est une couche de monitoring — pas de frais cachés par token et pas de vendor lock-in.',
           },
           {
             question: 'Pourquoi MIT et pas AGPL\u00A0?',
@@ -226,14 +226,14 @@ const fr: SiteContent = {
               'À l\u2019ère des agents, toute licence est MIT. Les agents clonent, forkent et livrent du code plus vite qu\u2019aucune équipe compliance ne peut vérifier des headers. Nous avons choisi la licence qui correspond à la façon dont le logiciel est réellement construit aujourd\u2019hui — zéro friction, zéro piège.',
           },
           {
-            question: 'Puis-je utiliser Vigie dans mon entreprise\u00A0?',
+            question: 'Puis-je utiliser vigie dans mon entreprise\u00A0?',
             answer:
-              'Oui. La licence MIT signifie que vous pouvez utiliser, modifier et distribuer Vigie librement — à des fins commerciales ou non. Pas de CLA, pas de contributor agreement requis.',
+              'Oui. La licence MIT signifie que vous pouvez utiliser, modifier et distribuer vigie librement — à des fins commerciales ou non. Pas de CLA, pas de contributor agreement requis.',
           },
           {
-            question: 'Qui construit Vigie\u00A0?',
+            question: 'Qui construit vigie\u00A0?',
             answer:
-              'Vigie est construit par Tmonier SRL, une société de consulting freelance fondée par Damien Meur. Ceux qui tiennent la barre sont aussi ceux qui veillent.',
+              'vigie est construit par Tmonier SRL, une société de consulting freelance fondée par Damien Meur. Ceux qui tiennent la barre sont aussi ceux qui veillent.',
           },
         ],
       },
@@ -241,27 +241,27 @@ const fr: SiteContent = {
         title: 'Confidentialité & sécurité',
         items: [
           {
-            question: 'Vigie accède-t-il à mon code source\u00A0?',
+            question: 'vigie accède-t-il à mon code source\u00A0?',
             answer:
-              'Non. Vigie observe uniquement les métadonnées de session — nombre de fichiers modifiés, consommation de tokens, pourcentage de fenêtre de contexte, durée de session. Il ne lit, n\u2019analyse et ne stocke jamais votre code source.',
+              'Non. vigie observe uniquement les métadonnées de session — nombre de fichiers modifiés, consommation de tokens, pourcentage de fenêtre de contexte, durée de session. Il ne lit, n\u2019analyse et ne stocke jamais votre code source.',
           },
           {
-            question: 'Quelles données Vigie collecte-t-il\u00A0?',
+            question: 'Quelles données vigie collecte-t-il\u00A0?',
             answer:
               'Nombre de tokens, pourcentages d\u2019utilisation de la fenêtre de contexte, durées de session, nombre de fichiers modifiés (pas leur contenu) et événements de checkpoint. Jamais le contenu des fichiers, les diffs, les prompts ou les réponses IA.',
           },
           {
-            question: 'Vigie est-il conforme au RGPD\u00A0?',
+            question: 'vigie est-il conforme au RGPD\u00A0?',
             answer:
-              'Oui. Vigie est local-first — vos données restent sur votre machine. Pour les fonctionnalités du dashboard hébergé, toutes les données sont traitées dans une infrastructure basée en UE.',
+              'Oui. vigie est local-first — vos données restent sur votre machine. Pour les fonctionnalités du dashboard hébergé, toutes les données sont traitées dans une infrastructure basée en UE.',
           },
           {
-            question: 'Peut-on héberger Vigie soi-même\u00A0?',
+            question: 'Peut-on héberger vigie soi-même\u00A0?',
             answer:
               'Oui — c\u2019est open source. Clonez le repo, déployez sur votre propre infrastructure. Contrôle total sur la résidence des données, les politiques d\u2019accès et les intégrations.',
           },
           {
-            question: 'Vigie fonctionne-t-il avec des modèles locaux\u00A0?',
+            question: 'vigie fonctionne-t-il avec des modèles locaux\u00A0?',
             answer:
               'Le support d\u2019Ollama est sur notre roadmap. Une fois disponible, vous pourrez lancer des sessions de coding entièrement privées où tout reste sur votre machine.',
           },
@@ -271,14 +271,14 @@ const fr: SiteContent = {
         title: 'Comparaison',
         items: [
           {
-            question: 'En quoi Vigie diffère de Claude Code seul\u00A0?',
+            question: 'En quoi vigie diffère de Claude Code seul\u00A0?',
             answer:
-              'Claude Code vous donne la sortie brute de l\u2019agent. Vigie ajoute un dashboard temps réel, la détection de boucle, les alertes de dérive de scope, le monitoring de fenêtre de contexte, le suivi des coûts, les checkpoints & rollback, et des prompts suggérés pour débloquer votre agent. C\u2019est la couche de visibilité qui rend Claude Code prévisible.',
+              'Claude Code vous donne la sortie brute de l\u2019agent. vigie ajoute un dashboard temps réel, la détection de boucle, les alertes de dérive de scope, le monitoring de fenêtre de contexte, le suivi des coûts, les checkpoints & rollback, et des prompts suggérés pour débloquer votre agent. C\u2019est la couche de visibilité qui rend Claude Code prévisible.',
           },
           {
-            question: 'Vigie remplace-t-il mon IDE ou mon terminal\u00A0?',
+            question: 'vigie remplace-t-il mon IDE ou mon terminal\u00A0?',
             answer:
-              'Non. Vigie est une couche de monitoring additive qui tourne à côté de vos outils existants. Vous continuez à utiliser votre IDE, votre terminal et Claude Code exactement comme avant. Vigie surveille et alerte, c\u2019est tout.',
+              'Non. vigie est une couche de monitoring additive qui tourne à côté de vos outils existants. Vous continuez à utiliser votre IDE, votre terminal et Claude Code exactement comme avant. vigie surveille et alerte, c\u2019est tout.',
           },
         ],
       },

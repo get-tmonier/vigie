@@ -1,6 +1,6 @@
 # @vigie/cli
 
-The local daemon for [Vigie](https://vigie.com). Runs on your machine, under your control.
+The local daemon for [vigie](https://vigie.com). Runs on your machine, under your control.
 
 ## What this is
 

@@ -1,9 +1,9 @@
-# Vigie
+# vigie
 
 Local-first agent supervisor for software engineers. "Eyes on the horizon."
 Real-time visibility into AI agent activity, drift detection, token cost guardrails, checkpoints & rollback. BYOA (Bring Your Own AI). Currently in Phase 0 (foundation).
 
-Vigie is built by **Tmonier SRL** (Damien Meur's freelance company). The freelance portfolio lives at `tmonier.com`; Vigie lives at `vigie.tmonier.com`.
+vigie is built by **Tmonier SRL** (Damien Meur's freelance company). The freelance portfolio lives at `tmonier.com`; vigie lives at `vigie.tmonier.com`.
 
 ## Stack
 
@@ -21,7 +21,7 @@ Vigie is built by **Tmonier SRL** (Damien Meur's freelance company). The freelan
 | `@vigie/cli` | `packages/cli/` | Effect, Bun PTY, xterm headless |
 | `@vigie/shared` | `packages/shared/` | ts-rest contracts, Valibot schemas |
 | `@vigie/tokens` | `packages/tokens/` | Design tokens — CSS + JS exports |
-| `@vigie/landing` | `packages/landing/` | Astro 5 + Tailwind v4 (Vigie product page) |
+| `@vigie/landing` | `packages/landing/` | Astro 5 + Tailwind v4 (vigie product page) |
 
 The freelance portfolio (`tmonier.com`) is a separate repo: `get-tmonier/landing`.
 
@@ -79,6 +79,7 @@ bun test:integration                           # run integration tests only
 - **No AI attribution** — never add `Co-Authored-By` or any Claude/AI mention in commit messages.
 - **Bun only** — never use npm, pnpm, yarn, or npx. Use `bun` and `bunx`.
 - **Pinned versions** — no `^` or `~` prefixes in `package.json` dependencies.
+- **Lowercase brand** — always write "vigie" (lowercase), never "Vigie". The brand is always lowercase in all contexts (titles, prose, UI, docs).
 
 ## Conventions
 
