@@ -1,0 +1,213 @@
+---
+interface Feature {
+  id: string;
+  label: string;
+  title: string;
+  description: string;
+  video: string;
+}
+
+const features: Feature[] = [
+  {
+    id: 'daemon-connect',
+    label: 'Local daemon',
+    title: 'Local-first connection',
+    description:
+      'Run vigie start — daemon connects via WebSocket. Your data never leaves your machine.',
+    video: '/videos/daemon-connect.webm',
+  },
+  {
+    id: 'agent-work',
+    label: 'Agent supervision',
+    title: 'Real-time activity',
+    description: 'Watch every file read, command run, and token spent as your agent works.',
+    video: '/videos/agent-work.webm',
+  },
+  {
+    id: 'loop-detect',
+    label: 'Loop detection',
+    title: 'Catch infinite loops',
+    description:
+      'vigie detects edit → test → fail cycles and suggests a fix before more tokens are wasted.',
+    video: '/videos/loop-detect.webm',
+  },
+  {
+    id: 'scope-drift',
+    label: 'Scope drift',
+    title: 'Stay on track',
+    description: 'Get alerted when your agent touches files outside the declared task scope.',
+    video: '/videos/scope-drift.webm',
+  },
+  {
+    id: 'context-cost',
+    label: 'Guardrails',
+    title: 'Context & cost guardrails',
+    description:
+      'Warnings when context fills up, budget thresholds, and cheaper model suggestions.',
+    video: '/videos/context-cost.webm',
+  },
+  {
+    id: 'checkpoint',
+    label: 'Checkpoints',
+    title: 'Checkpoint & rollback',
+    description: 'Snapshot your project state. Roll back to any checkpoint with one click.',
+    video: '/videos/checkpoint.webm',
+  },
+  {
+    id: 'terminal-attach',
+    label: 'CLI attach',
+    title: 'Same session, any interface',
+    description: 'Attach from the terminal — continue the same conversation seamlessly.',
+    video: '/videos/terminal-attach.webm',
+  },
+  {
+    id: 'pair-prog',
+    label: 'Pair prog',
+    title: 'Collaborative sessions',
+    description: 'Invite teammates. Flag thinking, share code views, edit the plan together.',
+    video: '/videos/pair-prog.webm',
+  },
+];
+---
+
+<section id="in-action" class="bg-navy-900 px-6 py-20 overflow-hidden">
+  <div class="max-w-[1200px] mx-auto">
+    <!-- Section header -->
+    <div class="text-center mb-12">
+      <span class="font-mono text-[0.7rem] text-vigie-400/60 tracking-[0.1em] uppercase">In action</span>
+      <h2 class="font-display text-cream-50 text-[clamp(1.6rem,3vw,2.4rem)] mt-2 mb-3">See every feature in motion</h2>
+      <p class="font-display text-cream-200/60 text-[0.95rem] max-w-[500px] mx-auto">Each clip shows a real workflow — from daemon start to pair programming.</p>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="feature-tabs flex gap-1 overflow-x-auto pb-3 mb-8 scrollbar-hide" role="tablist">
+      {features.map((f, i) => (
+        <button
+          role="tab"
+          aria-selected={i === 0 ? 'true' : 'false'}
+          data-tab={f.id}
+          class:list={[
+            'feature-tab font-mono text-[0.7rem] whitespace-nowrap px-4 py-2 rounded-lg border transition-all duration-200 cursor-pointer shrink-0',
+            i === 0
+              ? 'bg-vigie-400/12 border-vigie-400/25 text-vigie-400'
+              : 'bg-transparent border-cream-200/10 text-cream-200/50 hover:text-cream-200/70 hover:border-cream-200/20',
+          ]}
+        >
+          {f.label}
+        </button>
+      ))}
+    </div>
+
+    <!-- Feature panels -->
+    <div class="feature-panels">
+      {features.map((f, i) => (
+        <div
+          data-panel={f.id}
+          class:list={[
+            'feature-panel',
+            i === 0 ? 'block' : 'hidden',
+          ]}
+        >
+          <div class="flex gap-8 items-start max-md:flex-col">
+            <!-- Video -->
+            <div class="flex-1 min-w-0 rounded-xl overflow-hidden border border-vigie-400/10 shadow-[0_0_0_1px_rgba(38,192,154,0.06),0_24px_64px_rgba(0,0,0,0.4)]">
+              <video
+                data-video={f.id}
+                class="w-full h-auto block"
+                muted
+                playsinline
+                loop
+                preload="none"
+                poster=""
+              >
+                <source src={f.video} type="video/webm" />
+              </video>
+            </div>
+
+            <!-- Text -->
+            <div class="w-[280px] shrink-0 max-md:w-full">
+              <h3 class="font-display text-cream-50 text-[1.2rem] mb-2">{f.title}</h3>
+              <p class="font-display text-cream-200/60 text-[0.85rem] leading-[1.7] mb-4">{f.description}</p>
+              <div class="flex items-center gap-2">
+                <div class="size-[6px] rounded-full bg-vigie-400 animate-[pulse-soft_2s_ease-in-out_infinite]" />
+                <span class="font-mono text-[0.6rem] text-vigie-400/60 tracking-[0.06em]">Autoplay when visible</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+</style>
+
+<script>
+  const tabs = document.querySelectorAll<HTMLButtonElement>('.feature-tab');
+  const panels = document.querySelectorAll<HTMLDivElement>('.feature-panel');
+  const videos = document.querySelectorAll<HTMLVideoElement>('[data-video]');
+
+  function activateTab(id: string) {
+    // Update tabs
+    for (const tab of tabs) {
+      const isActive = tab.dataset.tab === id;
+      tab.setAttribute('aria-selected', String(isActive));
+      tab.classList.toggle('bg-vigie-400/12', isActive);
+      tab.classList.toggle('border-vigie-400/25', isActive);
+      tab.classList.toggle('text-vigie-400', isActive);
+      tab.classList.toggle('bg-transparent', !isActive);
+      tab.classList.toggle('border-cream-200/10', !isActive);
+      tab.classList.toggle('text-cream-200/50', !isActive);
+    }
+
+    // Update panels
+    for (const panel of panels) {
+      const isActive = panel.dataset.panel === id;
+      panel.classList.toggle('block', isActive);
+      panel.classList.toggle('hidden', !isActive);
+    }
+
+    // Play/pause videos
+    for (const video of videos) {
+      if (video.dataset.video === id) {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      } else {
+        video.pause();
+      }
+    }
+  }
+
+  // Tab click handlers
+  for (const tab of tabs) {
+    tab.addEventListener('click', () => {
+      const id = tab.dataset.tab;
+      if (id) activateTab(id);
+    });
+  }
+
+  // Autoplay first video when section is visible
+  const section = document.getElementById('in-action');
+  if (section) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            // Find active panel's video and play it
+            const activePanel = section.querySelector('.feature-panel:not(.hidden)');
+            if (activePanel) {
+              const video = activePanel.querySelector('video');
+              if (video) video.play().catch(() => {});
+            }
+            observer.unobserve(section);
+          }
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(section);
+  }
+</script>

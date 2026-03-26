@@ -42,5 +42,5 @@ export default {
   },
   ignore: ['.ncurc.cjs'],
   ignoreExportsUsedInFile: false,
-  ignoreWorkspaces: [],
+  ignoreWorkspaces: ['packages/video'],
 } satisfies KnipConfig;

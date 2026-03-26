@@ -1,0 +1,23 @@
+{
+  "name": "@vigie/video",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "remotion studio",
+    "render": "remotion render AppShowcase out/vigie-demo.mp4",
+    "render:clips": "bash render-clips.sh",
+    "render:gif": "remotion render AppShowcase out/vigie-demo.gif --image-format png"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.293",
+    "@remotion/gif": "4.0.293",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.293"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.8",
+    "typescript": "5.9.3"
+  }
+}
