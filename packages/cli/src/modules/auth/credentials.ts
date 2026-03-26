@@ -1,7 +1,7 @@
 import { chmodSync } from 'node:fs';
 import { join } from 'node:path';
 import * as v from 'valibot';
-import { TMONIER_HOME } from './config.js';
+import { VIGIE_HOME } from './config.js';
 
 const CredentialsSchema = v.object({
   token: v.string(),
@@ -14,7 +14,7 @@ function paths(dir: string) {
   return { dir, file: join(dir, 'credentials.json') };
 }
 
-export async function getCredentials(dir = TMONIER_HOME): Promise<Credentials | null> {
+export async function getCredentials(dir = VIGIE_HOME): Promise<Credentials | null> {
   const { file } = paths(dir);
   const f = Bun.file(file);
   if (!(await f.exists())) return null;
@@ -29,7 +29,7 @@ export async function getCredentials(dir = TMONIER_HOME): Promise<Credentials | 
 export async function saveCredentials(
   token: string,
   apiUrl?: string,
-  dir = TMONIER_HOME
+  dir = VIGIE_HOME
 ): Promise<void> {
   const { mkdirSync } = await import('node:fs');
   const p = paths(dir);
@@ -41,7 +41,7 @@ export async function saveCredentials(
   chmodSync(p.file, 0o600);
 }
 
-export async function clearCredentials(dir = TMONIER_HOME): Promise<void> {
+export async function clearCredentials(dir = VIGIE_HOME): Promise<void> {
   const { unlinkSync } = await import('node:fs');
   const { file } = paths(dir);
   try {

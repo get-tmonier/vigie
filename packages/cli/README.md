@@ -1,13 +1,13 @@
-# @tmonier/cli
+# @vigie/cli
 
-The local daemon for [Tmonier](https://tmonier.com). Runs on your machine, under your control.
+The local daemon for [Vigie](https://vigie.com). Runs on your machine, under your control.
 
 ## What this is
 
-The daemon that spawns and monitors AI agents locally. It connects to `api.tmonier.com` via WebSocket. No business logic lives here — it's a pure proxy: spawn, stream, control signals.
+The daemon that spawns and monitors AI agents locally. It connects to `api.vigie.com` via WebSocket. No business logic lives here — it's a pure proxy: spawn, stream, control signals.
 
 ```
-api.tmonier.com ↔ WebSocket ↔ Daemon (this repo) ↔ spawn(git, claude...)
+api.vigie.com ↔ WebSocket ↔ Daemon (this repo) ↔ spawn(git, claude...)
 ```
 
 ## What it does
@@ -29,7 +29,7 @@ Bun (runtime + compiler), TypeScript strict, ESM only.
 
 ```bash
 bun install
-bun run build        # → standalone dist/tmonier binary
+bun run build        # → standalone dist/vigie binary
 ```
 
 ## Verify

@@ -42,7 +42,7 @@ const daemonRestart = Command.make('restart', {}, () => daemonRestartCommand());
 const daemonAttach = Command.make('attach', {}, () => daemonAttachCommand());
 
 const daemon = Command.make('daemon').pipe(
-  Command.withDescription('Manage the tmonier background daemon'),
+  Command.withDescription('Manage the vigie background daemon'),
   Command.withSubcommands([
     daemonStart,
     daemonStop,
@@ -123,10 +123,10 @@ const logout = Command.make('logout', {}, () => logoutCommand()).pipe(
 
 // ── Root command ──
 
-const app = Command.make('tmonier', {}, () =>
+const app = Command.make('vigie', {}, () =>
   Console.log(
     [
-      'Usage: tmonier <command>',
+      'Usage: vigie <command>',
       '',
       'Commands:',
       '  daemon start         Start the background daemon',

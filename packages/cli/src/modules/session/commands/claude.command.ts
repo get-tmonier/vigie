@@ -16,7 +16,7 @@ export function claudeCommand(prompt: string): Effect.Effect<void> {
 
     if (!running) {
       return yield* new DaemonNotRunningError({
-        message: 'Daemon is not running. Start it with `tmonier daemon start`.',
+        message: 'Daemon is not running. Start it with `vigie daemon start`.',
       });
     }
 

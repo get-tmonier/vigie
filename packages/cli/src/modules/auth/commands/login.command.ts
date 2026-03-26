@@ -22,7 +22,7 @@ function html(title: string, message: string, redirectUrl?: string) {
     : '';
   return `<!DOCTYPE html>
 <html>
-<head><title>tmonier — ${safeTitle}</title>
+<head><title>vigie — ${safeTitle}</title>
 <style>body{font-family:system-ui;display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:#0a0e1a;color:#f5f0e8}
 .box{text-align:center;max-width:400px}h1{color:#c9a227;margin-bottom:0.5rem}p{opacity:0.8}</style></head>
 <body><div class="box"><h1>${safeTitle}</h1><p>${safeMessage}</p>${redirect}</div></body>
@@ -73,19 +73,19 @@ function openBrowser(url: string) {
 
 function manualLogin(token: string): Effect.Effect<void> {
   return Effect.gen(function* () {
-    if (!token.startsWith('tmonier_')) {
-      yield* Console.error('Invalid token format. API keys must start with "tmonier_".');
+    if (!token.startsWith('vigie_')) {
+      yield* Console.error('Invalid token format. API keys must start with "vigie_".');
       yield* Effect.sync(() => process.exit(1));
     }
     yield* Effect.promise(() => saveCredentials(token));
-    yield* Console.log('Credentials saved to ~/.tmonier/credentials.json');
+    yield* Console.log('Credentials saved to ~/.vigie/credentials.json');
   });
 }
 
 function browserLogin(): Effect.Effect<void> {
   return Effect.gen(function* () {
     const state = crypto.randomUUID();
-    const appUrl = config.TMONIER_APP_URL;
+    const appUrl = config.VIGIE_APP_URL;
     const handler = createCallbackHandler(state);
 
     const result = yield* Effect.tryPromise({
@@ -134,7 +134,7 @@ function browserLogin(): Effect.Effect<void> {
     });
 
     yield* Effect.promise(() => saveCredentials(result.key));
-    yield* Console.log('Login successful! Credentials saved to ~/.tmonier/credentials.json');
+    yield* Console.log('Login successful! Credentials saved to ~/.vigie/credentials.json');
   }).pipe(Effect.catchCause((cause) => Console.error(`Login failed: ${cause}`)));
 }
 

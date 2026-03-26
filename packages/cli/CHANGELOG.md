@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
-- Session resume (`tmonier session resume`) no longer creates a new session — it reuses the existing session ID and reactivates the DB row in-place
+- Session resume (`vigie session resume`) no longer creates a new session — it reuses the existing session ID and reactivates the DB row in-place
 - Ctrl+C to end a session no longer marks it "not resumable" — the disconnect handler now checks whether the session already ended before overwriting its resumable state
 - PTY dimensions are now forced to the CLI terminal size on attach, with an immediate resize notification sent to the backend
 - Attached CLI now correctly receives a PTY exit notification when a browser-started session ends
@@ -18,24 +18,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- `tmonier claude` command for running Claude Code sessions with streaming output and session summaries
-- `tmonier daemon start/stop/status/logs` subcommands for daemon lifecycle management
+- `vigie claude` command for running Claude Code sessions with streaming output and session summaries
+- `vigie daemon start/stop/status/logs` subcommands for daemon lifecycle management
 - Background daemon process for managing persistent backend connections and agent executions
 - IPC communication between CLI and daemon via Unix sockets
 - Effect-TS for declarative, type-safe program construction and error handling
 - Git context detection (repo, branch, dirty state) for session initialization
 - Modular source structure under `src/modules/` (auth, backend, daemon, session)
-- `tmonier login` command with browser-based OAuth flow and `--token` manual login
-- `tmonier logout` command to clear saved credentials
-- Credential storage in `~/.tmonier/credentials.json` with restrictive file permissions (0600)
-- `TMONIER_TOKEN` env var support as alternative to stored credentials
-- `TMONIER_APP_URL` config for auth redirect target
+- `vigie login` command with browser-based OAuth flow and `--token` manual login
+- `vigie logout` command to clear saved credentials
+- Credential storage in `~/.vigie/credentials.json` with restrictive file permissions (0600)
+- `VIGIE_TOKEN` env var support as alternative to stored credentials
+- `VIGIE_APP_URL` config for auth redirect target
 - WebSocket authentication via `daemon:hello` token field and query parameter on upgrade
 - Tests for credentials I/O, login callback (CSRF/XSS), config defaults, IPC messages, Claude stream, and git context
-- Interactive Claude sessions via PTY spawn and bidirectional terminal relay (`tmonier claude` interactive mode)
-- `tmonier session list` command to display active and past sessions
-- `tmonier session attach <id>` command to reattach to a running session
-- `tmonier session resume <id>` command with smart reattach using deterministic Claude session IDs
+- Interactive Claude sessions via PTY spawn and bidirectional terminal relay (`vigie claude` interactive mode)
+- `vigie session list` command to display active and past sessions
+- `vigie session attach <id>` command to reattach to a running session
+- `vigie session resume <id>` command with smart reattach using deterministic Claude session IDs
 - Detach/attach lifecycle: press `Ctrl+D` to detach from a session without stopping it
 - Keybind interceptor for in-session keyboard shortcuts
 - Live status bar footer rendered in gold via TUI renderer, updating every second

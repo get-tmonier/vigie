@@ -38,7 +38,7 @@ function cstrArray(strs: string[]): Buffer {
 function findLibrary(): string {
   const os = process.platform;
   const ext = os === 'darwin' ? 'dylib' : 'so';
-  const name = `libtmonier_pty.${ext}`;
+  const name = `libvigie_pty.${ext}`;
 
   // Check relative to this file (development)
   const devPath = join(import.meta.dir, 'native', name);

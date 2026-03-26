@@ -21,7 +21,7 @@ export function daemonStartCommand(foreground: boolean): Effect.Effect<void> {
       if (running) {
         const info = yield* manager.status();
         yield* Console.log(
-          `Daemon already running (pid ${info.pid}). Use \`tmonier daemon attach\` to follow its logs.`
+          `Daemon already running (pid ${info.pid}). Use \`vigie daemon attach\` to follow its logs.`
         );
         return;
       }
@@ -31,7 +31,7 @@ export function daemonStartCommand(foreground: boolean): Effect.Effect<void> {
   }
 
   return Effect.gen(function* () {
-    yield* Console.log('Starting tmonier daemon...');
+    yield* Console.log('Starting vigie daemon...');
     const info = yield* manager.start();
     yield* Console.log(`Daemon started (pid ${info.pid})`);
     yield* Console.log(`Socket: ${info.socketPath}`);
@@ -49,7 +49,7 @@ export function daemonStartCommand(foreground: boolean): Effect.Effect<void> {
 
 export function daemonStopCommand(): Effect.Effect<void> {
   return Effect.gen(function* () {
-    yield* Console.log('Stopping tmonier daemon...');
+    yield* Console.log('Stopping vigie daemon...');
     yield* manager.stop();
     yield* Console.log('Daemon stopped.');
   }).pipe(
@@ -151,7 +151,7 @@ export function daemonAttachCommand(): Effect.Effect<void> {
     }).pipe(Effect.catchCause(() => Console.error('Failed to tail logs')));
   }).pipe(
     Effect.catchTag('DaemonNotRunningError', () =>
-      Console.log('Daemon is not running. Start with `tmonier daemon start`.')
+      Console.log('Daemon is not running. Start with `vigie daemon start`.')
     ),
     exit0
   );

@@ -26,9 +26,9 @@ function formatElapsed(ms: number): string {
 function updateBar() {
   const shortId = barSessionId.slice(0, 8);
   const elapsed = formatElapsed(Date.now() - barStartedAt);
-  setTerminalTitle(`\u2699 tmonier | ${shortId} | ${elapsed}`);
+  setTerminalTitle(`\u2699 vigie | ${shortId} | ${elapsed}`);
   const infoSuffix = barInfo ? ` | ${barInfo}` : '';
-  rendererRef?.setStatusBar(`\u2699 tmonier | ${shortId} | ${elapsed} | ^B d detach${infoSuffix}`);
+  rendererRef?.setStatusBar(`\u2699 vigie | ${shortId} | ${elapsed} | ^B d detach${infoSuffix}`);
 }
 
 export function initStatusBar(

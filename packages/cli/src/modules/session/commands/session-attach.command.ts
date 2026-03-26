@@ -65,7 +65,7 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
 
     if (session.status !== 'active') {
       yield* Console.error(
-        `Session ${session.id.slice(0, 8)} has ended. Use \`tmonier session resume --id ${session.id.slice(0, 8)}\` to start a new session continuing from it.`
+        `Session ${session.id.slice(0, 8)} has ended. Use \`vigie session resume --id ${session.id.slice(0, 8)}\` to start a new session continuing from it.`
       );
       return;
     }
@@ -82,7 +82,7 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
 
     if (!running) {
       return yield* new DaemonNotRunningError({
-        message: 'Daemon is not running. Start it with `tmonier daemon start`.',
+        message: 'Daemon is not running. Start it with `vigie daemon start`.',
       });
     }
 
@@ -259,8 +259,8 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
 
     // Pre-launch banner — visible before Claude Code's TUI takes over
     const bannerWidth = 50;
-    const line1 = `  \u2699 tmonier session ${shortId}`;
-    const line2 = '  Ctrl-B d: detach | dashboard: app.tmonier.com';
+    const line1 = `  \u2699 vigie session ${shortId}`;
+    const line2 = '  Ctrl-B d: detach | dashboard: app.vigie.com';
     const pad1 = ' '.repeat(Math.max(0, bannerWidth - line1.length));
     const pad2 = ' '.repeat(Math.max(0, bannerWidth - line2.length));
     process.stdout.write(
@@ -399,23 +399,23 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
     if (result.type === 'exit') {
       yield* Console.log(`\n\x1b[33m${sep}\x1b[0m`);
       yield* Console.log(
-        `\x1b[33m\u2699 tmonier\x1b[0m | session \x1b[1m${shortId}\x1b[0m ended (exit ${result.exitCode}) after ${elapsed}`
+        `\x1b[33m\u2699 vigie\x1b[0m | session \x1b[1m${shortId}\x1b[0m ended (exit ${result.exitCode}) after ${elapsed}`
       );
       yield* Console.log(`\x1b[33m${sep}\x1b[0m`);
     } else if (result.type === 'detach') {
       yield* Console.log(`\n\x1b[33m${sep}\x1b[0m`);
       yield* Console.log(
-        `\x1b[33m\u2699 tmonier\x1b[0m | detached from session \x1b[1m${shortId}\x1b[0m after ${elapsed}`
+        `\x1b[33m\u2699 vigie\x1b[0m | detached from session \x1b[1m${shortId}\x1b[0m after ${elapsed}`
       );
-      yield* Console.log('  Re-attach: \x1b[1mtmonier attach\x1b[0m');
+      yield* Console.log('  Re-attach: \x1b[1mvigie attach\x1b[0m');
       yield* Console.log(`\x1b[33m${sep}\x1b[0m`);
     } else {
       yield* Console.log(`\n\x1b[31m${sep}\x1b[0m`);
       yield* Console.log(
-        `\x1b[31m\u2699 tmonier\x1b[0m | daemon disconnected — session \x1b[1m${shortId}\x1b[0m was interrupted after ${elapsed}`
+        `\x1b[31m\u2699 vigie\x1b[0m | daemon disconnected — session \x1b[1m${shortId}\x1b[0m was interrupted after ${elapsed}`
       );
-      yield* Console.log('  Restart daemon: \x1b[1mtmonier daemon start\x1b[0m');
-      yield* Console.log(`  Resume:         \x1b[1mtmonier session resume --id ${shortId}\x1b[0m`);
+      yield* Console.log('  Restart daemon: \x1b[1mvigie daemon start\x1b[0m');
+      yield* Console.log(`  Resume:         \x1b[1mvigie session resume --id ${shortId}\x1b[0m`);
       yield* Console.log(`\x1b[31m${sep}\x1b[0m`);
     }
   }).pipe(

@@ -54,9 +54,9 @@ describe('createCallbackHandler', () => {
 
   it('returns key object on success', () => {
     const handler = createCallbackHandler('state-123');
-    const req = new Request('http://localhost/callback?state=state-123&key=tmonier_abc');
+    const req = new Request('http://localhost/callback?state=state-123&key=vigie_abc');
     const res = handler(req);
     expect(res).not.toBeInstanceOf(Response);
-    expect((res as { key: string }).key).toBe('tmonier_abc');
+    expect((res as { key: string }).key).toBe('vigie_abc');
   });
 });

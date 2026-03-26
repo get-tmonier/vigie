@@ -68,7 +68,7 @@ describe('upstream message schemas', () => {
       hostname: 'h',
       pid: 1,
       version: '0.1.0',
-      token: 'tmonier_test',
+      token: 'vigie_test',
     };
     const result = v.parse(DaemonHelloSchema, msg);
     expect(result.hostname).toBe('h');

@@ -24,7 +24,7 @@ export function printHeader(opts: HeaderOptions) {
   const modeLabel = opts.mode === 'interactive' ? 'Interactive Session' : 'Claude Code Session';
 
   console.log(`\u250c${sep}\u2510`);
-  console.log(`\u2502  ${pad(`TMONIER \u00b7 ${modeLabel}`, width - 2)}\u2502`);
+  console.log(`\u2502  ${pad(`VIGIE \u00b7 ${modeLabel}`, width - 2)}\u2502`);
   console.log(`\u251c${sep}\u2524`);
   console.log(`\u2502  ${pad(`Session   ${shortId}`, width - 2)}\u2502`);
   console.log(

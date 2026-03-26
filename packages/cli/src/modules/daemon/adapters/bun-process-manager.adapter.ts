@@ -7,11 +7,11 @@ import {
   DaemonNotRunningError,
   DaemonStartError,
 } from '../domain/errors.js';
-import { LOG_FILE, PID_FILE, SOCKET_PATH, TMONIER_HOME, VERSION } from '../paths.js';
+import { LOG_FILE, PID_FILE, SOCKET_PATH, VERSION, VIGIE_HOME } from '../paths.js';
 import type { ProcessManagerShape } from '../ports/process-manager.port.js';
 
 function ensureHome() {
-  mkdirSync(TMONIER_HOME, { recursive: true, mode: 0o700 });
+  mkdirSync(VIGIE_HOME, { recursive: true, mode: 0o700 });
 }
 
 function readPidFile(): { pid: number; startedAt: number } | null {
@@ -63,7 +63,7 @@ export function createBunProcessManager(): ProcessManagerShape {
         const logFd = openSync(LOG_FILE, 'a');
 
         const proc = Bun.spawn(['bun', 'run', entryPoint], {
-          env: { ...process.env, TMONIER_INTERNAL_DAEMON: '1' },
+          env: { ...process.env, VIGIE_INTERNAL_DAEMON: '1' },
           stdin: null,
           stdout: logFd,
           stderr: logFd,

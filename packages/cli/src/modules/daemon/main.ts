@@ -14,7 +14,7 @@ import type { AgentSession } from '../session/domain/session.js';
 import { createUnixSocketServer } from './adapters/unix-socket-server.adapter.js';
 import type { LineBuffer } from './input-line-buffer.js';
 import { stripAnsiAndBuffer } from './input-line-buffer.js';
-import { DB_FILE, PID_FILE, SOCKET_PATH, STDIN_SOCKET_PATH, TMONIER_HOME } from './paths.js';
+import { DB_FILE, PID_FILE, SOCKET_PATH, STDIN_SOCKET_PATH, VIGIE_HOME } from './paths.js';
 import { openDatabase } from './persistence/database.js';
 import { createSessionStore } from './persistence/session-store.js';
 
@@ -38,7 +38,7 @@ function cleanup() {
 }
 
 export const runDaemon = Effect.gen(function* () {
-  mkdirSync(TMONIER_HOME, { recursive: true, mode: 0o700 });
+  mkdirSync(VIGIE_HOME, { recursive: true, mode: 0o700 });
 
   writeFileSync(PID_FILE, `${process.pid}\n${Date.now()}`);
   console.log(`[daemon] Started (pid ${process.pid})`);
@@ -80,9 +80,9 @@ export const runDaemon = Effect.gen(function* () {
 
   // Load credentials
   const creds = yield* Effect.promise(() => getCredentials());
-  const token = config.TMONIER_TOKEN ?? creds?.token;
+  const token = config.VIGIE_TOKEN ?? creds?.token;
   if (!token) {
-    console.error('[daemon] No API key found. Run `tmonier login` first.');
+    console.error('[daemon] No API key found. Run `vigie login` first.');
     process.exit(1);
   }
 
@@ -705,7 +705,7 @@ export const runDaemon = Effect.gen(function* () {
     }
   });
 
-  yield* wsClient.connect(config.TMONIER_API_URL, token);
+  yield* wsClient.connect(config.VIGIE_API_URL, token);
   console.log('[daemon] Backend WebSocket connecting...');
 
   // Clean up stale sockets

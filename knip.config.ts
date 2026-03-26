@@ -33,6 +33,9 @@ export default {
         'tailwindcss',
       ],
     },
+    'packages/cli': {
+      project: ['src/**/*.ts'],
+    },
     'packages/shared': {
       project: ['src/**/*.ts'],
     },

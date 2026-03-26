@@ -13,7 +13,7 @@ export function claudeInteractiveCommand(): Effect.Effect<void> {
 
     if (!running) {
       return yield* new DaemonNotRunningError({
-        message: 'Daemon is not running. Start it with `tmonier daemon start`.',
+        message: 'Daemon is not running. Start it with `vigie daemon start`.',
       });
     }
 
@@ -76,7 +76,7 @@ export function claudeInteractiveCommand(): Effect.Effect<void> {
 
     if (result.type === 'detach') {
       yield* Console.log(
-        'Session is still running in the background. Re-attach with `tmonier attach`.'
+        'Session is still running in the background. Re-attach with `vigie attach`.'
       );
     } else if (result.type === 'disconnect') {
       // Message already printed by pty-relay
