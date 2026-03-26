@@ -39,8 +39,8 @@ export function DeleteSessionButton({ daemonId, sessionId, onDeleted }: DeleteSe
       className={cn(
         'text-xs font-mono px-2 py-1 rounded transition-colors',
         armed
-          ? 'bg-red-500 text-white hover:bg-red-600'
-          : 'text-slate hover:text-red-400 hover:bg-navy-light',
+          ? 'bg-red-500 text-white hover:bg-red-600 shadow-[0_0_8px_rgba(239,68,68,0.3)] rounded-md'
+          : 'text-cream-200 hover:text-red-400 hover:bg-navy-700',
         loading && 'opacity-50 cursor-not-allowed'
       )}
     >

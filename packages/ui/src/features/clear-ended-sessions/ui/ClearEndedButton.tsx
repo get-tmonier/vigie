@@ -37,10 +37,10 @@ export function ClearEndedButton({ daemonId, endedCount, onCleared }: ClearEnded
       onClick={handleClick}
       disabled={loading || endedCount === 0}
       className={cn(
-        'text-xs font-mono px-1.5 py-0.5 rounded transition-colors',
+        'text-xs font-mono px-1.5 py-0.5 rounded-md transition-colors',
         armed
           ? 'bg-red-500 text-white hover:bg-red-600'
-          : 'text-slate hover:text-cream hover:bg-navy-light',
+          : 'text-cream-200 hover:text-cream-50 hover:bg-navy-700',
         (loading || endedCount === 0) && 'opacity-50 cursor-not-allowed'
       )}
     >

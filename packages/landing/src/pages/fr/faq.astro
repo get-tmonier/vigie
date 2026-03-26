@@ -1,0 +1,96 @@
+---
+import Footer from '#components/Footer.astro';
+import Header from '#components/Header.astro';
+import Waitlist from '#components/Waitlist.astro';
+import Base from '#layouts/Base.astro';
+import fr from '../../i18n/fr';
+
+const content = fr;
+const locale = 'fr';
+const { faq } = content;
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.categories.flatMap((cat) =>
+    cat.items.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    }))
+  ),
+};
+---
+
+<Base title="FAQ — vigie" description={faq.pageDescription} locale={locale}>
+  <script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />
+  <Header content={content} locale={locale} />
+  <main id="main">
+    <!-- Mini hero -->
+    <section class="bg-navy-900 pt-20 px-10 pb-12 text-center">
+      <div class="max-w-[720px] mx-auto">
+        <p class="font-mono text-[0.75rem] tracking-[0.15em] uppercase text-vigie-400/80 m-0 mb-4">
+          {faq.pageLabel}
+        </p>
+        <h1 class="font-display text-vigie-400 text-[clamp(2rem,4.5vw,3rem)] m-0 mb-5 leading-[1.15]">
+          {faq.pageHeading}
+        </h1>
+        <p class="font-display text-cream-200 text-[1.05rem] leading-[1.8] m-0 max-w-[600px] mx-auto">
+          {faq.pageDescription}
+        </p>
+      </div>
+    </section>
+
+    <!-- FAQ content -->
+    <section class="bg-navy-900 px-10 pb-20">
+      <div class="max-w-[800px] mx-auto">
+        {faq.categories.map((category) => (
+          <div class="mb-12">
+            <h2
+              class="font-mono text-[0.75rem] font-semibold tracking-[0.15em] uppercase text-vigie-400/80 m-0 mb-6 pb-3 border-b border-vigie-400/15"
+            >
+              {category.title}
+            </h2>
+            {category.items.map((item) => (
+              <details class="faq-item border-b border-cream-200/10">
+                <summary style="list-style: none" class="faq-summary flex items-center justify-between py-5 cursor-pointer font-body text-[1.1rem] font-semibold text-cream-50 transition-colors duration-200 hover:text-vigie-400 max-md:text-base max-md:py-4">
+                  <span>{item.question}</span>
+                  <span class="faq-icon font-mono text-[1.25rem] font-normal text-vigie-400 shrink-0 ml-4 transition-transform duration-300 ease-in-out">+</span>
+                </summary>
+                <div class="faq-answer overflow-hidden max-h-0 transition-[max-height] duration-[400ms] ease-in-out">
+                  <div class="faq-answer-inner pb-6">
+                    <p class="font-display text-cream-200 text-base leading-[1.8] m-0">
+                      {item.answer}
+                    </p>
+                  </div>
+                </div>
+              </details>
+            ))}
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <Waitlist content={content} />
+  </main>
+  <Footer content={content} locale={locale} />
+</Base>
+
+<script>
+  document.querySelectorAll<HTMLDetailsElement>('.faq-item').forEach((details) => {
+    const icon = details.querySelector('.faq-icon');
+    const answer = details.querySelector<HTMLElement>('.faq-answer');
+    details.addEventListener('toggle', () => {
+      if (icon) icon.textContent = details.open ? '\u2212' : '+';
+      if (answer) {
+        if (details.open) {
+          answer.classList.add('max-h-[500px]');
+        } else {
+          answer.classList.remove('max-h-[500px]');
+        }
+      }
+    });
+  });
+</script>

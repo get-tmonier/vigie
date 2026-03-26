@@ -50,7 +50,7 @@ describe('daemonAuthMiddleware', () => {
       key: { referenceId: 'user-123' },
     });
     const app = createApp();
-    const res = await app.request('/ws/daemon?token=tmonier_validkey');
+    const res = await app.request('/ws/daemon?token=vigie_validkey');
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.userId).toBe('user-123');
@@ -59,7 +59,7 @@ describe('daemonAuthMiddleware', () => {
   it('returns 401 when verifyApiKey throws', async () => {
     verifyApiKey.mockRejectedValue(new Error('DB connection failed'));
     const app = createApp();
-    const res = await app.request('/ws/daemon?token=tmonier_somekey');
+    const res = await app.request('/ws/daemon?token=vigie_somekey');
     expect(res.status).toBe(401);
     const body = await res.json();
     expect(body.error).toBe('Authentication failed');
@@ -72,13 +72,13 @@ describe('daemonAuthMiddleware', () => {
     });
     const app = createApp();
 
-    await app.request('/ws/daemon?token=tmonier_cachedkey');
+    await app.request('/ws/daemon?token=vigie_cachedkey');
     expect(verifyApiKey).toHaveBeenCalledTimes(1);
 
-    await app.request('/ws/daemon?token=tmonier_cachedkey');
+    await app.request('/ws/daemon?token=vigie_cachedkey');
     expect(verifyApiKey).toHaveBeenCalledTimes(1);
 
-    const res = await app.request('/ws/daemon?token=tmonier_cachedkey');
+    const res = await app.request('/ws/daemon?token=vigie_cachedkey');
     expect(res.status).toBe(200);
     const body = await res.json();
     expect(body.userId).toBe('user-456');

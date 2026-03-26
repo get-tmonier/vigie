@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { SSEDaemonConnected, SSEDaemonDisconnected, SSEEvent } from '@tmonier/shared';
+import type { SSEDaemonConnected, SSEDaemonDisconnected, SSEEvent } from '@vigie/shared';
 import type { RootState } from '#app/store';
 
 export interface ConnectionState {

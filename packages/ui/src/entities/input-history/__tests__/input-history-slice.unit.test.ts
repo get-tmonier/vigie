@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import type { SSEEvent } from '@tmonier/shared';
+import type { SSEEvent } from '@vigie/shared';
 import { inputEchoReceived, inputHistoryReducer } from '../model/input-history-slice';
 
 const initialState = { entriesBySessionId: {}, seenKeysBySessionId: {} };

@@ -1,4 +1,4 @@
-import type { SSEEvent } from '@tmonier/shared';
+import type { SSEEvent } from '@vigie/shared';
 import { Effect } from 'effect';
 import { EventPublisher } from '../ports/event-publisher.port';
 

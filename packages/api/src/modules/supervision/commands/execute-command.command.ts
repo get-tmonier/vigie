@@ -1,4 +1,4 @@
-import type { CommandRequest } from '@tmonier/shared';
+import type { CommandRequest } from '@vigie/shared';
 import { Effect } from 'effect';
 import { createCommand } from '../domain/command';
 import { DaemonWriteRepository } from '../ports/daemon-write-repository.port';

@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import type { DaemonHello } from '@tmonier/shared';
+import type { DaemonHello } from '@vigie/shared';
 
 export interface DaemonSession {
   readonly id: string;

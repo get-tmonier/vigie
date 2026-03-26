@@ -2,406 +2,291 @@ import type { SiteContent } from './types';
 
 const en: SiteContent = {
   meta: {
-    title: 'Damien Meur — Senior Fullstack Engineer · Freelance · Brussels',
+    title: 'vigie — Open-Source AI Agent Supervision · by Tmonier',
     description:
-      'Damien Meur — Senior Fullstack Engineer available for freelance missions in Brussels.',
-    keywords:
-      'freelance developer, senior fullstack engineer, TypeScript, React, Node.js, Effect-TS, Brussels, Belgium, consultant, software craft, clean architecture, AI agent supervision, Vigie',
+      'Local-first agent supervisor for software engineers. Real-time visibility, drift detection, token cost guardrails, checkpoints & rollback.',
   },
   nav: {
-    approach: 'Approach',
-    about: 'About me',
-    stack: 'Stack',
-    experience: 'Experience',
-    projects: 'Projects',
-    vigie: 'Vigie',
-    contact: 'Contact',
+    demo: 'Demo',
+    openSource: 'Open source',
+    faq: 'FAQ',
+    github: 'GitHub',
   },
   hero: {
-    fullName: 'Damien Meur',
-    tagline: 'You Keep The Helm.',
-    name: 'Tmonier',
-    oneLiner: 'Senior Fullstack Engineer · Freelance · Brussels',
-    ctaPrimary: 'Get in touch',
-    ctaSecondary: 'See my work',
+    pronunciation: '/vi.ʒi/',
+    definition: 'the lookout in the crow\u2019s nest',
+    tagline: 'Eyes on the horizon.',
+    description:
+      'Open-source AI agent supervision for engineers who ship.<br/>Real-time visibility, drift detection, cost guardrails.',
+    ctaGithub: 'View on GitHub',
+    ctaWaitlist: 'Join the waitlist',
   },
-  origin: {
-    pronunciation: '/ti.m\u0254.nje/',
-    grammar: '',
-    alt: 'alt. Timonier',
-    definition:
-      'The helmsman \u2014 the one who reads the wind, holds the course, and keeps the ship on track.',
+  toolsStrip: {
+    label: 'Your AI',
+    comingSoon:
+      'Coming soon: OpenCode <span class="text-vigie-400/50">&#9679;</span> supports Copilot license since Jan 2026 <span class="pl-2 text-cream-200/30">|</span><span class="pl-2">Codex, Aider, Cline & more</span>',
   },
-  approach: {
-    label: 'Approach',
-    title: 'How I work',
-    pitch:
-      'I embed in your team, understand your domain, and ship production-ready code. No hand-off friction — I take features from architecture to deployment, with clean code and clear communication at every step.',
-    cards: [
+  demo: {
+    terminal: {
+      title: 'zsh \u2014 ~/projects/my-app',
+      command: 'vigie start',
+      daemonRunning: '\u2713 daemon running on localhost:4800',
+      watching: 'watching claude-code \u00B7 all events forwarded to dashboard',
+      localFirst: 'local-first \u2014 your data never leaves your machine',
+    },
+    sidebar: { agents: 'Agents', runs: 'Runs', settings: 'Settings' },
+    main: {
+      taskTitle: 'Rate-limit /api/users',
+      badgeActive: '1 agent active',
+      contextLabel: 'context',
+      contextAction: 'fresh window from checkpoint',
+      activityLabel: 'Activity',
+    },
+    actionPanel: {
+      header: 'Agent paused \u2014 loop detected',
+      suggestedPromptLabel: 'Suggested prompt',
+      suggestedPrompt:
+        '\u201CTests expect a Redis mock \u2014 use ioredis-mock in the test setup instead of connecting to a real instance.\u201D',
+      btnRollback: 'Rollback #3',
+      btnResume: 'Resume',
+      btnStop: 'Stop agent',
+    },
+    logs: [
       {
-        title: 'Architecture & Clarity',
-        description:
-          'I help you make solid technical choices. **Data modelling**, API contracts, **system design** \u2014 I bring the expertise so your team can move fast with confidence.',
+        time: '14:32:01',
+        html: '<span class="text-cream-200">claude-code</span> \u00B7 reading <span class="text-success">src/api/users.ts</span>',
+        delay: 200,
       },
       {
-        title: 'End-to-End Delivery',
-        description:
-          'From requirements to production, I deliver complete features. You stay in control of the roadmap \u2014 I make sure what ships is **clean, tested**, and shipped on time.',
+        time: '14:33:12',
+        html: '<span class="text-cream-200">claude-code</span> \u00B7 created <span class="text-success">src/middleware/rate-limit.ts</span>',
+        delay: 350,
       },
       {
-        title: 'Your Stack, Your Team',
-        description:
-          'I adapt to your tools, your processes, and your people \u2014 but I value **pair programming** over solo silos, **pair reviews** over async back-and-forth. Direct collaboration is where the best work happens.',
+        time: '14:34:30',
+        html: '<span class="text-cream-200">claude-code</span> \u00B7 running <span class="text-cream-50">npm test</span> \u2014 <span class="text-danger">3 failed</span>',
+        delay: 550,
       },
       {
-        title: 'Security by Design',
-        description:
-          'Security is not an afterthought. **OAuth** with server-only cookies, strict **CSP** with nonces, XSS prevention, **least-privilege** permission models \u2014 I bake these in from day one. I maintain ongoing **CVE watch** on sensitive dependencies and treat security hygiene as a first-class engineering concern.',
+        time: '14:35:15',
+        html: '<span class="text-cream-200">claude-code</span> \u00B7 editing <span class="text-cream-50">src/middleware/rate-limit.ts</span>',
+        delay: 250,
+      },
+      {
+        time: '14:36:48',
+        html: '<span class="text-cream-200">claude-code</span> \u00B7 running <span class="text-cream-50">npm test</span> \u2014 <span class="text-danger">3 failed</span>',
+        delay: 600,
+      },
+      {
+        time: '14:37:02',
+        html: '<span class="text-warning">\u26A0 scope drift \u00B7 <span class="text-warning/70">agent modified package.json \u2014 outside declared scope</span></span>',
+        delay: 400,
+      },
+      {
+        time: '14:37:45',
+        html: '<span class="text-warning">\u26A0 context 65% \u00B7 <span class="text-warning/70">agent may lose early instructions \u2014 consider a checkpoint</span></span>',
+        delay: 300,
+      },
+      {
+        time: '14:38:01',
+        html: '<span class="text-cream-200">$ cost hint \u00B7 <span class="text-cream-200/70">this task could run on <span class="text-cream-50">sonnet</span> \u2014 ~3x cheaper for similar results</span></span>',
+        delay: 200,
+      },
+      {
+        time: '14:38:03',
+        html: '<span class="text-warning">\u26A0 loop detected \u00B7 <span class="text-warning/70">edit \u2192 test \u2192 fail \u2192 edit \u2014 4 cycles in 6 min</span></span>',
+        delay: 500,
       },
     ],
   },
-  about: {
-    label: 'About',
-    title: 'Behind the keyboard',
-    paragraphs: [
-      "I'm Damien — a curious tinkerer since the days I was dismantling every piece of electronics at home (sorry, Mom). {{age}} years old, married to the wonderful Clara who tolerates my late-night coding sessions, and proud dad to Basile who already beats me at board games.",
-      "What drives me is the craft. Part of the SoCraTes Belgium community, I believe great software is about clean design, tight feedback loops, and the discipline to keep learning. TDD, pair programming, continuous refactoring — that's how I sleep at night knowing my code won't wake anyone up at 3 AM.",
-      "The rise of AI in development? Fascinating — but when agents write code unsupervised, things drift fast. Context window limits, hallucinated logic, quality erosion. That's why I built Vigie: the more powerful our tools, the more we need control. When I'm not coding, you'll find me losing at Terraforming Mars or chasing whatever shiny tech caught my eye.",
-    ],
-    photoAlt: 'Damien Meur — Senior Fullstack Engineer',
-    tags: [
-      'Software Craft',
-      'SoCraTes Belgium',
-      'Board Games',
-      'AI Enthusiast',
-      'Curious Tinkerer',
-    ],
+  openSource: {
+    heading: 'Free & open source',
+    licenseBadge: 'MIT License',
+    headline: 'vigie is open source. Use it, fork it, ship it.',
+    description:
+      'Local-first monitoring, loop detection, scope drift, cost guardrails, checkpoints & rollback. No paywall, no premium tier, no vendor lock-in. Your machine, your data, your rules.',
+    ctaGithub: 'View on GitHub',
+    byoaHeadline: 'No AI token markup \u2014 ever.',
+    byoaDescription: 'Your AI subscription. Your machine. Zero middlemen.',
+    agplJoke: 'AGPL\u00A0? In the agent era, every license is MIT.',
   },
-  stack: {
-    label: 'Stack & Practices',
-    title: 'How I Build',
-    terminalTitle: 'zsh — ~/stack',
-    command: 'cat stack.yml',
+  waitlist: {
+    heading1: 'AI writes the code.',
+    heading2: 'Eyes on the horizon.',
+    description: 'Be the first to know when the beta drops. Star us on ',
+    githubLinkText: 'GitHub',
+    emailLabel: 'Email address',
+    emailPlaceholder: 'your@email.com',
+    ctaSubmit: 'Claim your spot',
+    ctaLoading: 'Sending\u2026',
+    successMessage: '\u2713 You\u2019re on the list. We\u2019ll be in touch when the beta opens.',
+    errorMessage: 'Oops! Something went wrong, please try again',
+    errorRateLimit: 'Too many signups, please try again in a little while',
+    backButton: '\u2190 Back',
+    footerText: 'Limited spots \u2014 no spam, just your invite when the beta opens.',
+  },
+  faq: {
+    pageLabel: 'Questions & answers',
+    pageHeading: 'Frequently asked questions',
+    pageDescription:
+      'Everything you need to know about vigie \u2014 from getting started to privacy and licensing.',
     categories: [
       {
-        name: 'languages',
+        title: 'Getting started',
         items: [
-          { name: 'TypeScript/JS', years: 10 },
-          { name: 'Python', years: 5 },
-          { name: 'PHP', years: 3 },
-          { name: 'Kotlin', years: 1 },
+          {
+            question: 'What is vigie?',
+            answer:
+              'vigie is a local-first monitoring daemon for Claude Code. It watches every file change, every command, every dollar spent. It catches loops, scope drift, and context bloat before they waste your time. Checkpoints let you roll back before anything ships.',
+          },
+          {
+            question: 'How does it work?',
+            answer:
+              'Run vigie start in your project. A lightweight daemon spawns Claude Code, captures every event \u2014 file edits, shell commands, token usage \u2014 and streams them to a real-time dashboard. No code leaves your machine.',
+          },
+          {
+            question: 'What does \u201Clocal-first\u201D mean?',
+            answer:
+              'The daemon runs entirely on your machine. It observes session metadata \u2014 files touched, commands run, token counts \u2014 but never reads or stores your source code. The dashboard connects via a local websocket and just streams command output \u2014 your codebase stays on your machine.',
+          },
+          {
+            question: 'How do I install vigie?',
+            answer:
+              'vigie is currently in private beta. Join the waitlist to get early access \u2014 you\u2019ll receive install instructions as soon as the beta opens. Installation is a single command.',
+          },
+          {
+            question: 'Which AI tools does vigie support?',
+            answer:
+              'Claude Code at launch. OpenCode (which supports Copilot licenses), Codex CLI, Aider, and Cline are on the roadmap. The architecture is CLI-agnostic by design \u2014 if your tool has a CLI, vigie can monitor it.',
+          },
+          {
+            question: 'What are the system requirements?',
+            answer:
+              'macOS or Linux (Windows via WSL). Git installed. Claude Code as your AI CLI. The daemon is lightweight and runs in the background with minimal CPU and memory overhead.',
+          },
         ],
       },
       {
-        name: 'frontend',
+        title: 'Features',
         items: [
-          { name: 'React', years: 6 },
-          { name: 'Next.js', years: 4 },
-          { name: 'Angular', years: 3 },
-          { name: 'Vue', years: 2 },
-          { name: 'Tailwind', years: 4 },
+          {
+            question: 'What does vigie monitor in real time?',
+            answer:
+              'Every file read, created, or edited. Every shell command. Token usage, context window percentage, and running cost. All streamed live to your dashboard as events happen.',
+          },
+          {
+            question: 'What is loop detection?',
+            answer:
+              'vigie detects edit\u2009\u2192\u2009test\u2009\u2192\u2009fail\u2009\u2192\u2009edit cycles where the agent is stuck repeating the same pattern. It flags the loop in your dashboard and suggests a prompt to help the agent break out.',
+          },
+          {
+            question: 'What is scope drift?',
+            answer:
+              'When your agent starts touching files outside the scope you declared for the task, vigie flags it immediately. You see exactly which files were accessed outside scope so you can course-correct before the agent goes further off track.',
+          },
+          {
+            question: 'How does context window monitoring work?',
+            answer:
+              'A live gauge shows how much of the context window is consumed. At 65%+ vigie warns that the agent may start losing early instructions and suggests opening a fresh window from your last checkpoint.',
+          },
+          {
+            question: 'What are checkpoints & rollback?',
+            answer:
+              'Checkpoints are approval gates that snapshot your project state. If something goes wrong, you roll back to the last clean state and resume with just the necessary context \u2014 no reprompting needed.',
+          },
+          {
+            question: 'Can I monitor multiple agents at once?',
+            answer:
+              'Yes. vigie supports monitoring multiple concurrent agents, each with its own activity stream in the dashboard.',
+          },
+          {
+            question: 'How does cost awareness work?',
+            answer:
+              'A live cost counter tracks spending in real time. vigie hints when a cheaper model would suffice for the current task. You can set budget guardrails that pause the session before exceeding a threshold.',
+          },
         ],
       },
       {
-        name: 'backend',
+        title: 'License & open source',
         items: [
-          { name: 'Node.js', years: 8 },
-          { name: 'Effect-TS', years: 4 },
-          { name: 'Hono', years: 1 },
-          { name: 'Fastify', years: 4 },
-          { name: 'Express', years: 6 },
-          { name: 'Symfony', years: 3 },
-          { name: 'Apache Pulsar', years: 2 },
-          { name: 'Bun', years: 1 },
+          {
+            question: 'Is vigie really free?',
+            answer:
+              'Yes. vigie is open source under the MIT license. All features \u2014 monitoring, loop detection, scope drift, checkpoints, rollback, cost guardrails \u2014 are free and always will be. No paywall, no premium tier.',
+          },
+          {
+            question: 'What does BYOA (Bring Your Own AI) mean?',
+            answer:
+              'vigie never touches your AI tokens. You pay Claude (or any supported provider) directly at their standard rates. vigie is a monitoring layer \u2014 there\u2019s no hidden per-token fee and no vendor lock-in.',
+          },
+          {
+            question: 'Why MIT and not AGPL?',
+            answer:
+              'In the agent era, every license is MIT. Agents clone, fork, and ship code faster than any compliance team can review headers. We chose the license that matches how software is actually built today \u2014 no friction, no gotchas.',
+          },
+          {
+            question: 'Can I use vigie in my company?',
+            answer:
+              'Yes. MIT license means you can use, modify, and distribute vigie freely \u2014 commercially or otherwise. No CLA, no contributor agreement required.',
+          },
+          {
+            question: 'Who builds vigie?',
+            answer:
+              'vigie is built by Tmonier SRL, a freelance software consultancy founded by Damien Meur. The same people who steer the ship also keep watch.',
+          },
         ],
       },
       {
-        name: 'data',
+        title: 'Privacy & security',
         items: [
-          { name: 'PostgreSQL', years: 6 },
-          { name: 'SQL Server', years: 4 },
-          { name: 'MongoDB', years: 1 },
-          { name: 'Delta Lake', years: 1 },
-          { name: 'PySpark', years: 1 },
-          { name: 'DuckDB', years: 1 },
-          { name: 'Elasticsearch', years: 1 },
+          {
+            question: 'Does vigie access my source code?',
+            answer:
+              'No. vigie observes session metadata only \u2014 file-change counts, token usage, context window percentage, session duration. It never reads, parses, or stores your source code.',
+          },
+          {
+            question: 'What data does vigie collect?',
+            answer:
+              'Token counts, context window utilisation percentages, session durations, file-change counts (not contents), and checkpoint events. Never file contents, diffs, prompts, or AI responses.',
+          },
+          {
+            question: 'Is vigie GDPR compliant?',
+            answer:
+              'Yes. vigie is local-first \u2014 your data stays on your machine. For hosted dashboard features, all data is processed in EU-based infrastructure.',
+          },
+          {
+            question: 'Can I self-host vigie?',
+            answer:
+              'Yes \u2014 it\u2019s open source. Clone the repo, deploy on your own infrastructure. Full control over data residency, access policies, and integrations.',
+          },
+          {
+            question: 'Does vigie work with local models?',
+            answer:
+              'Ollama support is on our roadmap. Once available, you\u2019ll be able to run fully private coding sessions where everything stays on your machine.',
+          },
         ],
       },
       {
-        name: 'cloud',
+        title: 'How it compares',
         items: [
-          { name: 'Azure', years: 4 },
-          { name: 'Databricks', years: 1 },
-          { name: 'Cloudflare', years: 2 },
-          { name: 'GitHub Actions', years: 4 },
-          { name: 'CI/CD', years: 8 },
-          { name: 'Kubernetes', years: 2 },
-        ],
-      },
-      {
-        name: 'tooling',
-        items: [
-          { name: 'Git', years: 10 },
-          { name: 'Docker', years: 6 },
+          {
+            question: 'How is vigie different from just using Claude Code?',
+            answer:
+              'Claude Code gives you raw agent output. vigie adds a real-time dashboard, loop detection, scope drift alerts, context window monitoring, cost tracking, checkpoints & rollback, and suggested prompts to unblock your agent. It\u2019s the visibility layer that makes Claude Code predictable.',
+          },
+          {
+            question: 'Does vigie replace my IDE or terminal?',
+            answer:
+              'No. vigie is an additive monitoring layer that runs alongside your existing tools. You keep using your IDE, terminal, and Claude Code exactly as before. vigie just watches and alerts.',
+          },
         ],
       },
     ],
-    practices: [
-      {
-        title: 'Clean Architecture',
-        description:
-          'Hexagonal architecture, dependency injection, clear boundaries between domain and infrastructure. Code that\u2019s easy to test, extend, and hand off.',
-        tags: ['Hexagonal', 'DDD', 'DI', 'Clean Code'],
-      },
-      {
-        title: 'Quality-Driven',
-        description:
-          'BDD and TDD aren\u2019t buzzwords \u2014 they\u2019re how I make sure what I ship actually works. Tests document intent, catch regressions, and give your team confidence to change things. Pair reviews over async back-and-forth.',
-        tags: ['BDD', 'TDD', 'Pair Review', 'QA Minded'],
-      },
-      {
-        title: 'Product Thinking',
-        description:
-          'I take the time to understand your domain deeply before writing a line of code. Good engineering starts with the right questions, not the fastest keyboard.',
-        tags: ['Domain Analysis', 'FSD', 'Pragmatism'],
-      },
-      {
-        title: 'AI-Augmented',
-        description:
-          'I use Claude Code and AI coding tools daily \u2014 not as a crutch, but as a multiplier. I know how to prompt, review, and steer AI output to ship faster without sacrificing quality.',
-        tags: ['AI Workflows', 'Prompt Engineering'],
-      },
-    ],
-  },
-  experience: {
-    label: 'Experience',
-    title: 'Track Record',
-    badgeEmployee: 'Employee',
-    badgeInternship: 'Intern',
-    badgeFounder: 'Founder',
-    jobs: [
-      {
-        period: 'May 2026 – Present',
-        company: 'Tmonier SRL',
-        type: 'founder' as const,
-        role: 'Founder & Freelance Software Engineer',
-        location: 'Brussels',
-        description:
-          'Founded Tmonier SRL to bring senior full-stack engineering and AI expertise to ambitious product teams — as an independent consultant.',
-        bullets: [],
-        tags: [],
-      },
-      {
-        period: 'Apr 2022 \u2013 Apr 2026',
-        company: 'Aware',
-        type: 'employee' as const,
-        role: 'Senior Full Stack Developer',
-        location: 'Brussels',
-        description:
-          'Data-sharing platform for food industry groups and supermarket chains to exchange and process operational datasets across 4 European markets.',
-        bullets: [
-          'Built frontend and backend services around **hexagonal architecture** principles, with a strong emphasis on type-safety and functional programming',
-          'Designed an ETL framework enabling the team to create and maintain 300+ bronze/silver/gold Medallion pipelines — **clean architecture**, dependency injection, and automated data quality checks',
-          'Built an embedded **DuckDB** ETL system directly in the backend — with **observability**, DX-friendly tooling, and auto-refresh — reducing analytics load times by up to 100× across all pages',
-          '**Mentored developers** and fostered a culture of ownership, knowledge sharing, curiosity, and quality across the team',
-          'Owned **dependency health**: drove major version upgrades across the stack, led the CJS → ESM migration, ran tech watch, and tracked **CVEs** to keep the stack secure and current',
-          'Managed cloud infrastructure; set up **CI/CD** with automated testing and Databricks deployment pipelines',
-        ],
-        tags: [
-          'TypeScript',
-          'React',
-          'Next.js',
-          'Effect-TS',
-          'Fastify',
-          'Python',
-          'DuckDB',
-          'SQL Server',
-          'Azure',
-          'Databricks',
-          'PySpark',
-        ],
-      },
-      {
-        period: 'Oct 2020 \u2013 Apr 2022',
-        company: 'Proxyclick',
-        type: 'employee' as const,
-        role: 'Full Stack Developer',
-        location: 'Brussels',
-        description:
-          'SaaS visitor management platform serving enterprise clients across 100+ countries.',
-        bullets: [
-          'Worked within a **microservices architecture** with event-driven inter-service communication via Apache Pulsar',
-          'Rewrote the entire **billing and self-service system** — module subscription flows, payment integration, and account management',
-          'Designed and built an **event-based automation engine** (IFTTT-style) to simplify the management and customisation of complex visitor workflows',
-          'Led a progressive **frontend modernisation** — migrating legacy AngularJS modules to a modern typed stack',
-        ],
-        tags: [
-          'Angular',
-          'TypeScript',
-          'Node.js',
-          'Express',
-          'PostgreSQL',
-          'Apache Pulsar',
-          'Microservices',
-        ],
-      },
-      {
-        period: 'Apr 2020 – Oct 2020',
-        company: 'Emisys',
-        type: 'employee' as const,
-        role: 'Full Stack Developer',
-        location: 'Louvain-la-Neuve',
-        description: 'Event management application used by major Belgian festivals.',
-        bullets: [
-          'Developed ticketing and scheduling features',
-          'Implemented **payment and refund systems** — transaction processing, cancellation flows, and financial reconciliation for festival operations',
-          'Maintained a platform serving **thousands of concurrent users** during live festival events',
-        ],
-        tags: ['PHP', 'JavaScript', 'PostgreSQL'],
-      },
-      {
-        period: 'Sep 2019 \u2013 Apr 2020',
-        company: 'mPhase',
-        type: 'employee' as const,
-        role: 'Full Stack Developer',
-        location: 'Montreal',
-        description: 'Water treatment logistics tool for Montreal municipal operations.',
-        bullets: [
-          'Built the **full application from scratch** — sole developer, end-to-end ownership from data model to UI',
-          'Designed **geolocation-based routing and scheduling** system',
-          'Architected a **generic form DSL** — a declarative schema-driven engine letting field technicians build and customise their own inspection forms without touching code',
-        ],
-        tags: ['Vue.js', 'Node.js', 'Express', 'MongoDB'],
-      },
-      {
-        period: 'Nov 2018 \u2013 Aug 2019',
-        company: 'Extia',
-        missionAt: 'Taktik',
-        type: 'employee' as const,
-        role: 'Full Stack Developer',
-        location: 'Brussels',
-        description:
-          'Software platform delivering personalized experiences through IPTV and digital signage solutions.',
-        bullets: [
-          'Built monitoring dashboards and alerting systems',
-          'Maintained the **high-throughput media backend** handling video and multimedia stream distribution across the IPTV infrastructure',
-          'Implemented **real-time data visualization** on the frontend dashboard',
-        ],
-        tags: ['Kotlin', 'Spring Boot', 'Angular', 'PostgreSQL'],
-      },
-      {
-        period: 'Jul 2018 \u2013 Nov 2018',
-        company: 'Extia',
-        missionAt: 'Bewan',
-        type: 'employee' as const,
-        role: 'Full Stack Developer',
-        location: 'Brussels',
-        description:
-          'CRM and event management platform for a digital transition expert in the hospitality industry.',
-        bullets: [
-          'Built CRM features and event management modules',
-          'Built **Diserv from scratch** — a metric collection and storage platform (**InfluxDB**) with a **flexible billing engine** supporting flat-rate plans, overage-based pricing, and per-metric charging',
-        ],
-        tags: ['JavaScript', 'jQuery', 'PHP', 'Symfony', 'PostgreSQL', 'InfluxDB'],
-      },
-      {
-        period: 'Jan 2018 \u2013 Mar 2018',
-        company: 'IoTFactory',
-        type: 'internship' as const,
-        role: 'Full Stack Developer',
-        location: 'Brussels',
-        description: 'Bluetooth/LoRa IoT gateway for on-site asset tracking.',
-        bullets: [
-          'Deployed on **Raspberry Pi** gateways with a **local-first architecture** — data persisted on-device and automatically reconciled with the backend when connectivity was restored',
-          'Implemented **geofencing and indoor geolocation** via Bluetooth beacon triangulation for precise asset positioning in GPS-denied environments',
-          'Built device management dashboard and monitoring tools',
-          'Set up a **captive portal** for frictionless WiFi onboarding of new devices on-site',
-        ],
-        tags: ['Python', 'IoT', 'Bluetooth', 'LoRa', 'Kubernetes', 'Raspberry Pi', 'Linux'],
-      },
-    ],
-    references: 'References, work samples & credentials available on request.',
-    projectsLabel: 'Projects',
-    projectsTitle: 'Side Projects',
-    projects: [
-      {
-        period: '2026',
-        name: 'Vigie',
-        builtAt: 'Tmonier',
-        type: 'Founder \u00b7 Solo',
-        description:
-          'Local-first AI agent supervision \u2014 real-time monitoring, loop detection, human-in-the-loop control over Claude Code. Built with Bun daemon, Hono + Effect-TS, TanStack Start, PostgreSQL.',
-        tags: ['TypeScript', 'Effect-TS', 'Hono', 'React', 'Bun', 'PostgreSQL'],
-        link: 'https://vigie.tmonier.com',
-      },
-      {
-        period: '2016 \u2013 2018',
-        name: 'Autonomous Bar',
-        type: 'Collaborative project',
-        description:
-          'Full self-service bar system: orders, inventory, accounting, referral engine, RFID cards (IoT), photobooth, cocktail machine, real-time BI dashboards.',
-        tags: ['PHP', 'Symfony', 'Python', 'C', 'IoT', 'QlikView'],
-      },
-    ],
-  },
-  education: {
-    label: 'Education',
-    title: 'Education & Languages',
-    degree: 'Bachelor in Computer Science',
-    specialisation: 'AI specialisation',
-    school: 'Institut Paul Lambin, Brussels',
-    period: '2015 \u2013 2018',
-    distinction: 'Cum Laude',
-    languagesTitle: 'Languages',
-    languages: ['French (native)', 'English (fluent)', 'Dutch (intermediate)'],
-  },
-  flagship: {
-    label: 'Flagship Project',
-    title: 'Vigie',
-    description:
-      'A local-first supervision layer for AI coding agents. Real-time visibility into agent activity, loop & drift detection, token cost guardrails, checkpoints & rollback. Your AI writes the code \u2014 you keep the helm.',
-    cta: 'Discover the project \u2192',
-    terminalLines: [
-      '$ vigie start',
-      '\u2713 daemon running on localhost:4800',
-      '  watching claude-code \u00b7 all events forwarded',
-      '  local-first \u2014 your data never leaves your machine',
-    ],
-  },
-  contact: {
-    label: 'Contact',
-    title: 'Let\u2019s work together',
-    availability: 'Available May 2026 \u00b7 Remote or Brussels',
-    email: 'damien.meur@tmonier.com',
-    phone: '+32 475 39 55 16',
-    cta: 'Get in touch',
   },
   footer: {
-    company: 'Tmonier \u00b7 Brussels, Belgium',
-    tagline: 'You Keep The Helm.',
-    copyright: '\u00a9 2026',
-  },
-  contactPage: {
-    title: 'Contact \u2014 Tmonier',
-    heading: 'Get in touch',
-    subtitle:
-      'A freelance mission, a technical question, or just want to say hi? I read every message and reply within 24 hours.',
-    nameLabel: 'Name',
-    namePlaceholder: 'Your name',
-    emailLabel: 'Email',
-    emailPlaceholder: 'your@email.com',
-    subjectLabel: 'Subject',
-    subjectPlaceholder: 'Select a topic\u2026',
-    subjectOptions: [
-      { value: 'Freelance mission', label: 'Freelance mission' },
-      { value: 'Technical consultation', label: 'Technical consultation' },
-      { value: 'Vigie project', label: 'Vigie project' },
-      { value: 'Other', label: 'Other' },
-    ],
-    messageLabel: 'Message',
-    messagePlaceholder: 'Tell me about your project...',
-    submit: 'Send message',
-    altText: 'Or reach me directly at',
+    builtBy: 'Built by',
+    tagline: 'freelance software consulting for teams that ship with AI.',
+    legal: 'Tmonier SRL \u00B7 Brussels, Belgium',
   },
 };
 

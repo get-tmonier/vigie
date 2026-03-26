@@ -1,5 +1,5 @@
 {
-  "name": "@tmonier/tokens",
+  "name": "@vigie/tokens",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -14,7 +14,8 @@
   "exports": {
     "./tailwind.css": "./tailwind.css",
     "./tokens.css": "./tokens.css",
-    "./assets/helm.svg": "./assets/helm.svg",
+    "./assets/radar.svg": "./assets/radar.svg",
+    "./assets/radar-favicon.svg": "./assets/radar-favicon.svg",
     ".": "./index.ts"
   }
 }

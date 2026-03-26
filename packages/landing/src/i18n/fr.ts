@@ -2,412 +2,292 @@ import type { SiteContent } from './types';
 
 const fr: SiteContent = {
   meta: {
-    title: 'Damien Meur — Ing\u00e9nieur Fullstack Senior \u00b7 Freelance \u00b7 Bruxelles',
+    title: 'vigie — Supervision IA Open Source · par Tmonier',
     description:
-      'Damien Meur — Ing\u00e9nieur Fullstack Senior disponible pour des missions freelance \u00e0 Bruxelles.',
-    keywords:
-      'd\u00e9veloppeur freelance, ing\u00e9nieur fullstack senior, TypeScript, React, Node.js, Effect-TS, Bruxelles, Belgique, consultant, software craft, clean architecture, supervision agents IA, Vigie',
+      'Superviseur local d\u2019agents IA pour ingénieurs. Visibilité en temps réel, détection de dérive, garde-fous de coûts, checkpoints & rollback.',
   },
   nav: {
-    approach: 'Approche',
-    about: 'À propos de moi',
-    stack: 'Stack',
-    experience: 'Exp\u00e9rience',
-    projects: 'Projets',
-    vigie: 'Vigie',
-    contact: 'Contact',
+    demo: 'Démo',
+    openSource: 'Open source',
+    faq: 'FAQ',
+    github: 'GitHub',
   },
   hero: {
-    fullName: 'Damien Meur',
-    tagline: 'You Keep The Helm.',
-    name: 'Tmonier',
-    oneLiner: 'Ing\u00e9nieur Fullstack Senior \u00b7 Freelance \u00b7 Bruxelles',
-    ctaPrimary: 'Me contacter',
-    ctaSecondary: 'Voir mon travail',
+    pronunciation: '/vi.ʒi/',
+    definition: 'le guetteur dans le nid de pie',
+    tagline: 'L\u2019œil sur l\u2019horizon.',
+    description:
+      'Supervision open source d\u2019agents IA pour les \u00E9quipes qui livrent.<br/>Visibilit\u00E9 temps r\u00E9el, d\u00E9tection de d\u00E9rive, garde-fous de co\u00FBts.',
+    ctaGithub: 'Voir sur GitHub',
+    ctaWaitlist: 'Rejoindre la liste d\u2019attente',
   },
-  origin: {
-    pronunciation: '/ti.m\u0254.nje/',
-    grammar: '',
-    alt: 'alt. Timonier',
-    definition:
-      'Le timonier \u2014 celui qui lit le vent, tient le cap et garde le navire sur sa route.',
+  toolsStrip: {
+    label: 'Votre IA',
+    comingSoon:
+      'Bientôt\u00A0: OpenCode <span class="text-vigie-400/50">&#9679;</span> supporte la licence Copilot depuis jan. 2026 <span class="pl-2 text-cream-200/30">|</span><span class="pl-2">Codex, Aider, Cline & plus</span>',
   },
-  approach: {
-    label: 'Approche',
-    title: 'Comment je travaille',
-    pitch:
-      'Je m\u2019int\u00e8gre \u00e0 votre \u00e9quipe, comprends votre domaine et livre du code production-ready. Pas de friction de handoff \u2014 je prends les features de l\u2019architecture au d\u00e9ploiement, avec du code propre et une communication claire \u00e0 chaque \u00e9tape.',
-    cards: [
+  demo: {
+    terminal: {
+      title: 'zsh — ~/projects/my-app',
+      command: 'vigie start',
+      daemonRunning: '✓ daemon actif sur localhost:4800',
+      watching: 'surveillance de claude-code · tous les événements transmis au dashboard',
+      localFirst: 'local-first — vos données ne quittent jamais votre machine',
+    },
+    sidebar: { agents: 'Agents', runs: 'Exécutions', settings: 'Paramètres' },
+    main: {
+      taskTitle: 'Rate-limit /api/users',
+      badgeActive: '1 agent actif',
+      contextLabel: 'contexte',
+      contextAction: 'nouvelle fenêtre depuis le checkpoint',
+      activityLabel: 'Activité',
+    },
+    actionPanel: {
+      header: 'Agent en pause — boucle détectée',
+      suggestedPromptLabel: 'Prompt suggéré',
+      suggestedPrompt:
+        '«\u00A0Les tests attendent un mock Redis — utilisez ioredis-mock dans le setup de test au lieu de vous connecter à une instance réelle.\u00A0»',
+      btnRollback: 'Rollback #3',
+      btnResume: 'Reprendre',
+      btnStop: 'Arrêter l\u2019agent',
+    },
+    logs: [
       {
-        title: 'Architecture & Clart\u00e9',
-        description:
-          'Je vous aide \u00e0 faire les bons choix techniques. **Mod\u00e8le de donn\u00e9es**, contrats d\u2019API, **design syst\u00e8me** \u2014 j\u2019apporte l\u2019expertise pour que votre \u00e9quipe avance vite en confiance.',
+        time: '14:32:01',
+        html: '<span class="text-cream-200">claude-code</span> · lecture de <span class="text-success">src/api/users.ts</span>',
+        delay: 200,
       },
       {
-        title: 'Livraison bout en bout',
-        description:
-          'Des requirements \u00e0 la production, je livre des features compl\u00e8tes. Vous gardez le contr\u00f4le de la roadmap \u2014 je m\u2019assure que ce qui part en prod est **propre, test\u00e9** et livr\u00e9 dans les temps.',
+        time: '14:33:12',
+        html: '<span class="text-cream-200">claude-code</span> · création de <span class="text-success">src/middleware/rate-limit.ts</span>',
+        delay: 350,
       },
       {
-        title: 'Votre Stack, Votre \u00c9quipe',
-        description:
-          'Je m\u2019adapte \u00e0 vos outils, vos processus et vos \u00e9quipes \u2014 mais je privil\u00e9gie le **pair programming** aux silos, la **pair review** aux aller-retours asynchrones. La collaboration directe, c\u2019est l\u00e0 que le meilleur travail se fait.',
+        time: '14:34:30',
+        html: '<span class="text-cream-200">claude-code</span> · exécution de <span class="text-cream-50">npm test</span> — <span class="text-danger">3 échecs</span>',
+        delay: 550,
       },
       {
-        title: 'S\u00e9curit\u00e9 d\u00e8s la Conception',
-        description:
-          'La s\u00e9curit\u00e9 n\u2019est pas une option. **OAuth** avec cookies server-only, **CSP** strict avec nonces, pr\u00e9vention XSS, mod\u00e8les de permissions en **least-privilege** \u2014 je les int\u00e8gre d\u00e8s le d\u00e9part. Je maintiens une veille active sur les **CVEs** des d\u00e9pendances sensibles et traite l\u2019hygi\u00e8ne s\u00e9curit\u00e9 comme une contrainte d\u2019ing\u00e9nierie de premier ordre.',
+        time: '14:35:15',
+        html: '<span class="text-cream-200">claude-code</span> · édition de <span class="text-cream-50">src/middleware/rate-limit.ts</span>',
+        delay: 250,
+      },
+      {
+        time: '14:36:48',
+        html: '<span class="text-cream-200">claude-code</span> · exécution de <span class="text-cream-50">npm test</span> — <span class="text-danger">3 échecs</span>',
+        delay: 600,
+      },
+      {
+        time: '14:37:02',
+        html: '<span class="text-warning">⚠ dérive de scope · <span class="text-warning/70">l\u2019agent a modifié package.json — hors du périmètre déclaré</span></span>',
+        delay: 400,
+      },
+      {
+        time: '14:37:45',
+        html: '<span class="text-warning">⚠ contexte 65% · <span class="text-warning/70">l\u2019agent risque de perdre les instructions initiales — envisagez un checkpoint</span></span>',
+        delay: 300,
+      },
+      {
+        time: '14:38:01',
+        html: '<span class="text-cream-200">$ conseil coût · <span class="text-cream-200/70">cette tâche pourrait tourner sur <span class="text-cream-50">sonnet</span> — ~3x moins cher pour des résultats similaires</span></span>',
+        delay: 200,
+      },
+      {
+        time: '14:38:03',
+        html: '<span class="text-warning">⚠ boucle détectée · <span class="text-warning/70">édition → test → échec → édition — 4 cycles en 6 min</span></span>',
+        delay: 500,
       },
     ],
   },
-  about: {
-    label: 'À propos',
-    title: 'Derrière le clavier',
-    paragraphs: [
-      "Moi c'est Damien — un curieux bricoleur depuis l'époque où je démontais tout ce qui avait un circuit imprimé à la maison (pardon, Maman). {{age}} ans, marié à l'extraordinaire Clara qui supporte mes nuits de codage, et papa fier de Basile qui me bat déjà aux jeux de société.",
-      "Ce qui me passionne, c'est le craft. Proche de la communauté SoCraTes Belgium, je crois que du bon logiciel c'est du design propre, des boucles de feedback courtes, et la discipline de toujours apprendre. TDD, pair programming, refactoring continu — c'est ce qui me permet de dormir tranquille en sachant que mon code ne réveillera personne à 3h du mat'.",
-      "L'arrivée de l'IA dans le dev ? Fascinant — mais quand des agents écrivent du code sans supervision, ça dérape vite. Fenêtre de contexte, logique hallucinée, érosion de la qualité. C'est pour ça que j'ai créé Vigie : plus nos outils deviennent puissants, plus on a besoin de contrôle. Quand je ne code pas, vous me trouverez en train de perdre à Terraforming Mars ou à explorer la dernière techno du moment.",
-    ],
-    photoAlt: 'Damien Meur — Ingénieur Fullstack Senior',
-    tags: [
-      'Software Craft',
-      'SoCraTes Belgium',
-      'Jeux de société',
-      "Passionné d'IA",
-      'Bidouilleur curieux',
-    ],
+  openSource: {
+    heading: 'Gratuit & open source',
+    licenseBadge: 'Licence MIT',
+    headline: 'vigie est open source. Utilisez-le, forkez-le, livrez-le.',
+    description:
+      'Monitoring local, détection de boucles, dérive de scope, garde-fous de coûts, checkpoints & rollback. Pas de paywall, pas de tier premium, pas de vendor lock-in. Votre machine, vos données, vos règles.',
+    ctaGithub: 'Voir sur GitHub',
+    byoaHeadline: 'Aucune marge sur vos tokens IA — jamais.',
+    byoaDescription: 'Votre abonnement IA. Votre machine. Zéro intermédiaire.',
+    agplJoke: 'AGPL\u00A0? À l\u2019ère des agents, toute licence est MIT.',
   },
-  stack: {
-    label: 'Stack & M\u00e9thodes',
-    title: 'Comment je construis',
-    terminalTitle: 'zsh — ~/stack',
-    command: 'cat stack.yml',
+  waitlist: {
+    heading1: 'L\u2019IA écrit le code.',
+    heading2: 'L\u2019œil sur l\u2019horizon.',
+    description: 'Soyez les premiers informés du lancement de la bêta. Mettez une étoile sur ',
+    githubLinkText: 'GitHub',
+    emailLabel: 'Adresse email',
+    emailPlaceholder: 'votre@email.com',
+    ctaSubmit: 'Réserver ma place',
+    ctaLoading: 'Envoi en cours\u2026',
+    successMessage: '✓ Vous êtes sur la liste. On vous contacte dès l\u2019ouverture de la bêta.',
+    errorMessage: 'Oups\u00A0! Quelque chose s\u2019est mal passé, réessayez',
+    errorRateLimit: 'Trop d\u2019inscriptions, réessayez dans un instant',
+    backButton: '← Retour',
+    footerText:
+      'Places limitées — pas de spam, juste votre invitation à l\u2019ouverture de la bêta.',
+  },
+  faq: {
+    pageLabel: 'Questions & réponses',
+    pageHeading: 'Foire aux questions',
+    pageDescription:
+      'Tout ce qu\u2019il faut savoir sur vigie — de la prise en main à la confidentialité et la licence.',
     categories: [
       {
-        name: 'langages',
+        title: 'Prise en main',
         items: [
-          { name: 'TypeScript/JS', years: 10 },
-          { name: 'Python', years: 5 },
-          { name: 'PHP', years: 3 },
-          { name: 'Kotlin', years: 1 },
+          {
+            question: 'Qu\u2019est-ce que vigie\u00A0?',
+            answer:
+              'vigie est un daemon de monitoring local pour Claude Code. Il surveille chaque fichier modifié, chaque commande, chaque dollar dépensé. Il détecte les boucles, les dérives de scope et la surcharge de contexte avant qu\u2019elles ne vous coûtent du temps. Les checkpoints permettent de revenir en arrière avant tout déploiement.',
+          },
+          {
+            question: 'Comment ça fonctionne\u00A0?',
+            answer:
+              'Lancez vigie start dans votre projet. Un daemon léger spawn Claude Code, capture chaque événement — éditions de fichiers, commandes shell, consommation de tokens — et les diffuse vers un dashboard temps réel. Aucun code ne quitte votre machine.',
+          },
+          {
+            question: 'Que signifie «\u00A0local-first\u00A0»\u00A0?',
+            answer:
+              'Le daemon tourne entièrement sur votre machine. Il observe les métadonnées de session — fichiers touchés, commandes exécutées, nombre de tokens — mais ne lit ni ne stocke jamais votre code source. Le dashboard se connecte via un websocket local et ne fait que diffuser la sortie des commandes — votre code reste chez vous.',
+          },
+          {
+            question: 'Comment installer vigie\u00A0?',
+            answer:
+              'vigie est actuellement en bêta privée. Inscrivez-vous sur la liste d\u2019attente pour un accès anticipé — vous recevrez les instructions d\u2019installation dès l\u2019ouverture de la bêta. L\u2019installation se fait en une seule commande.',
+          },
+          {
+            question: 'Quels outils IA vigie supporte-t-il\u00A0?',
+            answer:
+              'Claude Code au lancement. OpenCode (qui supporte les licences Copilot), Codex CLI, Aider et Cline sont sur la roadmap. L\u2019architecture est agnostique par conception — si votre outil a un CLI, vigie peut le surveiller.',
+          },
+          {
+            question: 'Quels sont les prérequis système\u00A0?',
+            answer:
+              'macOS ou Linux (Windows via WSL). Git installé. Claude Code comme CLI IA. Le daemon est léger et tourne en arrière-plan avec un minimum de CPU et de mémoire.',
+          },
         ],
       },
       {
-        name: 'frontend',
+        title: 'Fonctionnalités',
         items: [
-          { name: 'React', years: 6 },
-          { name: 'Next.js', years: 4 },
-          { name: 'Angular', years: 3 },
-          { name: 'Vue', years: 2 },
-          { name: 'Tailwind', years: 4 },
+          {
+            question: 'Que surveille vigie en temps réel\u00A0?',
+            answer:
+              'Chaque fichier lu, créé ou modifié. Chaque commande shell. La consommation de tokens, le pourcentage de fenêtre de contexte et le coût en cours. Le tout diffusé en direct dans votre dashboard.',
+          },
+          {
+            question: 'Qu\u2019est-ce que la détection de boucle\u00A0?',
+            answer:
+              'vigie détecte les cycles édition\u2009→\u2009test\u2009→\u2009échec\u2009→\u2009édition où l\u2019agent répète le même pattern. Il signale la boucle dans le dashboard et suggère un prompt pour aider l\u2019agent à en sortir.',
+          },
+          {
+            question: 'Qu\u2019est-ce que la dérive de scope\u00A0?',
+            answer:
+              'Quand votre agent commence à toucher des fichiers en dehors du périmètre déclaré pour la tâche, vigie le signale immédiatement. Vous voyez exactement quels fichiers ont été accédés hors scope pour corriger le tir avant que l\u2019agent ne dérive davantage.',
+          },
+          {
+            question: 'Comment fonctionne le monitoring de fenêtre de contexte\u00A0?',
+            answer:
+              'Une jauge en direct montre la consommation de la fenêtre de contexte. À 65%+, vigie avertit que l\u2019agent risque de perdre les instructions initiales et suggère d\u2019ouvrir une nouvelle fenêtre depuis le dernier checkpoint.',
+          },
+          {
+            question: 'Que sont les checkpoints & rollback\u00A0?',
+            answer:
+              'Les checkpoints sont des portes de validation qui prennent un snapshot de l\u2019état du projet. Si quelque chose tourne mal, vous revenez au dernier état stable et reprenez avec juste le contexte nécessaire — sans reprompting.',
+          },
+          {
+            question: 'Peut-on surveiller plusieurs agents en parallèle\u00A0?',
+            answer:
+              'Oui. vigie supporte le monitoring de plusieurs agents simultanés, chacun avec son propre flux d\u2019activité dans le dashboard.',
+          },
+          {
+            question: 'Comment fonctionne la conscience des coûts\u00A0?',
+            answer:
+              'Un compteur de coûts en direct suit les dépenses en temps réel. vigie suggère quand un modèle moins cher suffirait pour la tâche en cours. Vous pouvez définir des garde-fous budgétaires qui mettent la session en pause avant de dépasser un seuil.',
+          },
         ],
       },
       {
-        name: 'backend',
+        title: 'Licence & open source',
         items: [
-          { name: 'Node.js', years: 8 },
-          { name: 'Effect-TS', years: 4 },
-          { name: 'Hono', years: 1 },
-          { name: 'Fastify', years: 4 },
-          { name: 'Express', years: 6 },
-          { name: 'Symfony', years: 3 },
-          { name: 'Apache Pulsar', years: 2 },
-          { name: 'Bun', years: 1 },
+          {
+            question: 'vigie est-il vraiment gratuit\u00A0?',
+            answer:
+              'Oui. vigie est open source sous licence MIT. Toutes les fonctionnalités — monitoring, détection de boucle, dérive de scope, checkpoints, rollback, garde-fous de coûts — sont gratuites et le resteront. Pas de paywall, pas de tier premium.',
+          },
+          {
+            question: 'Que signifie BYOA (Bring Your Own AI)\u00A0?',
+            answer:
+              'vigie ne touche jamais à vos tokens IA. Vous payez Claude (ou tout fournisseur supporté) directement à leurs tarifs standard. vigie est une couche de monitoring — pas de frais cachés par token et pas de vendor lock-in.',
+          },
+          {
+            question: 'Pourquoi MIT et pas AGPL\u00A0?',
+            answer:
+              'À l\u2019ère des agents, toute licence est MIT. Les agents clonent, forkent et livrent du code plus vite qu\u2019aucune équipe compliance ne peut vérifier des headers. Nous avons choisi la licence qui correspond à la façon dont le logiciel est réellement construit aujourd\u2019hui — zéro friction, zéro piège.',
+          },
+          {
+            question: 'Puis-je utiliser vigie dans mon entreprise\u00A0?',
+            answer:
+              'Oui. La licence MIT signifie que vous pouvez utiliser, modifier et distribuer vigie librement — à des fins commerciales ou non. Pas de CLA, pas de contributor agreement requis.',
+          },
+          {
+            question: 'Qui construit vigie\u00A0?',
+            answer:
+              'vigie est construit par Tmonier SRL, une société de consulting freelance fondée par Damien Meur. Ceux qui tiennent la barre sont aussi ceux qui veillent.',
+          },
         ],
       },
       {
-        name: 'donn\u00e9es',
+        title: 'Confidentialité & sécurité',
         items: [
-          { name: 'PostgreSQL', years: 6 },
-          { name: 'SQL Server', years: 4 },
-          { name: 'MongoDB', years: 1 },
-          { name: 'Delta Lake', years: 1 },
-          { name: 'PySpark', years: 1 },
-          { name: 'DuckDB', years: 1 },
-          { name: 'Elasticsearch', years: 1 },
+          {
+            question: 'vigie accède-t-il à mon code source\u00A0?',
+            answer:
+              'Non. vigie observe uniquement les métadonnées de session — nombre de fichiers modifiés, consommation de tokens, pourcentage de fenêtre de contexte, durée de session. Il ne lit, n\u2019analyse et ne stocke jamais votre code source.',
+          },
+          {
+            question: 'Quelles données vigie collecte-t-il\u00A0?',
+            answer:
+              'Nombre de tokens, pourcentages d\u2019utilisation de la fenêtre de contexte, durées de session, nombre de fichiers modifiés (pas leur contenu) et événements de checkpoint. Jamais le contenu des fichiers, les diffs, les prompts ou les réponses IA.',
+          },
+          {
+            question: 'vigie est-il conforme au RGPD\u00A0?',
+            answer:
+              'Oui. vigie est local-first — vos données restent sur votre machine. Pour les fonctionnalités du dashboard hébergé, toutes les données sont traitées dans une infrastructure basée en UE.',
+          },
+          {
+            question: 'Peut-on héberger vigie soi-même\u00A0?',
+            answer:
+              'Oui — c\u2019est open source. Clonez le repo, déployez sur votre propre infrastructure. Contrôle total sur la résidence des données, les politiques d\u2019accès et les intégrations.',
+          },
+          {
+            question: 'vigie fonctionne-t-il avec des modèles locaux\u00A0?',
+            answer:
+              'Le support d\u2019Ollama est sur notre roadmap. Une fois disponible, vous pourrez lancer des sessions de coding entièrement privées où tout reste sur votre machine.',
+          },
         ],
       },
       {
-        name: 'cloud',
+        title: 'Comparaison',
         items: [
-          { name: 'Azure', years: 4 },
-          { name: 'Databricks', years: 1 },
-          { name: 'Cloudflare', years: 2 },
-          { name: 'GitHub Actions', years: 4 },
-          { name: 'CI/CD', years: 8 },
-          { name: 'Kubernetes', years: 2 },
-        ],
-      },
-      {
-        name: 'outillage',
-        items: [
-          { name: 'Git', years: 10 },
-          { name: 'Docker', years: 6 },
+          {
+            question: 'En quoi vigie diffère de Claude Code seul\u00A0?',
+            answer:
+              'Claude Code vous donne la sortie brute de l\u2019agent. vigie ajoute un dashboard temps réel, la détection de boucle, les alertes de dérive de scope, le monitoring de fenêtre de contexte, le suivi des coûts, les checkpoints & rollback, et des prompts suggérés pour débloquer votre agent. C\u2019est la couche de visibilité qui rend Claude Code prévisible.',
+          },
+          {
+            question: 'vigie remplace-t-il mon IDE ou mon terminal\u00A0?',
+            answer:
+              'Non. vigie est une couche de monitoring additive qui tourne à côté de vos outils existants. Vous continuez à utiliser votre IDE, votre terminal et Claude Code exactement comme avant. vigie surveille et alerte, c\u2019est tout.',
+          },
         ],
       },
     ],
-    practices: [
-      {
-        title: 'Architecture propre',
-        description:
-          'Architecture hexagonale, injection de d\u00e9pendances, fronti\u00e8res claires entre domaine et infrastructure. Du code facile \u00e0 tester, \u00e9tendre et transmettre.',
-        tags: ['Hexagonal', 'DDD', 'DI', 'Clean Code'],
-      },
-      {
-        title: 'Qualit\u00e9 d\u2019abord',
-        description:
-          'BDD et TDD ne sont pas des buzzwords \u2014 c\u2019est comme \u00e7a que je m\u2019assure que ce que je livre fonctionne vraiment. Les tests documentent l\u2019intention, attrapent les r\u00e9gressions et donnent confiance pour faire \u00e9voluer le code. Pair review plut\u00f4t qu\u2019aller-retours asynchrones.',
-        tags: ['BDD', 'TDD', 'Pair Review', 'QA Minded'],
-      },
-      {
-        title: 'Pens\u00e9e produit',
-        description:
-          'Je prends le temps de comprendre votre domaine en profondeur avant d\u2019\u00e9crire une ligne de code. Le bon engineering commence par les bonnes questions, pas le clavier le plus rapide.',
-        tags: ['Analyse domaine', 'FSD', 'Pragmatisme'],
-      },
-      {
-        title: 'Augment\u00e9 par l\u2019IA',
-        description:
-          'J\u2019utilise Claude Code et les outils de coding IA au quotidien \u2014 pas comme une b\u00e9quille, mais comme un multiplicateur. Je sais prompter, reviewer et piloter l\u2019output IA pour livrer plus vite sans sacrifier la qualit\u00e9.',
-        tags: ['AI Workflows', 'Prompt Engineering'],
-      },
-    ],
-  },
-  experience: {
-    label: 'Exp\u00e9rience',
-    title: 'Parcours',
-    badgeEmployee: 'Employé',
-    badgeInternship: 'Stagiaire',
-    badgeFounder: 'Fondateur',
-    jobs: [
-      {
-        period: 'Mai 2026 – Présent',
-        company: 'Tmonier SRL',
-        type: 'founder' as const,
-        role: 'Fondateur & Consultant Freelance',
-        location: 'Bruxelles',
-        description:
-          'Création de Tmonier SRL pour exercer en tant que consultant freelance senior — développement full-stack et expertise IA.',
-        bullets: [],
-        tags: [],
-      },
-      {
-        period: 'Avr 2022 \u2013 Avr 2026',
-        company: 'Aware',
-        type: 'employee' as const,
-        role: 'Senior Full Stack Developer',
-        location: 'Bruxelles',
-        description:
-          'Plateforme de partage de données pour groupes agroalimentaires et chaînes de supermarchés, traitant des datasets opérationnels sur 4 marchés européens.',
-        bullets: [
-          'Développement frontend et backend autour des principes d\u2019**architecture hexagonale**, avec un fort accent sur la type-safety et la programmation fonctionnelle',
-          "Conception d'un framework ETL permettant à l'équipe de créer et maintenir 300+ pipelines Medallion bronze/silver/gold — **clean architecture**, injection de dépendances, contrôles qualité automatisés",
-          "Mise en place d'un système ETL **DuckDB** embarqué directement dans le backend — avec **observabilité**, tooling DX-friendly et auto-refresh — réduisant les temps de chargement analytics jusqu'à un facteur 100× sur toutes les pages",
-          "**Mentorat de développeurs** et promotion d'une culture d'ownership, de partage de connaissances, de curiosité et de qualité au sein de l'équipe",
-          'Responsable de la **santé des dépendances** : montées de version majeures sur l\u2019ensemble de la stack, migration CJS → ESM, veille technologique et suivi des **CVEs**',
-          'Gestion de l\u2019infrastructure cloud ; mise en place du **CI/CD** avec tests automatisés et pipelines de déploiement Databricks',
-        ],
-        tags: [
-          'TypeScript',
-          'React',
-          'Next.js',
-          'Effect-TS',
-          'Fastify',
-          'Python',
-          'DuckDB',
-          'SQL Server',
-          'Azure',
-          'Databricks',
-          'PySpark',
-        ],
-      },
-      {
-        period: 'Oct 2020 \u2013 Avr 2022',
-        company: 'Proxyclick',
-        type: 'employee' as const,
-        role: 'Full Stack Developer',
-        location: 'Bruxelles',
-        description:
-          'Plateforme SaaS de gestion des visiteurs pour clients entreprise dans 100+ pays.',
-        bullets: [
-          "Travail au sein d'une **architecture microservices** avec communication inter-services event-driven via Apache Pulsar",
-          'Réécriture complète du **système de facturation et self-service** — flows d\u2019abonnement aux modules, intégration paiement et gestion de compte',
-          'Conception et développement d\u2019un **moteur d\u2019automatisation event-based** (style IFTTT) pour simplifier la gestion et la personnalisation des workflows visiteurs',
-          '**Modernisation progressive du frontend** — migration des modules AngularJS legacy vers une stack moderne et typée',
-        ],
-        tags: [
-          'Angular',
-          'TypeScript',
-          'Node.js',
-          'Express',
-          'PostgreSQL',
-          'Apache Pulsar',
-          'Microservices',
-        ],
-      },
-      {
-        period: 'Avr 2020 \u2013 Oct 2020',
-        company: 'Emisys',
-        type: 'employee' as const,
-        role: 'Full Stack Developer',
-        location: 'Louvain-la-Neuve',
-        description:
-          'Application de gestion d\u2019\u00e9v\u00e9nements utilis\u00e9e par les grands festivals belges.',
-        bullets: [
-          'Développement de fonctionnalités de billetterie et planning',
-          'Mise en place des **systèmes de paiement et remboursement** — traitement des transactions, flows d\u2019annulation et réconciliation financière pour les opérations festival',
-          'Maintenance d\u2019une plateforme servant **des milliers d\u2019utilisateurs simultanés** lors des événements en live',
-        ],
-        tags: ['PHP', 'JavaScript', 'PostgreSQL'],
-      },
-      {
-        period: 'Sep 2019 \u2013 Avr 2020',
-        company: 'mPhase',
-        type: 'employee' as const,
-        role: 'Full Stack Developer',
-        location: 'Montr\u00e9al',
-        description:
-          'Outil logistique de traitement des eaux pour les op\u00e9rations municipales de Montr\u00e9al.',
-        bullets: [
-          'Construction de l\u2019**application complète from scratch** — développeur unique, ownership total du modèle de données à l\u2019interface',
-          'Conception du **système de routage et planification géolocalisé**',
-          'Architecture d\u2019un **DSL de formulaires générique** — moteur déclaratif piloté par schéma permettant aux techniciens de terrain de créer et personnaliser leurs propres formulaires d\u2019inspection sans toucher au code',
-        ],
-        tags: ['Vue.js', 'Node.js', 'Express', 'MongoDB'],
-      },
-      {
-        period: 'Nov 2018 \u2013 Ao\u00fbt 2019',
-        company: 'Extia',
-        missionAt: 'Taktik',
-        type: 'employee' as const,
-        role: 'Full Stack Developer',
-        location: 'Bruxelles',
-        description:
-          'Plateforme logicielle d\u2019exp\u00e9riences personnalis\u00e9es via IPTV et affichage digital.',
-        bullets: [
-          'Construction de dashboards de monitoring et systèmes d\u2019alerting',
-          'Maintenance du **backend média haute intensité** gérant la distribution des flux vidéo et multimédia à travers l\u2019infrastructure IPTV',
-          'Implémentation de la **visualisation de données temps réel** sur le dashboard frontend',
-        ],
-        tags: ['Kotlin', 'Spring Boot', 'Angular', 'PostgreSQL'],
-      },
-      {
-        period: 'Juil 2018 \u2013 Nov 2018',
-        company: 'Extia',
-        missionAt: 'Bewan',
-        type: 'employee' as const,
-        role: 'Full Stack Developer',
-        location: 'Bruxelles',
-        description:
-          'Plateforme CRM et gestion d\u2019\u00e9v\u00e9nements pour un expert en transition digitale dans l\u2019horeca.',
-        bullets: [
-          'Construction de fonctionnalités CRM et modules de gestion d\u2019événements',
-          'Conception de **Diserv from scratch** — plateforme de collecte et stockage de métriques (**InfluxDB**) avec un **moteur de facturation flexible** : forfaits fixes, dépassements et facturation à la métrique',
-        ],
-        tags: ['JavaScript', 'jQuery', 'PHP', 'Symfony', 'PostgreSQL', 'InfluxDB'],
-      },
-      {
-        period: 'Janv 2018 \u2013 Mars 2018',
-        company: 'IoTFactory',
-        type: 'internship' as const,
-        role: 'Full Stack Developer',
-        location: 'Bruxelles',
-        description: 'Gateway IoT Bluetooth/LoRa pour le tracking d\u2019assets sur site.',
-        bullets: [
-          'Déployé sur gateways **Raspberry Pi** avec une architecture **local-first** — données persistées sur l\u2019appareil et réconciliées automatiquement avec le backend au retour de la connexion',
-          'Implémentation du **geofencing et de la géolocalisation indoor** par triangulation de balises Bluetooth pour le positionnement précis des assets en l\u2019absence de GPS',
-          'Construction du dashboard de gestion des devices et outils de monitoring',
-          'Mise en place d\u2019un **portail captif** pour le provisionnement WiFi sans friction des nouveaux devices sur chantier',
-        ],
-        tags: ['Python', 'IoT', 'Bluetooth', 'LoRa', 'Kubernetes', 'Raspberry Pi', 'Linux'],
-      },
-    ],
-    references: 'Références, preuves de travail & diplômes disponibles sur demande.',
-    projectsLabel: 'Projets',
-    projectsTitle: 'Projets perso',
-    projects: [
-      {
-        period: '2026',
-        name: 'Vigie',
-        builtAt: 'Tmonier',
-        type: 'Fondateur \u00b7 Solo',
-        description:
-          'Supervision local-first d\u2019agents IA \u2014 monitoring temps r\u00e9el, d\u00e9tection de boucles, contr\u00f4le human-in-the-loop sur Claude Code. Bun daemon, Hono + Effect-TS, TanStack Start, PostgreSQL.',
-        tags: ['TypeScript', 'Effect-TS', 'Hono', 'React', 'Bun', 'PostgreSQL'],
-        link: 'https://vigie.tmonier.com',
-      },
-      {
-        period: '2016 \u2013 2018',
-        name: 'Autonomous Bar',
-        type: 'Projet collaboratif',
-        description:
-          'Syst\u00e8me de bar en self-service complet : commandes, inventaire, comptabilit\u00e9, parrainage, cartes RFID (IoT), photobooth, machine \u00e0 cocktails, dashboards BI temps r\u00e9el.',
-        tags: ['PHP', 'Symfony', 'Python', 'C', 'IoT', 'QlikView'],
-      },
-    ],
-  },
-  education: {
-    label: 'Formation',
-    title: 'Formation & Langues',
-    degree: 'Bachelier en Informatique',
-    specialisation: 'option Intelligence Artificielle',
-    school: 'Institut Paul Lambin, Bruxelles',
-    period: '2015 \u2013 2018',
-    distinction: 'Cum Laude',
-    languagesTitle: 'Langues',
-    languages: [
-      'Fran\u00e7ais (langue maternelle)',
-      'Anglais (courant)',
-      'N\u00e9erlandais (interm\u00e9diaire)',
-    ],
-  },
-  flagship: {
-    label: 'Projet Phare',
-    title: 'Vigie',
-    description:
-      'Une couche de supervision local-first pour les agents de coding IA. Visibilit\u00e9 temps r\u00e9el sur l\u2019activit\u00e9 de l\u2019agent, d\u00e9tection de boucles et de d\u00e9rives, garde-fous sur les co\u00fbts de tokens, checkpoints & rollback. Votre IA \u00e9crit le code \u2014 vous gardez la barre.',
-    cta: 'D\u00e9couvrir le projet \u2192',
-    terminalLines: [
-      '$ vigie start',
-      '\u2713 daemon running on localhost:4800',
-      '  watching claude-code \u00b7 all events forwarded',
-      '  local-first \u2014 vos donn\u00e9es ne quittent jamais votre machine',
-    ],
-  },
-  contact: {
-    label: 'Contact',
-    title: 'Travaillons ensemble',
-    availability: 'Disponible mai 2026 \u00b7 Remote ou Bruxelles',
-    email: 'damien.meur@tmonier.com',
-    phone: '+32 475 39 55 16',
-    cta: 'Me contacter',
   },
   footer: {
-    company: 'Tmonier \u00b7 Bruxelles, Belgique',
-    tagline: 'You Keep The Helm.',
-    copyright: '\u00a9 2026',
-  },
-  contactPage: {
-    title: 'Contact \u2014 Tmonier',
-    heading: 'Me contacter',
-    subtitle:
-      'Une mission freelance, une question technique, ou simplement envie de dire bonjour\u00a0? Je lis chaque message et r\u00e9ponds sous 24 heures.',
-    nameLabel: 'Nom',
-    namePlaceholder: 'Votre nom',
-    emailLabel: 'Email',
-    emailPlaceholder: 'votre@email.com',
-    subjectLabel: 'Sujet',
-    subjectPlaceholder: 'Choisir un sujet\u2026',
-    subjectOptions: [
-      { value: 'Mission freelance', label: 'Mission freelance' },
-      { value: 'Consultation technique', label: 'Consultation technique' },
-      { value: 'Projet Vigie', label: 'Projet Vigie' },
-      { value: 'Autre', label: 'Autre' },
-    ],
-    messageLabel: 'Message',
-    messagePlaceholder: 'Parlez-moi de votre projet...',
-    submit: 'Envoyer le message',
-    altText: 'Ou contactez-moi directement \u00e0',
+    builtBy: 'Construit par',
+    tagline: 'consulting freelance pour les équipes qui livrent avec l\u2019IA.',
+    legal: 'Tmonier SRL · Bruxelles, Belgique',
   },
 };
 

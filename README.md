@@ -1,31 +1,32 @@
-# Tmonier
+# vigie
 
 **Local-first agent supervisor for software engineers.**
-*Your crew. Under your watch.*
+*You Keep The Helm.*
 
 Real-time visibility into AI agent activity, loop/drift detection, token cost guardrails, checkpoints & rollback — all running locally. Bring Your Own AI (BYOA).
 
-[tmonier.com](https://tmonier.com)
+[vigie.tmonier.com](https://vigie.tmonier.com)
 
 ## Architecture
 
 ```
-Browser ↔ TanStack Start (SSR, app.tmonier.com) ↔ Hono+Effect (API/WS, api.tmonier.com) ↔ WebSocket ↔ Daemon Bun (local) ↔ spawn(git, claude...)
+Browser ↔ TanStack Start (SSR, app.vigie.tmonier.com) ↔ Hono+Effect (API/WS, api.vigie.tmonier.com) ↔ WebSocket ↔ CLI daemon (local) ↔ spawn(git, claude...)
 ```
 
-- **App** — TanStack Start SSR on Railway (`app.tmonier.com`)
-- **API** — Hono + Effect + PostgreSQL on Railway (`api.tmonier.com`)
-- **Daemon** — local Bun binary (`@tmonier/cli`, separate repo `get-tmonier/cli`), connects via WebSocket
+- **App** — TanStack Start SSR on Railway (`app.vigie.tmonier.com`)
+- **API** — Hono + Effect + PostgreSQL on Railway (`api.vigie.tmonier.com`)
+- **CLI** — local Bun binary (`@vigie/cli`), connects via WebSocket
 
 ## Monorepo structure
 
 | Package | Path | Key libraries |
 |---|---|---|
-| `@tmonier/api` | `packages/api/` | Hono, Effect, Kysely, PostgreSQL |
-| `@tmonier/ui` | `packages/ui/` | React, TanStack Start/Router |
-| `@tmonier/shared` | `packages/shared/` | ts-rest, Valibot |
-| `@tmonier/tokens` | `packages/tokens/` | Design tokens (CSS + JS exports) |
-| `@tmonier/landing` | `packages/landing/` | Astro 5, Tailwind v4 |
+| `@vigie/api` | `packages/api/` | Hono, Effect, Kysely, PostgreSQL |
+| `@vigie/ui` | `packages/ui/` | React, TanStack Start/Router |
+| `@vigie/cli` | `packages/cli/` | Effect, Bun PTY, xterm headless |
+| `@vigie/shared` | `packages/shared/` | ts-rest, Valibot |
+| `@vigie/tokens` | `packages/tokens/` | Design tokens (CSS + JS exports) |
+| `@vigie/landing` | `packages/landing/` | Astro 5, Tailwind v4 |
 
 ## Tech stack
 

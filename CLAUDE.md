@@ -1,7 +1,9 @@
-# Tmonier
+# vigie
 
-Local-first agent supervisor for software engineers. "Your crew. Under your watch."
+Local-first agent supervisor for software engineers. "Eyes on the horizon."
 Real-time visibility into AI agent activity, drift detection, token cost guardrails, checkpoints & rollback. BYOA (Bring Your Own AI). Currently in Phase 0 (foundation).
+
+vigie is built by **Tmonier SRL** (Damien Meur's freelance company). The freelance portfolio lives at `tmonier.com`; vigie lives at `vigie.tmonier.com`.
 
 ## Stack
 
@@ -14,31 +16,35 @@ Real-time visibility into AI agent activity, drift detection, token cost guardra
 
 | Package | Path | Key libraries |
 |---|---|---|
-| `@tmonier/api` | `packages/api/` | Hono, Effect, Kysely, PostgreSQL |
-| `@tmonier/ui` | `packages/ui/` | React, TanStack Start/Router |
-| `@tmonier/shared` | `packages/shared/` | ts-rest contracts, Valibot schemas |
-| `@tmonier/tokens` | `packages/tokens/` | Design tokens — CSS + JS exports |
-| `@tmonier/landing` | `packages/landing/` | Astro 5 + Tailwind v4 (Cloudflare Pages) |
+| `@vigie/api` | `packages/api/` | Hono, Effect, Kysely, PostgreSQL |
+| `@vigie/ui` | `packages/ui/` | React, TanStack Start/Router |
+| `@vigie/cli` | `packages/cli/` | Effect, Bun PTY, xterm headless |
+| `@vigie/shared` | `packages/shared/` | ts-rest contracts, Valibot schemas |
+| `@vigie/tokens` | `packages/tokens/` | Design tokens — CSS + JS exports |
+| `@vigie/landing` | `packages/landing/` | Astro 5 + Tailwind v4 (vigie product page) |
+
+The freelance portfolio (`tmonier.com`) is a separate repo: `get-tmonier/landing`.
 
 ## Architecture
 
-**Overall:** `Browser ↔ TanStack Start (SSR, app.tmonier.com) ↔ Hono+Effect (API/WS, api.tmonier.com) ↔ WebSocket ↔ Daemon Bun (local) ↔ spawn(git, claude...)`
+**Overall:** `Browser ↔ TanStack Start (SSR, app.vigie.tmonier.com) ↔ Hono+Effect (API/WS, api.vigie.tmonier.com) ↔ WebSocket ↔ CLI daemon (local) ↔ spawn(git, claude...)`
 
-- **2 Railway services:** TanStack Start SSR (`app.tmonier.com`) + Hono+Effect+PostgreSQL (`api.tmonier.com`)
+- **2 Railway services:** TanStack Start SSR (`app.vigie.tmonier.com`) + Hono+Effect+PostgreSQL (`api.vigie.tmonier.com`)
 - **Backend:** hexagonal/DDD — Effect for domain/services, Hono as HTTP adapter, Kysely+PostgreSQL for persistence
   - **Module structure:** each module follows `domain/`, `ports/`, `commands/`, `queries/`, `adapters/primary/`, `adapters/secondary/`
   - **CQRS:** commands (`*.command.ts`) for writes, queries (`*.query.ts`) for reads
   - **File naming:** `*.port.ts`, `*.command.ts`, `*.query.ts`, `*.adapter.ts`
   - **Effect patterns:** services via `ServiceMap.Service`, errors via `Data.TaggedError`, DI via `Layer`, no try/catch
   - **Tests split:** `*.unit.test.ts` for domain/commands/queries, `*.integration.test.ts` for adapters. Tests live in `__tests__/` co-located with source
-- **Daemon:** proxy only — spawn, stream, control signals. No business logic. Separate public repo (`get-tmonier/cli`)
+- **CLI daemon** (`@vigie/cli`): local proxy — spawn, stream, control signals. No business logic. Binary name: `vigie`. Config dir: `~/.vigie/`. Env vars: `VIGIE_*`.
 - **Shared:** ts-rest contracts + Valibot schemas consumed by api + ui
 - **Frontend:** TanStack Start SSR + file-based routing
-  - **Feature-Sliced Design** in `@tmonier/ui` — layers: `app → shared → entities → features → widgets → pages → routes`
+  - **Feature-Sliced Design** in `@vigie/ui` — layers: `app → shared → entities → features → widgets → pages → routes`
   - Each slice organized as `api/`, `model/`, `ui/` sub-folders
   - No cross-slice imports (features don't import from other features)
   - State management: React hooks only (no Redux/Zustand/etc.)
 - **Auth:** Better Auth (GitHub OAuth) · **ORM:** Kysely · **Payments:** Stripe
+- **API key prefix:** `vigie_`
 
 ## Verify pipeline
 
@@ -52,7 +58,7 @@ knip → biome check → typecheck → test → build
 ```bash
 bun install                                    # install all dependencies
 bun turbo dev                                  # dev servers (api + ui)
-bun run dev:landing                            # dev server for landing only
+bun run dev:landing                            # dev server for vigie landing
 bun turbo build                                # build all packages
 bun turbo check                                # biome check
 bun turbo check -- --fix                       # biome check + fix
@@ -60,7 +66,7 @@ bun turbo typecheck                            # typescript check
 bun turbo test                                 # run tests
 bun run verify                                 # full pipeline: knip → check → typecheck → test → build
 bun run verify:fix                             # auto-fix then verify
-bun turbo build --filter=@tmonier/landing      # build single package
+bun turbo build --filter=@vigie/landing        # build single package
 bun test:unit                                  # run unit tests only
 bun test:integration                           # run integration tests only
 ```
@@ -73,13 +79,13 @@ bun test:integration                           # run integration tests only
 - **No AI attribution** — never add `Co-Authored-By` or any Claude/AI mention in commit messages.
 - **Bun only** — never use npm, pnpm, yarn, or npx. Use `bun` and `bunx`.
 - **Pinned versions** — no `^` or `~` prefixes in `package.json` dependencies.
+- **Lowercase brand** — always write "vigie" (lowercase), never "Vigie". The brand is always lowercase in all contexts (titles, prose, UI, docs).
 
 ## Conventions
 
-- CSS vars from `@tmonier/tokens` — design tokens are the single source of truth
-- **`@tmonier/tokens` for branding** — both UI and Landing import `@tmonier/tokens/tailwind.css` + `@tmonier/tokens/tokens.css` to enforce consistent branding
+- CSS vars from `@vigie/tokens` — design tokens are the single source of truth
+- **`@vigie/tokens` for branding** — UI and Landing import `@vigie/tokens/tailwind.css` + `@vigie/tokens/tokens.css` to enforce consistent branding
 - Fonts loaded via `@fontsource/*` npm packages (self-hosted, imported in global.css via `@import`)
-- Landing page deploys to **Cloudflare Pages** — output: `packages/landing/dist/`
 - No `any` — strict TypeScript everywhere
 - **Effect** for all backend business logic (no try/catch)
 - **Valibot** for all schemas (no Zod)
@@ -93,7 +99,7 @@ bun test:integration                           # run integration tests only
 - **Self-documenting code** — minimal comments. Code should be self-explanatory. No JSDoc unless for public library APIs
 - **Clean code** — no dead code, no commented-out code, no TODO comments without linked issues
 - **Bun test runner** — `import { describe, expect, it } from 'bun:test'`
-- **Effect logging only in `@tmonier/api`** — use `Effect.logInfo`, `Effect.logWarning`, `Effect.logError`, `Effect.logDebug` with `Effect.annotateLogs` for structured context. `console.log` is banned by Biome in the API package. Use `Logger.consolePretty()` layer for dev output.
+- **Effect logging only in `@vigie/api`** — use `Effect.logInfo`, `Effect.logWarning`, `Effect.logError`, `Effect.logDebug` with `Effect.annotateLogs` for structured context. `console.log` is banned by Biome in the API package. Use `Logger.consolePretty()` layer for dev output.
 
 ## Subpath imports
 
@@ -101,7 +107,8 @@ All cross-folder imports must use ESM subpath aliases (`#alias/...`), never rela
 
 | Package | Aliases |
 |---|---|
-| `@tmonier/api` | `#modules/*`, `#routes/*` |
-| `@tmonier/ui` | `#app/*`, `#shared/*`, `#entities/*`, `#features/*`, `#widgets/*`, `#pages/*`, `#routes/*` |
-| `@tmonier/landing` | `#components/*`, `#layouts/*`, `#assets/*`, `#styles/*`, `#lib/*` |
-| `@tmonier/shared` | `#contracts/*`, `#schemas/*` |
+| `@vigie/api` | `#modules/*`, `#routes/*` |
+| `@vigie/ui` | `#app/*`, `#shared/*`, `#entities/*`, `#features/*`, `#widgets/*`, `#pages/*`, `#routes/*` |
+| `@vigie/cli` | `#modules/*`, `#schemas/*`, `#terminal/*`, `#vterm/*` |
+| `@vigie/landing` | `#components/*`, `#layouts/*`, `#assets/*`, `#styles/*`, `#lib/*` |
+| `@vigie/shared` | `#contracts/*`, `#schemas/*` |

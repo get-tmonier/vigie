@@ -1,4 +1,4 @@
-import type { DaemonHello } from '@tmonier/shared';
+import type { DaemonHello } from '@vigie/shared';
 import { Effect } from 'effect';
 import { createDaemonSession, deriveDaemonId } from '../domain/daemon-session';
 import { DaemonWriteRepository } from '../ports/daemon-write-repository.port';

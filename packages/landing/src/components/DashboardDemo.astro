@@ -1,0 +1,423 @@
+---
+import type { SiteContent } from '../i18n/types';
+
+interface Props {
+  content: SiteContent;
+}
+const { content } = Astro.props;
+const { demo } = content;
+---
+
+<section
+  id="dashboard-demo"
+  class="dashboard-section bg-navy-900 px-6 pb-8 overflow-hidden"
+>
+  <!-- 1. Local daemon terminal (appears first) -->
+  <div
+    class="local-terminal font-mono opacity-0 translate-y-6 max-w-[520px] mx-auto mb-6 rounded-[10px] overflow-hidden shadow-[0_0_0_1px_rgba(232,220,200,0.08),0_16px_48px_rgba(0,0,0,0.3),0_2px_8px_rgba(0,0,0,0.2)] max-md:max-w-full"
+  >
+    <!-- Window chrome -->
+    <div class="bg-navy-800/50 py-[0.55rem] px-[0.85rem] flex gap-[0.45rem] items-center border-b border-cream-200/10">
+      <span class="size-[10px] rounded-full inline-block bg-danger"></span>
+      <span class="size-[10px] rounded-full inline-block bg-warning"></span>
+      <span class="size-[10px] rounded-full inline-block bg-success"></span>
+      <span class="text-[0.6rem] text-cream-200/40 ml-[0.4rem]">{demo.terminal.title}</span>
+    </div>
+    <!-- Terminal content -->
+    <div class="bg-navy-900/60 py-4 px-5 text-[0.68rem] leading-[2]">
+      <div>
+        <span class="text-vigie-400">$</span>
+        <span class="text-vigie-300"> {demo.terminal.command}</span>
+      </div>
+      <div class="text-cream-200">{demo.terminal.daemonRunning}</div>
+      <div class="text-cream-200/50">
+        {demo.terminal.watching}
+      </div>
+      <div class="text-cream-200/35 text-[0.58rem] mt-[0.15rem]">
+        {demo.terminal.localFirst}
+      </div>
+      <div class="mt-[0.35rem]">
+        <span class="text-vigie-400">$</span>
+        <span class="terminal-cursor inline-block w-[7px] h-[1em] bg-vigie-400 ml-1 align-text-bottom animate-[blink_1.2s_step-end_infinite]"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Websocket connector: line segment + badge + line segment -->
+  <div class="ws-connector font-mono grid grid-rows-[0fr] opacity-0 [transition:grid-template-rows_1.6s_cubic-bezier(0.22,1,0.36,1),opacity_1s_ease]">
+    <div class="ws-connector-inner flex flex-col items-center overflow-hidden min-h-0">
+      <!-- Top line segment -->
+      <div class="ws-dash ws-dash-top w-[2px] h-[28px] scale-y-0 origin-top transition-[scale] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]" style="background: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--success) 30%, transparent) 0px, color-mix(in srgb, var(--success) 30%, transparent) 4px, transparent 4px, transparent 8px)"></div>
+      <!-- Badge -->
+      <div class="ws-badge flex items-center gap-[0.4rem] bg-success/7 border border-success/25 rounded-[20px] py-1 px-3 my-1 opacity-0 transition-opacity duration-[400ms]">
+        <span class="size-[6px] rounded-full inline-block shrink-0 bg-success animate-[pulse-soft_2s_ease-in-out_infinite]"></span>
+        <span class="text-[0.52rem] text-success tracking-[0.04em]">ws://localhost:4800</span>
+      </div>
+      <!-- Bottom line segment -->
+      <div class="ws-dash ws-dash-bottom w-[2px] h-[48px] scale-y-0 origin-top transition-[scale] duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)]" style="background: repeating-linear-gradient(to bottom, color-mix(in srgb, var(--success) 30%, transparent) 0px, color-mix(in srgb, var(--success) 30%, transparent) 4px, transparent 4px, transparent 8px)"></div>
+    </div>
+  </div>
+
+  <!-- 3. Browser UI mockup / dashboard (appears last, then animates internally) -->
+  <div class="browser-wrapper grid grid-rows-[0fr] opacity-0 [transition:grid-template-rows_1.8s_cubic-bezier(0.22,1,0.36,1),opacity_1.2s_ease]">
+    <div class="browser-wrapper-inner flex flex-col items-center overflow-hidden min-h-0">
+      <div
+        class="browser-mock font-mono max-w-[920px] w-full rounded-xl overflow-hidden shadow-[0_0_0_1px_rgba(38,192,154,0.12),0_2px_8px_rgba(0,0,0,0.2),0_32px_80px_rgba(0,0,0,0.5)]"
+      >
+        <!-- Browser chrome -->
+        <div class="bg-navy-800/70 py-[0.65rem] px-4 flex items-center gap-2 border-b border-vigie-400/10">
+          <span class="size-3 rounded-full inline-block shrink-0 bg-danger"></span>
+          <span class="size-3 rounded-full inline-block shrink-0 bg-warning"></span>
+          <span class="size-3 rounded-full inline-block shrink-0 bg-success"></span>
+          <!-- Address bar -->
+          <div class="flex-1 mx-3 bg-navy-900/70 border border-cream-200/15 rounded-md py-1 px-3 flex items-center gap-[0.4rem] max-w-[320px] ml-auto mr-auto">
+            <svg width="10" height="12" viewBox="0 0 10 12" fill="none" class="shrink-0 opacity-50 text-cream-200">
+              <path d="M5 0C3.067 0 1.5 1.567 1.5 3.5V5H1C0.448 5 0 5.448 0 6v5c0 .552.448 1 1 1h8c.552 0 1-.448 1-1V6c0-.552-.448-1-1-1H8.5V3.5C8.5 1.567 6.933 0 5 0zm2.5 5h-5V3.5C2.5 2.12 3.62 1 5 1s2.5 1.12 2.5 2.5V5z" fill="currentColor"/>
+            </svg>
+            <span class="text-[0.65rem] text-cream-200/60">app.vigie.tmonier.com</span>
+          </div>
+        </div>
+
+        <!-- Browser body -->
+        <div class="browser-body flex bg-navy-900/50 max-md:flex-col">
+          <!-- Sidebar -->
+          <div class="browser-sidebar w-[180px] shrink-0 bg-navy-900/60 border-r border-vigie-400/10 py-5 max-md:hidden">
+            <!-- Logo -->
+            <div class="px-4 pb-5 border-b border-cream-200/10 mb-4">
+              <div class="flex items-center gap-2">
+                <svg width="18" height="18" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-vigie-400">
+                  <circle cx="32" cy="32" r="24" fill="none" stroke="currentColor" stroke-width="2.5"/>
+                  <circle cx="32" cy="32" r="16" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                  <circle cx="32" cy="32" r="8" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
+                  <circle cx="32" cy="32" r="3.5" fill="currentColor"/>
+                  <line x1="32" y1="8" x2="32" y2="2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                  <line x1="52.8" y1="20" x2="57.4" y2="16.4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                  <line x1="52.8" y1="44" x2="57.4" y2="47.6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+                <span class="text-[0.78rem] text-vigie-400 font-semibold">vigie</span>
+              </div>
+            </div>
+            <!-- Nav items -->
+            <nav class="px-3 flex flex-col gap-[0.15rem]">
+              <div class="flex items-center gap-[0.6rem] py-[0.45rem] px-[0.6rem] rounded-md bg-vigie-400/8 border border-vigie-400/15">
+                <span class="size-[6px] rounded-full inline-block shrink-0 bg-success"></span>
+                <span class="text-[0.7rem] text-cream-50">{demo.sidebar.agents}</span>
+              </div>
+              <div class="flex items-center gap-[0.6rem] py-[0.45rem] px-[0.6rem] rounded-md">
+                <span class="w-[6px] h-[6px] rounded-full inline-block shrink-0"></span>
+                <span class="text-[0.7rem] text-cream-200">{demo.sidebar.runs}</span>
+              </div>
+              <div class="flex items-center gap-[0.6rem] py-[0.45rem] px-[0.6rem] rounded-md">
+                <span class="w-[6px] h-[6px] rounded-full inline-block shrink-0"></span>
+                <span class="text-[0.7rem] text-cream-200">{demo.sidebar.settings}</span>
+              </div>
+            </nav>
+          </div>
+
+          <!-- Main area -->
+          <div class="flex-1 p-5 bg-navy-900/40 min-w-0 relative">
+            <!-- Header row -->
+            <div class="flex items-center justify-between mb-4 gap-2">
+              <span class="text-[0.7rem] text-cream-50 font-semibold">{demo.main.taskTitle}</span>
+              <div class="flex items-center gap-[0.6rem]">
+                <span class="badge-active text-[0.65rem] bg-success/12 text-success border border-success/30 rounded-[10px] py-[0.1rem] px-[0.55rem]">{demo.main.badgeActive}</span>
+                <span class="cost-counter text-[0.65rem] text-cream-200 tabular-nums [font-variant-numeric:tabular-nums]">$0.00</span>
+              </div>
+            </div>
+
+            <!-- Agent card -->
+            <div
+              class="agent-card opacity-0 bg-navy-800/50 rounded-lg p-3 mb-4 border border-success/30 transition-[opacity,transform] duration-300 ease-out max-md:p-[0.6rem]"
+            >
+              <div class="agent-header flex items-center justify-between mb-[0.4rem] max-md:flex-col max-md:items-start max-md:gap-1">
+                <div class="flex items-center gap-[0.35rem]">
+                  <span class="size-[6px] rounded-full inline-block bg-success"></span>
+                  <span class="text-[0.7rem] text-vigie-400 font-semibold">Claude Code</span>
+                  <span class="badge-model text-[0.5rem] bg-cream-200/10 border border-cream-200/20 rounded-[4px] py-[0.05rem] px-[0.35rem] text-cream-200">opus</span>
+                </div>
+                <span class="agent-file text-[0.6rem] text-cream-200/60 max-md:text-[0.52rem] max-md:break-all">src/middleware/rate-limit.ts</span>
+              </div>
+              <!-- Context window gauge -->
+              <div class="flex items-center gap-2 mt-[0.55rem]">
+                <span class="text-[0.5rem] text-cream-200/50 shrink-0">{demo.main.contextLabel}</span>
+                <div class="flex-1 h-[3px] bg-cream-200/15 rounded-sm overflow-hidden relative">
+                  <div class="context-bar h-full w-0 rounded-[2px] bg-success [transition:width_1.5s_ease-out,background_0.5s_ease]"></div>
+                </div>
+                <span class="context-pct text-[0.5rem] text-cream-200/50 shrink-0 min-w-[2.2em] text-right [font-variant-numeric:tabular-nums]">0%</span>
+                <span class="context-action text-[0.48rem] text-warning shrink-0 cursor-default opacity-0 transition-opacity duration-[400ms] max-md:hidden" style="border-bottom: 1px dotted color-mix(in srgb, var(--warning) 40%, transparent)">{demo.main.contextAction}</span>
+              </div>
+            </div>
+
+            <!-- Activity log -->
+            <div class="bg-navy-900/50 border border-cream-200/10 rounded-md py-[0.6rem] px-3 mb-3">
+              <div class="text-[0.55rem] tracking-[0.08em] uppercase text-cream-200/40 mb-2">{demo.main.activityLabel}</div>
+              <div class="log-container flex flex-col gap-1 h-[130px] overflow-y-hidden"></div>
+            </div>
+
+            <!-- Action panel — appears after loop detection -->
+            <div class="action-panel-wrapper grid grid-rows-[0fr] [transition:grid-template-rows_0.6s_cubic-bezier(0.22,1,0.36,1)]">
+            <div
+              class="action-panel opacity-0 translate-y-2 overflow-hidden min-h-0 bg-navy-800/40 border border-vigie-400/30 rounded-lg p-3 max-md:p-[0.6rem]"
+            >
+              <!-- Panel header -->
+              <div class="flex items-center justify-between mb-[0.6rem]">
+                <div class="flex items-center gap-[0.4rem]">
+                  <span class="text-[0.6rem] text-warning font-bold">&#9888;</span>
+                  <span class="text-[0.62rem] text-cream-50 font-semibold">{demo.actionPanel.header}</span>
+                </div>
+                <span class="text-[0.55rem] text-warning">$4.20 spent</span>
+              </div>
+
+              <!-- Suggested prompt -->
+              <div class="bg-navy-900/60 border border-cream-200/15 rounded-md py-[0.55rem] px-[0.65rem] mb-[0.6rem]">
+                <div class="text-[0.5rem] tracking-[0.08em] uppercase text-cream-200/40 mb-[0.3rem]">{demo.actionPanel.suggestedPromptLabel}</div>
+                <p class="suggested-prompt-text text-[0.6rem] text-cream-50 m-0 leading-[1.6] italic min-h-[1.6em] max-md:min-h-[4.8em]"></p>
+              </div>
+
+              <!-- Action buttons -->
+              <div class="flex gap-[0.35rem] justify-end">
+                <div
+                  class="action-btn-rollback opacity-0 flex items-center gap-[0.3rem] text-[0.58rem] bg-vigie-400/12 border border-vigie-400/35 rounded-[5px] py-[0.35rem] px-[0.6rem] text-vigie-400 font-semibold cursor-default"
+                >
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="shrink-0">
+                    <path d="M2 8a6 6 0 1 1 1.76 4.24" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    <path d="M2 4v4h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  {demo.actionPanel.btnRollback}
+                </div>
+                <div
+                  class="action-btn-send opacity-0 flex items-center gap-[0.3rem] text-[0.58rem] bg-success/10 border border-success/30 rounded-[5px] py-[0.35rem] px-[0.6rem] text-success font-semibold cursor-default"
+                >
+                  <svg width="10" height="10" viewBox="0 0 16 16" fill="none" class="shrink-0">
+                    <path d="M2 8h12M10 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  {demo.actionPanel.btnResume}
+                </div>
+                <div
+                  class="action-btn-stop opacity-0 text-[0.58rem] bg-danger/8 border border-danger/25 rounded-[5px] py-[0.35rem] px-[0.6rem] text-danger/70 cursor-default"
+                >
+                  {demo.actionPanel.btnStop}
+                </div>
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<script define:vars={{ demoLogs: demo.logs, suggestedPrompt: demo.actionPanel.suggestedPrompt }}>
+  const section = document.getElementById('dashboard-demo');
+  if (section) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // --- Phase 1: Terminal fades in immediately (~500ms) ---
+            const terminal = section.querySelector('.local-terminal');
+            if (terminal) {
+              terminal.classList.add('animate-[fade-up_0.5s_cubic-bezier(0.16,1,0.3,1)_forwards]');
+            }
+
+            // --- Phase 2: WS gap + dashboard grow simultaneously (both endpoints visible before line draws) ---
+            const wsConn = section.querySelector('.ws-connector');
+            const browserWrap = section.querySelector('.browser-wrapper');
+
+            if (wsConn) {
+              // Grid expands at 800ms — gap grows but line/badge stay invisible
+              setTimeout(() => { wsConn.style.gridTemplateRows = '1fr'; }, 800);
+              // Container becomes visible at 1000ms (still no line segments)
+              setTimeout(() => { wsConn.style.opacity = '1'; }, 1000);
+            }
+            if (browserWrap) {
+              // Dashboard grid expands simultaneously with ws gap
+              setTimeout(() => { browserWrap.style.gridTemplateRows = '1fr'; }, 800);
+              setTimeout(() => { browserWrap.style.opacity = '1'; }, 1000);
+            }
+
+            // --- Phase 3: WS line draws top-to-bottom (both endpoints now visible) ---
+            const topLine = section.querySelector('.ws-dash-top');
+            const bottomLine = section.querySelector('.ws-dash-bottom');
+            const wsBadge = section.querySelector('.ws-badge');
+
+            if (topLine) {
+              setTimeout(() => {
+                topLine.classList.remove('scale-y-0');
+                topLine.classList.add('animate-[scroll-stripe_0.6s_linear_infinite]');
+              }, 2000);
+            }
+            if (wsBadge) {
+              setTimeout(() => { wsBadge.style.opacity = '1'; }, 2300);
+            }
+            if (bottomLine) {
+              setTimeout(() => {
+                bottomLine.classList.remove('scale-y-0');
+                bottomLine.classList.add('animate-[scroll-stripe_0.6s_linear_infinite]');
+              }, 2400);
+            }
+
+            // --- Phase 4: Dashboard internal animations start after line fully drawn ---
+            const dashboardStart = 2800;
+
+            const container = section.querySelector('.log-container');
+            if (!container) return;
+
+            // Agent card fade in
+            const agentCard = section.querySelector('.agent-card');
+            if (agentCard) {
+              setTimeout(() => {
+                agentCard.style.opacity = '1';
+                agentCard.style.transform = 'translateY(0)';
+              }, dashboardStart);
+            }
+
+            // Log data — each line injected dynamically like a real terminal
+            const logs = demoLogs;
+
+            let elapsed = dashboardStart + 300;
+            logs.forEach((log) => {
+              elapsed += log.delay;
+              const t = elapsed;
+              setTimeout(() => {
+                const div = document.createElement('div');
+                div.className = 'log-line font-mono text-[0.62rem] leading-[1.8] flex gap-2 items-baseline max-md:text-[0.55rem]';
+                div.style.color = 'color-mix(in srgb, var(--cream-200) 55%, transparent)';
+                div.innerHTML = `<span class="log-line-time shrink-0" style="color: color-mix(in srgb, var(--cream-200) 35%, transparent)">${log.time}</span><span>${log.html}</span>`;
+                container.appendChild(div);
+                container.scrollTop = container.scrollHeight;
+              }, t);
+            });
+
+            const loopDetectedTime = elapsed;
+
+            // --- Agent card border turns amber when loop detected ---
+            setTimeout(() => {
+              const card = section.querySelector('.agent-card');
+              if (card) {
+                card.style.transition = 'border-color 0.4s ease';
+                card.style.borderColor = 'var(--warning)';
+              }
+            }, loopDetectedTime);
+
+            // --- Action panel slides in after loop detected ---
+            const panelWrapper = section.querySelector('.action-panel-wrapper');
+            const panel = section.querySelector('.action-panel');
+            if (panelWrapper) {
+              // Expand the grid wrapper first so space grows smoothly
+              setTimeout(() => {
+                panelWrapper.style.gridTemplateRows = '1fr';
+              }, loopDetectedTime + 300);
+            }
+            if (panel) {
+              // Then fade in the panel content after the space has opened
+              setTimeout(() => {
+                panel.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+                panel.style.opacity = '1';
+                panel.style.transform = 'translateY(0)';
+                panel.style.animation = 'pulse-amber 2.5s ease-in-out 0.3s infinite';
+              }, loopDetectedTime + 500);
+            }
+
+            // --- Stream suggested prompt like LLM token output ---
+            const promptEl = section.querySelector('.suggested-prompt-text');
+            if (promptEl) {
+              const promptText = suggestedPrompt;
+              const words = promptText.split(' ');
+              const tokens = [];
+              for (let i = 0; i < words.length; i += 2) {
+                tokens.push(words.slice(i, i + 2).join(' '));
+              }
+              let tokenIdx = 0;
+              const streamStart = loopDetectedTime + 600;
+              const streamToken = () => {
+                if (tokenIdx >= tokens.length) {
+                  const cursor = promptEl.querySelector('.stream-cursor');
+                  if (cursor) cursor.remove();
+                  return;
+                }
+                promptEl.textContent = (promptEl.textContent || '') + (tokenIdx > 0 ? ' ' : '') + tokens[tokenIdx];
+                let cursor = promptEl.querySelector('.stream-cursor');
+                if (!cursor) {
+                  cursor = document.createElement('span');
+                  cursor.className = 'stream-cursor inline-block w-[5px] h-[0.85em] bg-cream-50 ml-[2px] align-text-bottom animate-[blink_0.6s_step-end_infinite] opacity-70';
+                }
+                promptEl.appendChild(cursor);
+                tokenIdx++;
+                setTimeout(streamToken, 80 + Math.random() * 120);
+              };
+              setTimeout(streamToken, streamStart);
+            }
+
+            // Action buttons staggered after panel
+            const btnRollback = section.querySelector('.action-btn-rollback');
+            const btnSend = section.querySelector('.action-btn-send');
+            const btnStop = section.querySelector('.action-btn-stop');
+            [btnRollback, btnSend, btnStop].forEach((btn, i) => {
+              if (btn) {
+                setTimeout(() => {
+                  btn.style.transition = 'opacity 0.15s ease-out';
+                  btn.style.opacity = '1';
+                }, loopDetectedTime + 700 + i * 100);
+              }
+            });
+
+            // Signal that the full demo animation is complete
+            setTimeout(() => {
+              document.dispatchEvent(new CustomEvent('dashboard-demo-complete'));
+            }, loopDetectedTime + 1100);
+
+            // --- Context window bar: synced with log progression ---
+            const ctxBar = section.querySelector('.context-bar');
+            const ctxPct = section.querySelector('.context-pct');
+            if (ctxBar && ctxPct) {
+              const ctxSteps = [
+                { delay: dashboardStart + 550,  width: '18', pct: '18%', color: 'var(--success)' },
+                { delay: dashboardStart + 1100, width: '31', pct: '31%', color: 'var(--success)' },
+                { delay: dashboardStart + 1350, width: '44', pct: '44%', color: 'var(--warning)' },
+                { delay: dashboardStart + 1950, width: '57', pct: '57%', color: 'var(--warning)' },
+                { delay: loopDetectedTime,      width: '65', pct: '65%', color: 'var(--warning)' },
+              ];
+              for (const step of ctxSteps) {
+                setTimeout(() => {
+                  ctxBar.style.width = step.width + '%';
+                  ctxBar.style.background = step.color;
+                  ctxPct.textContent = step.pct;
+                  ctxPct.style.color = step.color;
+                }, step.delay);
+              }
+              const ctxAction = section.querySelector('.context-action');
+              if (ctxAction) {
+                setTimeout(() => { ctxAction.style.opacity = '1'; }, loopDetectedTime + 100);
+              }
+            }
+
+            // --- Cost counter: synced with log progression ---
+            const costEl = section.querySelector('.cost-counter');
+            if (costEl) {
+              const costSteps = [
+                { delay: dashboardStart + 550,  value: '$0.40', color: '' },
+                { delay: dashboardStart + 1100, value: '$1.12', color: '' },
+                { delay: dashboardStart + 1350, value: '$2.30', color: 'var(--warning)' },
+                { delay: dashboardStart + 1950, value: '$3.45', color: 'var(--warning)' },
+                { delay: loopDetectedTime,      value: '$4.20', color: 'var(--warning)' },
+              ];
+              for (const step of costSteps) {
+                setTimeout(() => {
+                  costEl.textContent = step.value;
+                  if (step.color) costEl.style.color = step.color;
+                }, step.delay);
+              }
+            }
+
+            observer.unobserve(section);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(section);
+  }
+</script>

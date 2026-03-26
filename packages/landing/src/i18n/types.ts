@@ -1,138 +1,81 @@
 export interface SiteContent {
-  meta: {
-    title: string;
-    description: string;
-    keywords: string;
-  };
-  nav: {
-    approach: string;
-    about: string;
-    stack: string;
-    experience: string;
-    projects: string;
-    vigie: string;
-    contact: string;
-  };
+  meta: { title: string; description: string };
+  nav: { demo: string; openSource: string; faq: string; github: string };
   hero: {
-    fullName: string;
-    tagline: string;
-    name: string;
-    oneLiner: string;
-    ctaPrimary: string;
-    ctaSecondary: string;
-  };
-  origin: {
     pronunciation: string;
-    grammar: string;
-    alt: string;
     definition: string;
-  };
-  approach: {
-    label: string;
-    title: string;
-    pitch: string;
-    cards: {
-      title: string;
-      description: string;
-    }[];
-  };
-  about: {
-    label: string;
-    title: string;
-    paragraphs: string[];
-    photoAlt: string;
-    tags: string[];
-  };
-  stack: {
-    label: string;
-    title: string;
-    terminalTitle: string;
-    command: string;
-    categories: {
-      name: string;
-      items: { name: string; years: number }[];
-    }[];
-    practices: {
-      title: string;
-      description: string;
-      tags: string[];
-    }[];
-  };
-  experience: {
-    label: string;
-    title: string;
-    badgeEmployee: string;
-    badgeInternship: string;
-    badgeFounder: string;
-    jobs: {
-      period: string;
-      company: string;
-      missionAt?: string;
-      type?: 'employee' | 'internship' | 'founder';
-      role: string;
-      location: string;
-      description: string;
-      bullets: string[];
-      tags: string[];
-    }[];
-    references: string;
-    projectsLabel: string;
-    projectsTitle: string;
-    projects: {
-      period: string;
-      name: string;
-      builtAt?: string;
-      type: string;
-      description: string;
-      tags: string[];
-      link?: string;
-    }[];
-  };
-  education: {
-    label: string;
-    title: string;
-    degree: string;
-    specialisation: string;
-    school: string;
-    period: string;
-    distinction: string;
-    languagesTitle: string;
-    languages: string[];
-  };
-  flagship: {
-    label: string;
-    title: string;
-    description: string;
-    cta: string;
-    terminalLines: string[];
-  };
-  contact: {
-    label: string;
-    title: string;
-    availability: string;
-    email: string;
-    phone: string;
-    cta: string;
-  };
-  footer: {
-    company: string;
     tagline: string;
-    copyright: string;
+    description: string;
+    ctaGithub: string;
+    ctaWaitlist: string;
   };
-  contactPage: {
-    title: string;
+  toolsStrip: {
+    label: string;
+    comingSoon: string;
+  };
+  demo: {
+    terminal: {
+      title: string;
+      command: string;
+      daemonRunning: string;
+      watching: string;
+      localFirst: string;
+    };
+    sidebar: { agents: string; runs: string; settings: string };
+    main: {
+      taskTitle: string;
+      badgeActive: string;
+      contextLabel: string;
+      contextAction: string;
+      activityLabel: string;
+    };
+    actionPanel: {
+      header: string;
+      suggestedPromptLabel: string;
+      suggestedPrompt: string;
+      btnRollback: string;
+      btnResume: string;
+      btnStop: string;
+    };
+    logs: Array<{ time: string; html: string; delay: number }>;
+  };
+  openSource: {
     heading: string;
-    subtitle: string;
-    nameLabel: string;
-    namePlaceholder: string;
+    licenseBadge: string;
+    headline: string;
+    description: string;
+    ctaGithub: string;
+    byoaHeadline: string;
+    byoaDescription: string;
+    agplJoke: string;
+  };
+  waitlist: {
+    heading1: string;
+    heading2: string;
+    description: string;
+    githubLinkText: string;
     emailLabel: string;
     emailPlaceholder: string;
-    subjectLabel: string;
-    subjectPlaceholder: string;
-    subjectOptions: { value: string; label: string }[];
-    messageLabel: string;
-    messagePlaceholder: string;
-    submit: string;
-    altText: string;
+    ctaSubmit: string;
+    ctaLoading: string;
+    successMessage: string;
+    errorMessage: string;
+    errorRateLimit: string;
+    backButton: string;
+    footerText: string;
+  };
+  faq: {
+    pageLabel: string;
+    pageHeading: string;
+    pageDescription: string;
+    categories: Array<{
+      title: string;
+      items: Array<{ question: string; answer: string }>;
+    }>;
+  };
+  footer: {
+    builtBy: string;
+    tagline: string;
+    legal: string;
   };
 }

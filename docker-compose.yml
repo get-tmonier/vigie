@@ -4,9 +4,9 @@ services:
     ports:
       - '5432:5432'
     environment:
-      POSTGRES_DB: tmonier
-      POSTGRES_USER: tmonier
-      POSTGRES_PASSWORD: tmonier
+      POSTGRES_DB: vigie
+      POSTGRES_USER: vigie
+      POSTGRES_PASSWORD: vigie
     volumes:
       - pgdata:/var/lib/postgresql/data
 

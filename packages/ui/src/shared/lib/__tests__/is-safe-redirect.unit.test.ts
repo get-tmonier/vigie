@@ -6,7 +6,7 @@ describe('isSafeRedirect', () => {
 
   beforeAll(() => {
     globalThis.window = {
-      location: { origin: 'https://app.tmonier.com' },
+      location: { origin: 'https://app.vigie.tmonier.com' },
     } as unknown as Window & typeof globalThis;
   });
 
@@ -19,7 +19,7 @@ describe('isSafeRedirect', () => {
   });
 
   it('accepts same-origin absolute URL', () => {
-    expect(isSafeRedirect('https://app.tmonier.com/settings')).toBe(true);
+    expect(isSafeRedirect('https://app.vigie.tmonier.com/settings')).toBe(true);
   });
 
   it('accepts localhost callback URL', () => {

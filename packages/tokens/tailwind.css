@@ -1,24 +1,33 @@
 @theme {
-  --color-navy-deep: #0b1a2e;
-  --color-navy-mid: #1d3557;
-  --color-navy-light: #2a4a7f;
-  --color-gold: #c49a2b;
-  --color-gold-light: #d4aa3c;
-  --color-gold-pale: #e0bc5a;
-  --color-gold-dark: #a67c1a;
-  --color-cream: #f5f0e8;
-  --color-cream-dark: #e8e0d0;
-  --color-slate: #8b9caf;
-  --color-success: #22c55e;
-  --color-error: #ef4444;
-  --color-signal-green: #28c840;
-  --color-signal-red: #ff5f57;
-  --color-signal-amber: #ffbd2e;
-  --color-signal-orange: #ff8c42;
+  /* Foundation */
+  --color-navy-900: #0a1628;
+  --color-navy-800: #0f2035;
+  --color-navy-700: #162d4a;
+  --color-navy-600: #1e3a5f;
+  --color-brass-400: #d4aa3c;
+  --color-cream-50: #fdf8f0;
+  --color-cream-100: #f5ede0;
+  --color-cream-200: #e8dcc8;
 
-  --font-vollkorn-sc: "Vollkorn SC", serif;
-  --font-vollkorn: "Vollkorn", serif;
-  --font-source-serif: "Source Serif 4", serif;
+  /* vigie accent */
+  --color-vigie-50: #e8f8f5;
+  --color-vigie-100: #b2ebe0;
+  --color-vigie-200: #7dddc8;
+  --color-vigie-300: #4ecfb0;
+  --color-vigie-400: #26c09a;
+  --color-vigie-500: #1fa882;
+  --color-vigie-600: #178a6a;
+  --color-vigie-700: #106b52;
+  --color-vigie-800: #094d3b;
+
+  /* Semantic */
+  --color-warning: #f0a030;
+  --color-danger: #e24b4a;
+  --color-success: #26c09a;
+  --color-idle: #162d4a;
+
+  /* Typography */
+  --font-display: "Instrument Serif", serif;
+  --font-body: "DM Sans", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
-  --font-bitter: "Bitter", serif;
 }

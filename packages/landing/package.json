@@ -1,5 +1,5 @@
 {
-  "name": "@tmonier/landing",
+  "name": "@vigie/landing",
   "type": "module",
   "version": "0.0.1",
   "private": true,
@@ -11,8 +11,8 @@
     "#lib/*": "./src/lib/*"
   },
   "scripts": {
-    "dev": "astro dev",
-    "build": "bun scripts/gen-favicon.mjs && astro build",
+    "dev": "astro dev --port 4322",
+    "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "biome lint .",
@@ -25,22 +25,17 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.0",
-    "@fontsource/bitter": "5.2.10",
+    "@fontsource-variable/dm-sans": "5.2.8",
+    "@fontsource/instrument-serif": "5.2.8",
     "@fontsource/jetbrains-mono": "5.2.8",
-    "@fontsource/source-serif-4": "5.2.9",
-    "@fontsource/vollkorn": "5.2.10",
-    "@fontsource/vollkorn-sc": "5.2.8",
     "@tailwindcss/vite": "4.2.1",
-    "@tmonier/tokens": "workspace:*",
+    "@vigie/tokens": "workspace:*",
     "astro": "6.0.0-beta.17",
     "tailwind-merge": "3.5.0",
     "tailwindcss": "4.2.1"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.6",
-    "@resvg/resvg-js": "2.6.2",
-    "satori": "0.19.2",
-    "sharp": "0.34.5",
     "typescript": "5.9.3",
     "vite": "7.3.1"
   }

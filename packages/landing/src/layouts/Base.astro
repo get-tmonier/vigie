@@ -1,22 +1,18 @@
 ---
 import '#styles/global.css';
 
-import bitter600 from '@fontsource/bitter/files/bitter-latin-600-normal.woff2?url';
-import jbMono400 from '@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2?url';
-import sourceSerif400 from '@fontsource/source-serif-4/files/source-serif-4-latin-400-normal.woff2?url';
-import vollkornSc700 from '@fontsource/vollkorn-sc/files/vollkorn-sc-latin-700-normal.woff2?url';
-import vollkornSc900 from '@fontsource/vollkorn-sc/files/vollkorn-sc-latin-900-normal.woff2?url';
-
 interface Props {
   title?: string;
   description?: string;
   locale?: string;
+  skipLabel?: string;
 }
 
 const {
-  title = 'Damien Meur — Senior Fullstack Engineer · Freelance · Brussels',
-  description = 'Damien Meur — Senior Fullstack Engineer available for freelance missions in Brussels.',
+  title = 'vigie — Open-Source AI Agent Supervision · by Tmonier',
+  description = 'Local-first agent supervisor for software engineers. Real-time visibility, drift detection, token cost guardrails, checkpoints & rollback.',
   locale = 'en',
+  skipLabel = 'Skip to main content',
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -26,63 +22,6 @@ const altPath =
     ? Astro.url.pathname.replace(/^\/fr\//, '/').replace(/^\/fr$/, '/')
     : `/fr${Astro.url.pathname === '/' ? '/' : Astro.url.pathname}`;
 const altURL = new URL(altPath, Astro.site);
-
-const personJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: 'Damien Meur',
-  jobTitle: 'Senior Fullstack Engineer',
-  description:
-    'Freelance Senior Fullstack Engineer based in Brussels. 8+ years building production software with TypeScript, React, and Effect-TS. Creator of Vigie.',
-  url: 'https://tmonier.com',
-  email: 'damien.meur@tmonier.com',
-  sameAs: ['https://www.linkedin.com/in/damien-meur/', 'https://github.com/get-tmonier'],
-  knowsAbout: [
-    'TypeScript',
-    'React',
-    'Node.js',
-    'Effect-TS',
-    'PostgreSQL',
-    'Clean Architecture',
-    'Software Craft',
-    'AI Agent Supervision',
-  ],
-  address: {
-    '@type': 'PostalAddress',
-    addressLocality: 'Brussels',
-    addressCountry: 'BE',
-  },
-  worksFor: {
-    '@type': 'Organization',
-    name: 'Tmonier',
-    url: 'https://tmonier.com',
-  },
-};
-
-const organizationJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: 'Tmonier',
-  url: 'https://tmonier.com',
-  logo: 'https://tmonier.com/favicon.svg',
-  sameAs: ['https://www.linkedin.com/in/damien-meur/', 'https://github.com/get-tmonier'],
-};
-
-const vigieJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: 'Vigie',
-  url: 'https://vigie.tmonier.com',
-  description:
-    'Local-first supervision layer for AI coding agents. Real-time monitoring, loop detection, token cost guardrails, and human-in-the-loop control over Claude Code.',
-  applicationCategory: 'DeveloperApplication',
-  operatingSystem: 'macOS, Linux, Windows',
-  author: {
-    '@type': 'Person',
-    name: 'Damien Meur',
-    url: 'https://tmonier.com',
-  },
-};
 ---
 
 <!doctype html>
@@ -90,56 +29,22 @@ const vigieJsonLd = {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-
-    <!-- Primary Meta -->
     <title>{title}</title>
     <meta name="description" content={description} />
-
-    <!-- Canonical + hreflang -->
     <link rel="canonical" href={canonicalURL} />
     <link rel="alternate" hreflang={locale} href={canonicalURL} />
     <link rel="alternate" hreflang={altLocale} href={altURL} />
     <link rel="alternate" hreflang="x-default" href={new URL('/', Astro.site)} />
-
-    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-
-    <!-- Preload critical above-the-fold fonts -->
-    <link rel="preload" href={vollkornSc900} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={vollkornSc700} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={jbMono400} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={sourceSerif400} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={bitter600} as="font" type="font/woff2" crossorigin />
-
-    <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content="https://tmonier.com/og-image.png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
     <meta property="og:url" content={canonicalURL} />
-    <meta property="og:type" content="profile" />
-    <meta property="profile:first_name" content="Damien" />
-    <meta property="profile:last_name" content="Meur" />
-    <meta property="og:site_name" content="Tmonier" />
-    <meta property="og:locale" content={locale === 'fr' ? 'fr_BE' : 'en_US'} />
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content="https://tmonier.com/og-image.png" />
-
-    <!-- Structured data -->
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(personJsonLd)} />
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationJsonLd)} />
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(vigieJsonLd)} />
+    <meta property="og:type" content="website" />
     <slot name="head" />
   </head>
   <body>
-    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:bg-gold focus:text-navy-deep focus:font-mono focus:text-sm focus:font-semibold focus:py-2 focus:px-4 focus:rounded-[4px] focus:no-underline">
-      Skip to main content
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:bg-vigie-400 focus:text-navy-900 focus:font-mono focus:text-sm focus:font-semibold focus:py-2 focus:px-4 focus:rounded-[4px] focus:no-underline">
+      {skipLabel}
     </a>
     <slot />
   </body>

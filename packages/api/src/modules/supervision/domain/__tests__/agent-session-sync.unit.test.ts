@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import type { DaemonSyncSession } from '@tmonier/shared';
+import type { DaemonSyncSession } from '@vigie/shared';
 import { createAgentSessionFromSync } from '../agent-session';
 
 const baseSyncSession: DaemonSyncSession = {

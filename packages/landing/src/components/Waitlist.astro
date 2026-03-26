@@ -1,0 +1,187 @@
+---
+import RadarMark from '#components/RadarMark.astro';
+import type { SiteContent } from '../i18n/types';
+
+interface Props {
+  content: SiteContent;
+}
+const { content } = Astro.props;
+const { waitlist } = content;
+---
+
+<section id="waitlist" class="bg-navy-900 py-24 px-10 text-center min-h-screen box-border flex flex-col justify-center max-md:py-8 max-md:px-5 max-md:pb-6">
+  <div class="max-w-[600px] mx-auto">
+    <div class="flex justify-center mb-10">
+      <RadarMark size={80} />
+    </div>
+
+    <h2
+      class="font-display text-cream-200 text-[clamp(1.4rem,3vw,1.9rem)] m-0 mb-4 leading-[1.35] [text-wrap:balance]"
+    >
+      {waitlist.heading1}
+    </h2>
+
+    <p
+      class="font-display text-vigie-400 text-[clamp(1.3rem,3vw,1.8rem)] m-0 mb-6 leading-[1.3]"
+    >
+      {waitlist.heading2}
+    </p>
+
+    <p
+      class="font-mono text-cream-50 text-[0.82rem] m-0 mb-8 leading-[1.6]"
+    >
+      {waitlist.description} <a href="https://github.com/get-tmonier/core" class="text-vigie-400 no-underline hover:underline">{waitlist.githubLinkText}</a>.
+    </p>
+
+    <div class="newsletter-form-container">
+      <form
+        class="newsletter-form waitlist-form flex gap-3 max-w-[480px] mx-auto mb-4 max-[540px]:flex-col"
+        action="https://app.loops.so/api/newsletter-form/cmm61m1au0ws70i1mpmh6f87r"
+        method="POST"
+      >
+        <label for="waitlist-email" class="sr-only">{waitlist.emailLabel}</label>
+        <input
+          id="waitlist-email"
+          class="newsletter-form-input font-mono text-cream-50 flex-1 text-[0.85rem] bg-navy-800/50 rounded-lg py-[0.8rem] px-4 outline-none min-w-0 shadow-[inset_0_0_0_1px_rgba(38,192,154,0.2)] transition-all duration-200 focus:shadow-[inset_0_0_0_1px_rgba(38,192,154,0.5),0_0_0_3px_rgba(38,192,154,0.1)]"
+          type="email"
+          name="newsletter-form-input"
+          placeholder={waitlist.emailPlaceholder}
+          required
+          autocomplete="email"
+          aria-describedby="waitlist-error-msg"
+        />
+        <button
+          type="submit"
+          class="newsletter-form-button font-mono bg-vigie-400 text-navy-900 font-semibold text-[0.85rem] border-none rounded-lg py-[0.8rem] px-[1.4rem] cursor-pointer whitespace-nowrap shadow-[0_1px_2px_rgba(0,0,0,0.15),0_4px_12px_rgba(38,192,154,0.2)] transition-all duration-200 hover:bg-vigie-500 hover:shadow-[0_2px_4px_rgba(0,0,0,0.2),0_8px_24px_rgba(38,192,154,0.25)]"
+        >
+          {waitlist.ctaSubmit}
+        </button>
+        <button
+          type="button"
+          class="newsletter-loading-button hidden font-mono bg-vigie-400 text-navy-900 font-semibold text-[0.85rem] border-none rounded-[4px] py-[0.8rem] px-[1.4rem] whitespace-nowrap opacity-70 cursor-not-allowed"
+        >
+          {waitlist.ctaLoading}
+        </button>
+      </form>
+
+      <div class="newsletter-success hidden justify-center items-center p-[0.8rem] mb-4" aria-live="polite">
+        <p class="font-mono text-vigie-400 text-[0.82rem] m-0">
+          {waitlist.successMessage}
+        </p>
+      </div>
+
+      <div class="newsletter-error hidden justify-center items-center p-[0.8rem] mb-4" aria-live="polite">
+        <p id="waitlist-error-msg" class="newsletter-error-message font-mono text-[0.82rem] text-[#c0392b] m-0">
+          {waitlist.errorMessage}
+        </p>
+      </div>
+
+      <button
+        class="newsletter-back-button hidden font-mono text-cream-200 text-[0.75rem] bg-transparent border-none cursor-pointer mx-auto mt-2 hover:underline"
+        type="button"
+      >
+        {waitlist.backButton}
+      </button>
+    </div>
+
+    <p class="font-mono text-[0.72rem] text-cream-200/60 m-0">
+      {waitlist.footerText}
+    </p>
+  </div>
+</section>
+
+<script define:vars={{ errorMsg: waitlist.errorMessage, rateLimitMsg: waitlist.errorRateLimit }}>
+  function submitHandler(event) {
+    event.preventDefault();
+    const container = event.target.parentNode;
+    const form = container.querySelector('.newsletter-form');
+    const formInput = container.querySelector('.newsletter-form-input');
+    const success = container.querySelector('.newsletter-success');
+    const errorContainer = container.querySelector('.newsletter-error');
+    const errorMessage = container.querySelector('.newsletter-error-message');
+    const backButton = container.querySelector('.newsletter-back-button');
+    const submitButton = container.querySelector('.newsletter-form-button');
+    const loadingButton = container.querySelector('.newsletter-loading-button');
+
+    const show = (el) => el.classList.remove('hidden');
+    const hide = (el) => el.classList.add('hidden');
+
+    const rateLimit = () => {
+      show(errorContainer);
+      errorMessage.innerText = rateLimitMsg;
+      hide(submitButton);
+      hide(formInput);
+      show(backButton);
+    };
+
+    const time = new Date();
+    const timestamp = time.valueOf();
+    const previousTimestamp = localStorage.getItem('loops-form-timestamp');
+    if (previousTimestamp && Number(previousTimestamp) + 60000 > timestamp) {
+      rateLimit();
+      return;
+    }
+    localStorage.setItem('loops-form-timestamp', String(timestamp));
+
+    hide(submitButton);
+    show(loadingButton);
+
+    const formBody = 'userGroup=&mailingLists=&email=' + encodeURIComponent(formInput.value);
+
+    fetch(event.target.action, {
+      method: 'POST',
+      body: formBody,
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    })
+      .then((res) => Promise.all([res.ok, res.json()]))
+      .then(([ok, data]) => {
+        if (ok) {
+          show(success);
+          form.reset();
+        } else {
+          show(errorContainer);
+          errorMessage.innerText = data.message ?? errorMsg;
+        }
+      })
+      .catch((error) => {
+        if (error.message === 'Failed to fetch') { rateLimit(); return; }
+        show(errorContainer);
+        if (error.message) errorMessage.innerText = error.message;
+        localStorage.setItem('loops-form-timestamp', '');
+      })
+      .finally(() => {
+        hide(formInput);
+        hide(loadingButton);
+        show(backButton);
+      });
+  }
+
+  function resetFormHandler(event) {
+    const container = event.target.parentNode;
+    const formInput = container.querySelector('.newsletter-form-input');
+    const success = container.querySelector('.newsletter-success');
+    const errorContainer = container.querySelector('.newsletter-error');
+    const errorMessage = container.querySelector('.newsletter-error-message');
+    const backButton = container.querySelector('.newsletter-back-button');
+    const submitButton = container.querySelector('.newsletter-form-button');
+
+    const show = (el) => el.classList.remove('hidden');
+    const hide = (el) => el.classList.add('hidden');
+
+    hide(success);
+    hide(errorContainer);
+    errorMessage.innerText = errorMsg;
+    hide(backButton);
+    show(formInput);
+    show(submitButton);
+  }
+
+  const formContainers = document.getElementsByClassName('newsletter-form-container');
+  for (let i = 0; i < formContainers.length; i++) {
+    const container = formContainers[i];
+    if (container.classList.contains('newsletter-handlers-added')) continue;
+    container.querySelector('.newsletter-form').addEventListener('submit', submitHandler);
+    container.querySelector('.newsletter-back-button').addEventListener('click', resetFormHandler);
+    container.classList.add('newsletter-handlers-added');
+  }
+</script>

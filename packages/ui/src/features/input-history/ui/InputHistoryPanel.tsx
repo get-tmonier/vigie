@@ -16,26 +16,28 @@ function formatRelativeTime(timestamp: number): string {
 export function InputHistoryPanel({ history }: InputHistoryPanelProps) {
   if (history.length === 0) {
     return (
-      <div className="w-64 border-l border-navy-light bg-navy-deep p-3">
-        <div className="text-xs text-slate uppercase tracking-wider mb-2">Input History</div>
-        <div className="text-xs text-slate">No commands yet</div>
+      <div className="w-64 shadow-[-1px_0_0_0_rgba(22,45,74,0.8)] bg-navy-900 p-3">
+        <div className="font-mono text-[0.6rem] text-cream-200/50 uppercase tracking-[0.12em] mb-2">
+          Input History
+        </div>
+        <div className="text-xs text-cream-50-200">No commands yet</div>
       </div>
     );
   }
 
   return (
-    <div className="w-64 border-l border-navy-light bg-navy-deep overflow-y-auto">
-      <div className="text-xs text-slate uppercase tracking-wider p-3 pb-2 sticky top-0 bg-navy-deep">
+    <div className="w-64 shadow-[-1px_0_0_0_rgba(22,45,74,0.8)] bg-navy-900 overflow-y-auto">
+      <div className="font-mono text-[0.6rem] text-cream-200/50 uppercase tracking-[0.12em] p-3 pb-2 sticky top-0 bg-navy-900">
         Input History
       </div>
       <div className="space-y-1 px-3 pb-3">
         {history.map((entry, i) => (
           <div key={`${entry.timestamp}-${i}`} className="group">
-            <div className="font-mono text-xs text-cream truncate">{entry.text}</div>
-            <div className="flex items-center gap-1.5 text-[0.625rem] text-slate">
+            <div className="font-mono text-xs text-cream-50 truncate">{entry.text}</div>
+            <div className="flex items-center gap-1.5 text-[0.625rem] text-cream-50-200">
               <span>{formatRelativeTime(entry.timestamp)}</span>
               {entry.source && (
-                <span className="px-1 py-px rounded bg-navy-light text-[0.5625rem] uppercase tracking-wider">
+                <span className="px-1 py-px rounded bg-navy-700 text-[0.5625rem] uppercase tracking-wider">
                   {entry.source}
                 </span>
               )}

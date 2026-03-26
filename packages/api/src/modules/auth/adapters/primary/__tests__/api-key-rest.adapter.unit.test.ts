@@ -72,7 +72,7 @@ describe('api-key-rest adapter', () => {
 
     it('POST /api/keys with valid name returns 201', async () => {
       authenticatedUser = { id: 'user-1', name: 'Test' };
-      createApiKey.mockResolvedValue({ id: 'k1', name: 'My Key', key: 'tmonier_abc' });
+      createApiKey.mockResolvedValue({ id: 'k1', name: 'My Key', key: 'vigie_abc' });
       const app = createApp();
 
       const res = await app.request('/api/keys', {
@@ -82,7 +82,7 @@ describe('api-key-rest adapter', () => {
       });
       expect(res.status).toBe(201);
       const body = await res.json();
-      expect(body.key).toBe('tmonier_abc');
+      expect(body.key).toBe('vigie_abc');
     });
 
     it('POST /api/keys with empty name returns 400', async () => {

@@ -1,4 +1,4 @@
-import type { SSEEvent } from '@tmonier/shared';
+import type { SSEEvent } from '@vigie/shared';
 import { type Effect, ServiceMap } from 'effect';
 
 interface EventPublisherShape {

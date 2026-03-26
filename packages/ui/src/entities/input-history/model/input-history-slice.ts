@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { SSETerminalInputEcho } from '@tmonier/shared';
+import type { SSETerminalInputEcho } from '@vigie/shared';
 import type { RootState } from '#app/store';
 
 export interface HistoryEntry {

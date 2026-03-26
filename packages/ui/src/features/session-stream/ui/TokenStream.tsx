@@ -10,10 +10,10 @@ interface TokenStreamProps {
 function ChunkDisplay({ chunk }: { chunk: SessionChunk }) {
   switch (chunk.type) {
     case 'text':
-      return <span className="text-cream whitespace-pre-wrap break-words">{chunk.data}</span>;
+      return <span className="text-cream-50 whitespace-pre-wrap break-words">{chunk.data}</span>;
     case 'thinking':
       return (
-        <div className="text-slate italic text-xs py-1 border-l-2 border-navy-light pl-2 my-1">
+        <div className="text-cream-200 italic text-xs py-1 border-l-2 border-vigie-400/20 pl-2 my-1">
           {chunk.data}
         </div>
       );
@@ -23,21 +23,25 @@ function ChunkDisplay({ chunk }: { chunk: SessionChunk }) {
       const input = parts.slice(1).join(' ');
       return (
         <div className="flex items-start gap-2 py-1 my-1">
-          <span className="text-gold font-bold text-xs shrink-0">{toolName}</span>
-          {input && <span className="text-slate text-xs truncate">{input.slice(0, 100)}</span>}
+          <span className="text-vigie-400 font-bold text-xs shrink-0">{toolName}</span>
+          {input && <span className="text-cream-200 text-xs truncate">{input.slice(0, 100)}</span>}
         </div>
       );
     }
     case 'tool_result': {
       const truncated = chunk.data.length > 200 ? `${chunk.data.slice(0, 200)}...` : chunk.data;
-      return <div className="text-slate text-xs pl-4 py-0.5 opacity-60 truncate">{truncated}</div>;
+      return (
+        <div className="text-cream-200 text-xs pl-4 py-0.5 opacity-60 truncate">{truncated}</div>
+      );
     }
     case 'status':
       return (
-        <div className="text-gold text-xs py-2 border-t border-navy-light mt-2">{chunk.data}</div>
+        <div className="text-vigie-400 text-xs py-2 border-t border-navy-700/50 mt-2">
+          {chunk.data}
+        </div>
       );
     case 'error':
-      return <div className="text-error text-xs py-1">{chunk.data}</div>;
+      return <div className="text-danger text-xs py-1">{chunk.data}</div>;
   }
 }
 
@@ -58,13 +62,13 @@ export function TokenStream({ chunks }: TokenStreamProps) {
   return (
     <div
       ref={containerRef}
-      className="flex-1 font-mono text-[0.8125rem] leading-relaxed bg-navy-deep p-4 overflow-y-auto"
+      className="flex-1 font-mono text-[0.8125rem] leading-relaxed bg-navy-900 p-4 overflow-y-auto"
     >
       {thinkingChunks.length > 0 && (
         <button
           type="button"
           onClick={() => setShowThinking(!showThinking)}
-          className="text-xs text-slate hover:text-cream mb-2 flex items-center gap-1"
+          className="text-xs text-cream-200 hover:text-cream-50 mb-2 flex items-center gap-1"
         >
           <span className={cn('transition-transform', showThinking && 'rotate-90')}>&#9654;</span>
           {thinkingChunks.length} thinking block{thinkingChunks.length > 1 ? 's' : ''}

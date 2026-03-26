@@ -1,6 +1,155 @@
 ---
-import HomePage from '#components/HomePage.astro';
+import DashboardDemo from '#components/DashboardDemo.astro';
+import Footer from '#components/Footer.astro';
+import Header from '#components/Header.astro';
+import Pricing from '#components/Pricing.astro';
+import ToolsStrip from '#components/ToolsStrip.astro';
+import Waitlist from '#components/Waitlist.astro';
+import Base from '#layouts/Base.astro';
 import fr from '../../i18n/fr';
+
+const content = fr;
+const locale = 'fr';
 ---
 
-<HomePage content={fr} locale="fr" />
+<Base title={content.meta.title} description={content.meta.description} locale={locale}>
+  <Header content={content} locale={locale} />
+  <main id="main">
+    <!-- Hero -->
+    <section class="min-h-[calc(100vh-52px)] flex flex-col items-center justify-center px-10 text-center relative" style="background: radial-gradient(ellipse at 50% 40%, rgba(38,192,154,0.06) 0%, transparent 55%)">
+
+      <!-- Animated radar logo -->
+      <div class="hero-radar relative mb-6" style="width: 120px; height: 120px;">
+        <!-- Ambient scan sweep (continuous, starts after draw) -->
+        <div class="hero-sweep absolute inset-0 opacity-0" style="transition: opacity 0.8s ease 2.2s;">
+          <svg viewBox="0 0 120 120" class="w-full h-full animate-[spin_8s_linear_infinite]">
+            <defs>
+              <linearGradient id="sweep-grad" gradientTransform="rotate(90)">
+                <stop offset="0%" stop-color="rgba(38,192,154,0)" />
+                <stop offset="100%" stop-color="rgba(38,192,154,0.12)" />
+              </linearGradient>
+            </defs>
+            <path d="M60,60 L60,6 A54,54 0 0,1 105,35 Z" fill="url(#sweep-grad)" />
+          </svg>
+        </div>
+
+        <!-- Main radar SVG with draw animation -->
+        <svg viewBox="0 0 64 64" class="w-full h-full relative z-10" style="overflow: visible;">
+          <defs>
+            <linearGradient id="hero-vigie" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#4ECFB0" />
+              <stop offset="100%" stop-color="#178A6A" />
+            </linearGradient>
+          </defs>
+          <circle cx="32" cy="32" r="8" fill="none" stroke="url(#hero-vigie)" stroke-width="1" opacity="0.5"
+            class="hero-ring" style="stroke-dasharray: 50.27; stroke-dashoffset: 50.27;" />
+          <circle cx="32" cy="32" r="16" fill="none" stroke="url(#hero-vigie)" stroke-width="1.5" opacity="0.7"
+            class="hero-ring" style="stroke-dasharray: 100.53; stroke-dashoffset: 100.53;" />
+          <circle cx="32" cy="32" r="24" fill="none" stroke="url(#hero-vigie)" stroke-width="2.5"
+            class="hero-ring" style="stroke-dasharray: 150.80; stroke-dashoffset: 150.80;" />
+          <circle cx="32" cy="32" r="3.5" fill="url(#hero-vigie)"
+            class="hero-center" style="transform-origin: 32px 32px; transform: scale(0); opacity: 0;" />
+          <line x1="32" y1="8" x2="32" y2="2" stroke="url(#hero-vigie)" stroke-width="2.5" stroke-linecap="round"
+            class="hero-ray" style="stroke-dasharray: 6; stroke-dashoffset: 6;" />
+          <line x1="52.8" y1="20" x2="57.4" y2="16.4" stroke="url(#hero-vigie)" stroke-width="2.5" stroke-linecap="round"
+            class="hero-ray" style="stroke-dasharray: 5.6; stroke-dashoffset: 5.6;" />
+          <line x1="52.8" y1="44" x2="57.4" y2="47.6" stroke="url(#hero-vigie)" stroke-width="2.5" stroke-linecap="round"
+            class="hero-ray" style="stroke-dasharray: 5.6; stroke-dashoffset: 5.6;" />
+        </svg>
+
+        <div class="hero-glow absolute inset-[-20px] rounded-full opacity-0" style="background: radial-gradient(circle, rgba(38,192,154,0.08) 0%, transparent 70%); transition: opacity 1s ease 2s;"></div>
+      </div>
+
+      <!-- Text content — chained after logo animation -->
+      <h1 class="hero-text font-display text-vigie-400 text-[clamp(2.8rem,6vw,5rem)] m-0 mb-2 leading-[1.1] [text-wrap:balance] opacity-0" style="transform: translateY(12px); filter: blur(2px);">
+        vigie
+      </h1>
+      <p class="hero-text flex items-center gap-[0.6rem] mb-5 opacity-0" style="transform: translateY(12px); filter: blur(2px);">
+        <span class="font-mono text-[0.75rem] text-vigie-400/60">{content.hero.pronunciation}</span>
+        <span class="text-cream-200/25">—</span>
+        <span class="font-display italic text-cream-200/60 text-[0.85rem]">{content.hero.definition}</span>
+      </p>
+      <p class="hero-text font-display italic text-cream-50 text-[clamp(1.1rem,2.5vw,1.5rem)] m-0 mb-3 leading-[1.4] [text-wrap:balance] opacity-0" style="transform: translateY(12px); filter: blur(2px);">
+        {content.hero.tagline}
+      </p>
+      <p class="hero-text font-display text-cream-200 text-[clamp(0.95rem,1.6vw,1.1rem)] m-0 mb-10 max-w-[620px] leading-[1.7] opacity-0" style="transform: translateY(12px); filter: blur(2px);" set:html={content.hero.description}></p>
+      <div class="hero-text flex gap-4 flex-wrap justify-center opacity-0" style="transform: translateY(12px); filter: blur(2px);">
+        <a
+          href="https://github.com/get-tmonier/core"
+          class="font-mono bg-vigie-400 text-navy-900 font-semibold text-sm py-3 px-8 rounded-lg no-underline shadow-[0_1px_2px_rgba(0,0,0,0.15),0_4px_12px_rgba(38,192,154,0.2)] transition-all duration-200 hover:bg-vigie-500 hover:shadow-[0_2px_4px_rgba(0,0,0,0.2),0_8px_24px_rgba(38,192,154,0.25)]"
+        >
+          {content.hero.ctaGithub}
+        </a>
+        <a
+          href="#waitlist"
+          class="font-mono border border-vigie-400/40 text-vigie-400 font-semibold text-sm py-3 px-8 rounded-lg no-underline transition-all duration-200 hover:bg-vigie-400/10 hover:border-vigie-400/60"
+        >
+          {content.hero.ctaWaitlist}
+        </a>
+      </div>
+    </section>
+
+    <ToolsStrip content={content} />
+    <DashboardDemo content={content} />
+    <Pricing content={content} />
+    <Waitlist content={content} />
+  </main>
+  <Footer content={content} locale={locale} />
+</Base>
+
+<style>
+  .hero-ring {
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .hero-center {
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+  }
+  .hero-ray {
+    transition: stroke-dashoffset 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+</style>
+
+<script>
+  const rings = document.querySelectorAll<SVGElement>('.hero-ring');
+  const center = document.querySelector<SVGElement>('.hero-center');
+  const rays = document.querySelectorAll<SVGElement>('.hero-ray');
+  const sweep = document.querySelector<HTMLElement>('.hero-sweep');
+  const glow = document.querySelector<HTMLElement>('.hero-glow');
+  const texts = document.querySelectorAll<HTMLElement>('.hero-text');
+
+  if (rings.length && center && rays.length) {
+    let t = 300;
+
+    rings.forEach((ring, i) => {
+      setTimeout(() => {
+        ring.style.strokeDashoffset = '0';
+      }, t + i * 250);
+    });
+    t += rings.length * 250 + 200;
+
+    setTimeout(() => {
+      center.style.opacity = '1';
+      center.style.transform = 'scale(1)';
+    }, t);
+    t += 200;
+
+    rays.forEach((ray, i) => {
+      setTimeout(() => {
+        ray.style.strokeDashoffset = '0';
+      }, t + i * 100);
+    });
+    t += rays.length * 100 + 200;
+
+    if (sweep) sweep.style.opacity = '1';
+    if (glow) glow.style.opacity = '1';
+
+    texts.forEach((el, i) => {
+      setTimeout(() => {
+        el.style.transition = 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease';
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+        el.style.filter = 'blur(0)';
+      }, t + i * 120);
+    });
+  }
+</script>

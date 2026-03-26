@@ -44,7 +44,9 @@ export function InteractiveTerminal({
   );
 
   const onPtyResized = useCallback((cols: number, rows: number) => {
-    terminalRef.current?.resize(cols, rows);
+    const terminal = terminalRef.current;
+    if (!terminal || (terminal.cols === cols && terminal.rows === rows)) return;
+    terminal.resize(cols, rows);
   }, []);
 
   const onClear = useCallback(() => {
@@ -74,14 +76,14 @@ export function InteractiveTerminal({
       theme: {
         background: '#0a0e1a',
         foreground: '#f5f0e8',
-        cursor: '#d4a843',
-        selectionBackground: '#d4a84333',
+        cursor: '#26c09a',
+        selectionBackground: '#26c09a33',
         black: '#0a0e1a',
         brightBlack: '#6b7280',
         white: '#f5f0e8',
         brightWhite: '#ffffff',
-        yellow: '#d4a843',
-        brightYellow: '#e5b954',
+        yellow: '#4ecfb0',
+        brightYellow: '#7dddc8',
       },
     });
 
@@ -115,5 +117,5 @@ export function InteractiveTerminal({
     };
   }, [send, sendResize]);
 
-  return <div ref={containerRef} className="flex-1 bg-navy-deep" />;
+  return <div ref={containerRef} className="flex-1 bg-navy-900 overflow-hidden" />;
 }

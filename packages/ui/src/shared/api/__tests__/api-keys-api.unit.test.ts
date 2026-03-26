@@ -14,7 +14,7 @@ describe('api-keys-api', () => {
   });
 
   it('listApiKeys calls GET /api/keys and extracts apiKeys', async () => {
-    const keys = [{ id: 'k1', name: 'Key 1', prefix: 'tmonier_', createdAt: '2025-01-01' }];
+    const keys = [{ id: 'k1', name: 'Key 1', prefix: 'vigie_', createdAt: '2025-01-01' }];
     globalThis.fetch = mock(() =>
       Promise.resolve(new Response(JSON.stringify({ apiKeys: keys }), { status: 200 }))
     ) as unknown as typeof fetch;
@@ -28,7 +28,7 @@ describe('api-keys-api', () => {
     globalThis.fetch = mock((_url: string, init?: RequestInit) => {
       capturedBody = init?.body as string;
       return Promise.resolve(
-        new Response(JSON.stringify({ id: 'k1', name: 'test', key: 'tmonier_abc' }), {
+        new Response(JSON.stringify({ id: 'k1', name: 'test', key: 'vigie_abc' }), {
           status: 200,
         })
       );
@@ -36,7 +36,7 @@ describe('api-keys-api', () => {
 
     const result = await createApiKey('test');
     expect(JSON.parse(capturedBody)).toEqual({ name: 'test' });
-    expect(result.key).toBe('tmonier_abc');
+    expect(result.key).toBe('vigie_abc');
   });
 
   it('deleteApiKey calls DELETE /api/keys/:id', async () => {

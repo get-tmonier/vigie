@@ -1,5 +1,5 @@
 {
-  "name": "tmonier",
+  "name": "vigie",
   "private": true,
   "workspaces": [
     "packages/*"
@@ -9,9 +9,8 @@
     "workerd"
   ],
   "scripts": {
-    "dev": "turbo run dev --filter=@tmonier/api --filter=@tmonier/ui",
-    "dev:landing": "turbo run dev --filter=@tmonier/landing",
-    "dev:vigie": "turbo run dev --filter=@tmonier/vigie-landing",
+    "dev": "turbo run dev --filter=@vigie/api --filter=@vigie/ui",
+    "dev:landing": "turbo run dev --filter=@vigie/landing",
     "dev:all": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
