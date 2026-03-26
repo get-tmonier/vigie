@@ -13,32 +13,6 @@ export interface SiteContent {
     label: string;
     comingSoon: string;
   };
-  demo: {
-    terminal: {
-      title: string;
-      command: string;
-      daemonRunning: string;
-      watching: string;
-      localFirst: string;
-    };
-    sidebar: { agents: string; runs: string; settings: string };
-    main: {
-      taskTitle: string;
-      badgeActive: string;
-      contextLabel: string;
-      contextAction: string;
-      activityLabel: string;
-    };
-    actionPanel: {
-      header: string;
-      suggestedPromptLabel: string;
-      suggestedPrompt: string;
-      btnRollback: string;
-      btnResume: string;
-      btnStop: string;
-    };
-    logs: Array<{ time: string; html: string; delay: number }>;
-  };
   openSource: {
     heading: string;
     licenseBadge: string;

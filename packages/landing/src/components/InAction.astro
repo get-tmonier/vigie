@@ -1,0 +1,189 @@
+---
+interface Feature {
+  id: string;
+  label: string;
+  title: string;
+  description: string;
+  video: string;
+}
+
+const features: Feature[] = [
+  {
+    id: 'daemon-connect',
+    label: 'Local daemon',
+    title: 'Local-first connection',
+    description:
+      'Run vigie start — daemon connects via WebSocket. Your data never leaves your machine.',
+    video: '/videos/daemon-connect.webm',
+  },
+  {
+    id: 'agent-work',
+    label: 'Agent supervision',
+    title: 'Real-time activity',
+    description: 'Watch every file read, command run, and token spent as your agent works.',
+    video: '/videos/agent-work.webm',
+  },
+  {
+    id: 'loop-detect',
+    label: 'Loop detection',
+    title: 'Catch infinite loops',
+    description:
+      'vigie detects edit → test → fail cycles and suggests a fix before more tokens are wasted.',
+    video: '/videos/loop-detect.webm',
+  },
+  {
+    id: 'scope-drift',
+    label: 'Scope drift',
+    title: 'Stay on track',
+    description: 'Get alerted when your agent touches files outside the declared task scope.',
+    video: '/videos/scope-drift.webm',
+  },
+  {
+    id: 'context-cost',
+    label: 'Guardrails',
+    title: 'Context & cost guardrails',
+    description:
+      'Warnings when context fills up, budget thresholds, and cheaper model suggestions.',
+    video: '/videos/context-cost.webm',
+  },
+  {
+    id: 'checkpoint',
+    label: 'Checkpoints',
+    title: 'Checkpoint & rollback',
+    description: 'Snapshot your project state. Roll back to any checkpoint with one click.',
+    video: '/videos/checkpoint.webm',
+  },
+  {
+    id: 'terminal-attach',
+    label: 'CLI attach',
+    title: 'Same session, any interface',
+    description: 'Attach from the terminal — continue the same conversation seamlessly.',
+    video: '/videos/terminal-attach.webm',
+  },
+  {
+    id: 'pair-prog',
+    label: 'Pair prog',
+    title: 'Collaborative sessions',
+    description: 'Invite teammates. Flag thinking, share code views, edit the plan together.',
+    video: '/videos/pair-prog.webm',
+  },
+];
+---
+
+<section id="in-action" class="bg-navy-900 px-6 py-8 h-screen max-h-screen flex items-center overflow-hidden">
+  <div class="max-w-[1100px] mx-auto w-full">
+    <!-- Section header -->
+    <div class="text-center mb-6">
+      <span class="font-mono text-[0.7rem] text-vigie-400/60 tracking-[0.1em] uppercase">In action</span>
+      <h2 class="font-display text-cream-50 text-[clamp(1.4rem,2.5vw,2rem)] mt-1 mb-2">See every feature in motion</h2>
+      <p class="font-display text-cream-200/60 text-[0.85rem] max-w-[500px] mx-auto">Each clip shows a real workflow — from daemon start to pair programming.</p>
+    </div>
+
+    <!-- Tab grid -->
+    <div class="feature-tabs grid grid-cols-4 max-md:grid-cols-2 gap-1.5 mb-5" role="tablist">
+      {features.map((f, i) => (
+        <button
+          role="tab"
+          aria-selected={i === 0 ? 'true' : 'false'}
+          data-tab={f.id}
+          class:list={[
+            'feature-tab font-mono text-[0.7rem] text-center px-3 py-2.5 rounded-lg border transition-all duration-200 cursor-pointer',
+            i === 0
+              ? 'bg-vigie-400/12 border-vigie-400/25 text-vigie-400'
+              : 'bg-transparent border-cream-200/10 text-cream-200/50 hover:text-cream-200/70 hover:border-cream-200/20',
+          ]}
+        >
+          {f.label}
+        </button>
+      ))}
+    </div>
+
+    <!-- Title + description -->
+    <div class="flex items-baseline justify-between gap-4 mb-3 max-md:flex-col max-md:gap-1">
+      <h3 id="feature-title" class="font-display text-cream-50 text-[1rem]">{features[0].title}</h3>
+      <p id="feature-desc" class="font-display text-cream-200/50 text-[0.78rem] leading-[1.5] max-w-[420px] text-right max-md:text-left">{features[0].description}</p>
+    </div>
+
+    <!-- Single video player -->
+    <div class="rounded-xl overflow-hidden border border-vigie-400/10 shadow-[0_0_0_1px_rgba(38,192,154,0.06),0_24px_64px_rgba(0,0,0,0.4)]">
+      <video
+        id="feature-video"
+        class="w-full h-auto block max-h-[calc(100vh-320px)]"
+        controls
+        muted
+        playsinline
+        preload="auto"
+        src={features[0].video}
+      />
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ features }}>
+  const tabs = document.querySelectorAll('.feature-tab');
+  const video = document.getElementById('feature-video');
+  const titleEl = document.getElementById('feature-title');
+  const descEl = document.getElementById('feature-desc');
+  const featureIds = features.map((f) => f.id);
+
+  function activateTab(id) {
+    const feature = features.find((f) => f.id === id);
+    if (!feature || !video) return;
+
+    // Update tabs
+    for (const tab of tabs) {
+      const isActive = tab.dataset.tab === id;
+      tab.setAttribute('aria-selected', String(isActive));
+      tab.classList.toggle('bg-vigie-400/12', isActive);
+      tab.classList.toggle('border-vigie-400/25', isActive);
+      tab.classList.toggle('text-vigie-400', isActive);
+      tab.classList.toggle('bg-transparent', !isActive);
+      tab.classList.toggle('border-cream-200/10', !isActive);
+      tab.classList.toggle('text-cream-200/50', !isActive);
+    }
+
+    // Update text
+    if (titleEl) titleEl.textContent = feature.title;
+    if (descEl) descEl.textContent = feature.description;
+
+    // Swap src on same video element (preserves fullscreen)
+    video.src = feature.video;
+    video.load();
+    video.play().catch(() => {});
+  }
+
+  // Tab click handlers
+  for (const tab of tabs) {
+    tab.addEventListener('click', () => {
+      const id = tab.dataset.tab;
+      if (id) activateTab(id);
+    });
+  }
+
+  // Auto-advance to next clip when current one ends
+  if (video) {
+    video.addEventListener('ended', () => {
+      const currentSrc = video.src;
+      const currentIdx = features.findIndex((f) => currentSrc.endsWith(f.video));
+      const nextIdx = (currentIdx + 1) % features.length;
+      activateTab(features[nextIdx].id);
+    });
+  }
+
+  // Autoplay when section is visible
+  const section = document.getElementById('in-action');
+  if (section && video) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            video.play().catch(() => {});
+            observer.unobserve(section);
+          }
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(section);
+  }
+</script>
