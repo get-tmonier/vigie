@@ -321,16 +321,11 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
     });
 
     const triggerDetach = () => {
-      try {
-        Effect.runSync(
-          client.send({
-            type: 'session:detach',
-            sessionId: session.id,
-          })
-        );
-      } catch {
-        // Best-effort — detach locally even if IPC send fails
-      }
+      Effect.runFork(
+        client
+          .send({ type: 'session:detach', sessionId: session.id })
+          .pipe(Effect.catch(() => Effect.void))
+      );
       resolveDetach();
     };
 
@@ -358,13 +353,10 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
       renderer.fullRender(resizeScreen);
       resizeStatusBar();
       // daemon does its own rows-1, so send full newRows
-      Effect.runSync(
-        client.send({
-          type: 'session:cli-resize',
-          sessionId: session.id,
-          cols: newCols,
-          rows: newRows,
-        })
+      Effect.runFork(
+        client
+          .send({ type: 'session:cli-resize', sessionId: session.id, cols: newCols, rows: newRows })
+          .pipe(Effect.catch(() => Effect.void))
       );
     };
     process.stdout.on('resize', onResize);
@@ -374,13 +366,17 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
       | { type: 'exit'; exitCode: number }
       | { type: 'detach' }
       | { type: 'disconnect' };
-    const result = yield* Effect.promise(() =>
-      Promise.race([
-        exitPromise.then((exitCode): AttachResult => ({ type: 'exit', exitCode })),
-        detachPromise.then((): AttachResult => ({ type: 'detach' })),
-        disconnectPromise.then((): AttachResult => ({ type: 'disconnect' })),
-      ])
-    );
+    const result = yield* Effect.raceAll([
+      Effect.promise(() => exitPromise).pipe(
+        Effect.map((exitCode): AttachResult => ({ type: 'exit', exitCode }))
+      ),
+      Effect.promise(() => detachPromise).pipe(
+        Effect.map((): AttachResult => ({ type: 'detach' }))
+      ),
+      Effect.promise(() => disconnectPromise).pipe(
+        Effect.map((): AttachResult => ({ type: 'disconnect' }))
+      ),
+    ]);
 
     // Cleanup
     interceptor.destroy();

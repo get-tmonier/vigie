@@ -161,16 +161,9 @@ export function attachPtyRelay(
     });
 
     const triggerDetach = () => {
-      try {
-        Effect.runSync(
-          client.send({
-            type: 'session:detach',
-            sessionId,
-          })
-        );
-      } catch {
-        // Best-effort — detach locally even if IPC send fails
-      }
+      Effect.runFork(
+        client.send({ type: 'session:detach', sessionId }).pipe(Effect.catch(() => Effect.void))
+      );
       resolveDetach();
     };
 
@@ -195,25 +188,26 @@ export function attachPtyRelay(
       renderer.fullRender(vterm.getScreen());
       resizeStatusBar();
       // daemon does its own rows-1, so send full newRows
-      Effect.runSync(
-        client.send({
-          type: 'session:cli-resize',
-          sessionId,
-          cols: newCols,
-          rows: newRows,
-        })
+      Effect.runFork(
+        client
+          .send({ type: 'session:cli-resize', sessionId, cols: newCols, rows: newRows })
+          .pipe(Effect.catch(() => Effect.void))
       );
     };
     process.stdout.on('resize', onResize);
 
     // Wait for PTY exit, detach, or daemon disconnect
-    const result = yield* Effect.promise(() =>
-      Promise.race([
-        exitPromise.then((exitCode): PtyRelayResult => ({ type: 'exit', exitCode })),
-        detachPromise.then((): PtyRelayResult => ({ type: 'detach' })),
-        disconnectPromise.then((): PtyRelayResult => ({ type: 'disconnect' })),
-      ])
-    );
+    const result = yield* Effect.raceAll([
+      Effect.promise(() => exitPromise).pipe(
+        Effect.map((exitCode): PtyRelayResult => ({ type: 'exit', exitCode }))
+      ),
+      Effect.promise(() => detachPromise).pipe(
+        Effect.map((): PtyRelayResult => ({ type: 'detach' }))
+      ),
+      Effect.promise(() => disconnectPromise).pipe(
+        Effect.map((): PtyRelayResult => ({ type: 'disconnect' }))
+      ),
+    ]);
 
     // Cleanup
     process.off('SIGINT', onSigint);
