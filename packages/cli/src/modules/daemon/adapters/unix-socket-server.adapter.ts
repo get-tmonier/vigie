@@ -1,6 +1,6 @@
 import { Effect } from 'effect';
 import * as v from 'valibot';
-import { SessionToDaemonSchema } from '#schemas/ipc-messages.js';
+import { SessionToDaemonSchema } from '#modules/daemon/ipc/schemas.js';
 import type { IpcConnection, IpcServerShape } from '../ports/ipc-server.port.js';
 
 interface ConnectionState {

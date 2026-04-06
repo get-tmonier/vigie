@@ -1,5 +1,5 @@
 import type { Effect } from 'effect';
-import type { SessionToDaemon } from '#schemas/ipc-messages.js';
+import type { SessionToDaemon } from '#modules/daemon/ipc/schemas.js';
 
 export interface IpcConnection {
   readonly id: string;

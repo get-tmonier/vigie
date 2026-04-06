@@ -11,9 +11,7 @@
     "types": ["bun-types"],
     "paths": {
       "#modules/*": ["./src/modules/*"],
-      "#schemas/*": ["./src/schemas/*"],
-      "#terminal/*": ["./src/terminal/*"],
-      "#vterm/*": ["./src/vterm/*"]
+      "#lib/*": ["./src/lib/*"]
     }
   },
   "include": ["src"],

@@ -1,10 +1,10 @@
 import { Console, Effect, Stream } from 'effect';
+import { printChunk } from '#lib/cli-terminal/chunk-printer.js';
+import { printHeader } from '#lib/cli-terminal/header.js';
+import { printSessionSummary } from '#lib/cli-terminal/status-bar.js';
 import { createBunProcessManager } from '#modules/daemon/adapters/bun-process-manager.adapter.js';
 import { DaemonNotRunningError } from '#modules/daemon/domain/errors.js';
 import { SOCKET_PATH } from '#modules/daemon/paths.js';
-import { printChunk } from '#terminal/chunk-printer.js';
-import { printHeader } from '#terminal/header.js';
-import { printSessionSummary } from '#terminal/status-bar.js';
 import { createClaudeRunner } from '../adapters/agents/claude-runner.adapter.js';
 import { createUnixSocketClient } from '../adapters/unix-socket-client.adapter.js';
 import { getGitContext } from '../domain/git-context.js';

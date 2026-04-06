@@ -1,5 +1,5 @@
 import type { Effect } from 'effect';
-import type { DaemonToSession, SessionToDaemon } from '#schemas/ipc-messages.js';
+import type { DaemonToSession, SessionToDaemon } from '#modules/daemon/ipc/schemas.js';
 import type { IpcConnectionError } from '../domain/errors.js';
 
 export interface IpcClientShape {

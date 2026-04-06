@@ -1,4 +1,4 @@
-import type { createTuiRenderer } from '#vterm/tui-renderer.js';
+import type { createTuiRenderer } from '#lib/vterm/tui-renderer.js';
 
 type TuiRenderer = ReturnType<typeof createTuiRenderer>;
 

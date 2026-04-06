@@ -8,7 +8,7 @@ import {
   ClaudeSystemSchema,
   ClaudeToolResultSchema,
   ClaudeToolUseSchema,
-} from '../schemas/claude-stream.js';
+} from '../modules/agent/schemas.js';
 
 describe('Claude stream schemas', () => {
   it('parses assistant text message', () => {

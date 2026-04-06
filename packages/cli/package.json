@@ -7,9 +7,7 @@
   },
   "imports": {
     "#modules/*": "./src/modules/*",
-    "#schemas/*": "./src/schemas/*",
-    "#terminal/*": "./src/terminal/*",
-    "#vterm/*": "./src/vterm/*"
+    "#lib/*": "./src/lib/*"
   },
   "scripts": {
     "dev": "VIGIE_DEV=true bun run --watch src/modules/daemon/main.ts",

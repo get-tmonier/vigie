@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'bun:test';
-import { executeCommand } from '../execution/executor.js';
+import { executeCommand } from '../modules/filesystem/executor.js';
 import type {
   CommandDone,
   CommandError,
   CommandOutput,
   CommandRequest,
-} from '../schemas/messages.js';
+} from '../modules/filesystem/schemas.js';
 
 type UpstreamMessage = CommandOutput | CommandDone | CommandError;
 

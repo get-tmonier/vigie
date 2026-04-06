@@ -3,7 +3,7 @@ import type {
   CommandError,
   CommandOutput,
   CommandRequest,
-} from '../schemas/messages.js';
+} from '#modules/filesystem/schemas.js';
 
 type UpstreamMessage = CommandOutput | CommandDone | CommandError;
 

@@ -1,10 +1,14 @@
 import { Console, Effect } from 'effect';
+import { createKeybindInterceptor } from '#lib/cli-terminal/keybind-interceptor.js';
+import {
+  initStatusBar,
+  resizeStatusBar,
+  teardownStatusBar,
+} from '#lib/cli-terminal/status-bar-live.js';
+import { createTuiRenderer } from '#lib/vterm/tui-renderer.js';
+import { createVTerm } from '#lib/vterm/vterm.js';
 import { DaemonNotRunningError } from '#modules/daemon/domain/errors.js';
 import { STDIN_SOCKET_PATH } from '#modules/daemon/paths.js';
-import { createKeybindInterceptor } from '#terminal/keybind-interceptor.js';
-import { initStatusBar, resizeStatusBar, teardownStatusBar } from '#terminal/status-bar-live.js';
-import { createTuiRenderer } from '#vterm/tui-renderer.js';
-import { createVTerm } from '#vterm/vterm.js';
 import type { IpcClientShape } from '../ports/ipc-client.port.js';
 
 function formatDuration(ms: number): string {

@@ -19,7 +19,7 @@ import {
   SessionSpawnInteractiveSchema,
   SessionStdinSchema,
   SessionToDaemonSchema,
-} from '../schemas/ipc-messages.js';
+} from '../modules/daemon/ipc/schemas.js';
 
 describe('SessionToDaemon schemas', () => {
   it('parses session:register', () => {

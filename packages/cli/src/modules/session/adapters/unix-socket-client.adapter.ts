@@ -1,7 +1,7 @@
 import type { Socket } from 'bun';
 import { Effect } from 'effect';
 import * as v from 'valibot';
-import { type DaemonToSession, DaemonToSessionSchema } from '#schemas/ipc-messages.js';
+import { type DaemonToSession, DaemonToSessionSchema } from '#modules/daemon/ipc/schemas.js';
 import { IpcConnectionError } from '../domain/errors.js';
 import type { IpcClientShape } from '../ports/ipc-client.port.js';
 

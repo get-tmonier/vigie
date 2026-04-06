@@ -6,7 +6,7 @@ import {
   SessionTerminalOutputSchema,
   SessionTerminalResizeSchema,
   SessionToDaemonSchema,
-} from '../schemas/ipc-messages.js';
+} from '../modules/daemon/ipc/schemas.js';
 import {
   CommandDoneSchema,
   CommandErrorSchema,
@@ -19,7 +19,7 @@ import {
   TerminalInputDownstreamSchema,
   TerminalOutputUpstreamSchema,
   TerminalResizeDownstreamSchema,
-} from '../schemas/messages.js';
+} from '../modules/filesystem/schemas.js';
 
 describe('downstream message schemas', () => {
   it('parses command:request', () => {
