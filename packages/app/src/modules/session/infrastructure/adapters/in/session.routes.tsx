@@ -8,6 +8,7 @@ import * as v from 'valibot';
 import { renderPage } from '#infra/ssr/render-page';
 import type { SessionService } from '#modules/session/application/session.service';
 import { SessionId } from '#modules/session/domain/session-id';
+import { expandPath } from '#modules/session/infrastructure/adapters/expand-path';
 import { SpawnSessionRequestSchema } from '#modules/session/infrastructure/adapters/in/session.dto';
 import { sessionToDTO } from './session.mapper';
 import { DashboardPage } from './session.page';
@@ -70,11 +71,11 @@ export function createSessionRoutes(deps: SessionRouteDeps): HttpRouter.Route<Ro
         const request = yield* HttpServerRequest.HttpServerRequest;
         const body = yield* request.text;
         const params = new URLSearchParams(body);
-        const cwd = params.get('cwd') ?? '~';
+        const cwd = expandPath(params.get('cwd') ?? '~');
         const agentType = params.get('agentType') ?? 'claude';
-        yield* Effect.tryPromise(() =>
-          sessionService.spawnInteractive({ agentType, cwd, cols: 220, rows: 50 })
-        );
+        yield* sessionService
+          .spawnInteractive({ agentType, cwd, cols: 220, rows: 50 })
+          .pipe(Effect.catch(() => Effect.void));
         return HttpServerResponse.redirect('/');
       })
     ),
@@ -96,9 +97,9 @@ export function createSessionRoutes(deps: SessionRouteDeps): HttpRouter.Route<Ro
       Effect.gen(function* () {
         const { id: sessionId } = yield* HttpRouter.params;
         if (!sessionId) return HttpServerResponse.redirect('/');
-        yield* Effect.tryPromise(() =>
-          sessionService.resume(SessionId(sessionId), { cols: 220, rows: 50 })
-        ).pipe(Effect.catch(() => Effect.void));
+        yield* sessionService
+          .resume(SessionId(sessionId), { cols: 220, rows: 50 })
+          .pipe(Effect.catch(() => Effect.void));
         return HttpServerResponse.redirect('/');
       })
     ),
@@ -163,14 +164,12 @@ export function createSessionRoutes(deps: SessionRouteDeps): HttpRouter.Route<Ro
           return HttpServerResponse.jsonUnsafe({ error: 'Invalid request body' }, { status: 400 });
         }
         const body = parsed.output;
-        const result = yield* Effect.tryPromise(() =>
-          sessionService.spawnInteractive({
-            agentType: body.agentType ?? 'claude',
-            cwd: body.cwd ?? '~',
-            cols: body.cols ?? 120,
-            rows: body.rows ?? 30,
-          })
-        );
+        const result = yield* sessionService.spawnInteractive({
+          agentType: body.agentType ?? 'claude',
+          cwd: expandPath(body.cwd ?? '~'),
+          cols: body.cols ?? 120,
+          rows: body.rows ?? 30,
+        });
         return HttpServerResponse.jsonUnsafe({ sessionId: result.sessionId });
       })
     ),
@@ -223,9 +222,7 @@ export function createSessionRoutes(deps: SessionRouteDeps): HttpRouter.Route<Ro
           if (typeof body.rows === 'number') rows = body.rows;
         }).pipe(Effect.catch(() => Effect.void));
 
-        const result = yield* Effect.tryPromise(() =>
-          sessionService.resume(SessionId(sessionId), { cols, rows })
-        );
+        const result = yield* sessionService.resume(SessionId(sessionId), { cols, rows });
         return HttpServerResponse.jsonUnsafe({ sessionId: result.sessionId });
       })
     ),

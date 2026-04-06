@@ -1,5 +1,3 @@
-import { homedir } from 'node:os';
-import { resolve } from 'node:path';
 import { Effect, Layer, ServiceMap } from 'effect';
 import type { IpcServerShape } from '#modules/daemon/application/ports/out/ipc-server.port';
 import { IpcServer } from '#modules/daemon/application/ports/out/ipc-server.port';
@@ -18,6 +16,7 @@ import type { TerminalSubscribersShape } from '#modules/terminal/application/ter
 import { TerminalSubscribers } from '#modules/terminal/application/terminal-subscribers';
 import type { LineBuffer } from '#modules/terminal/domain/input-line-buffer';
 import { stripAnsiAndBuffer } from '#modules/terminal/domain/input-line-buffer';
+import type { AgentRunnerError } from '../domain/errors';
 import { CannotResumeSessionError, SessionNotFoundError } from '../domain/errors';
 import type { SessionDomainEvent } from '../domain/events';
 import { Session } from '../domain/session';
@@ -49,13 +48,6 @@ interface SessionServiceDeps {
   agentRegistry: AgentRegistryShape;
   ipcServer: IpcServerShape;
   terminalSubs: TerminalSubscribersShape;
-}
-
-function expandPath(p: string): string {
-  if (p === '~' || p.startsWith('~/')) {
-    return resolve(homedir(), p.slice(2) || '.');
-  }
-  return resolve(p);
 }
 
 export function createSessionService(deps: SessionServiceDeps) {
@@ -92,31 +84,37 @@ export function createSessionService(deps: SessionServiceDeps) {
       Effect.runFork(terminalSubs.publish(sessionId, base64));
     });
 
-    entry.handle.wait().then((exitCode: number) => {
-      const session = sessionRepo.findById(sessionId);
-      if (!session) return;
+    Effect.runFork(
+      Effect.promise(() => entry.handle.wait()).pipe(
+        Effect.flatMap((exitCode) =>
+          Effect.sync(() => {
+            const session = sessionRepo.findById(sessionId);
+            if (!session) return;
 
-      const adapter = agentRegistry.resolve(session.agentType);
-      const resumable =
-        adapter.canResume &&
-        session.agentSessionId != null &&
-        resumabilityChecker.isResumable(session.agentSessionId, session.cwd);
+            const adapter = agentRegistry.resolve(session.agentType);
+            const resumable =
+              adapter.canResume &&
+              session.agentSessionId != null &&
+              resumabilityChecker.isResumable(session.agentSessionId, session.cwd);
 
-      session.markEnded(exitCode, resumable);
-      sessionRepo.save(session);
-      Effect.runFork(publishEvents(session.pullEvents()));
+            session.markEnded(exitCode, resumable);
+            sessionRepo.save(session);
+            Effect.runFork(publishEvents(session.pullEvents()));
 
-      for (const connId of entry.cliChannels.keys()) {
-        Effect.runSync(
-          ipcServer.sendTo(
-            connId,
-            JSON.stringify({ type: 'session:pty-exited', sessionId, exitCode })
-          )
-        );
-      }
+            for (const connId of entry.cliChannels.keys()) {
+              Effect.runSync(
+                ipcServer.sendTo(
+                  connId,
+                  JSON.stringify({ type: 'session:pty-exited', sessionId, exitCode })
+                )
+              );
+            }
 
-      ptyHandles.delete(sessionId);
-    });
+            ptyHandles.delete(sessionId);
+          })
+        )
+      )
+    );
   }
 
   // ── Internal helpers ────────────────────────────────────────────────
@@ -194,7 +192,7 @@ export function createSessionService(deps: SessionServiceDeps) {
       return session;
     },
 
-    async spawnInteractive(props: {
+    spawnInteractive(props: {
       sessionId?: string;
       agentType: string;
       cwd: string;
@@ -205,95 +203,99 @@ export function createSessionService(deps: SessionServiceDeps) {
       resume?: boolean;
       gitBranch?: string;
       repoName?: string;
-    }): Promise<SpawnResult> {
-      const resolvedCwd = expandPath(props.cwd);
-      const session = Session.create({
-        id: props.sessionId,
-        agentType: props.agentType,
-        cwd: resolvedCwd,
-        mode: 'interactive',
-        gitBranch: props.gitBranch,
-        repoName: props.repoName,
-      });
+    }): Effect.Effect<SpawnResult, AgentRunnerError> {
+      return Effect.gen(function* () {
+        const session = Session.create({
+          id: props.sessionId,
+          agentType: props.agentType,
+          cwd: props.cwd,
+          mode: 'interactive',
+          gitBranch: props.gitBranch,
+          repoName: props.repoName,
+        });
 
-      sessionRepo.save(session);
-
-      const adapter = agentRegistry.resolve(props.agentType);
-      const agentSessionId = props.agentSessionId ?? session.id;
-
-      if (adapter.detectSessionId) {
-        session.setAgentSessionId(agentSessionId);
         sessionRepo.save(session);
-      }
 
-      const { command, args } = adapter.buildSpawnArgs({
-        agentSessionId,
-        resume: props.resume,
+        const adapter = agentRegistry.resolve(props.agentType);
+        const agentSessionId = props.agentSessionId ?? session.id;
+
+        if (adapter.detectSessionId) {
+          session.setAgentSessionId(agentSessionId);
+          sessionRepo.save(session);
+        }
+
+        const { command, args } = adapter.buildSpawnArgs({
+          agentSessionId,
+          resume: props.resume,
+        });
+        const handle = yield* ptySpawner.spawn(command, args, props.cwd, props.cols, props.rows);
+
+        const entry: PtyEntry = {
+          handle,
+          cliChannels: new Map(),
+          browserChannels: new Map(),
+          ptyDimensions: { cols: props.cols, rows: props.rows },
+        };
+        ptyHandles.set(session.id, entry);
+
+        if (props.connId) {
+          connSessions.set(props.connId, session.id);
+        }
+
+        Effect.runFork(publishEvents(session.pullEvents()));
+        setupPtyLifecycle(session.id, entry);
+
+        return { sessionId: session.id, entry };
       });
-      const handle = await Effect.runPromise(
-        ptySpawner.spawn(command, args, resolvedCwd, props.cols, props.rows)
-      );
-
-      const entry: PtyEntry = {
-        handle,
-        cliChannels: new Map(),
-        browserChannels: new Map(),
-        ptyDimensions: { cols: props.cols, rows: props.rows },
-      };
-      ptyHandles.set(session.id, entry);
-
-      if (props.connId) {
-        connSessions.set(props.connId, session.id);
-      }
-
-      Effect.runFork(publishEvents(session.pullEvents()));
-      setupPtyLifecycle(session.id, entry);
-
-      return { sessionId: session.id, entry };
     },
 
-    async resume(
+    resume(
       sessionId: SessionId,
       opts: { cols: number; rows: number; connId?: string; gitBranch?: string; repoName?: string }
-    ): Promise<SpawnResult> {
-      const session = sessionRepo.findById(sessionId);
-      if (!session) throw new SessionNotFoundError(sessionId);
+    ): Effect.Effect<
+      SpawnResult,
+      SessionNotFoundError | CannotResumeSessionError | AgentRunnerError
+    > {
+      return Effect.gen(function* () {
+        const session = sessionRepo.findById(sessionId);
+        if (!session) return yield* Effect.fail(new SessionNotFoundError(sessionId));
 
-      const adapter = agentRegistry.resolve(session.agentType);
-      if (!adapter.canResume || !session.canResume) {
-        throw new CannotResumeSessionError(
-          sessionId,
-          session.agentSessionId ? 'session is not resumable' : 'no session ID'
-        );
-      }
+        const adapter = agentRegistry.resolve(session.agentType);
+        if (!adapter.canResume || !session.canResume) {
+          return yield* Effect.fail(
+            new CannotResumeSessionError(
+              sessionId,
+              session.agentSessionId ? 'session is not resumable' : 'no session ID'
+            )
+          );
+        }
 
-      session.reactivate();
-      sessionRepo.save(session);
+        session.reactivate();
+        sessionRepo.save(session);
 
-      const { command, args } = adapter.buildSpawnArgs({
-        agentSessionId: session.agentSessionId,
-        resume: true,
+        const { command, args } = adapter.buildSpawnArgs({
+          agentSessionId: session.agentSessionId,
+          resume: true,
+        });
+        const handle = yield* ptySpawner.spawn(command, args, session.cwd, opts.cols, opts.rows);
+
+        const entry: PtyEntry = {
+          handle,
+          cliChannels: new Map(),
+          browserChannels: new Map(),
+          ptyDimensions: { cols: opts.cols, rows: opts.rows },
+        };
+        ptyHandles.set(sessionId, entry);
+
+        if (opts.connId) {
+          connSessions.set(opts.connId, sessionId);
+        }
+
+        Effect.runFork(publishEvents(session.pullEvents()));
+        setupPtyLifecycle(sessionId, entry);
+
+        return { sessionId, entry };
       });
-      const handle = await Effect.runPromise(
-        ptySpawner.spawn(command, args, session.cwd, opts.cols, opts.rows)
-      );
-
-      const entry: PtyEntry = {
-        handle,
-        cliChannels: new Map(),
-        browserChannels: new Map(),
-        ptyDimensions: { cols: opts.cols, rows: opts.rows },
-      };
-      ptyHandles.set(sessionId, entry);
-
-      if (opts.connId) {
-        connSessions.set(opts.connId, sessionId);
-      }
-
-      Effect.runFork(publishEvents(session.pullEvents()));
-      setupPtyLifecycle(sessionId, entry);
-
-      return { sessionId, entry };
     },
 
     kill(sessionId: SessionId): void {
@@ -486,8 +488,6 @@ export function createSessionService(deps: SessionServiceDeps) {
     applyResizePriority(sessionId: string): { cols: number; rows: number } | null {
       return applyResizePriority(sessionId);
     },
-
-    expandPath,
   };
 }
 

@@ -3,6 +3,7 @@ import type { IpcConnection } from '#modules/daemon/application/ports/out/ipc-se
 import type { SessionToDaemon } from '#modules/daemon/ipc/schemas';
 import type { SessionService } from '#modules/session/application/session.service';
 import { SessionId } from '#modules/session/domain/session-id';
+import { expandPath } from '#modules/session/infrastructure/adapters/expand-path';
 
 export function createIpcRouter(
   svc: SessionService
@@ -27,19 +28,17 @@ export function createIpcRouter(
         case 'session:spawn-interactive': {
           svc.connSessions.set(conn.id, msg.sessionId);
           const spawnResult = yield* Effect.result(
-            Effect.tryPromise(() =>
-              svc.spawnInteractive({
-                sessionId: msg.sessionId,
-                agentType: msg.agentType,
-                cwd: msg.cwd,
-                cols: msg.cols,
-                rows: msg.rows - 1,
-                connId: conn.id,
-                agentSessionId: msg.sessionId,
-                gitBranch: msg.gitBranch,
-                repoName: msg.repoName,
-              })
-            )
+            svc.spawnInteractive({
+              sessionId: msg.sessionId,
+              agentType: msg.agentType,
+              cwd: expandPath(msg.cwd),
+              cols: msg.cols,
+              rows: msg.rows - 1,
+              connId: conn.id,
+              agentSessionId: msg.sessionId,
+              gitBranch: msg.gitBranch,
+              repoName: msg.repoName,
+            })
           );
 
           if (spawnResult._tag === 'Failure') {
@@ -151,15 +150,13 @@ export function createIpcRouter(
         case 'session:resume': {
           svc.connSessions.set(conn.id, msg.sessionId);
           const resumeResult = yield* Effect.result(
-            Effect.tryPromise(() =>
-              svc.resume(SessionId(msg.sessionId), {
-                cols: msg.cols,
-                rows: msg.rows,
-                connId: conn.id,
-                gitBranch: msg.gitBranch,
-                repoName: msg.repoName,
-              })
-            )
+            svc.resume(SessionId(msg.sessionId), {
+              cols: msg.cols,
+              rows: msg.rows,
+              connId: conn.id,
+              gitBranch: msg.gitBranch,
+              repoName: msg.repoName,
+            })
           );
 
           if (resumeResult._tag === 'Failure') {
