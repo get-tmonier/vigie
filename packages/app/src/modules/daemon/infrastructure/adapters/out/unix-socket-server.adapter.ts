@@ -79,7 +79,7 @@ function createUnixSocketServer(): IpcServerShape {
               Effect.runFork(onDisconnect(connId));
             },
             error(_socket, err) {
-              console.error('[ipc-server] Socket error:', err.message);
+              Effect.runFork(Effect.logError(`[ipc-server] Socket error: ${err.message}`));
             },
           },
         });

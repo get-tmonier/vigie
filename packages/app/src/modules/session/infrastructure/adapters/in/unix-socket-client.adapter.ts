@@ -61,7 +61,7 @@ export function createUnixSocketClient(): IpcClientShape {
                   }
                 },
                 error(_s, err) {
-                  console.error('[ipc-client] Socket error:', err.message);
+                  Effect.runFork(Effect.logError(`[ipc-client] Socket error: ${err.message}`));
                 },
               },
             }).catch(reject);

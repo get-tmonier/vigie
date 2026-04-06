@@ -62,7 +62,7 @@ export function createTerminalRoutes(
         const socket = yield* request.upgrade;
         const write = yield* socket.writer;
 
-        console.log('[server] Events WS client connected');
+        yield* Effect.logInfo('[server] Events WS client connected');
 
         const sessions = sessionService.listAll().map(sessionToDTO);
         yield* write(JSON.stringify({ type: 'snapshot', sessions }));
@@ -92,7 +92,7 @@ export function createTerminalRoutes(
         const write = yield* socket.writer;
         const browserConnId = crypto.randomUUID();
 
-        console.log(`[server] Terminal WS client connected for session ${sessionId}`);
+        yield* Effect.logInfo(`[server] Terminal WS client connected for session ${sessionId}`);
 
         const chunks = sessionService.getAllChunks(sessionId);
         for (const chunk of chunks) {

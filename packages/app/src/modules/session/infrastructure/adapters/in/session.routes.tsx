@@ -262,12 +262,12 @@ export function createSessionRoutes(deps: SessionRouteDeps): HttpRouter.Route<Ro
     HttpRouter.route(
       'POST',
       '/api/sessions/kill-all',
-      Effect.sync(() => {
+      Effect.gen(function* () {
         let killedCount = 0;
         for (const [sessionId, entry] of sessionService.ptyHandles) {
           entry.handle.kill();
           killedCount++;
-          console.log(`[server] Kill requested for session ${sessionId}`);
+          yield* Effect.logInfo(`[server] Kill requested for session ${sessionId}`);
         }
         return HttpServerResponse.jsonUnsafe({ killedCount });
       })

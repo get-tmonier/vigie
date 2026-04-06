@@ -56,7 +56,7 @@ function cleanup() {
 export const runDaemon = Effect.gen(function* () {
   mkdirSync(VIGIE_HOME, { recursive: true, mode: 0o700 });
   writeFileSync(PID_FILE, `${process.pid}\n${Date.now()}`);
-  console.log(`[daemon] Started (pid ${process.pid})`);
+  yield* Effect.logInfo(`[daemon] Started (pid ${process.pid})`);
 
   // ── 1. Get services from context ───────────────────────────────────
   const db = yield* VigiDatabase;
@@ -82,12 +82,12 @@ export const runDaemon = Effect.gen(function* () {
     }
   });
 
-  console.log('[daemon] SQLite database opened, orphaned sessions cleaned up');
+  yield* Effect.logInfo('[daemon] SQLite database opened, orphaned sessions cleaned up');
 
   const pruneInterval = setInterval(
     () => {
       sessionRepo.pruneOld();
-      console.log('[daemon] Pruned old sessions');
+      Effect.runFork(Effect.logInfo('[daemon] Pruned old sessions'));
     },
     60 * 60 * 1000
   );
@@ -97,8 +97,8 @@ export const runDaemon = Effect.gen(function* () {
   }, 5_000);
 
   yield* Effect.addFinalizer(() =>
-    Effect.sync(() => {
-      console.log('[daemon] Shutting down...');
+    Effect.gen(function* () {
+      yield* Effect.logInfo('[daemon] Shutting down...');
       clearInterval(pruneInterval);
       clearInterval(resumableCheckInterval);
       db.close();
@@ -113,7 +113,7 @@ export const runDaemon = Effect.gen(function* () {
   ];
   const clientDistPath = clientDistCandidates.find((p) => existsSync(p));
   if (clientDistPath) {
-    console.log(`[daemon] Serving client islands from ${clientDistPath}`);
+    yield* Effect.logInfo(`[daemon] Serving client islands from ${clientDistPath}`);
   }
 
   const routesLayer = createRoutesLayer({
@@ -131,14 +131,14 @@ export const runDaemon = Effect.gen(function* () {
   }).pipe(
     Effect.provide(BunHttpServer.layerHttpServices),
     Effect.catchDefect((defect) =>
-      Effect.sync(() => {
+      Effect.gen(function* () {
         const msg = defect instanceof Error ? defect.message : String(defect);
         if (msg.includes('EADDRINUSE') || msg.includes('address already in use')) {
-          console.error(
+          yield* Effect.logError(
             `[daemon] Port ${port} is already in use. Is another vigie daemon running? Stop it with: vigie daemon stop`
           );
         } else {
-          console.error('[daemon] HTTP server failed to start:', msg);
+          yield* Effect.logError('[daemon] HTTP server failed to start:', msg);
         }
         cleanup();
         process.exit(1);
@@ -147,7 +147,7 @@ export const runDaemon = Effect.gen(function* () {
   );
 
   writeFileSync(PORT_FILE, String(port));
-  console.log(`[daemon] HTTP + WebSocket server listening on http://localhost:${port}`);
+  yield* Effect.logInfo(`[daemon] HTTP + WebSocket server listening on http://localhost:${port}`);
 
   // ── 4. IPC Server ─────────────────────────────────────────────────
   if (existsSync(SOCKET_PATH)) unlinkSync(SOCKET_PATH);
@@ -158,7 +158,7 @@ export const runDaemon = Effect.gen(function* () {
     Effect.sync(() => sessionService.handleDisconnect(connId))
   );
 
-  console.log(`[daemon] IPC server listening on ${SOCKET_PATH}`);
+  yield* Effect.logInfo(`[daemon] IPC server listening on ${SOCKET_PATH}`);
 
   // ── 5. Stdin socket ───────────────────────────────────────────────
   Bun.listen({
@@ -183,11 +183,11 @@ export const runDaemon = Effect.gen(function* () {
       open() {},
       close() {},
       error(_socket, err) {
-        console.error('[stdin-server] error:', err.message);
+        Effect.runFork(Effect.logError(`[stdin-server] error: ${err.message}`));
       },
     },
   });
-  console.log(`[daemon] Stdin socket listening on ${STDIN_SOCKET_PATH}`);
+  yield* Effect.logInfo(`[daemon] Stdin socket listening on ${STDIN_SOCKET_PATH}`);
 
   yield* Effect.never;
 }).pipe(Effect.scoped);
@@ -222,12 +222,12 @@ if (import.meta.main) {
     process.exit(0);
   });
   process.on('uncaughtException', (err) => {
-    console.error('[daemon] Uncaught exception:', err);
+    Effect.runFork(Effect.logError('[daemon] Uncaught exception:', err));
     cleanup();
     process.exit(1);
   });
   process.on('unhandledRejection', (reason) => {
-    console.error('[daemon] Unhandled rejection:', reason);
+    Effect.runFork(Effect.logError('[daemon] Unhandled rejection:', reason));
     cleanup();
     process.exit(1);
   });
@@ -236,8 +236,8 @@ if (import.meta.main) {
     runDaemon.pipe(
       Effect.provide(AppLayer),
       Effect.catch((err) =>
-        Effect.sync(() => {
-          console.error('[daemon] Fatal error:', err);
+        Effect.gen(function* () {
+          yield* Effect.logError('[daemon] Fatal error:', err);
           cleanup();
           process.exit(1);
         })

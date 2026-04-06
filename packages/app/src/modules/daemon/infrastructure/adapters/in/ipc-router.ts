@@ -73,7 +73,7 @@ export function createIpcRouter(
           if (entry?.cliChannels.has(conn.id)) {
             entry.cliChannels.set(conn.id, { cols: msg.cols, rows: msg.rows });
             svc.applyResizePriority(msg.sessionId);
-            console.log(
+            yield* Effect.logInfo(
               `[daemon] cli-resize sessionId=${msg.sessionId} cols=${msg.cols} rows=${msg.rows}`
             );
           }
@@ -115,7 +115,7 @@ export function createIpcRouter(
                 sessionId: msg.sessionId,
               })
             );
-            console.log(
+            yield* Effect.logInfo(
               `[daemon] CLI attached to session ${msg.sessionId} (replayed ${result.chunks.length} chunks)`
             );
           } else {
@@ -135,12 +135,12 @@ export function createIpcRouter(
         }
         case 'session:done': {
           svc.markEnded(SessionId(msg.sessionId), msg.exitCode);
-          console.log(`[daemon] Session done: ${msg.sessionId} (exit ${msg.exitCode})`);
+          yield* Effect.logInfo(`[daemon] Session done: ${msg.sessionId} (exit ${msg.exitCode})`);
           break;
         }
         case 'session:error': {
           svc.markError(SessionId(msg.sessionId), msg.error);
-          console.log(`[daemon] Session error: ${msg.sessionId}: ${msg.error}`);
+          yield* Effect.logError(`[daemon] Session error: ${msg.sessionId}: ${msg.error}`);
           break;
         }
         case 'session:terminal-output': {
@@ -184,7 +184,7 @@ export function createIpcRouter(
         }
         case 'session:agent-id': {
           svc.setAgentSessionId(SessionId(msg.sessionId), msg.agentSessionId);
-          console.log(
+          yield* Effect.logInfo(
             `[daemon] Agent session ID detected for ${msg.sessionId}: ${msg.agentSessionId}`
           );
           break;
