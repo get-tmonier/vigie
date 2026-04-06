@@ -70,12 +70,12 @@ const fr: SiteContent = {
           {
             question: 'Comment ça fonctionne\u00A0?',
             answer:
-              'Lancez vigie start dans votre projet. Un daemon léger spawn Claude Code, capture chaque événement — éditions de fichiers, commandes shell, consommation de tokens — et les diffuse vers un dashboard temps réel. Aucun code ne quitte votre machine.',
+              'Lancez vigie daemon start dans votre projet. Un daemon léger spawn Claude Code, capture chaque événement — éditions de fichiers, commandes shell, consommation de tokens — et les diffuse vers un dashboard temps réel. Aucun code ne quitte votre machine.',
           },
           {
             question: 'Que signifie «\u00A0local-first\u00A0»\u00A0?',
             answer:
-              'Le daemon tourne entièrement sur votre machine. Il observe les métadonnées de session — fichiers touchés, commandes exécutées, nombre de tokens — mais ne lit ni ne stocke jamais votre code source. Le dashboard se connecte via un websocket local et ne fait que diffuser la sortie des commandes — votre code reste chez vous.',
+              'Le daemon tourne entièrement sur votre machine. Il capture l\u2019activité terminale — sortie de l\u2019agent et données de session — et les stocke localement dans une base SQLite à ~/.vigie/. Le dashboard se connecte via un websocket local. Rien ne quitte jamais votre machine — pas de télémétrie, pas de synchronisation cloud.',
           },
           {
             question: 'Comment installer vigie\u00A0?',
@@ -170,17 +170,17 @@ const fr: SiteContent = {
           {
             question: 'vigie accède-t-il à mon code source\u00A0?',
             answer:
-              'Non. vigie observe uniquement les métadonnées de session — nombre de fichiers modifiés, consommation de tokens, pourcentage de fenêtre de contexte, durée de session. Il ne lit, n\u2019analyse et ne stocke jamais votre code source.',
+              'vigie capture l\u2019activité terminale — notamment la sortie de l\u2019agent diffusée vers le dashboard — et stocke les données de session localement dans une base SQLite à ~/.vigie/. Tout reste sur votre machine. Rien n\u2019est envoyé à un serveur distant.',
           },
           {
             question: 'Quelles données vigie collecte-t-il\u00A0?',
             answer:
-              'Nombre de tokens, pourcentages d\u2019utilisation de la fenêtre de contexte, durées de session, nombre de fichiers modifiés (pas leur contenu) et événements de checkpoint. Jamais le contenu des fichiers, les diffs, les prompts ou les réponses IA.',
+              'Les métadonnées de session (heure de démarrage, durée, code de sortie), la sortie terminale pour la fonctionnalité de relecture du dashboard, et l\u2019historique des saisies. Toutes les données sont stockées localement à ~/.vigie/data.db. Aucune donnée n\u2019est envoyée nulle part.',
           },
           {
             question: 'vigie est-il conforme au RGPD\u00A0?',
             answer:
-              'Oui. vigie est local-first — vos données restent sur votre machine. Pour les fonctionnalités du dashboard hébergé, toutes les données sont traitées dans une infrastructure basée en UE.',
+              'Oui. vigie est entièrement local-first — vos données ne quittent jamais votre machine. Pas de serveurs distants, pas de télémétrie, pas de synchronisation cloud.',
           },
           {
             question: 'Peut-on héberger vigie soi-même\u00A0?',

@@ -33,24 +33,23 @@
 Fully local — single process, no remote servers, no cloud dependency.
 
 ```
-Browser (SPA, localhost:19191) <-> Effect HTTP+WS (embedded in daemon) <-> PTY manager <-> spawn(claude, aider, ...)
+Browser (SSR, localhost:19191) <-> Effect HTTP+WS (embedded in daemon) <-> PTY manager <-> spawn(claude, aider, ...)
 ```
 
 | Component | Description |
 |---|---|
 | **CLI daemon** | Single Bun process — embedded HTTP server, PTY manager, SQLite |
-| **Dashboard** | React SPA served by the daemon at `localhost:19191` |
+| **Dashboard** | React SSR rendered by the daemon at `localhost:19191` |
 | **Agents** | Claude Code, aider, codex, or any CLI tool — spawned via PTY |
 
 ## Monorepo
 
 | Package | Path | Stack |
 |---|---|---|
-| `@vigie/cli` | `packages/cli/` | Effect, @effect/platform-bun, Bun PTY, xterm headless, SQLite |
-| `@vigie/ui` | `packages/ui/` | React, Redux Toolkit, xterm.js, Vite SPA |
-| `@vigie/shared` | `packages/shared/` | Valibot schemas (API/WS contracts) |
+| `@vigie/app` | `packages/app/` | Effect, @effect/platform-bun, React SSR, Bun PTY, xterm headless, SQLite |
 | `@vigie/tokens` | `packages/tokens/` | Design tokens (CSS + JS) |
 | `@vigie/landing` | `packages/landing/` | Astro 5, Tailwind v4 |
+| `@vigie/video` | `packages/video/` | Remotion feature clips |
 
 ## Tech stack
 
@@ -60,7 +59,7 @@ Bun · Turborepo · Biome · TypeScript strict · ESM only
 
 ```bash
 bun install            # install all dependencies
-bun turbo dev          # daemon (localhost:19191) + ui dev server (localhost:3000)
+bun turbo dev          # daemon + ui on localhost:19191 (SSR)
 bun turbo build        # build all packages
 bun turbo test         # run tests
 ```

@@ -16,29 +16,25 @@ vigie is built by **Tmonier SRL** (Damien Meur's freelance company). The freelan
 
 | Package | Path | Key libraries |
 |---|---|---|
-| `@vigie/app` | `packages/app/` | Effect, @effect/platform-bun HTTP, Bun PTY, xterm headless, SQLite, React SSR |
+| `@vigie/app` | `packages/app/` | Effect, @effect/platform-bun HTTP, React SSR, Bun PTY, xterm headless, SQLite, Vite (client islands) |
 | `@vigie/tokens` | `packages/tokens/` | Design tokens — CSS + JS exports |
 | `@vigie/landing` | `packages/landing/` | Astro 5 + Tailwind v4 (vigie product page) |
+| `@vigie/video` | `packages/video/` | Remotion feature clips |
 
 The freelance portfolio (`tmonier.com`) is a separate repo: `get-tmonier/landing`.
 
 ## Architecture
 
-**Overall:** `Browser (SPA, localhost:19191) ↔ Effect HTTP+WS (embedded in daemon) ↔ PTY manager ↔ spawn(claude, aider, ...)`
+**Overall:** `Browser (SSR, localhost:19191) ↔ Effect HTTP+WS (embedded in daemon) ↔ PTY manager ↔ spawn(claude, aider, ...)`
 
 **Single process, fully local:**
-- **CLI daemon** (`@vigie/cli`): single Bun process that runs everything
-  - **Embedded Effect HTTP server** on `localhost:19191` — serves REST API + WebSocket + static UI
+- **CLI daemon** (`@vigie/app`): single Bun process that runs everything
+  - **Embedded Effect HTTP server** on `localhost:19191` — serves REST API + WebSocket + React SSR
   - **PTY manager** — spawns and manages agent sessions (Claude, aider, codex, generic)
   - **SQLite database** at `~/.vigie/data.db` — sessions, terminal chunks, input history
   - **Unix socket IPC** at `~/.vigie/daemon.sock` — CLI-to-daemon communication
-  - Agent-agnostic design: `AgentConfig` type defines how to spawn any CLI agent
-- **Frontend:** React SPA built with Vite, served as static files by the daemon
-  - **Feature-Sliced Design** in `@vigie/ui` — layers: `app → shared → entities → features → widgets → pages`
-  - Each slice organized as `api/`, `model/`, `ui/` sub-folders
-  - No cross-slice imports (features don't import from other features)
-  - State management: Redux Toolkit
-  - Real-time: WebSocket for events + terminal I/O
+  - Agent-agnostic design: `AgentAdapter` port + `AgentRegistry` defines how to spawn any CLI agent
+- **Frontend:** React SSR rendered by the daemon, with Vite-bundled client islands for interactivity
 - **No auth required** — everything runs on localhost
 - **No external database** — SQLite only
 - **No remote servers** — no Railway, no PostgreSQL, no OAuth
@@ -47,7 +43,7 @@ The freelance portfolio (`tmonier.com`) is a separate repo: `get-tmonier/landing
 
 ```
 CLI commands → Unix socket IPC → Daemon
-Browser SPA  → HTTP/WebSocket  → Daemon (localhost:19191)
+Browser      → HTTP/WebSocket  → Daemon (localhost:19191)
 Daemon       → PTY spawn       → claude/aider/codex/...
 ```
 
@@ -70,7 +66,7 @@ knip → biome check → typecheck → test → build
 
 ```bash
 bun install                                    # install all dependencies
-bun turbo dev                                  # daemon (localhost:19191) + ui (localhost:3000)
+bun turbo dev                                  # daemon + ui on localhost:19191 (SSR)
 bun run dev:landing                            # dev server for vigie landing
 bun turbo build                                # build all packages
 bun turbo check                                # biome check
@@ -132,7 +128,17 @@ All cross-folder imports must use ESM subpath aliases (`#alias/...`), never rela
 
 | Package | Aliases |
 |---|---|
-| `@vigie/cli` | `#modules/*`, `#schemas/*`, `#terminal/*`, `#vterm/*` |
-| `@vigie/ui` | `#app/*`, `#shared/*`, `#entities/*`, `#features/*`, `#widgets/*`, `#pages/*` |
+| `@vigie/app` | `#modules/*`, `#lib/*`, `#infra/*`, `#shared/*` |
 | `@vigie/landing` | `#components/*`, `#layouts/*`, `#assets/*`, `#styles/*`, `#lib/*` |
-| `@vigie/shared` | `#contracts/*`, `#schemas/*` |
+
+## Multi-agent extensibility
+
+The **domain layer and ports are agent-agnostic** — `AgentAdapter` port, `AgentRegistry`, and the `Session` domain entity treat `agentType` as a plain string. Adding a new agent (e.g. opencode) requires changes only in the infrastructure layer:
+
+| What to change | Location | Notes |
+|---|---|---|
+| CLI command | `src/modules/session/infrastructure/adapters/in/commands/` | `vigie claude` is Claude-specific — add `vigie opencode` or generalize to `vigie run --agent <name>` |
+| Prompt-mode runner | `src/modules/session/infrastructure/adapters/out/agents/claude-runner.adapter.ts` | The only `AgentRunnerShape` impl — new agents need their own runner |
+| Session resume | `src/modules/session/infrastructure/adapters/in/commands/session-resume.command.ts` | Rejects non-Claude + hardcodes `~/.claude/` paths — use `AgentAdapter.canResume` instead |
+| IPC schema | `src/modules/daemon/infrastructure/adapters/ipc-schemas.ts` | `agentType` is a closed `picklist` — extend or change to `v.string()` |
+| Agent adapter | `src/modules/session/infrastructure/adapters/out/agents/` | One file per agent (e.g. `opencode.adapter.ts`), registered in `agent-registry.ts` |
