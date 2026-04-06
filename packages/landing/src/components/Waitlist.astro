@@ -9,7 +9,7 @@ const { content } = Astro.props;
 const { waitlist } = content;
 ---
 
-<section id="waitlist" class="bg-navy-900 py-24 px-10 text-center min-h-screen box-border flex flex-col justify-center max-md:py-8 max-md:px-5 max-md:pb-6">
+<section id="waitlist" data-error-msg={waitlist.errorMessage} data-rate-limit-msg={waitlist.errorRateLimit} class="bg-navy-900 py-24 px-10 text-center min-h-screen box-border flex flex-col justify-center max-md:py-8 max-md:px-5 max-md:pb-6">
   <div class="max-w-[600px] mx-auto">
     <div class="flex justify-center mb-10">
       <RadarMark size={80} />
@@ -90,7 +90,11 @@ const { waitlist } = content;
   </div>
 </section>
 
-<script define:vars={{ errorMsg: waitlist.errorMessage, rateLimitMsg: waitlist.errorRateLimit }}>
+<script is:inline>
+  const waitlistSection = document.getElementById('waitlist');
+  const errorMsg = waitlistSection?.dataset.errorMsg ?? '';
+  const rateLimitMsg = waitlistSection?.dataset.rateLimitMsg ?? '';
+
   function submitHandler(event) {
     event.preventDefault();
     const container = event.target.parentNode;

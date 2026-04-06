@@ -70,7 +70,7 @@ const features: Feature[] = [
 ];
 ---
 
-<section id="in-action" class="bg-navy-900 px-6 py-8 h-screen max-h-screen flex items-center overflow-hidden">
+<section id="in-action" data-features={JSON.stringify(features)} class="bg-navy-900 px-6 py-8 h-screen max-h-screen flex items-center overflow-hidden">
   <div class="max-w-[1100px] mx-auto w-full">
     <!-- Section header -->
     <div class="text-center mb-6">
@@ -119,12 +119,14 @@ const features: Feature[] = [
   </div>
 </section>
 
-<script define:vars={{ features }}>
+<script is:inline>
+  const section = document.getElementById('in-action');
+  const features = JSON.parse(section?.dataset.features ?? '[]');
+
   const tabs = document.querySelectorAll('.feature-tab');
   const video = document.getElementById('feature-video');
   const titleEl = document.getElementById('feature-title');
   const descEl = document.getElementById('feature-desc');
-  const featureIds = features.map((f) => f.id);
 
   function activateTab(id) {
     const feature = features.find((f) => f.id === id);
@@ -171,7 +173,6 @@ const features: Feature[] = [
   }
 
   // Autoplay when section is visible
-  const section = document.getElementById('in-action');
   if (section && video) {
     const observer = new IntersectionObserver(
       (entries) => {
