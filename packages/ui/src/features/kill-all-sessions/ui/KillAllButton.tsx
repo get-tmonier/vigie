@@ -3,11 +3,10 @@ import { cn } from '#shared/lib/cn';
 import { useKillAllSessions } from '../model/use-kill-all-sessions';
 
 interface KillAllButtonProps {
-  daemonId: string;
   activeCount: number;
 }
 
-export function KillAllButton({ daemonId, activeCount }: KillAllButtonProps) {
+export function KillAllButton({ activeCount }: KillAllButtonProps) {
   const { killAll, loading } = useKillAllSessions();
   const [armed, setArmed] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -22,12 +21,12 @@ export function KillAllButton({ daemonId, activeCount }: KillAllButtonProps) {
     if (armed) {
       if (timerRef.current) clearTimeout(timerRef.current);
       setArmed(false);
-      await killAll(daemonId);
+      await killAll();
     } else {
       setArmed(true);
       timerRef.current = setTimeout(() => setArmed(false), 3000);
     }
-  }, [armed, killAll, daemonId]);
+  }, [armed, killAll]);
 
   return (
     <button

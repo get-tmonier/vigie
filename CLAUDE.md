@@ -1,7 +1,7 @@
 # vigie
 
 Local-first agent supervisor for software engineers. "Eyes on the horizon."
-Real-time visibility into AI agent activity, drift detection, token cost guardrails, checkpoints & rollback. BYOA (Bring Your Own AI). Currently in Phase 0 (foundation).
+Real-time visibility into AI agent activity, drift detection, token cost guardrails, checkpoints & rollback. BYOA (Bring Your Own AI). Fully local — no remote servers, no cloud dependency.
 
 vigie is built by **Tmonier SRL** (Damien Meur's freelance company). The freelance portfolio lives at `tmonier.com`; vigie lives at `vigie.tmonier.com`.
 
@@ -16,10 +16,9 @@ vigie is built by **Tmonier SRL** (Damien Meur's freelance company). The freelan
 
 | Package | Path | Key libraries |
 |---|---|---|
-| `@vigie/api` | `packages/api/` | Hono, Effect, Kysely, PostgreSQL |
-| `@vigie/ui` | `packages/ui/` | React, TanStack Start/Router |
-| `@vigie/cli` | `packages/cli/` | Effect, Bun PTY, xterm headless |
-| `@vigie/shared` | `packages/shared/` | ts-rest contracts, Valibot schemas |
+| `@vigie/cli` | `packages/cli/` | Effect, Hono, Bun PTY, xterm headless, SQLite |
+| `@vigie/ui` | `packages/ui/` | React, Redux Toolkit, xterm.js, Vite SPA |
+| `@vigie/shared` | `packages/shared/` | Valibot schemas |
 | `@vigie/tokens` | `packages/tokens/` | Design tokens — CSS + JS exports |
 | `@vigie/landing` | `packages/landing/` | Astro 5 + Tailwind v4 (vigie product page) |
 
@@ -27,24 +26,40 @@ The freelance portfolio (`tmonier.com`) is a separate repo: `get-tmonier/landing
 
 ## Architecture
 
-**Overall:** `Browser ↔ TanStack Start (SSR, app.vigie.tmonier.com) ↔ Hono+Effect (API/WS, api.vigie.tmonier.com) ↔ WebSocket ↔ CLI daemon (local) ↔ spawn(git, claude...)`
+**Overall:** `Browser (SPA, localhost:19191) ↔ Hono HTTP+WS (embedded in daemon) ↔ PTY manager ↔ spawn(claude, aider, ...)`
 
-- **2 Railway services:** TanStack Start SSR (`app.vigie.tmonier.com`) + Hono+Effect+PostgreSQL (`api.vigie.tmonier.com`)
-- **Backend:** hexagonal/DDD — Effect for domain/services, Hono as HTTP adapter, Kysely+PostgreSQL for persistence
-  - **Module structure:** each module follows `domain/`, `ports/`, `commands/`, `queries/`, `adapters/primary/`, `adapters/secondary/`
-  - **CQRS:** commands (`*.command.ts`) for writes, queries (`*.query.ts`) for reads
-  - **File naming:** `*.port.ts`, `*.command.ts`, `*.query.ts`, `*.adapter.ts`
-  - **Effect patterns:** services via `ServiceMap.Service`, errors via `Data.TaggedError`, DI via `Layer`, no try/catch
-  - **Tests split:** `*.unit.test.ts` for domain/commands/queries, `*.integration.test.ts` for adapters. Tests live in `__tests__/` co-located with source
-- **CLI daemon** (`@vigie/cli`): local proxy — spawn, stream, control signals. No business logic. Binary name: `vigie`. Config dir: `~/.vigie/`. Env vars: `VIGIE_*`.
-- **Shared:** ts-rest contracts + Valibot schemas consumed by api + ui
-- **Frontend:** TanStack Start SSR + file-based routing
-  - **Feature-Sliced Design** in `@vigie/ui` — layers: `app → shared → entities → features → widgets → pages → routes`
+**Single process, fully local:**
+- **CLI daemon** (`@vigie/cli`): single Bun process that runs everything
+  - **Embedded Hono HTTP server** on `localhost:19191` — serves REST API + WebSocket + static UI
+  - **PTY manager** — spawns and manages agent sessions (Claude, aider, codex, generic)
+  - **SQLite database** at `~/.vigie/data.db` — sessions, terminal chunks, input history
+  - **Unix socket IPC** at `~/.vigie/daemon.sock` — CLI-to-daemon communication
+  - Agent-agnostic design: `AgentConfig` type defines how to spawn any CLI agent
+- **Frontend:** React SPA built with Vite, served as static files by the daemon
+  - **Feature-Sliced Design** in `@vigie/ui` — layers: `app → shared → entities → features → widgets → pages`
   - Each slice organized as `api/`, `model/`, `ui/` sub-folders
   - No cross-slice imports (features don't import from other features)
-  - State management: React hooks only (no Redux/Zustand/etc.)
-- **Auth:** Better Auth (GitHub OAuth) · **ORM:** Kysely · **Payments:** Stripe
-- **API key prefix:** `vigie_`
+  - State management: Redux Toolkit
+  - Real-time: WebSocket for events + terminal I/O
+- **No auth required** — everything runs on localhost
+- **No external database** — SQLite only
+- **No remote servers** — no Railway, no PostgreSQL, no OAuth
+
+### Communication
+
+```
+CLI commands → Unix socket IPC → Daemon
+Browser SPA  → HTTP/WebSocket  → Daemon (localhost:19191)
+Daemon       → PTY spawn       → claude/aider/codex/...
+```
+
+- `GET /api/sessions` — list all sessions
+- `POST /api/sessions` — spawn new agent session
+- `POST /api/sessions/:id/kill` — kill session
+- `POST /api/sessions/:id/resume` — resume session
+- `DELETE /api/sessions/:id` — delete session
+- `WS /ws/events` — real-time session lifecycle events
+- `WS /ws/terminal/:sessionId` — terminal I/O for xterm.js
 
 ## Verify pipeline
 
@@ -57,7 +72,7 @@ knip → biome check → typecheck → test → build
 
 ```bash
 bun install                                    # install all dependencies
-bun turbo dev                                  # dev servers (api + ui)
+bun turbo dev                                  # daemon (localhost:19191) + ui (localhost:3000)
 bun run dev:landing                            # dev server for vigie landing
 bun turbo build                                # build all packages
 bun turbo check                                # biome check
@@ -67,15 +82,28 @@ bun turbo test                                 # run tests
 bun run verify                                 # full pipeline: knip → check → typecheck → test → build
 bun run verify:fix                             # auto-fix then verify
 bun turbo build --filter=@vigie/landing        # build single package
-bun test:unit                                  # run unit tests only
-bun test:integration                           # run integration tests only
+```
+
+### CLI commands
+
+```bash
+vigie daemon start          # start daemon in background
+vigie daemon start --fg     # start in foreground
+vigie daemon stop           # stop daemon
+vigie daemon status         # show daemon status
+vigie open                  # open dashboard in browser
+vigie claude                # run Claude Code (interactive)
+vigie claude -p "..."       # run Claude Code with prompt
+vigie session list          # list sessions
+vigie session attach --id   # attach to active session
+vigie session resume --id   # resume ended session
 ```
 
 ## Rules
 
 - **Feature branches only** — never commit directly to `main`. Before starting any work, create or switch to a feature branch. Always `git pull --rebase origin main` before beginning work and before opening a PR.
 - **Never `git push` directly** — always ask before pushing to any remote.
-- **Conventional Commits** — `type(scope): description` (e.g. `feat(api): add auth endpoint`, `fix(tokens): correct color value`).
+- **Conventional Commits** — `type(scope): description` (e.g. `feat(cli): add open command`, `fix(tokens): correct color value`).
 - **No AI attribution** — never add `Co-Authored-By` or any Claude/AI mention in commit messages.
 - **Bun only** — never use npm, pnpm, yarn, or npx. Use `bun` and `bunx`.
 - **Pinned versions** — no `^` or `~` prefixes in `package.json` dependencies.
@@ -87,7 +115,7 @@ bun test:integration                           # run integration tests only
 - **`@vigie/tokens` for branding** — UI and Landing import `@vigie/tokens/tailwind.css` + `@vigie/tokens/tokens.css` to enforce consistent branding
 - Fonts loaded via `@fontsource/*` npm packages (self-hosted, imported in global.css via `@import`)
 - No `any` — strict TypeScript everywhere
-- **Effect** for all backend business logic (no try/catch)
+- **Effect** for CLI daemon business logic (no try/catch)
 - **Valibot** for all schemas (no Zod)
 - **Valibot for env validation** — environment variables validated with Valibot schemas (see `env.ts` patterns)
 - **Biome** only (no ESLint/Prettier)
@@ -99,7 +127,6 @@ bun test:integration                           # run integration tests only
 - **Self-documenting code** — minimal comments. Code should be self-explanatory. No JSDoc unless for public library APIs
 - **Clean code** — no dead code, no commented-out code, no TODO comments without linked issues
 - **Bun test runner** — `import { describe, expect, it } from 'bun:test'`
-- **Effect logging only in `@vigie/api`** — use `Effect.logInfo`, `Effect.logWarning`, `Effect.logError`, `Effect.logDebug` with `Effect.annotateLogs` for structured context. `console.log` is banned by Biome in the API package. Use `Logger.consolePretty()` layer for dev output.
 
 ## Subpath imports
 
@@ -107,8 +134,7 @@ All cross-folder imports must use ESM subpath aliases (`#alias/...`), never rela
 
 | Package | Aliases |
 |---|---|
-| `@vigie/api` | `#modules/*`, `#routes/*` |
-| `@vigie/ui` | `#app/*`, `#shared/*`, `#entities/*`, `#features/*`, `#widgets/*`, `#pages/*`, `#routes/*` |
 | `@vigie/cli` | `#modules/*`, `#schemas/*`, `#terminal/*`, `#vterm/*` |
+| `@vigie/ui` | `#app/*`, `#shared/*`, `#entities/*`, `#features/*`, `#widgets/*`, `#pages/*` |
 | `@vigie/landing` | `#components/*`, `#layouts/*`, `#assets/*`, `#styles/*`, `#lib/*` |
 | `@vigie/shared` | `#contracts/*`, `#schemas/*` |

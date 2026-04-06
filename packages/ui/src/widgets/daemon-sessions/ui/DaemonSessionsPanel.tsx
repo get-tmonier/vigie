@@ -28,15 +28,11 @@ import { cn } from '#shared/lib/cn';
 import { RadarIcon } from '#shared/ui/RadarIcon';
 import { SessionDetailHeader } from './SessionDetailHeader';
 
-interface DaemonSessionsPanelProps {
-  daemonId: string | null;
-}
-
-export function DaemonSessionsPanel({ daemonId }: DaemonSessionsPanelProps) {
+export function DaemonSessionsPanel() {
   const dispatch = useAppDispatch();
-  const activeSessions = useAppSelector(selectActiveSessions(daemonId));
-  const endedSessions = useAppSelector(selectEndedSessions(daemonId));
-  const loading = useAppSelector(selectLoading(daemonId));
+  const activeSessions = useAppSelector(selectActiveSessions);
+  const endedSessions = useAppSelector(selectEndedSessions);
+  const loading = useAppSelector(selectLoading);
   const daemonOnline = useAppSelector(selectDaemonOnline);
   const reconnectCount = useAppSelector(selectReconnectCount);
   const events = useAppSelector(selectEvents);
@@ -83,7 +79,7 @@ export function DaemonSessionsPanel({ daemonId }: DaemonSessionsPanelProps) {
   useEffect(() => {
     for (const event of events) {
       if (event.type === 'session:spawn-failed' && event.sessionId === pendingSessionId) {
-        setSpawnError(event.error);
+        setSpawnError(String(event.error));
         setPendingSessionId(null);
         const timer = setTimeout(() => setSpawnError(null), 8000);
         return () => clearTimeout(timer);
@@ -92,9 +88,9 @@ export function DaemonSessionsPanel({ daemonId }: DaemonSessionsPanelProps) {
   }, [events, pendingSessionId]);
 
   const handleResume = useCallback(async () => {
-    if (!daemonId || !selectedSession) return;
+    if (!selectedSession) return;
     try {
-      const result = await resumeSession(daemonId, selectedSession.id);
+      const result = await resumeSession(selectedSession.id);
       setPendingSessionId(result.sessionId);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to resume session';
@@ -102,20 +98,12 @@ export function DaemonSessionsPanel({ daemonId }: DaemonSessionsPanelProps) {
       setResumeFailedSessions((prev) => new Map(prev).set(selectedSession.id, message));
       setTimeout(() => setSpawnError(null), 8000);
     }
-  }, [daemonId, selectedSession]);
+  }, [selectedSession]);
 
   const handleSpawned = useCallback((sessionId: string) => {
     setPendingSessionId(sessionId);
     setShowSpawnForm(false);
   }, []);
-
-  if (!daemonId) {
-    return (
-      <div className="flex-1 flex items-center justify-center text-cream-200 text-sm font-body">
-        Select a daemon to view sessions
-      </div>
-    );
-  }
 
   if (loading && sessions.length === 0) {
     return (
@@ -143,7 +131,7 @@ export function DaemonSessionsPanel({ daemonId }: DaemonSessionsPanelProps) {
   return (
     <div className="flex flex-1 overflow-hidden relative">
       {/* Disconnection overlay */}
-      {daemonId && !daemonOnline && (
+      {!daemonOnline && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-navy-900/80 backdrop-blur-sm">
           <div className="flex flex-col items-center gap-3 text-center px-6">
             <div className="relative flex items-center justify-center">
@@ -212,11 +200,7 @@ export function DaemonSessionsPanel({ daemonId }: DaemonSessionsPanelProps) {
           </div>
 
           {showSpawnForm && (
-            <SpawnSessionDialog
-              daemonId={daemonId}
-              onSpawned={handleSpawned}
-              onClose={() => setShowSpawnForm(false)}
-            />
+            <SpawnSessionDialog onSpawned={handleSpawned} onClose={() => setShowSpawnForm(false)} />
           )}
 
           {spawnError && (
@@ -238,7 +222,7 @@ export function DaemonSessionsPanel({ daemonId }: DaemonSessionsPanelProps) {
                   <span className="font-mono text-[0.6rem] text-cream-200/50 uppercase tracking-[0.12em]">
                     Active
                   </span>
-                  <KillAllButton daemonId={daemonId} activeCount={activeSessions.length} />
+                  <KillAllButton activeCount={activeSessions.length} />
                 </div>
                 {activeSessions.map((session, i) => (
                   <div
@@ -262,10 +246,9 @@ export function DaemonSessionsPanel({ daemonId }: DaemonSessionsPanelProps) {
                     Ended
                   </span>
                   <ClearEndedButton
-                    daemonId={daemonId}
                     endedCount={endedSessions.length}
                     onCleared={() => {
-                      dispatch(endedSessionsCleared(daemonId));
+                      dispatch(endedSessionsCleared());
                       if (selectedSession && selectedSession.status === 'ended') {
                         setSelectedSessionId(null);
                       }

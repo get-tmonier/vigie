@@ -12,11 +12,11 @@
     "#vterm/*": "./src/vterm/*"
   },
   "scripts": {
-    "dev": "bun run --watch src/cli.ts",
+    "dev": "VIGIE_DEV=true bun run --watch src/modules/daemon/main.ts",
     "dev:claude": "bun run src/cli.ts claude",
-    "dev:daemon": "bun run src/modules/daemon/main.ts",
     "build:pty": "sh scripts/build-pty.sh",
-    "build": "bun run build:pty && bun build --compile --target=bun src/cli.ts --outfile dist/vigie",
+    "build:ui": "cd ../ui && bun run build && cp -r dist ../../packages/cli/dist/ui-dist",
+    "build": "bun run build:pty && bun build --compile --target=bun src/cli.ts --outfile dist/vigie && bun run build:ui",
     "typecheck": "tsc --noEmit",
     "lint": "biome lint ./src",
     "lint:fix": "biome lint --write ./src",
@@ -30,6 +30,7 @@
     "@effect/platform-bun": "4.0.0-beta.24",
     "@xterm/headless": "5.5.0",
     "effect": "4.0.0-beta.24",
+    "hono": "4.7.11",
     "valibot": "1.2.0"
   },
   "devDependencies": {

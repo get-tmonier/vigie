@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'bun:test';
-import type { SSEEvent } from '@vigie/shared';
+import type { DaemonEvent } from '#shared/types/daemon-event';
 import { inputEchoReceived, inputHistoryReducer } from '../model/input-history-slice';
 
 const initialState = { entriesBySessionId: {}, seenKeysBySessionId: {} };
 
-function echo(sessionId: string, text: string, timestamp: number): SSEEvent {
+function echo(sessionId: string, text: string, timestamp: number): DaemonEvent {
   return {
     type: 'terminal:input-echo',
     daemonId: 'd-1',
@@ -12,7 +12,7 @@ function echo(sessionId: string, text: string, timestamp: number): SSEEvent {
     text,
     source: 'cli',
     timestamp,
-  } as SSEEvent;
+  } as DaemonEvent;
 }
 
 describe('inputHistorySlice', () => {

@@ -7,10 +7,8 @@ export default {
       project: ['src/**/*.ts'],
     },
     'packages/ui': {
-      entry: ['src/routes/**/*.tsx', 'src/router.tsx'],
       project: ['src/**/*.{ts,tsx}'],
       ignoreDependencies: [
-        '@tanstack/react-router-devtools',
         '@fontsource-variable/dm-sans',
         '@fontsource/instrument-serif',
         '@fontsource/jetbrains-mono',
@@ -26,7 +24,6 @@ export default {
         '@fontsource-variable/dm-sans',
         '@fontsource/instrument-serif',
         '@fontsource/jetbrains-mono',
-        '@vigie/tokens',
         'tailwindcss',
       ],
     },

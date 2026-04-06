@@ -2,17 +2,17 @@ import { useCallback, useState } from 'react';
 import { clearEndedSessions } from '#entities/session/api/session-api';
 
 interface UseClearEndedSessionsResult {
-  clear: (daemonId: string) => Promise<boolean>;
+  clear: () => Promise<boolean>;
   loading: boolean;
 }
 
 export function useClearEndedSessions(): UseClearEndedSessionsResult {
   const [loading, setLoading] = useState(false);
 
-  const clear = useCallback(async (daemonId: string): Promise<boolean> => {
+  const clear = useCallback(async (): Promise<boolean> => {
     setLoading(true);
     try {
-      await clearEndedSessions(daemonId);
+      await clearEndedSessions();
       return true;
     } catch {
       return false;

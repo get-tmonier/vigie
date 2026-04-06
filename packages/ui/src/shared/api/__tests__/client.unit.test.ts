@@ -22,7 +22,7 @@ describe('apiFetch', () => {
     expect(result.data).toBe('ok');
   });
 
-  it('sets credentials and content-type', async () => {
+  it('sets content-type header', async () => {
     let capturedInit: RequestInit | undefined;
     globalThis.fetch = mock((_url: string, init?: RequestInit) => {
       capturedInit = init;
@@ -30,7 +30,6 @@ describe('apiFetch', () => {
     }) as unknown as typeof fetch;
 
     await apiFetch('/test');
-    expect(capturedInit?.credentials).toBe('include');
     expect(new Headers(capturedInit?.headers).get('Content-Type')).toBe('application/json');
   });
 

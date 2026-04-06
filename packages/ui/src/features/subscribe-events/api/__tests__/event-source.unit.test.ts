@@ -6,7 +6,7 @@ mock.module('#shared/config/env', () => ({
 
 const OriginalEventSource = globalThis.EventSource;
 
-describe('createDaemonEventSource', () => {
+describe('createEventSource', () => {
   afterEach(() => {
     globalThis.EventSource = OriginalEventSource;
   });
@@ -22,10 +22,10 @@ describe('createDaemonEventSource', () => {
       }
     } as unknown as typeof EventSource;
 
-    const { createDaemonEventSource } = await import('../event-source');
-    createDaemonEventSource('d-1');
+    const { createEventSource } = await import('../event-source');
+    createEventSource();
 
-    expect(capturedUrl).toBe('http://localhost:3001/daemons/d-1/events');
+    expect(capturedUrl).toBe('http://localhost:3001/api/events');
     expect(capturedInit?.withCredentials).toBe(true);
   });
 });

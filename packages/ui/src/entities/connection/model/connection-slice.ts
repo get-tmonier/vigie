@@ -1,12 +1,12 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { SSEDaemonConnected, SSEDaemonDisconnected, SSEEvent } from '@vigie/shared';
 import type { RootState } from '#app/store';
+import type { DaemonEvent } from '#shared/types/daemon-event';
 
 export interface ConnectionState {
   daemonOnline: boolean;
   hostname: string | null;
   reconnectCount: number;
-  events: SSEEvent[];
+  events: DaemonEvent[];
 }
 
 const initialState: ConnectionState = {
@@ -20,18 +20,18 @@ const connectionSlice = createSlice({
   name: 'connection',
   initialState,
   reducers: {
-    daemonConnected: (state, action: PayloadAction<SSEDaemonConnected>) => {
+    daemonConnected: (state, action: PayloadAction<DaemonEvent>) => {
       state.daemonOnline = true;
-      state.hostname = action.payload.hostname;
+      state.hostname = (action.payload.hostname as string) ?? null;
       state.reconnectCount += 1;
     },
 
-    daemonDisconnected: (state, action: PayloadAction<SSEDaemonDisconnected>) => {
+    daemonDisconnected: (state, action: PayloadAction<DaemonEvent>) => {
       state.daemonOnline = false;
-      state.hostname = action.payload.hostname;
+      state.hostname = (action.payload.hostname as string) ?? null;
     },
 
-    eventAdded: (state, action: PayloadAction<SSEEvent>) => {
+    eventAdded: (state, action: PayloadAction<DaemonEvent>) => {
       state.events.push(action.payload);
     },
 
@@ -52,4 +52,4 @@ export const selectDaemonOnline = (state: RootState): boolean => state.connectio
 
 export const selectReconnectCount = (state: RootState): number => state.connection.reconnectCount;
 
-export const selectEvents = (state: RootState): SSEEvent[] => state.connection.events;
+export const selectEvents = (state: RootState): DaemonEvent[] => state.connection.events;

@@ -8,3 +8,5 @@ export const LOG_FILE = join(VIGIE_HOME, 'daemon.log');
 export const SOCKET_PATH = join(VIGIE_HOME, 'daemon.sock');
 export const STDIN_SOCKET_PATH = join(VIGIE_HOME, 'daemon-stdin.sock');
 export const DB_FILE = join(VIGIE_HOME, 'data.db');
+export const PORT_FILE = join(VIGIE_HOME, 'port');
+export const DEFAULT_PORT = 19191;

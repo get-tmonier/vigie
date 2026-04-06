@@ -207,13 +207,9 @@ export function SessionDetailHeader({
         {session.agentType === 'claude' && (
           <ResumeStatus session={session} resumeError={resumeError} onResume={onResume} />
         )}
-        {isActive && <KillSessionButton daemonId={session.daemonId} sessionId={session.id} />}
+        {isActive && <KillSessionButton sessionId={session.id} />}
         {session.status === 'ended' && onDelete && (
-          <DeleteSessionButton
-            daemonId={session.daemonId}
-            sessionId={session.id}
-            onDeleted={onDelete}
-          />
+          <DeleteSessionButton sessionId={session.id} onDeleted={onDelete} />
         )}
         <span
           className={cn(

@@ -1,8 +1,6 @@
 import { BunRuntime, BunServices } from '@effect/platform-bun';
 import { Console, Effect } from 'effect';
 import { Command, Flag } from 'effect/unstable/cli';
-import { loginCommand } from '#modules/auth/commands/login.command.js';
-import { logoutCommand } from '#modules/auth/commands/logout.command.js';
 import {
   daemonAttachCommand,
   daemonLogsCommand,
@@ -11,13 +9,14 @@ import {
   daemonStatusCommand,
   daemonStopCommand,
 } from '#modules/daemon/commands/daemon.command.js';
+import { openCommand } from '#modules/daemon/commands/open.command.js';
 import { claudeCommand } from '#modules/session/commands/claude.command.js';
 import { claudeInteractiveCommand } from '#modules/session/commands/claude-interactive.command.js';
 import { sessionAttachCommand } from '#modules/session/commands/session-attach.command.js';
 import { sessionListCommand } from '#modules/session/commands/session-list.command.js';
 import { sessionResumeCommand } from '#modules/session/commands/session-resume.command.js';
 
-// ── Daemon subcommands ──
+// ── Daemon subcommands ��─
 
 const daemonStart = Command.make(
   'start',
@@ -104,21 +103,10 @@ const session = Command.make('session').pipe(
   Command.withSubcommands([sessionList, sessionAttach, sessionResume])
 );
 
-// ── Auth commands ──
+// ── Open command ──
 
-const login = Command.make(
-  'login',
-  {
-    token: Flag.string('token').pipe(Flag.optional, Flag.withDescription('API key (manual login)')),
-  },
-  ({ token }) => {
-    const tokenValue = token._tag === 'Some' ? token.value : undefined;
-    return loginCommand(tokenValue);
-  }
-).pipe(Command.withDescription('Authenticate with Tmonier'));
-
-const logout = Command.make('logout', {}, () => logoutCommand()).pipe(
-  Command.withDescription('Clear saved credentials')
+const open = Command.make('open', {}, () => openCommand()).pipe(
+  Command.withDescription('Open the vigie dashboard in your browser')
 );
 
 // ── Root command ──
@@ -141,11 +129,10 @@ const app = Command.make('vigie', {}, () =>
       '  session list         List sessions (--active, --all)',
       '  session attach --id  Attach to an active interactive session',
       '  session resume --id  Resume an ended Claude session',
-      '  login                Authenticate',
-      '  logout               Clear credentials',
+      '  open                 Open the dashboard in your browser',
     ].join('\n')
   )
-).pipe(Command.withSubcommands([daemon, claude, session, login, logout]));
+).pipe(Command.withSubcommands([daemon, claude, session, open]));
 
 // ── Run ──
 

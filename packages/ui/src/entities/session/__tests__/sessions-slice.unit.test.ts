@@ -1,18 +1,19 @@
 import { describe, expect, it } from 'bun:test';
-import type { SSEEvent } from '@vigie/shared';
+import type { DaemonEvent } from '#shared/types/daemon-event';
 import {
-  daemonSessionsReset,
+  endedSessionsCleared,
   sessionEnded,
   sessionStarted,
   sessionsLoaded,
   sessionsReducer,
+  sessionsReset,
 } from '../model/sessions-slice';
 
-const initialState = { byId: {}, allIds: [], loadingByDaemonId: {}, resumeCountById: {} };
+const initialState = { byId: {}, allIds: [], loading: false, resumeCountById: {} };
 
 function sseEnded(
   overrides: Partial<{ sessionId: string; exitCode: number; resumable: boolean }> = {}
-): SSEEvent {
+): DaemonEvent {
   return {
     type: 'session:ended',
     daemonId: 'd-1',
@@ -21,12 +22,11 @@ function sseEnded(
     resumable: false,
     timestamp: 2000,
     ...overrides,
-  } as SSEEvent;
+  } as DaemonEvent;
 }
 
 function sseStarted(
   overrides: Partial<{
-    daemonId: string;
     sessionId: string;
     agentType: 'claude' | 'opencode' | 'generic';
     mode: 'prompt' | 'interactive';
@@ -35,7 +35,7 @@ function sseStarted(
     claudeSessionId: string;
     timestamp: number;
   }> = {}
-): SSEEvent {
+): DaemonEvent {
   return {
     type: 'session:started',
     daemonId: 'd-1',
@@ -45,7 +45,7 @@ function sseStarted(
     cwd: '/home/user',
     timestamp: 1000,
     ...overrides,
-  } as SSEEvent;
+  } as DaemonEvent;
 }
 
 describe('sessionsSlice', () => {
@@ -84,45 +84,50 @@ describe('sessionsSlice', () => {
     });
   });
 
-  describe('daemonSessionsReset', () => {
-    it('clears only sessions of the specified daemon', () => {
+  describe('sessionsReset', () => {
+    it('clears all sessions', () => {
       let state = sessionsReducer(
         initialState,
-        sessionStarted(sseStarted({ sessionId: 's-1', daemonId: 'd-1' }) as never)
+        sessionStarted(sseStarted({ sessionId: 's-1' }) as never)
       );
-      state = sessionsReducer(
-        state,
-        sessionStarted(sseStarted({ sessionId: 's-2', daemonId: 'd-2' }) as never)
-      );
+      state = sessionsReducer(state, sessionStarted(sseStarted({ sessionId: 's-2' }) as never));
       expect(state.allIds).toHaveLength(2);
 
-      state = sessionsReducer(state, daemonSessionsReset('d-1'));
-      expect(state.allIds).toHaveLength(1);
-      expect(state.byId['s-1']).toBeUndefined();
-      expect(state.byId['s-2']?.daemonId).toBe('d-2');
+      state = sessionsReducer(state, sessionsReset());
+      expect(state.allIds).toHaveLength(0);
+      expect(state.byId).toEqual({});
     });
 
-    it('resetting unknown daemon leaves state unchanged', () => {
-      const state = sessionsReducer(initialState, sessionStarted(sseStarted() as never));
-      const next = sessionsReducer(state, daemonSessionsReset('d-unknown'));
-      expect(next.allIds).toHaveLength(1);
-    });
-
-    it('clears resumeCountById for sessions of the reset daemon', () => {
-      // Start session, end it, then resume it to build up a resumeCount
+    it('clears resumeCountById', () => {
       let state = sessionsReducer(
         initialState,
-        sessionStarted(sseStarted({ sessionId: 's-1', daemonId: 'd-1' }) as never)
+        sessionStarted(sseStarted({ sessionId: 's-1' }) as never)
       );
       state = sessionsReducer(state, sessionEnded(sseEnded({ sessionId: 's-1' }) as never));
       state = sessionsReducer(
         state,
-        sessionStarted(sseStarted({ sessionId: 's-1', daemonId: 'd-1', timestamp: 3000 }) as never)
+        sessionStarted(sseStarted({ sessionId: 's-1', timestamp: 3000 }) as never)
       );
       expect(state.resumeCountById['s-1']).toBe(1);
 
-      state = sessionsReducer(state, daemonSessionsReset('d-1'));
+      state = sessionsReducer(state, sessionsReset());
       expect(state.resumeCountById['s-1']).toBeUndefined();
+    });
+  });
+
+  describe('endedSessionsCleared', () => {
+    it('clears only ended sessions', () => {
+      let state = sessionsReducer(
+        initialState,
+        sessionStarted(sseStarted({ sessionId: 's-1' }) as never)
+      );
+      state = sessionsReducer(state, sessionStarted(sseStarted({ sessionId: 's-2' }) as never));
+      state = sessionsReducer(state, sessionEnded(sseEnded({ sessionId: 's-1' }) as never));
+
+      state = sessionsReducer(state, endedSessionsCleared());
+      expect(state.allIds).toHaveLength(1);
+      expect(state.byId['s-1']).toBeUndefined();
+      expect(state.byId['s-2']?.status).toBe('active');
     });
   });
 
@@ -170,7 +175,6 @@ describe('sessionsSlice', () => {
     });
 
     it('session:started for active session (new spawn) does not increment', () => {
-      // Start s-1 and s-2, end s-1, resume s-1, then start s-3 fresh
       let state = sessionsReducer(
         initialState,
         sessionStarted(sseStarted({ sessionId: 's-1' }) as never)
@@ -184,7 +188,7 @@ describe('sessionsSlice', () => {
       // Start a brand new s-3
       state = sessionsReducer(
         state,
-        sessionStarted(sseStarted({ sessionId: 's-3', daemonId: 'd-1', timestamp: 4000 }) as never)
+        sessionStarted(sseStarted({ sessionId: 's-3', timestamp: 4000 }) as never)
       );
       expect(state.resumeCountById['s-3']).toBeUndefined();
       expect(state.resumeCountById['s-1']).toBe(1);
@@ -192,7 +196,7 @@ describe('sessionsSlice', () => {
   });
 
   describe('sessionsLoaded', () => {
-    it('replaces existing sessions for daemon and marks loading false', () => {
+    it('replaces existing sessions and marks loading false', () => {
       let state = sessionsReducer(
         initialState,
         sessionStarted(sseStarted({ sessionId: 's-old' }) as never)
@@ -200,11 +204,9 @@ describe('sessionsSlice', () => {
       state = sessionsReducer(
         state,
         sessionsLoaded({
-          daemonId: 'd-1',
           sessions: [
             {
               id: 's-new',
-              daemonId: 'd-1',
               agentType: 'claude',
               mode: 'interactive',
               cwd: '/home',
@@ -216,18 +218,16 @@ describe('sessionsSlice', () => {
       );
       expect(state.byId['s-old']).toBeUndefined();
       expect(state.byId['s-new']?.id).toBe('s-new');
-      expect(state.loadingByDaemonId['d-1']).toBe(false);
+      expect(state.loading).toBe(false);
     });
 
     it('stores resumable: true when API returns it', () => {
       const state = sessionsReducer(
         initialState,
         sessionsLoaded({
-          daemonId: 'd-1',
           sessions: [
             {
               id: 's-1',
-              daemonId: 'd-1',
               agentType: 'claude',
               mode: 'interactive',
               cwd: '/home',
@@ -245,11 +245,9 @@ describe('sessionsSlice', () => {
       const state = sessionsReducer(
         initialState,
         sessionsLoaded({
-          daemonId: 'd-1',
           sessions: [
             {
               id: 's-1',
-              daemonId: 'd-1',
               agentType: 'claude',
               mode: 'interactive',
               cwd: '/home',
@@ -267,16 +265,12 @@ describe('sessionsSlice', () => {
 
   describe('page-refresh resumable scenarios', () => {
     it('sessionStarted with resumable: true after sessionsLoaded with undefined keeps true', () => {
-      // Simulates: listSessions returns resumable: undefined, then SSE snapshot
-      // session:started arrives with resumable: true (carry-forward from sessionStore)
       let state = sessionsReducer(
         initialState,
         sessionsLoaded({
-          daemonId: 'd-1',
           sessions: [
             {
               id: 's-1',
-              daemonId: 'd-1',
               agentType: 'claude',
               mode: 'interactive',
               cwd: '/home',
@@ -293,16 +287,12 @@ describe('sessionsSlice', () => {
     });
 
     it('sessionStarted with resumable: undefined preserves existing resumable from sessionsLoaded', () => {
-      // Simulates: listSessions returns resumable: true, then SSE session:started
-      // arrives without resumable (e.g. snapshot has no resumable field)
       let state = sessionsReducer(
         initialState,
         sessionsLoaded({
-          daemonId: 'd-1',
           sessions: [
             {
               id: 's-1',
-              daemonId: 'd-1',
               agentType: 'claude',
               mode: 'interactive',
               cwd: '/home',
@@ -320,9 +310,6 @@ describe('sessionsSlice', () => {
     });
 
     it('resumed session: sessionStarted for ended session preserves resumable: true', () => {
-      // Simulates the SSE snapshot session:started for a resumed session where
-      // the API correctly carries forward resumable from the ended session.
-      // The snapshot session:started includes resumable: true.
       let state = sessionsReducer(initialState, sessionStarted(sseStarted() as never));
       state = sessionsReducer(state, sessionEnded(sseEnded({ resumable: true }) as never));
       expect(state.byId['s-1']?.resumable).toBe(true);

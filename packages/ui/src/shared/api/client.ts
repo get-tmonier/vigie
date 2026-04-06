@@ -4,7 +4,6 @@ export const API_BASE = env.VITE_API_URL;
 
 export async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
-    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     ...options,
   });

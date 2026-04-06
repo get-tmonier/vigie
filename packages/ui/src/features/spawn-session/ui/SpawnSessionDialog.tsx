@@ -5,12 +5,11 @@ import { cn } from '#shared/lib/cn';
 import { useSpawnSession } from '../model/use-spawn-session';
 
 interface SpawnSessionDialogProps {
-  daemonId: string;
   onSpawned: (sessionId: string) => void;
   onClose: () => void;
 }
 
-export function SpawnSessionDialog({ daemonId, onSpawned, onClose }: SpawnSessionDialogProps) {
+export function SpawnSessionDialog({ onSpawned, onClose }: SpawnSessionDialogProps) {
   const [cwd, setCwd] = useState('~/');
   const [suggestions, setSuggestions] = useState<FsEntry[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -20,24 +19,21 @@ export function SpawnSessionDialog({ daemonId, onSpawned, onClose }: SpawnSessio
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { spawn, loading, error } = useSpawnSession();
 
-  const fetchSuggestions = useCallback(
-    async (path: string) => {
-      setLoadingSuggestions(true);
-      try {
-        const result = await listDirectory(daemonId, path);
-        const dirs = result.entries.filter((e) => e.isDirectory);
-        setSuggestions(dirs);
-        setSelectedIndex(0);
-        setShowSuggestions(dirs.length > 0);
-      } catch {
-        setSuggestions([]);
-        setShowSuggestions(false);
-      } finally {
-        setLoadingSuggestions(false);
-      }
-    },
-    [daemonId]
-  );
+  const fetchSuggestions = useCallback(async (path: string) => {
+    setLoadingSuggestions(true);
+    try {
+      const result = await listDirectory(path);
+      const dirs = result.entries.filter((e) => e.isDirectory);
+      setSuggestions(dirs);
+      setSelectedIndex(0);
+      setShowSuggestions(dirs.length > 0);
+    } catch {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    } finally {
+      setLoadingSuggestions(false);
+    }
+  }, []);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -107,7 +103,7 @@ export function SpawnSessionDialog({ daemonId, onSpawned, onClose }: SpawnSessio
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const sessionId = await spawn(daemonId, {
+    const sessionId = await spawn({
       cwd: cwd.trim() || undefined,
     });
     if (sessionId) {

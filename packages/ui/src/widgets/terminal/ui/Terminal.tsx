@@ -1,9 +1,9 @@
-import type { SSEEvent } from '@vigie/shared';
+import type { DaemonEvent } from '#shared/types/daemon-event';
 import { CommandInput } from './CommandInput';
 import { TerminalOutput } from './TerminalOutput';
 
 interface TerminalProps {
-  events: SSEEvent[];
+  events: DaemonEvent[];
   onCommand: (command: string) => void;
   disabled: boolean;
 }

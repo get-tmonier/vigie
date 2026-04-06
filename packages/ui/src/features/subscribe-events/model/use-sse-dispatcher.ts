@@ -1,4 +1,3 @@
-import type { SSEEvent } from '@vigie/shared';
 import { useEffect, useRef } from 'react';
 import { useAppDispatch } from '#app/hooks';
 import {
@@ -11,51 +10,46 @@ import { inputEchoReceived } from '#entities/input-history/model/input-history-s
 import { listSessions } from '#entities/session/api/session-api';
 import {
   claudeIdDetected,
-  daemonSessionsReset,
   resumableChanged,
   sessionEnded,
   sessionErrored,
   sessionStarted,
   sessionsLoaded,
   sessionsLoading,
+  sessionsReset,
 } from '#entities/session/model/sessions-slice';
+import type { DaemonEvent } from '#shared/types/daemon-event';
 
-export function useSSEDispatcher(events: SSEEvent[], daemonId: string | null) {
+export function useSSEDispatcher(events: DaemonEvent[]) {
   const dispatch = useAppDispatch();
   const processedCount = useRef(0);
-  const prevDaemonIdRef = useRef<string | null>(null);
+  const initializedRef = useRef(false);
   const fetchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const daemonIdRef = useRef(daemonId);
-  daemonIdRef.current = daemonId;
 
-  // Reset slices when daemonId changes, then do initial fetch
+  // Initial fetch on mount
   useEffect(() => {
-    const prev = prevDaemonIdRef.current;
-    prevDaemonIdRef.current = daemonId;
+    if (initializedRef.current) return;
+    initializedRef.current = true;
 
-    if (fetchTimerRef.current) {
-      clearTimeout(fetchTimerRef.current);
-      fetchTimerRef.current = null;
-    }
-
-    processedCount.current = 0;
     dispatch(eventsReset());
+    dispatch(sessionsReset());
+    dispatch(sessionsLoading());
 
-    if (prev) {
-      dispatch(daemonSessionsReset(prev));
-    }
-
-    if (!daemonId) return;
-
-    dispatch(sessionsLoading(daemonId));
-    listSessions(daemonId)
+    listSessions()
       .then((sessions) => {
-        dispatch(sessionsLoaded({ daemonId, sessions }));
+        dispatch(sessionsLoaded({ sessions }));
       })
       .catch(() => {
-        dispatch(sessionsLoaded({ daemonId, sessions: [] }));
+        dispatch(sessionsLoaded({ sessions: [] }));
       });
-  }, [daemonId, dispatch]);
+
+    return () => {
+      if (fetchTimerRef.current) {
+        clearTimeout(fetchTimerRef.current);
+        fetchTimerRef.current = null;
+      }
+    };
+  }, [dispatch]);
 
   // Process new events and dispatch to slices
   useEffect(() => {
@@ -71,37 +65,34 @@ export function useSSEDispatcher(events: SSEEvent[], daemonId: string | null) {
           dispatch(daemonConnected(event));
           if (fetchTimerRef.current) clearTimeout(fetchTimerRef.current);
           fetchTimerRef.current = setTimeout(() => {
-            const id = daemonIdRef.current;
-            if (id) {
-              listSessions(id)
-                .then((sessions) => {
-                  dispatch(sessionsLoaded({ daemonId: id, sessions }));
-                })
-                .catch(() => {});
-            }
+            listSessions()
+              .then((sessions) => {
+                dispatch(sessionsLoaded({ sessions }));
+              })
+              .catch(() => {});
           }, 500);
           break;
         case 'daemon:disconnected':
           dispatch(daemonDisconnected(event));
           break;
         case 'session:started':
-          dispatch(sessionStarted(event));
+          dispatch(sessionStarted(event as never));
           break;
         case 'session:ended':
-          dispatch(sessionEnded(event));
+          dispatch(sessionEnded(event as never));
           break;
         case 'session:error':
         case 'session:spawn-failed':
-          dispatch(sessionErrored(event));
+          dispatch(sessionErrored(event as never));
           break;
         case 'session:claude-id-detected':
-          dispatch(claudeIdDetected(event));
+          dispatch(claudeIdDetected(event as never));
           break;
         case 'session:resumable-changed':
-          dispatch(resumableChanged(event));
+          dispatch(resumableChanged(event as never));
           break;
         case 'terminal:input-echo':
-          dispatch(inputEchoReceived(event));
+          dispatch(inputEchoReceived(event as never));
           break;
         // command:output, command:done, command:error, session:output → raw events only
       }

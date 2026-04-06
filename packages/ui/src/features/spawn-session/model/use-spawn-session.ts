@@ -2,10 +2,10 @@ import { useCallback, useState } from 'react';
 import { spawnSession } from '#entities/session/api/session-api';
 
 interface UseSpawnSessionResult {
-  spawn: (
-    daemonId: string,
-    options: { agentType?: 'claude' | 'opencode' | 'generic'; cwd?: string }
-  ) => Promise<string | null>;
+  spawn: (options: {
+    agentType?: 'claude' | 'opencode' | 'generic';
+    cwd?: string;
+  }) => Promise<string | null>;
   loading: boolean;
   error: string | null;
 }
@@ -15,14 +15,14 @@ export function useSpawnSession(): UseSpawnSessionResult {
   const [error, setError] = useState<string | null>(null);
 
   const spawn = useCallback(
-    async (
-      daemonId: string,
-      options: { agentType?: 'claude' | 'opencode' | 'generic'; cwd?: string }
-    ): Promise<string | null> => {
+    async (options: {
+      agentType?: 'claude' | 'opencode' | 'generic';
+      cwd?: string;
+    }): Promise<string | null> => {
       setLoading(true);
       setError(null);
       try {
-        const result = await spawnSession(daemonId, {
+        const result = await spawnSession({
           agentType: options.agentType ?? 'claude',
           cwd: options.cwd,
         });

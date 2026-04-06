@@ -2,17 +2,17 @@ import { useCallback, useState } from 'react';
 import { killAllSessions } from '#entities/session/api/session-api';
 
 interface UseKillAllSessionsResult {
-  killAll: (daemonId: string) => Promise<boolean>;
+  killAll: () => Promise<boolean>;
   loading: boolean;
 }
 
 export function useKillAllSessions(): UseKillAllSessionsResult {
   const [loading, setLoading] = useState(false);
 
-  const killAll = useCallback(async (daemonId: string): Promise<boolean> => {
+  const killAll = useCallback(async (): Promise<boolean> => {
     setLoading(true);
     try {
-      await killAllSessions(daemonId);
+      await killAllSessions();
       return true;
     } catch {
       return false;

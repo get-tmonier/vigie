@@ -1,5 +1,5 @@
-import type { SSEEvent } from '@vigie/shared';
 import { useMemo } from 'react';
+import type { DaemonEvent } from '#shared/types/daemon-event';
 
 export type SessionChunk =
   | { type: 'text'; data: string; timestamp: number }
@@ -9,13 +9,21 @@ export type SessionChunk =
   | { type: 'status'; data: string; timestamp: number }
   | { type: 'error'; data: string; timestamp: number };
 
-export function useSessionStream(events: SSEEvent[], sessionId: string | null) {
+interface SessionOutputEvent extends DaemonEvent {
+  type: 'session:output';
+  sessionId: string;
+  chunkType: string;
+  data: string;
+  timestamp: number;
+}
+
+export function useSessionStream(events: DaemonEvent[], sessionId: string | null) {
   const chunks = useMemo(() => {
     if (!sessionId) return [];
 
     return events
       .filter(
-        (e): e is Extract<SSEEvent, { type: 'session:output' }> =>
+        (e): e is SessionOutputEvent =>
           e.type === 'session:output' && 'sessionId' in e && e.sessionId === sessionId
       )
       .map(

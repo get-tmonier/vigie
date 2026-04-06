@@ -3,11 +3,10 @@ import { cn } from '#shared/lib/cn';
 import { useKillSession } from '../model/use-kill-session';
 
 interface KillSessionButtonProps {
-  daemonId: string;
   sessionId: string;
 }
 
-export function KillSessionButton({ daemonId, sessionId }: KillSessionButtonProps) {
+export function KillSessionButton({ sessionId }: KillSessionButtonProps) {
   const { kill, loading } = useKillSession();
   const [armed, setArmed] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -22,12 +21,12 @@ export function KillSessionButton({ daemonId, sessionId }: KillSessionButtonProp
     if (armed) {
       if (timerRef.current) clearTimeout(timerRef.current);
       setArmed(false);
-      await kill(daemonId, sessionId);
+      await kill(sessionId);
     } else {
       setArmed(true);
       timerRef.current = setTimeout(() => setArmed(false), 3000);
     }
-  }, [armed, kill, daemonId, sessionId]);
+  }, [armed, kill, sessionId]);
 
   return (
     <button

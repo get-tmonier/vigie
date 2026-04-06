@@ -1,28 +1,19 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type {
-  SSEEvent,
-  SSESessionClaudeIdDetected,
-  SSESessionEnded,
-  SSESessionError,
-  SSESessionSpawnFailed,
-  SSESessionStarted,
-} from '@vigie/shared';
 import type { RootState } from '#app/store';
+import type { DaemonEvent } from '#shared/types/daemon-event';
 import type { AgentSession } from '../api/session-api';
-
-type SSESessionResumableChanged = Extract<SSEEvent, { type: 'session:resumable-changed' }>;
 
 export interface SessionsState {
   byId: Record<string, AgentSession>;
   allIds: string[];
-  loadingByDaemonId: Record<string, boolean>;
+  loading: boolean;
   resumeCountById: Record<string, number>;
 }
 
 const initialState: SessionsState = {
   byId: {},
   allIds: [],
-  loadingByDaemonId: {},
+  loading: false,
   resumeCountById: {},
 };
 
@@ -30,87 +21,87 @@ const sessionsSlice = createSlice({
   name: 'sessions',
   initialState,
   reducers: {
-    sessionsLoading: (state, action: PayloadAction<string>) => {
-      state.loadingByDaemonId[action.payload] = true;
+    sessionsLoading: (state) => {
+      state.loading = true;
     },
 
-    sessionsLoaded: (
-      state,
-      action: PayloadAction<{ daemonId: string; sessions: AgentSession[] }>
-    ) => {
-      const { daemonId, sessions } = action.payload;
-      const toRemove = state.allIds.filter((id) => state.byId[id]?.daemonId === daemonId);
-      for (const id of toRemove) {
-        delete state.byId[id];
-      }
-      state.allIds = state.allIds.filter((id) => !toRemove.includes(id));
+    sessionsLoaded: (state, action: PayloadAction<{ sessions: AgentSession[] }>) => {
+      const { sessions } = action.payload;
+      state.byId = {};
+      state.allIds = [];
       for (const session of sessions) {
         state.byId[session.id] = session;
         state.allIds.push(session.id);
       }
-      state.loadingByDaemonId[daemonId] = false;
+      state.loading = false;
     },
 
-    sessionStarted: (state, action: PayloadAction<SSESessionStarted>) => {
+    sessionStarted: (state, action: PayloadAction<DaemonEvent>) => {
       const event = action.payload;
-      const existing = state.byId[event.sessionId];
+      const sessionId = event.sessionId as string;
+      const existing = state.byId[sessionId];
       const isResume = existing?.status === 'ended';
       const session: AgentSession = {
-        id: event.sessionId,
-        daemonId: event.daemonId,
-        agentType: event.agentType,
-        mode: event.mode ?? 'prompt',
-        cwd: event.cwd,
-        gitBranch: event.gitBranch,
-        repoName: event.repoName,
-        startedAt: event.timestamp,
+        id: sessionId,
+        agentType: (event.agentType as string) ?? 'claude',
+        mode: (event.mode as string) ?? 'prompt',
+        cwd: (event.cwd as string) ?? '',
+        gitBranch: event.gitBranch as string | undefined,
+        repoName: event.repoName as string | undefined,
+        startedAt: (event.timestamp as number) ?? Date.now(),
         status: 'active',
-        ...(event.resumable !== undefined && { resumable: event.resumable }),
-        ...(event.claudeSessionId !== undefined && { claudeSessionId: event.claudeSessionId }),
+        ...(event.resumable !== undefined && { resumable: event.resumable as boolean }),
+        ...(event.claudeSessionId !== undefined && {
+          claudeSessionId: event.claudeSessionId as string,
+        }),
       };
       if (existing) {
-        state.byId[event.sessionId] = {
+        state.byId[sessionId] = {
           ...existing,
           ...session,
-          resumable: event.resumable ?? existing.resumable,
+          resumable: (event.resumable as boolean) ?? existing.resumable,
         };
       } else {
-        state.byId[event.sessionId] = session;
-        state.allIds.push(event.sessionId);
+        state.byId[sessionId] = session;
+        state.allIds.push(sessionId);
       }
       if (isResume) {
-        state.resumeCountById[event.sessionId] = (state.resumeCountById[event.sessionId] ?? 0) + 1;
+        state.resumeCountById[sessionId] = (state.resumeCountById[sessionId] ?? 0) + 1;
       }
     },
 
-    sessionEnded: (state, action: PayloadAction<SSESessionEnded>) => {
-      const session = state.byId[action.payload.sessionId];
+    sessionEnded: (state, action: PayloadAction<DaemonEvent>) => {
+      const sessionId = action.payload.sessionId as string;
+      const session = state.byId[sessionId];
       if (session) {
         session.status = 'ended';
-        session.exitCode = action.payload.exitCode;
-        session.resumable = action.payload.resumable ?? false;
+        session.exitCode = action.payload.exitCode as number | undefined;
+        session.resumable = (action.payload.resumable as boolean) ?? false;
       }
     },
 
-    sessionErrored: (state, action: PayloadAction<SSESessionError | SSESessionSpawnFailed>) => {
-      const session = state.byId[action.payload.sessionId];
+    sessionErrored: (state, action: PayloadAction<DaemonEvent>) => {
+      const sessionId = action.payload.sessionId as string;
+      const session = state.byId[sessionId];
       if (session) {
         session.status = 'ended';
         session.exitCode = -1;
       }
     },
 
-    claudeIdDetected: (state, action: PayloadAction<SSESessionClaudeIdDetected>) => {
-      const session = state.byId[action.payload.sessionId];
+    claudeIdDetected: (state, action: PayloadAction<DaemonEvent>) => {
+      const sessionId = action.payload.sessionId as string;
+      const session = state.byId[sessionId];
       if (session) {
-        session.claudeSessionId = action.payload.claudeSessionId;
+        session.claudeSessionId = action.payload.claudeSessionId as string;
       }
     },
 
-    resumableChanged: (state, action: PayloadAction<SSESessionResumableChanged>) => {
-      const session = state.byId[action.payload.sessionId];
+    resumableChanged: (state, action: PayloadAction<DaemonEvent>) => {
+      const sessionId = action.payload.sessionId as string;
+      const session = state.byId[sessionId];
       if (session) {
-        session.resumable = action.payload.resumable;
+        session.resumable = action.payload.resumable as boolean;
       }
     },
 
@@ -120,26 +111,19 @@ const sessionsSlice = createSlice({
       state.allIds = state.allIds.filter((existingId) => existingId !== id);
     },
 
-    endedSessionsCleared: (state, action: PayloadAction<string>) => {
-      const daemonId = action.payload;
-      const toRemove = state.allIds.filter(
-        (id) => state.byId[id]?.daemonId === daemonId && state.byId[id]?.status === 'ended'
-      );
+    endedSessionsCleared: (state) => {
+      const toRemove = state.allIds.filter((id) => state.byId[id]?.status === 'ended');
       for (const id of toRemove) {
         delete state.byId[id];
       }
       state.allIds = state.allIds.filter((id) => !toRemove.includes(id));
     },
 
-    daemonSessionsReset: (state, action: PayloadAction<string>) => {
-      const daemonId = action.payload;
-      const toRemove = state.allIds.filter((id) => state.byId[id]?.daemonId === daemonId);
-      for (const id of toRemove) {
-        delete state.byId[id];
-        delete state.resumeCountById[id];
-      }
-      state.allIds = state.allIds.filter((id) => !toRemove.includes(id));
-      delete state.loadingByDaemonId[daemonId];
+    sessionsReset: (state) => {
+      state.byId = {};
+      state.allIds = [];
+      state.loading = false;
+      state.resumeCountById = {};
     },
   },
 });
@@ -154,44 +138,27 @@ export const {
   resumableChanged,
   sessionRemoved,
   endedSessionsCleared,
-  daemonSessionsReset,
+  sessionsReset,
 } = sessionsSlice.actions;
 
 export const sessionsReducer = sessionsSlice.reducer;
 
-export const selectActiveSessions =
-  (daemonId: string | null) =>
-  (state: RootState): AgentSession[] =>
-    daemonId
-      ? state.sessions.allIds
-          .map((id) => state.sessions.byId[id])
-          .filter(
-            (s): s is AgentSession =>
-              s !== undefined && s.daemonId === daemonId && s.status === 'active'
-          )
-      : [];
+export const selectActiveSessions = (state: RootState): AgentSession[] =>
+  state.sessions.allIds
+    .map((id) => state.sessions.byId[id])
+    .filter((s): s is AgentSession => s !== undefined && s.status === 'active');
 
-export const selectEndedSessions =
-  (daemonId: string | null) =>
-  (state: RootState): AgentSession[] =>
-    daemonId
-      ? state.sessions.allIds
-          .map((id) => state.sessions.byId[id])
-          .filter(
-            (s): s is AgentSession =>
-              s !== undefined && s.daemonId === daemonId && s.status === 'ended'
-          )
-      : [];
+export const selectEndedSessions = (state: RootState): AgentSession[] =>
+  state.sessions.allIds
+    .map((id) => state.sessions.byId[id])
+    .filter((s): s is AgentSession => s !== undefined && s.status === 'ended');
 
 export const selectSession =
   (sessionId: string | null) =>
   (state: RootState): AgentSession | null =>
     sessionId ? (state.sessions.byId[sessionId] ?? null) : null;
 
-export const selectLoading =
-  (daemonId: string | null) =>
-  (state: RootState): boolean =>
-    daemonId ? (state.sessions.loadingByDaemonId[daemonId] ?? false) : false;
+export const selectLoading = (state: RootState): boolean => state.sessions.loading;
 
 export const selectSessionResumeCount =
   (sessionId: string | null) =>

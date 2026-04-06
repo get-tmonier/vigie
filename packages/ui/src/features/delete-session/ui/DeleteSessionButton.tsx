@@ -3,12 +3,11 @@ import { cn } from '#shared/lib/cn';
 import { useDeleteSession } from '../model/use-delete-session';
 
 interface DeleteSessionButtonProps {
-  daemonId: string;
   sessionId: string;
   onDeleted: () => void;
 }
 
-export function DeleteSessionButton({ daemonId, sessionId, onDeleted }: DeleteSessionButtonProps) {
+export function DeleteSessionButton({ sessionId, onDeleted }: DeleteSessionButtonProps) {
   const { remove, loading } = useDeleteSession();
   const [armed, setArmed] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -23,13 +22,13 @@ export function DeleteSessionButton({ daemonId, sessionId, onDeleted }: DeleteSe
     if (armed) {
       if (timerRef.current) clearTimeout(timerRef.current);
       setArmed(false);
-      const success = await remove(daemonId, sessionId);
+      const success = await remove(sessionId);
       if (success) onDeleted();
     } else {
       setArmed(true);
       timerRef.current = setTimeout(() => setArmed(false), 3000);
     }
-  }, [armed, remove, daemonId, sessionId, onDeleted]);
+  }, [armed, remove, sessionId, onDeleted]);
 
   return (
     <button

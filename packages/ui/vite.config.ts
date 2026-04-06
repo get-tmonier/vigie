@@ -1,7 +1,6 @@
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
-import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
@@ -19,5 +18,15 @@ export default defineConfig({
       '#widgets': resolve(__dirname, 'src/widgets'),
     },
   },
-  plugins: [tailwindcss(), tanstackStart(), react()],
+  plugins: [tailwindcss(), react()],
+  server: {
+    port: 3000,
+    proxy: {
+      '/api': 'http://localhost:19191',
+      '/ws': {
+        target: 'ws://localhost:19191',
+        ws: true,
+      },
+    },
+  },
 });

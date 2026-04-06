@@ -1,4 +1,4 @@
-export type AgentType = 'claude' | 'opencode' | 'generic';
+export type AgentType = 'claude' | 'aider' | 'codex' | 'generic' | (string & {});
 export type SessionStatus = 'registering' | 'active' | 'ended' | 'error';
 
 export interface AgentSession {

@@ -3,12 +3,11 @@ import { cn } from '#shared/lib/cn';
 import { useClearEndedSessions } from '../model/use-clear-ended-sessions';
 
 interface ClearEndedButtonProps {
-  daemonId: string;
   endedCount: number;
   onCleared: () => void;
 }
 
-export function ClearEndedButton({ daemonId, endedCount, onCleared }: ClearEndedButtonProps) {
+export function ClearEndedButton({ endedCount, onCleared }: ClearEndedButtonProps) {
   const { clear, loading } = useClearEndedSessions();
   const [armed, setArmed] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -23,13 +22,13 @@ export function ClearEndedButton({ daemonId, endedCount, onCleared }: ClearEnded
     if (armed) {
       if (timerRef.current) clearTimeout(timerRef.current);
       setArmed(false);
-      const success = await clear(daemonId);
+      const success = await clear();
       if (success) onCleared();
     } else {
       setArmed(true);
       timerRef.current = setTimeout(() => setArmed(false), 3000);
     }
-  }, [armed, clear, daemonId, onCleared]);
+  }, [armed, clear, onCleared]);
 
   return (
     <button
