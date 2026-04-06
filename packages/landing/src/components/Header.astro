@@ -35,8 +35,8 @@ const { nav } = content;
       <span class="font-display text-[1.2rem] text-vigie-400">vigie</span>
     </a>
 
-    <!-- Nav -->
-    <nav class="flex items-center gap-6 max-md:gap-4">
+    <!-- Desktop nav -->
+    <nav class="hidden md:flex items-center gap-6">
       <a href="#in-action" class="font-body text-[0.8rem] text-cream-200 no-underline hover:text-cream-50 transition-all duration-150">{nav.demo}</a>
       <a href="#open-source" class="font-body text-[0.8rem] text-cream-200 no-underline hover:text-cream-50 transition-all duration-150">{nav.openSource}</a>
       <a href={locale === 'fr' ? '/fr/faq' : '/faq'} class="font-body text-[0.8rem] text-cream-200 no-underline hover:text-cream-50 transition-all duration-150">{nav.faq}</a>
@@ -52,12 +52,95 @@ const { nav } = content;
       </div>
       <a
         href="https://github.com/get-tmonier/core"
-        class="font-mono text-[0.75rem] bg-vigie-400/10 text-vigie-400 rounded-[6px] py-[0.35rem] px-3 no-underline shadow-[inset_0_0_0_1px_rgba(38,192,154,0.2)] hover:shadow-[inset_0_0_0_1px_rgba(38,192,154,0.4)] hover:bg-vigie-400/15 transition-all duration-150 max-md:hidden"
+        class="font-mono text-[0.75rem] bg-vigie-400/10 text-vigie-400 rounded-[6px] py-[0.35rem] px-3 no-underline shadow-[inset_0_0_0_1px_rgba(38,192,154,0.2)] hover:shadow-[inset_0_0_0_1px_rgba(38,192,154,0.4)] hover:bg-vigie-400/15 transition-all duration-150"
       >
         {nav.github}
       </a>
     </nav>
+
+    <!-- Mobile: language toggle + hamburger -->
+    <div class="md:hidden flex items-center gap-3">
+      <div class="flex items-center bg-navy-800/50 rounded-[16px] p-[2px] gap-[2px]">
+        <a
+          href={locale === 'en' ? '#' : '/'}
+          class:list={['font-mono text-[0.6rem] font-semibold py-[3px] px-[0.5rem] rounded-[12px] no-underline transition-all duration-150', locale === 'en' ? 'bg-vigie-400/15 text-vigie-400' : 'text-cream-200/50']}
+        >EN</a>
+        <a
+          href={locale === 'fr' ? '#' : '/fr/'}
+          class:list={['font-mono text-[0.6rem] font-semibold py-[3px] px-[0.5rem] rounded-[12px] no-underline transition-all duration-150', locale === 'fr' ? 'bg-vigie-400/15 text-vigie-400' : 'text-cream-200/50']}
+        >FR</a>
+      </div>
+      <button
+        id="hamburger-btn"
+        class="bg-transparent border-none cursor-pointer p-2 flex flex-col gap-[5px]"
+        aria-label="Menu"
+        aria-expanded="false"
+      >
+        <span class="hamburger-bar block w-[22px] h-0.5 bg-vigie-400 rounded-[1px] transition-[transform,opacity] duration-300 ease-in-out"></span>
+        <span class="hamburger-bar block w-[22px] h-0.5 bg-vigie-400 rounded-[1px] transition-[transform,opacity] duration-300 ease-in-out"></span>
+        <span class="hamburger-bar block w-[22px] h-0.5 bg-vigie-400 rounded-[1px] transition-[transform,opacity] duration-300 ease-in-out"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile menu panel -->
+  <div
+    id="mobile-menu"
+    class="md:hidden overflow-hidden max-h-0 transition-[max-height] duration-300 ease-in-out border-t border-transparent"
+  >
+    <div class="pt-2 px-6 pb-6">
+      <a href="#in-action" class="mobile-nav-link font-body text-cream-200 text-[0.85rem] no-underline block py-3 transition-colors duration-200 hover:text-cream-50">{nav.demo}</a>
+      <a href="#open-source" class="mobile-nav-link font-body text-cream-200 text-[0.85rem] no-underline block py-3 transition-colors duration-200 hover:text-cream-50">{nav.openSource}</a>
+      <a href={locale === 'fr' ? '/fr/faq' : '/faq'} class="mobile-nav-link font-body text-cream-200 text-[0.85rem] no-underline block py-3 transition-colors duration-200 hover:text-cream-50">{nav.faq}</a>
+      <div class="border-t border-navy-700/50 mt-2 pt-3">
+        <a
+          href="https://github.com/get-tmonier/core"
+          class="mobile-nav-link font-mono bg-vigie-400/10 text-vigie-400 text-[0.85rem] py-[0.65rem] px-[1.1rem] rounded-[6px] no-underline block text-center shadow-[inset_0_0_0_1px_rgba(38,192,154,0.2)] transition-all duration-150 hover:bg-vigie-400/15"
+        >
+          {nav.github}
+        </a>
+      </div>
+    </div>
   </div>
 </header>
 <!-- Spacer for fixed header -->
 <div class="h-[52px]"></div>
+
+<script>
+  const hamburgerBtn = document.getElementById('hamburger-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  if (hamburgerBtn && mobileMenu) {
+    const bars = hamburgerBtn.querySelectorAll<HTMLElement>('.hamburger-bar');
+
+    function setOpen(open: boolean) {
+      hamburgerBtn!.setAttribute('aria-expanded', String(open));
+      mobileMenu!.style.maxHeight = open ? `${mobileMenu!.scrollHeight}px` : '0';
+      mobileMenu!.style.borderTopColor = open ? 'color-mix(in srgb, var(--color-navy-700) 50%, transparent)' : '';
+      if (bars[0]) bars[0].style.transform = open ? 'translateY(7px) rotate(45deg)' : '';
+      if (bars[1]) bars[1].style.opacity = open ? '0' : '';
+      if (bars[2]) bars[2].style.transform = open ? 'translateY(-7px) rotate(-45deg)' : '';
+    }
+
+    let isOpen = false;
+    hamburgerBtn.addEventListener('click', () => {
+      isOpen = !isOpen;
+      setOpen(isOpen);
+    });
+
+    mobileMenu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        isOpen = false;
+        setOpen(false);
+      });
+    });
+
+    const mediaQuery = window.matchMedia('(min-width: 768px)');
+    mediaQuery.addEventListener('change', (e) => {
+      if (e.matches) {
+        isOpen = false;
+        setOpen(false);
+      }
+    });
+  }
+</script>
