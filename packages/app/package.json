@@ -33,10 +33,12 @@
   },
   "dependencies": {
     "@effect/platform-bun": "4.0.0-beta.24",
+    "@reduxjs/toolkit": "2.11.2",
     "@xterm/headless": "5.5.0",
     "effect": "4.0.0-beta.24",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "react-redux": "9.2.0",
     "tailwind-merge": "3.5.0",
     "valibot": "1.2.0"
   },

@@ -1,17 +1,8 @@
 import { createRoot } from 'react-dom/client';
-import { InteractiveTerminal } from '#modules/terminal/infrastructure/adapters/in/ui/InteractiveTerminal.island';
-import { EventsSocket } from '#shared/ui/events-socket.island';
+import { DashboardApp } from '#modules/session/infrastructure/adapters/in/ui/DashboardApp.island';
 import '#shared/styles/global.css';
 
-// Mount terminal islands
-for (const el of document.querySelectorAll<HTMLElement>('[data-island="terminal"]')) {
-  const sessionId = el.dataset.sessionId;
-  if (!sessionId) continue;
-  createRoot(el).render(<InteractiveTerminal sessionId={sessionId} />);
-}
-
-// Mount events socket island
-const eventsSocketEl = document.getElementById('events-socket');
-if (eventsSocketEl) {
-  createRoot(eventsSocketEl).render(<EventsSocket />);
+const dashboardEl = document.getElementById('dashboard-app');
+if (dashboardEl) {
+  createRoot(dashboardEl).render(<DashboardApp />);
 }

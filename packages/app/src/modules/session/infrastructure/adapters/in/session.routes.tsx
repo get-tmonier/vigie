@@ -1,3 +1,4 @@
+import { homedir as homedirFn } from 'node:os';
 import { Effect } from 'effect';
 import type * as Cause from 'effect/Cause';
 import * as HttpRouter from 'effect/unstable/http/HttpRouter';
@@ -52,14 +53,10 @@ export function createSessionRoutes(deps: SessionRouteDeps): HttpRouter.Route<Ro
       'GET',
       '/',
       Effect.gen(function* () {
-        const request = yield* HttpServerRequest.HttpServerRequest;
-        const url = new URL(request.url, 'http://localhost');
-        const selectedSessionId = url.searchParams.get('session') ?? undefined;
         const sessions = sessionService.listAll().map(sessionToDTO);
-        return yield* renderPage(
-          <DashboardPage sessions={sessions} selectedSessionId={selectedSessionId} />,
-          { title: 'vigie' }
-        );
+        return yield* renderPage(<DashboardPage sessions={sessions} homedir={homedirFn()} />, {
+          title: 'vigie',
+        });
       })
     ),
 

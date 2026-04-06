@@ -29,7 +29,19 @@ function shortenPath(cwd: string): string {
   return cwd;
 }
 
-export function SessionDetailHeader({ session }: { session: AgentSession }) {
+interface SessionDetailHeaderProps {
+  session: AgentSession;
+  onKill?: () => void;
+  onResume?: () => void;
+  onDelete?: () => void;
+}
+
+export function SessionDetailHeader({
+  session,
+  onKill,
+  onResume,
+  onDelete,
+}: SessionDetailHeaderProps) {
   const isActive = session.status === 'active';
   const duration = formatDuration(session.startedAt);
 
@@ -43,7 +55,7 @@ export function SessionDetailHeader({ session }: { session: AgentSession }) {
       >
         {AGENT_ICONS[session.agentType] ?? '?'}
       </span>
-      <span className="text-sm font-mono text-cream-50">{session.id.slice(0, 8)}</span>
+      <CopyableId sessionId={session.id} />
       <span className="text-[0.625rem] text-vigie-400 border border-vigie-400/30 rounded px-1 py-0.5 leading-none shrink-0">
         {session.mode}
       </span>
@@ -59,35 +71,35 @@ export function SessionDetailHeader({ session }: { session: AgentSession }) {
           </span>
         )}
         <span className="text-xs text-cream-200 font-mono tabular-nums">{duration}</span>
-        {isActive && (
-          <form action={`/sessions/${session.id}/kill`} method="POST" className="m-0">
-            <button
-              type="submit"
-              className="text-xs font-mono px-2 py-1 rounded transition-colors text-danger hover:bg-danger/10 cursor-pointer"
-            >
-              Kill
-            </button>
-          </form>
+        {isActive && session.mode === 'interactive' && onKill && (
+          <AttachButton sessionId={session.id} />
         )}
-        {session.resumable && !isActive && (
-          <form action={`/sessions/${session.id}/resume`} method="POST" className="m-0">
-            <button
-              type="submit"
-              className="text-xs font-mono px-2 py-1 rounded transition-colors bg-vigie-400/20 text-vigie-400 hover:bg-vigie-400/30 cursor-pointer"
-            >
-              Resume
-            </button>
-          </form>
+        {isActive && onKill && (
+          <button
+            type="button"
+            onClick={onKill}
+            className="text-xs font-mono px-2 py-1 rounded transition-colors text-danger hover:bg-danger/10 cursor-pointer"
+          >
+            Kill
+          </button>
         )}
-        {!isActive && (
-          <form action={`/sessions/${session.id}/delete`} method="POST" className="m-0">
-            <button
-              type="submit"
-              className="text-xs font-mono px-2 py-1 rounded transition-colors text-cream-200 hover:bg-navy-700 cursor-pointer"
-            >
-              Delete
-            </button>
-          </form>
+        {session.resumable && !isActive && onResume && (
+          <button
+            type="button"
+            onClick={onResume}
+            className="text-xs font-mono px-2 py-1 rounded transition-colors bg-vigie-400/20 text-vigie-400 hover:bg-vigie-400/30 cursor-pointer"
+          >
+            Resume
+          </button>
+        )}
+        {!isActive && onDelete && (
+          <button
+            type="button"
+            onClick={onDelete}
+            className="text-xs font-mono px-2 py-1 rounded transition-colors text-cream-200 hover:bg-navy-700 cursor-pointer"
+          >
+            Delete
+          </button>
         )}
         <span
           className={cn(
@@ -97,5 +109,31 @@ export function SessionDetailHeader({ session }: { session: AgentSession }) {
         />
       </div>
     </div>
+  );
+}
+
+function CopyableId({ sessionId }: { sessionId: string }) {
+  return (
+    <button
+      type="button"
+      onClick={() => navigator.clipboard.writeText(sessionId)}
+      className="text-sm font-mono text-cream-50 hover:text-vigie-400 cursor-pointer transition-colors bg-transparent border-none p-0"
+      title={`Copy full ID: ${sessionId}`}
+    >
+      {sessionId.slice(0, 8)}
+    </button>
+  );
+}
+
+function AttachButton({ sessionId }: { sessionId: string }) {
+  return (
+    <button
+      type="button"
+      onClick={() => navigator.clipboard.writeText(`vigie session attach --id ${sessionId}`)}
+      className="text-xs font-mono px-2 py-1 rounded transition-colors text-cream-200 hover:bg-navy-700 cursor-pointer"
+      title="Copy attach command to clipboard"
+    >
+      &gt;_ Attach
+    </button>
   );
 }
