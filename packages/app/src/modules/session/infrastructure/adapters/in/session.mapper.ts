@@ -13,7 +13,7 @@ export function sessionToDTO(session: Session): AgentSession {
     endedAt: session.endedAt,
     status: session.status,
     exitCode: session.exitCode,
-    claudeSessionId: session.claudeSessionId,
+    agentSessionId: session.agentSessionId,
     resumable: session.resumable,
   };
 }

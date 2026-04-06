@@ -35,7 +35,7 @@ export function createIpcRouter(
                 cols: msg.cols,
                 rows: msg.rows - 1,
                 connId: conn.id,
-                claudeSessionId: msg.sessionId,
+                agentSessionId: msg.sessionId,
                 gitBranch: msg.gitBranch,
                 repoName: msg.repoName,
               })
@@ -185,10 +185,10 @@ export function createIpcRouter(
           );
           break;
         }
-        case 'session:claude-id': {
-          svc.setClaudeSessionId(SessionId(msg.sessionId), msg.claudeSessionId);
+        case 'session:agent-id': {
+          svc.setAgentSessionId(SessionId(msg.sessionId), msg.agentSessionId);
           console.log(
-            `[daemon] Claude session ID detected for ${msg.sessionId}: ${msg.claudeSessionId}`
+            `[daemon] Agent session ID detected for ${msg.sessionId}: ${msg.agentSessionId}`
           );
           break;
         }

@@ -72,8 +72,8 @@ export const runDaemon = Effect.gen(function* () {
   sessionRepo.pruneOld();
 
   sessionRepo.findAll().forEach((session) => {
-    if (session.agentType === 'claude' && session.claudeSessionId) {
-      const resumable = resumabilityChecker.isResumable(session.claudeSessionId, session.cwd);
+    if (session.agentSessionId) {
+      const resumable = resumabilityChecker.isResumable(session.agentSessionId, session.cwd);
       if (resumable !== session.resumable) {
         session.setResumable(resumable);
         sessionRepo.save(session);

@@ -59,14 +59,14 @@ describe('Session', () => {
         endedAt: now,
         status: 'ended',
         exitCode: 0,
-        claudeSessionId: 'claude-123',
+        agentSessionId: 'claude-123',
         resumable: true,
         mode: 'interactive',
       });
       expect(s.id).toBe(SessionId('abc'));
       expect(s.status).toBe('ended');
       expect(s.exitCode).toBe(0);
-      expect(s.claudeSessionId).toBe('claude-123');
+      expect(s.agentSessionId).toBe('claude-123');
       expect(s.resumable).toBe(true);
       expect(s.endedAt).toBe(now);
       expect(s.pullEvents()).toHaveLength(0);
@@ -156,7 +156,7 @@ describe('Session', () => {
         status: 'ended',
         exitCode: 0,
         resumable: true,
-        claudeSessionId: 'cid',
+        agentSessionId: 'cid',
       });
       s.reactivate();
       expect(s.status).toBe('active');
@@ -184,19 +184,19 @@ describe('Session', () => {
 
     it('accumulates events from multiple operations', () => {
       const s = Session.create({ agentType: 'claude', cwd: '/tmp' });
-      s.setClaudeSessionId('cid');
+      s.setAgentSessionId('cid');
       s.markEnded(0, true);
       const events = s.pullEvents();
       expect(events.map((e) => e.type)).toEqual([
         'session:started',
-        'session:claude-id-detected',
+        'session:agent-id-detected',
         'session:ended',
       ]);
     });
   });
 
   describe('canResume', () => {
-    it('is true only when ended + resumable + claudeSessionId set', () => {
+    it('is true only when ended + resumable + agentSessionId set', () => {
       const s = Session.reconstitute({
         id: 'x',
         agentType: 'claude',
@@ -204,7 +204,7 @@ describe('Session', () => {
         startedAt: Date.now(),
         status: 'ended',
         resumable: true,
-        claudeSessionId: 'cid',
+        agentSessionId: 'cid',
       });
       expect(s.canResume).toBe(true);
     });
@@ -217,12 +217,12 @@ describe('Session', () => {
         startedAt: Date.now(),
         status: 'ended',
         resumable: false,
-        claudeSessionId: 'cid',
+        agentSessionId: 'cid',
       });
       expect(s.canResume).toBe(false);
     });
 
-    it('is false when ended + resumable but no claudeSessionId', () => {
+    it('is false when ended + resumable but no agentSessionId', () => {
       const s = Session.reconstitute({
         id: 'x',
         agentType: 'claude',
@@ -271,15 +271,15 @@ describe('Session', () => {
     });
   });
 
-  describe('setClaudeSessionId', () => {
-    it('stores the id and emits session:claude-id-detected', () => {
+  describe('setAgentSessionId', () => {
+    it('stores the id and emits session:agent-id-detected', () => {
       const s = Session.create({ agentType: 'claude', cwd: '/tmp' });
       s.pullEvents();
-      s.setClaudeSessionId('my-claude-id');
-      expect(s.claudeSessionId).toBe('my-claude-id');
+      s.setAgentSessionId('my-claude-id');
+      expect(s.agentSessionId).toBe('my-claude-id');
       const events = s.pullEvents();
       expect(events).toHaveLength(1);
-      expect(events[0].type).toBe('session:claude-id-detected');
+      expect(events[0].type).toBe('session:agent-id-detected');
     });
   });
 

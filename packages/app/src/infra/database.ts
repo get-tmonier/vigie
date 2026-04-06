@@ -49,7 +49,10 @@ export function openDatabase(path: string): Database {
   db.run('PRAGMA synchronous = NORMAL');
   db.exec(SCHEMA);
   try {
-    db.run('ALTER TABLE sessions ADD COLUMN claude_session_id TEXT');
+    db.run('ALTER TABLE sessions RENAME COLUMN claude_session_id TO agent_session_id');
+  } catch {}
+  try {
+    db.run('ALTER TABLE sessions ADD COLUMN agent_session_id TEXT');
   } catch {}
   try {
     db.run('ALTER TABLE sessions ADD COLUMN resumable INTEGER NOT NULL DEFAULT 0');

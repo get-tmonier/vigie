@@ -37,10 +37,10 @@ export type SessionsCleared = {
   readonly timestamp: number;
 };
 
-export type ClaudeIdDetected = {
-  readonly type: 'session:claude-id-detected';
+export type AgentSessionIdDetected = {
+  readonly type: 'session:agent-id-detected';
   readonly sessionId: SessionId;
-  readonly claudeSessionId: string;
+  readonly agentSessionId: string;
   readonly timestamp: number;
 };
 
@@ -57,5 +57,5 @@ export type SessionDomainEvent =
   | SessionError
   | SessionDeleted
   | SessionsCleared
-  | ClaudeIdDetected
+  | AgentSessionIdDetected
   | ResumableChanged;

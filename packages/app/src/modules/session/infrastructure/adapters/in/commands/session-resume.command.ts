@@ -17,7 +17,7 @@ interface SessionRow {
   status: string;
   cwd: string;
   git_branch: string | null;
-  claude_session_id: string | null;
+  agent_session_id: string | null;
 }
 
 export function sessionResumeCommand(partialId: string): Effect.Effect<void> {
@@ -62,7 +62,7 @@ export function sessionResumeCommand(partialId: string): Effect.Effect<void> {
       return;
     }
 
-    if (!session.claude_session_id) {
+    if (!session.agent_session_id) {
       yield* Console.error(
         `Session ${session.id.slice(0, 8)} has no Claude session ID stored. Cannot resume.`
       );
@@ -92,7 +92,7 @@ export function sessionResumeCommand(partialId: string): Effect.Effect<void> {
       '.claude',
       'projects',
       projectKey,
-      `${session.claude_session_id}.jsonl`
+      `${session.agent_session_id}.jsonl`
     );
     const canResume = existsSync(claudeSessionFile);
 
@@ -131,7 +131,7 @@ export function sessionResumeCommand(partialId: string): Effect.Effect<void> {
       yield* client.send({
         type: 'session:resume',
         sessionId: session.id,
-        claudeSessionId: session.claude_session_id,
+        agentSessionId: session.agent_session_id,
         cwd: session.cwd,
         cols,
         rows: rows_,

@@ -9,17 +9,17 @@ describe('claudeAdapter', () => {
     expect(claudeAdapter.detectSessionId).toBe(true);
   });
 
-  it('buildSpawnArgs with resume + claudeSessionId → --resume flag', () => {
+  it('buildSpawnArgs with resume + agentSessionId → --resume flag', () => {
     const { command, args } = claudeAdapter.buildSpawnArgs({
       resume: true,
-      claudeSessionId: 'abc123',
+      agentSessionId: 'abc123',
     });
     expect(command).toBe('claude');
     expect(args).toEqual(['claude', '--resume', 'abc123']);
   });
 
-  it('buildSpawnArgs with claudeSessionId only → --session-id flag', () => {
-    const { command, args } = claudeAdapter.buildSpawnArgs({ claudeSessionId: 'abc123' });
+  it('buildSpawnArgs with agentSessionId only → --session-id flag', () => {
+    const { command, args } = claudeAdapter.buildSpawnArgs({ agentSessionId: 'abc123' });
     expect(command).toBe('claude');
     expect(args).toEqual(['claude', '--session-id', 'abc123']);
   });

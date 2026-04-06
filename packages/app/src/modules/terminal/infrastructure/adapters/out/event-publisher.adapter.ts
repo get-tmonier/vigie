@@ -42,11 +42,11 @@ function domainEventToBrowserEvent(event: DomainEvent): BrowserEvent | null {
       };
     case 'sessions:cleared':
       return { type: 'sessions:cleared', timestamp: event.timestamp };
-    case 'session:claude-id-detected':
+    case 'session:agent-id-detected':
       return {
-        type: 'session:claude-id-detected',
+        type: 'session:agent-id-detected',
         sessionId: event.sessionId,
-        claudeSessionId: event.claudeSessionId,
+        agentSessionId: event.agentSessionId,
         timestamp: event.timestamp,
       };
     case 'session:resumable-changed':
@@ -83,21 +83,22 @@ export function createEventPublisher(): AppEventPublisher {
   const browserListeners = new Set<(event: BrowserEvent) => void>();
 
   return {
-    publish(event: DomainEvent): void {
-      for (const listener of listeners) {
-        try {
-          listener(event);
-        } catch {}
-      }
-
-      const browserEvent = domainEventToBrowserEvent(event);
-      if (browserEvent) {
-        for (const listener of browserListeners) {
-          try {
-            listener(browserEvent);
-          } catch {}
+    publish(event: DomainEvent): Effect.Effect<void> {
+      return Effect.gen(function* () {
+        for (const listener of listeners) {
+          yield* Effect.try({ try: () => listener(event), catch: (err) => err }).pipe(
+            Effect.catch((err) => Effect.logError(`domain listener error: ${err}`))
+          );
         }
-      }
+        const browserEvent = domainEventToBrowserEvent(event);
+        if (browserEvent) {
+          for (const listener of browserListeners) {
+            yield* Effect.try({ try: () => listener(browserEvent), catch: (err) => err }).pipe(
+              Effect.catch((err) => Effect.logError(`browser listener error: ${err}`))
+            );
+          }
+        }
+      });
     },
 
     subscribe(listener: (event: DomainEvent) => void): () => void {

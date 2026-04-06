@@ -9,10 +9,10 @@ import {
 
 function createFsResumabilityChecker(): ResumabilityCheckerShape {
   return {
-    isResumable(claudeSessionId: string, cwd: string): boolean {
+    isResumable(agentSessionId: string, cwd: string): boolean {
       const projectDir = cwd.replace(/\//g, '-');
       const claudeDir = join(homedir(), '.claude', 'projects', projectDir);
-      return existsSync(join(claudeDir, `${claudeSessionId}.jsonl`));
+      return existsSync(join(claudeDir, `${agentSessionId}.jsonl`));
     },
   };
 }

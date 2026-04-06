@@ -29,7 +29,7 @@ interface SessionRow {
   status: string;
   cwd: string;
   git_branch: string | null;
-  claude_session_id: string | null;
+  agent_session_id: string | null;
 }
 
 export function sessionAttachCommand(partialId: string): Effect.Effect<void> {

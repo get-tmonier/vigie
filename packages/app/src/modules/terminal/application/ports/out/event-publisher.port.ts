@@ -1,3 +1,4 @@
+import type { Effect } from 'effect';
 import { ServiceMap } from 'effect';
 import type { SessionDomainEvent } from '#modules/session/domain/events';
 
@@ -30,7 +31,7 @@ export type DomainEvent =
   | TerminalResizedEvent;
 
 export interface EventPublisherShape {
-  publish(event: DomainEvent): void;
+  publish(event: DomainEvent): Effect.Effect<void>;
   subscribe(listener: (event: DomainEvent) => void): () => void;
 }
 

@@ -17,19 +17,19 @@ afterEach(() => {
 
 function makeActiveSession(
   id: string,
-  overrides: { agentType?: string; claudeSessionId?: string } = {}
+  overrides: { agentType?: string; agentSessionId?: string } = {}
 ) {
   const s = Session.create({ agentType: overrides.agentType ?? 'claude', cwd: '/tmp', id });
   s.pullEvents();
-  if (overrides.claudeSessionId) {
-    s.setClaudeSessionId(overrides.claudeSessionId);
+  if (overrides.agentSessionId) {
+    s.setAgentSessionId(overrides.agentSessionId);
     s.pullEvents();
   }
   return s;
 }
 
-function makeEndedSession(id: string, resumable = false, claudeSessionId?: string) {
-  const s = makeActiveSession(id, { claudeSessionId });
+function makeEndedSession(id: string, resumable = false, agentSessionId?: string) {
+  const s = makeActiveSession(id, { agentSessionId });
   s.markEnded(0, resumable);
   s.pullEvents();
   return s;
@@ -50,23 +50,24 @@ describe('SqliteSessionRepository', () => {
         endedAt: 2000,
         status: 'ended',
         exitCode: 0,
-        claudeSessionId: 'cid',
+        agentSessionId: 'cid',
         resumable: true,
         mode: 'interactive',
       });
       repo.save(session);
       const found = repo.findById(SessionId('abc'));
       expect(found).not.toBeNull();
-      expect(found!.id).toBe(SessionId('abc'));
-      expect(found!.agentType).toBe('claude');
-      expect(found!.cwd).toBe('/home/user');
-      expect(found!.gitBranch).toBe('main');
-      expect(found!.repoName).toBe('bar');
-      expect(found!.status).toBe('ended');
-      expect(found!.exitCode).toBe(0);
-      expect(found!.claudeSessionId).toBe('cid');
-      expect(found!.resumable).toBe(true);
-      expect(found!.mode).toBe('interactive');
+      if (!found) return;
+      expect(found.id).toBe(SessionId('abc'));
+      expect(found.agentType).toBe('claude');
+      expect(found.cwd).toBe('/home/user');
+      expect(found.gitBranch).toBe('main');
+      expect(found.repoName).toBe('bar');
+      expect(found.status).toBe('ended');
+      expect(found.exitCode).toBe(0);
+      expect(found.agentSessionId).toBe('cid');
+      expect(found.resumable).toBe(true);
+      expect(found.mode).toBe('interactive');
     });
 
     it('returns null for unknown id', () => {
@@ -105,28 +106,29 @@ describe('SqliteSessionRepository', () => {
     });
   });
 
-  describe('findActiveClaudeWithId', () => {
-    it('returns only active claude sessions with claudeSessionId set', () => {
+  describe('findActiveWithAgentId', () => {
+    it('returns all active sessions with agentSessionId set, regardless of agent type', () => {
       const repo = createSqliteSessionRepository(db);
-      repo.save(makeActiveSession('s1', { claudeSessionId: 'cid1' }));
-      repo.save(makeActiveSession('s2')); // no claudeSessionId
-      repo.save(makeActiveSession('s3', { agentType: 'aider', claudeSessionId: 'cid3' })); // not claude
-      const result = repo.findActiveClaudeWithId();
-      expect(result).toHaveLength(1);
-      expect(result[0].claudeSessionId).toBe('cid1');
+      repo.save(makeActiveSession('s1', { agentSessionId: 'cid1' }));
+      repo.save(makeActiveSession('s2')); // no agentSessionId
+      repo.save(makeActiveSession('s3', { agentType: 'aider', agentSessionId: 'cid3' }));
+      const result = repo.findActiveWithAgentId();
+      expect(result).toHaveLength(2);
+      const ids = result.map((r) => r.agentSessionId).sort();
+      expect(ids).toEqual(['cid1', 'cid3']);
     });
   });
 
-  describe('findRecentlyEndedClaude', () => {
+  describe('findRecentlyEnded', () => {
     it('returns recently ended claude sessions with resumable=false', () => {
       const repo = createSqliteSessionRepository(db);
       const s1 = makeEndedSession('s1', false, 'cid1'); // ended, not resumable
       const s2 = makeEndedSession('s2', true, 'cid2'); // ended, resumable (excluded)
       repo.save(s1);
       repo.save(s2);
-      const result = repo.findRecentlyEndedClaude(60_000);
+      const result = repo.findRecentlyEnded(60_000);
       expect(result).toHaveLength(1);
-      expect(result[0].claudeSessionId).toBe('cid1');
+      expect(result[0].agentSessionId).toBe('cid1');
     });
 
     it('excludes sessions ended outside the time window', () => {
@@ -139,11 +141,11 @@ describe('SqliteSessionRepository', () => {
         endedAt: 1000, // very old
         status: 'ended',
         exitCode: 0,
-        claudeSessionId: 'cid',
+        agentSessionId: 'cid',
         resumable: false,
       });
       repo.save(oldEnded);
-      expect(repo.findRecentlyEndedClaude(1000)).toHaveLength(0);
+      expect(repo.findRecentlyEnded(1000)).toHaveLength(0);
     });
   });
 

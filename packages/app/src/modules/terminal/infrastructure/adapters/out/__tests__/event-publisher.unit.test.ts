@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'bun:test';
+import { Effect } from 'effect';
 import { createEventPublisher } from '../event-publisher.adapter';
 
 function makeStartedEvent() {
@@ -19,8 +20,8 @@ describe('EventPublisher', () => {
     const publisher = createEventPublisher();
     const received: string[] = [];
     publisher.subscribe((e) => received.push(e.type));
-    publisher.subscribe((e) => received.push(e.type + '-2'));
-    publisher.publish(makeStartedEvent());
+    publisher.subscribe((e) => received.push(`${e.type}-2`));
+    Effect.runSync(publisher.publish(makeStartedEvent()));
     expect(received).toEqual(['session:started', 'session:started-2']);
   });
 
@@ -28,9 +29,9 @@ describe('EventPublisher', () => {
     const publisher = createEventPublisher();
     const received: string[] = [];
     const unsub = publisher.subscribe((e) => received.push(e.type));
-    publisher.publish(makeStartedEvent());
+    Effect.runSync(publisher.publish(makeStartedEvent()));
     unsub();
-    publisher.publish(makeStartedEvent());
+    Effect.runSync(publisher.publish(makeStartedEvent()));
     expect(received).toHaveLength(1);
   });
 
@@ -41,7 +42,7 @@ describe('EventPublisher', () => {
       throw new Error('oops');
     });
     publisher.subscribe((e) => received.push(e.type));
-    publisher.publish(makeStartedEvent());
+    Effect.runSync(publisher.publish(makeStartedEvent()));
     expect(received).toHaveLength(1);
   });
 
@@ -49,7 +50,7 @@ describe('EventPublisher', () => {
     const publisher = createEventPublisher();
     const browserEvents: string[] = [];
     publisher.subscribeBrowser((e) => browserEvents.push(e.type));
-    publisher.publish(makeStartedEvent());
+    Effect.runSync(publisher.publish(makeStartedEvent()));
     expect(browserEvents).toEqual(['session:started']);
   });
 
@@ -57,12 +58,14 @@ describe('EventPublisher', () => {
     const publisher = createEventPublisher();
     const browserEvents: string[] = [];
     publisher.subscribeBrowser((e) => browserEvents.push(e.type));
-    publisher.publish({
-      type: 'terminal:output',
-      sessionId: 'sess-1',
-      data: 'some data',
-      timestamp: Date.now(),
-    });
+    Effect.runSync(
+      publisher.publish({
+        type: 'terminal:output',
+        sessionId: 'sess-1',
+        data: 'some data',
+        timestamp: Date.now(),
+      })
+    );
     expect(browserEvents).toHaveLength(0);
   });
 });

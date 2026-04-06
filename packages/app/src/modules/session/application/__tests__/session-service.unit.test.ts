@@ -4,7 +4,7 @@ import type { IpcServerShape } from '#modules/daemon/application/ports/out/ipc-s
 import type { AgentRegistryShape } from '#modules/session/application/ports/out/agent-adapter.port';
 import type { ResumabilityCheckerShape } from '#modules/session/application/ports/out/resumability-checker.port';
 import type {
-  ClaudeSessionInfo,
+  ResumableSessionInfo,
   SessionRepositoryShape,
 } from '#modules/session/application/ports/out/session-repository.port';
 import { createSessionService } from '#modules/session/application/session.service';
@@ -27,18 +27,18 @@ function makeRepo(): SessionRepositoryShape {
     },
     findAll: () => [...store.values()],
     findActive: () => [...store.values()].filter((s) => s.status === 'active'),
-    findActiveClaudeWithId: (): ClaudeSessionInfo[] =>
+    findActiveWithAgentId: (): ResumableSessionInfo[] =>
       [...store.values()]
         .filter(
-          (s) => s.status === 'active' && s.agentType === 'claude' && s.claudeSessionId != null
+          (s) => s.status === 'active' && s.agentType === 'claude' && s.agentSessionId != null
         )
         .map((s) => ({
           id: s.id,
-          claudeSessionId: s.claudeSessionId!,
+          agentSessionId: s.agentSessionId as string,
           cwd: s.cwd,
           resumable: s.resumable,
         })),
-    findRecentlyEndedClaude: (): ClaudeSessionInfo[] => [],
+    findRecentlyEnded: (): ResumableSessionInfo[] => [],
     delete: (id) => {
       store.delete(id);
     },
@@ -58,6 +58,7 @@ function makePublisher() {
   } = {
     publish: (e) => {
       events.push(e);
+      return Effect.void;
     },
     subscribe: () => () => {},
     getEventsOfType: <T extends DomainEvent['type']>(type: T) =>
@@ -110,7 +111,7 @@ const noopIpcServer: IpcServerShape = {
 
 const noopTerminalSubs: TerminalSubscribersShape = {
   subscribe: () => () => {},
-  publish: () => {},
+  publish: () => Effect.void,
   hasSubscribers: () => false,
 };
 
@@ -161,16 +162,18 @@ describe('SessionService', () => {
       service.register({ sessionId: 'sess-1', agentType: 'claude', cwd: '/tmp', connId: 'conn-1' });
       eventPublisher.clear();
 
-      // Seed a claudeSessionId so resumability check runs
-      const session = sessionRepo.findById(SessionId('sess-1'))!;
-      session.setClaudeSessionId('cid');
+      // Seed a agentSessionId so resumability check runs
+      const session = sessionRepo.findById(SessionId('sess-1'));
+      if (!session) throw new Error('session not found');
+      session.setAgentSessionId('cid');
       sessionRepo.save(session);
       session.pullEvents();
 
       resumabilityChecker.setReturn(true);
       service.markEnded(SessionId('sess-1'), 0);
 
-      const saved = sessionRepo.findById(SessionId('sess-1'))!;
+      const saved = sessionRepo.findById(SessionId('sess-1'));
+      if (!saved) throw new Error('session not found');
       expect(saved.status).toBe('ended');
       expect(saved.resumable).toBe(true);
 
@@ -190,7 +193,8 @@ describe('SessionService', () => {
       service.register({ sessionId: 'sess-1', agentType: 'claude', cwd: '/tmp', connId: 'conn-1' });
       eventPublisher.clear();
       service.markError(SessionId('sess-1'), 'something broke');
-      const saved = sessionRepo.findById(SessionId('sess-1'))!;
+      const saved = sessionRepo.findById(SessionId('sess-1'));
+      if (!saved) throw new Error('session not found');
       expect(saved.status).toBe('error');
       const events = eventPublisher.getEventsOfType('session:error');
       expect(events).toHaveLength(1);
@@ -233,16 +237,17 @@ describe('SessionService', () => {
     });
   });
 
-  describe('setClaudeSessionId', () => {
-    it('sets id on session, saves, and publishes session:claude-id-detected', () => {
+  describe('setAgentSessionId', () => {
+    it('sets id on session, saves, and publishes session:agent-id-detected', () => {
       const { service, sessionRepo, eventPublisher } = makeService();
       service.register({ sessionId: 'sess-1', agentType: 'claude', cwd: '/tmp', connId: 'conn-1' });
       eventPublisher.clear();
 
-      service.setClaudeSessionId(SessionId('sess-1'), 'cid-123');
-      const saved = sessionRepo.findById(SessionId('sess-1'))!;
-      expect(saved.claudeSessionId).toBe('cid-123');
-      const events = eventPublisher.getEventsOfType('session:claude-id-detected');
+      service.setAgentSessionId(SessionId('sess-1'), 'cid-123');
+      const saved = sessionRepo.findById(SessionId('sess-1'));
+      if (!saved) throw new Error('session not found');
+      expect(saved.agentSessionId).toBe('cid-123');
+      const events = eventPublisher.getEventsOfType('session:agent-id-detected');
       expect(events).toHaveLength(1);
     });
   });
@@ -252,7 +257,8 @@ describe('SessionService', () => {
       const { service, sessionRepo } = makeService();
       service.register({ sessionId: 'sess-1', agentType: 'claude', cwd: '/tmp', connId: 'conn-1' });
       service.deregister(SessionId('sess-1'));
-      const saved = sessionRepo.findById(SessionId('sess-1'))!;
+      const saved = sessionRepo.findById(SessionId('sess-1'));
+      if (!saved) throw new Error('session not found');
       expect(saved.status).toBe('ended');
       expect(service.sessionConnections.has('sess-1')).toBe(false);
       expect(service.connSessions.has('conn-1')).toBe(false);
@@ -285,8 +291,9 @@ describe('SessionService', () => {
     it('updates session and publishes session:resumable-changed when value changes', () => {
       const { service, sessionRepo, eventPublisher, resumabilityChecker } = makeService();
       service.register({ sessionId: 'sess-1', agentType: 'claude', cwd: '/tmp', connId: 'c1' });
-      const session = sessionRepo.findById(SessionId('sess-1'))!;
-      session.setClaudeSessionId('cid');
+      const session = sessionRepo.findById(SessionId('sess-1'));
+      if (!session) throw new Error('session not found');
+      session.setAgentSessionId('cid');
       sessionRepo.save(session);
       session.pullEvents();
       eventPublisher.clear();
@@ -294,17 +301,19 @@ describe('SessionService', () => {
       resumabilityChecker.setReturn(true);
       service.checkResumableForActive();
 
-      const saved = sessionRepo.findById(SessionId('sess-1'))!;
+      const saved = sessionRepo.findById(SessionId('sess-1'));
+      if (!saved) throw new Error('session not found');
       expect(saved.resumable).toBe(true);
       const events = eventPublisher.getEventsOfType('session:resumable-changed');
       expect(events).toHaveLength(1);
     });
 
     it('does not emit event when resumable value is unchanged', () => {
-      const { service, sessionRepo, eventPublisher, resumabilityChecker } = makeService();
+      const { service, sessionRepo, eventPublisher } = makeService();
       service.register({ sessionId: 'sess-1', agentType: 'claude', cwd: '/tmp', connId: 'c1' });
-      const session = sessionRepo.findById(SessionId('sess-1'))!;
-      session.setClaudeSessionId('cid');
+      const session = sessionRepo.findById(SessionId('sess-1'));
+      if (!session) throw new Error('session not found');
+      session.setAgentSessionId('cid');
       sessionRepo.save(session);
       session.pullEvents();
       eventPublisher.clear();

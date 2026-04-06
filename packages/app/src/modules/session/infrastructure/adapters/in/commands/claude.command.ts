@@ -62,12 +62,12 @@ export function claudeCommand(prompt: string): Effect.Effect<void> {
       .spawn({
         prompt,
         cwd,
-        onSessionId: (claudeSessionId) => {
+        onSessionId: (agentSessionId) => {
           Effect.runPromise(
             client.send({
-              type: 'session:claude-id',
+              type: 'session:agent-id',
               sessionId,
-              claudeSessionId,
+              agentSessionId,
             })
           ).catch(() => {});
         },

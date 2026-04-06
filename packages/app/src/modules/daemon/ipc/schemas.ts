@@ -40,10 +40,10 @@ export const SessionDeregisterSchema = v.object({
   sessionId: v.string(),
 });
 
-const SessionClaudeIdSchema = v.object({
-  type: v.literal('session:claude-id'),
+const SessionAgentIdSchema = v.object({
+  type: v.literal('session:agent-id'),
   sessionId: v.string(),
-  claudeSessionId: v.string(),
+  agentSessionId: v.string(),
 });
 
 export const SessionTerminalOutputSchema = v.object({
@@ -93,7 +93,7 @@ export const SessionAttachSchema = v.object({
 const SessionResumeSchema = v.object({
   type: v.literal('session:resume'),
   sessionId: v.string(),
-  claudeSessionId: v.string(),
+  agentSessionId: v.string(),
   cwd: v.string(),
   cols: v.number(),
   rows: v.number(),
@@ -108,7 +108,7 @@ export const SessionToDaemonSchema = v.variant('type', [
   SessionDoneSchema,
   SessionErrorSchema,
   SessionDeregisterSchema,
-  SessionClaudeIdSchema,
+  SessionAgentIdSchema,
   SessionTerminalOutputSchema,
   SessionSpawnInteractiveSchema,
   SessionStdinSchema,

@@ -11,7 +11,7 @@ type DaemonSyncSession = {
   startedAt: number;
   status: 'active' | 'ended' | 'error';
   exitCode?: number;
-  claudeSessionId?: string;
+  agentSessionId?: string;
   resumable: boolean;
   terminalChunks: Array<{ data: string; timestamp: number; seq: number }>;
   inputHistory?: Array<{ text: string; source: 'cli' | 'browser'; timestamp: number }>;
@@ -71,9 +71,9 @@ export type BrowserEvent =
       timestamp: number;
     }
   | {
-      type: 'session:claude-id-detected';
+      type: 'session:agent-id-detected';
       sessionId: string;
-      claudeSessionId: string;
+      agentSessionId: string;
       timestamp: number;
     }
   | { type: 'session:resumable-changed'; sessionId: string; resumable: boolean; timestamp: number }

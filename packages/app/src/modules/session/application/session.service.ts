@@ -74,10 +74,8 @@ export function createSessionService(deps: SessionServiceDeps) {
   const sessionConnections = new Map<string, string>(); // sessionId → connId
   const connSessions = new Map<string, string>(); // connId → sessionId
 
-  function publishEvents(events: SessionDomainEvent[]): void {
-    for (const event of events) {
-      eventPublisher.publish(event);
-    }
+  function publishEvents(events: SessionDomainEvent[]): Effect.Effect<void> {
+    return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
   }
 
   function setupPtyLifecycle(sessionId: SessionId, entry: PtyEntry): void {
@@ -91,7 +89,7 @@ export function createSessionService(deps: SessionServiceDeps) {
         Effect.runSync(ipcServer.sendTo(connId, msg));
       }
 
-      terminalSubs.publish(sessionId, base64);
+      Effect.runFork(terminalSubs.publish(sessionId, base64));
     });
 
     entry.handle.wait().then((exitCode: number) => {
@@ -101,12 +99,12 @@ export function createSessionService(deps: SessionServiceDeps) {
       const adapter = agentRegistry.resolve(session.agentType);
       const resumable =
         adapter.canResume &&
-        session.claudeSessionId != null &&
-        resumabilityChecker.isResumable(session.claudeSessionId, session.cwd);
+        session.agentSessionId != null &&
+        resumabilityChecker.isResumable(session.agentSessionId, session.cwd);
 
       session.markEnded(exitCode, resumable);
       sessionRepo.save(session);
-      publishEvents(session.pullEvents());
+      Effect.runFork(publishEvents(session.pullEvents()));
 
       for (const connId of entry.cliChannels.keys()) {
         Effect.runSync(
@@ -118,7 +116,6 @@ export function createSessionService(deps: SessionServiceDeps) {
       }
 
       ptyHandles.delete(sessionId);
-      console.log(`[daemon] PTY exited for session ${sessionId} (exit ${exitCode})`);
     });
   }
 
@@ -158,7 +155,7 @@ export function createSessionService(deps: SessionServiceDeps) {
       );
     }
 
-    eventPublisher.publish({ type: 'terminal:pty-resized', sessionId, cols, rows });
+    Effect.runFork(eventPublisher.publish({ type: 'terminal:pty-resized', sessionId, cols, rows }));
     return { cols, rows };
   }
 
@@ -192,11 +189,8 @@ export function createSessionService(deps: SessionServiceDeps) {
       sessionRepo.save(session);
       sessionConnections.set(props.sessionId, props.connId);
       connSessions.set(props.connId, props.sessionId);
-      publishEvents(session.pullEvents());
+      Effect.runFork(publishEvents(session.pullEvents()));
 
-      console.log(
-        `[daemon] Session registered: ${props.sessionId} (${props.agentType}, ${props.mode ?? 'prompt'})`
-      );
       return session;
     },
 
@@ -207,7 +201,7 @@ export function createSessionService(deps: SessionServiceDeps) {
       cols: number;
       rows: number;
       connId?: string;
-      claudeSessionId?: string;
+      agentSessionId?: string;
       resume?: boolean;
       gitBranch?: string;
       repoName?: string;
@@ -225,15 +219,15 @@ export function createSessionService(deps: SessionServiceDeps) {
       sessionRepo.save(session);
 
       const adapter = agentRegistry.resolve(props.agentType);
-      const claudeSessionId = props.claudeSessionId ?? session.id;
+      const agentSessionId = props.agentSessionId ?? session.id;
 
       if (adapter.detectSessionId) {
-        session.setClaudeSessionId(claudeSessionId);
+        session.setAgentSessionId(agentSessionId);
         sessionRepo.save(session);
       }
 
       const { command, args } = adapter.buildSpawnArgs({
-        claudeSessionId,
+        agentSessionId,
         resume: props.resume,
       });
       const handle = await Effect.runPromise(
@@ -252,12 +246,9 @@ export function createSessionService(deps: SessionServiceDeps) {
         connSessions.set(props.connId, session.id);
       }
 
-      publishEvents(session.pullEvents());
+      Effect.runFork(publishEvents(session.pullEvents()));
       setupPtyLifecycle(session.id, entry);
 
-      console.log(
-        `[daemon] PTY spawned for session ${session.id} (pid ${handle.pid}, ${props.cols}x${props.rows})`
-      );
       return { sessionId: session.id, entry };
     },
 
@@ -272,7 +263,7 @@ export function createSessionService(deps: SessionServiceDeps) {
       if (!adapter.canResume || !session.canResume) {
         throw new CannotResumeSessionError(
           sessionId,
-          session.claudeSessionId ? 'session is not resumable' : 'no session ID'
+          session.agentSessionId ? 'session is not resumable' : 'no session ID'
         );
       }
 
@@ -280,7 +271,7 @@ export function createSessionService(deps: SessionServiceDeps) {
       sessionRepo.save(session);
 
       const { command, args } = adapter.buildSpawnArgs({
-        claudeSessionId: session.claudeSessionId,
+        agentSessionId: session.agentSessionId,
         resume: true,
       });
       const handle = await Effect.runPromise(
@@ -299,10 +290,9 @@ export function createSessionService(deps: SessionServiceDeps) {
         connSessions.set(opts.connId, sessionId);
       }
 
-      publishEvents(session.pullEvents());
+      Effect.runFork(publishEvents(session.pullEvents()));
       setupPtyLifecycle(sessionId, entry);
 
-      console.log(`[daemon] PTY resumed for session ${sessionId} (pid ${handle.pid})`);
       return { sessionId, entry };
     },
 
@@ -316,12 +306,12 @@ export function createSessionService(deps: SessionServiceDeps) {
       if (!session) return;
       session.delete();
       sessionRepo.delete(sessionId);
-      publishEvents(session.pullEvents());
+      Effect.runFork(publishEvents(session.pullEvents()));
     },
 
     deleteAllEnded(): void {
       sessionRepo.deleteAllEnded();
-      eventPublisher.publish({ type: 'sessions:cleared', timestamp: Date.now() });
+      Effect.runFork(eventPublisher.publish({ type: 'sessions:cleared', timestamp: Date.now() }));
     },
 
     markEnded(sessionId: SessionId, exitCode: number): void {
@@ -331,12 +321,12 @@ export function createSessionService(deps: SessionServiceDeps) {
       const adapter = agentRegistry.resolve(session.agentType);
       const resumable =
         adapter.canResume &&
-        session.claudeSessionId != null &&
-        resumabilityChecker.isResumable(session.claudeSessionId, session.cwd);
+        session.agentSessionId != null &&
+        resumabilityChecker.isResumable(session.agentSessionId, session.cwd);
 
       session.markEnded(exitCode, resumable);
       sessionRepo.save(session);
-      publishEvents(session.pullEvents());
+      Effect.runFork(publishEvents(session.pullEvents()));
     },
 
     markError(sessionId: SessionId, error: string): void {
@@ -344,15 +334,15 @@ export function createSessionService(deps: SessionServiceDeps) {
       if (!session) return;
       session.markError(error);
       sessionRepo.save(session);
-      publishEvents(session.pullEvents());
+      Effect.runFork(publishEvents(session.pullEvents()));
     },
 
-    setClaudeSessionId(sessionId: SessionId, claudeSessionId: string): void {
+    setAgentSessionId(sessionId: SessionId, agentSessionId: string): void {
       const session = sessionRepo.findById(sessionId);
       if (!session) return;
-      session.setClaudeSessionId(claudeSessionId);
+      session.setAgentSessionId(agentSessionId);
       sessionRepo.save(session);
-      publishEvents(session.pullEvents());
+      Effect.runFork(publishEvents(session.pullEvents()));
     },
 
     deregister(sessionId: SessionId): void {
@@ -360,7 +350,7 @@ export function createSessionService(deps: SessionServiceDeps) {
       if (session) {
         session.markEnded(0, false);
         sessionRepo.save(session);
-        publishEvents(session.pullEvents());
+        Effect.runFork(publishEvents(session.pullEvents()));
       }
 
       const connId = sessionConnections.get(sessionId);
@@ -368,8 +358,6 @@ export function createSessionService(deps: SessionServiceDeps) {
         connSessions.delete(connId);
       }
       sessionConnections.delete(sessionId);
-
-      console.log(`[daemon] Session deregistered: ${sessionId}`);
     },
 
     attach(
@@ -387,12 +375,14 @@ export function createSessionService(deps: SessionServiceDeps) {
       entry.handle.resize(dims.cols, cliRows);
       entry.ptyDimensions = { cols: dims.cols, rows: cliRows };
 
-      eventPublisher.publish({
-        type: 'terminal:pty-resized',
-        sessionId,
-        cols: dims.cols,
-        rows: cliRows,
-      });
+      Effect.runFork(
+        eventPublisher.publish({
+          type: 'terminal:pty-resized',
+          sessionId,
+          cols: dims.cols,
+          rows: cliRows,
+        })
+      );
 
       const chunks = terminalRepo.getAllChunks(sessionId);
       return { chunks };
@@ -404,7 +394,6 @@ export function createSessionService(deps: SessionServiceDeps) {
       entry.cliChannels.delete(connId);
       connSessions.delete(connId);
       applyResizePriority(sessionId);
-      console.log(`[daemon] CLI detached from session ${sessionId}, PTY kept alive`);
     },
 
     handleDisconnect(connId: string): void {
@@ -416,7 +405,6 @@ export function createSessionService(deps: SessionServiceDeps) {
         entry.cliChannels.delete(connId);
         connSessions.delete(connId);
         applyResizePriority(sessionId);
-        console.log(`[daemon] CLI connection lost for session ${sessionId}, PTY kept alive`);
       } else {
         const session = sessionRepo.findById(makeSessionId(sessionId));
         const alreadyEnded = session && (session.status === 'ended' || session.status === 'error');
@@ -424,8 +412,7 @@ export function createSessionService(deps: SessionServiceDeps) {
         if (!alreadyEnded && session) {
           session.markEnded(-1, false);
           sessionRepo.save(session);
-          publishEvents(session.pullEvents());
-          console.log(`[daemon] Connection lost for session: ${sessionId}`);
+          Effect.runFork(publishEvents(session.pullEvents()));
         }
 
         connSessions.delete(connId);
@@ -450,33 +437,27 @@ export function createSessionService(deps: SessionServiceDeps) {
     },
 
     checkResumableForActive(): void {
-      const activeSessions = sessionRepo.findActiveClaudeWithId();
+      const activeSessions = sessionRepo.findActiveWithAgentId();
       for (const row of activeSessions) {
-        const isResumable = resumabilityChecker.isResumable(row.claudeSessionId, row.cwd);
+        const isResumable = resumabilityChecker.isResumable(row.agentSessionId, row.cwd);
         if (isResumable !== row.resumable) {
           const session = sessionRepo.findById(row.id);
           if (session) {
             session.setResumable(isResumable);
             sessionRepo.save(session);
-            publishEvents(session.pullEvents());
-            console.log(
-              `[daemon] Session ${row.id} resumable changed: ${row.resumable} -> ${isResumable}`
-            );
+            Effect.runFork(publishEvents(session.pullEvents()));
           }
         }
       }
 
-      const recentlyEnded = sessionRepo.findRecentlyEndedClaude(5 * 60 * 1000);
+      const recentlyEnded = sessionRepo.findRecentlyEnded(5 * 60 * 1000);
       for (const row of recentlyEnded) {
-        if (resumabilityChecker.isResumable(row.claudeSessionId, row.cwd)) {
+        if (resumabilityChecker.isResumable(row.agentSessionId, row.cwd)) {
           const session = sessionRepo.findById(row.id);
           if (session) {
             session.setResumable(true);
             sessionRepo.save(session);
-            publishEvents(session.pullEvents());
-            console.log(
-              `[daemon] Session ${row.id} resumable updated: false -> true (post-exit check)`
-            );
+            Effect.runFork(publishEvents(session.pullEvents()));
           }
         }
       }
@@ -489,13 +470,15 @@ export function createSessionService(deps: SessionServiceDeps) {
         entry.handle.write(bytes);
         stripAnsiAndBuffer(inputLineBuffers, sessionId, data, source, (text, src, ts) => {
           terminalRepo.appendInput(sessionId, text, src, ts);
-          eventPublisher.publish({
-            type: 'terminal:input-echo',
-            sessionId,
-            text,
-            source: src,
-            timestamp: ts,
-          });
+          Effect.runFork(
+            eventPublisher.publish({
+              type: 'terminal:input-echo',
+              sessionId,
+              text,
+              source: src,
+              timestamp: ts,
+            })
+          );
         });
       }
     },

@@ -11,7 +11,7 @@ export const AgentSessionSchema = v.object({
   endedAt: v.optional(v.number()),
   status: v.picklist(['registering', 'active', 'ended', 'error']),
   exitCode: v.optional(v.number()),
-  claudeSessionId: v.optional(v.string()),
+  agentSessionId: v.optional(v.string()),
   resumable: v.optional(v.boolean()),
 });
 export type AgentSession = v.InferOutput<typeof AgentSessionSchema>;

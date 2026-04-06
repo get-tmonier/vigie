@@ -4,7 +4,7 @@ export interface AgentAdapter {
   readonly agentType: string;
   readonly canResume: boolean;
   readonly detectSessionId: boolean;
-  buildSpawnArgs(opts?: { claudeSessionId?: string; resume?: boolean }): {
+  buildSpawnArgs(opts?: { agentSessionId?: string; resume?: boolean }): {
     command: string;
     args: string[];
   };

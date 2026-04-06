@@ -2,7 +2,7 @@ import type { Database } from 'bun:sqlite';
 import { Effect, Layer } from 'effect';
 import { VigiDatabase } from '#infra/database';
 import {
-  type ClaudeSessionInfo,
+  type ResumableSessionInfo,
   SessionRepository,
   type SessionRepositoryShape,
 } from '#modules/session/application/ports/out/session-repository.port';
@@ -23,7 +23,7 @@ interface SessionRow {
   ended_at: number | null;
   status: string;
   exit_code: number | null;
-  claude_session_id: string | null;
+  agent_session_id: string | null;
   resumable: number;
 }
 
@@ -39,7 +39,7 @@ function rowToSession(row: SessionRow): Session {
     endedAt: row.ended_at ?? undefined,
     status: row.status as SessionStatus,
     exitCode: row.exit_code ?? undefined,
-    claudeSessionId: row.claude_session_id ?? undefined,
+    agentSessionId: row.agent_session_id ?? undefined,
     resumable: row.resumable === 1,
     mode: row.mode,
   });
@@ -47,13 +47,13 @@ function rowToSession(row: SessionRow): Session {
 
 export function createSqliteSessionRepository(db: Database): SessionRepositoryShape {
   const upsertStmt = db.prepare(`
-    INSERT INTO sessions (id, agent_type, mode, cwd, git_branch, git_remote_url, repo_name, started_at, ended_at, status, exit_code, claude_session_id, resumable)
-    VALUES ($id, $agent_type, $mode, $cwd, $git_branch, $git_remote_url, $repo_name, $started_at, $ended_at, $status, $exit_code, $claude_session_id, $resumable)
+    INSERT INTO sessions (id, agent_type, mode, cwd, git_branch, git_remote_url, repo_name, started_at, ended_at, status, exit_code, agent_session_id, resumable)
+    VALUES ($id, $agent_type, $mode, $cwd, $git_branch, $git_remote_url, $repo_name, $started_at, $ended_at, $status, $exit_code, $agent_session_id, $resumable)
     ON CONFLICT(id) DO UPDATE SET
       status = excluded.status,
       ended_at = excluded.ended_at,
       exit_code = excluded.exit_code,
-      claude_session_id = excluded.claude_session_id,
+      agent_session_id = excluded.agent_session_id,
       resumable = excluded.resumable
   `);
 
@@ -89,35 +89,35 @@ export function createSqliteSessionRepository(db: Database): SessionRepositorySh
       return (findActiveStmt.all() as SessionRow[]).map(rowToSession);
     },
 
-    findActiveClaudeWithId(): ClaudeSessionInfo[] {
+    findActiveWithAgentId(): ResumableSessionInfo[] {
       const rows = db
         .prepare(
-          "SELECT id, claude_session_id, cwd, resumable FROM sessions WHERE status = 'active' AND agent_type = 'claude' AND claude_session_id IS NOT NULL"
+          "SELECT id, agent_session_id, cwd, resumable FROM sessions WHERE status = 'active' AND agent_session_id IS NOT NULL"
         )
-        .all() as Array<{ id: string; claude_session_id: string; cwd: string; resumable: number }>;
+        .all() as Array<{ id: string; agent_session_id: string; cwd: string; resumable: number }>;
       return rows.map((r) => ({
         id: makeSessionId(r.id),
-        claudeSessionId: r.claude_session_id,
+        agentSessionId: r.agent_session_id,
         cwd: r.cwd,
         resumable: r.resumable === 1,
       }));
     },
 
-    findRecentlyEndedClaude(withinMs: number): ClaudeSessionInfo[] {
+    findRecentlyEnded(withinMs: number): ResumableSessionInfo[] {
       const cutoff = Date.now() - withinMs;
       const rows = db
         .prepare(
-          "SELECT id, claude_session_id, cwd, resumable FROM sessions WHERE status = 'ended' AND agent_type = 'claude' AND claude_session_id IS NOT NULL AND ended_at > $cutoff AND resumable = 0"
+          "SELECT id, agent_session_id, cwd, resumable FROM sessions WHERE status = 'ended' AND agent_session_id IS NOT NULL AND ended_at > $cutoff AND resumable = 0"
         )
         .all({ $cutoff: cutoff }) as Array<{
         id: string;
-        claude_session_id: string;
+        agent_session_id: string;
         cwd: string;
         resumable: number;
       }>;
       return rows.map((r) => ({
         id: makeSessionId(r.id),
-        claudeSessionId: r.claude_session_id,
+        agentSessionId: r.agent_session_id,
         cwd: r.cwd,
         resumable: r.resumable === 1,
       }));
@@ -136,7 +136,7 @@ export function createSqliteSessionRepository(db: Database): SessionRepositorySh
         $ended_at: session.endedAt ?? null,
         $status: session.status,
         $exit_code: session.exitCode ?? null,
-        $claude_session_id: session.claudeSessionId ?? null,
+        $agent_session_id: session.agentSessionId ?? null,
         $resumable: session.resumable ? 1 : 0,
       });
     },

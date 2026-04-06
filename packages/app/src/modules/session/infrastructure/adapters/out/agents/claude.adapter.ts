@@ -6,11 +6,11 @@ export const claudeAdapter: AgentAdapter = {
   detectSessionId: true,
   buildSpawnArgs(opts) {
     const args: string[] = ['claude'];
-    if (opts?.claudeSessionId) {
+    if (opts?.agentSessionId) {
       if (opts.resume) {
-        args.push('--resume', opts.claudeSessionId);
+        args.push('--resume', opts.agentSessionId);
       } else {
-        args.push('--session-id', opts.claudeSessionId);
+        args.push('--session-id', opts.agentSessionId);
       }
     }
     return { command: 'claude', args };

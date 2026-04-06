@@ -2,9 +2,9 @@ import { ServiceMap } from 'effect';
 import type { Session } from '#modules/session/domain/session';
 import type { SessionId } from '#modules/session/domain/session-id';
 
-export interface ClaudeSessionInfo {
+export interface ResumableSessionInfo {
   readonly id: SessionId;
-  readonly claudeSessionId: string;
+  readonly agentSessionId: string;
   readonly cwd: string;
   readonly resumable: boolean;
 }
@@ -13,8 +13,8 @@ export interface SessionRepositoryShape {
   findById(id: SessionId): Session | null;
   findAll(): Session[];
   findActive(): Session[];
-  findActiveClaudeWithId(): ClaudeSessionInfo[];
-  findRecentlyEndedClaude(withinMs: number): ClaudeSessionInfo[];
+  findActiveWithAgentId(): ResumableSessionInfo[];
+  findRecentlyEnded(withinMs: number): ResumableSessionInfo[];
   save(session: Session): void;
   delete(id: SessionId): void;
   deleteAllEnded(): void;

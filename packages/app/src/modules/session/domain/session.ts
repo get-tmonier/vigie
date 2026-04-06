@@ -5,7 +5,7 @@ import { SessionId as makeSessionId } from './session-id';
 import type { SessionStatus } from './session-status';
 import { canTransition } from './session-status';
 
-type AgentType = 'claude' | 'aider' | 'codex' | 'generic' | (string & {});
+type AgentType = string;
 
 interface CreateSessionProps {
   readonly id?: string;
@@ -28,7 +28,7 @@ interface ReconstitutedSessionProps {
   readonly endedAt?: number;
   readonly status: SessionStatus;
   readonly exitCode?: number;
-  readonly claudeSessionId?: string;
+  readonly agentSessionId?: string;
   readonly resumable: boolean;
   readonly mode?: string;
 }
@@ -44,7 +44,7 @@ export class Session {
   readonly mode: string;
 
   private _status: SessionStatus;
-  private _claudeSessionId?: string;
+  private _agentSessionId?: string;
   private _resumable: boolean;
   private _exitCode?: number;
   private _endedAt?: number;
@@ -59,7 +59,7 @@ export class Session {
     repoName?: string;
     startedAt: number;
     status: SessionStatus;
-    claudeSessionId?: string;
+    agentSessionId?: string;
     resumable: boolean;
     exitCode?: number;
     endedAt?: number;
@@ -74,7 +74,7 @@ export class Session {
     this.startedAt = props.startedAt;
     this.mode = props.mode;
     this._status = props.status;
-    this._claudeSessionId = props.claudeSessionId;
+    this._agentSessionId = props.agentSessionId;
     this._resumable = props.resumable;
     this._exitCode = props.exitCode;
     this._endedAt = props.endedAt;
@@ -119,7 +119,7 @@ export class Session {
       repoName: props.repoName,
       startedAt: props.startedAt,
       status: props.status,
-      claudeSessionId: props.claudeSessionId,
+      agentSessionId: props.agentSessionId,
       resumable: props.resumable,
       exitCode: props.exitCode,
       endedAt: props.endedAt,
@@ -135,8 +135,8 @@ export class Session {
     return this._status === 'active';
   }
 
-  get claudeSessionId(): string | undefined {
-    return this._claudeSessionId;
+  get agentSessionId(): string | undefined {
+    return this._agentSessionId;
   }
 
   get resumable(): boolean {
@@ -152,7 +152,7 @@ export class Session {
   }
 
   get canResume(): boolean {
-    return this._status === 'ended' && this._resumable && this._claudeSessionId != null;
+    return this._status === 'ended' && this._resumable && this._agentSessionId != null;
   }
 
   get canDelete(): boolean {
@@ -209,13 +209,13 @@ export class Session {
     });
   }
 
-  setClaudeSessionId(claudeSessionId: string): void {
-    this._claudeSessionId = claudeSessionId;
+  setAgentSessionId(agentSessionId: string): void {
+    this._agentSessionId = agentSessionId;
 
     this._events.push({
-      type: 'session:claude-id-detected',
+      type: 'session:agent-id-detected',
       sessionId: this.id,
-      claudeSessionId,
+      agentSessionId,
       timestamp: Date.now(),
     });
   }

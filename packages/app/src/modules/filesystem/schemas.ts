@@ -57,7 +57,7 @@ const FsListDirRequestSchema = v.object({
 const SessionResumeRequestSchema = v.object({
   type: v.literal('session:resume-request'),
   sessionId: v.string(),
-  claudeSessionId: v.string(),
+  agentSessionId: v.string(),
   cwd: v.string(),
   cols: v.number(),
   rows: v.number(),
@@ -148,10 +148,10 @@ const _TerminalInputEchoSchema = v.object({
   timestamp: v.number(),
 });
 
-const _SessionClaudeIdDetectedSchema = v.object({
-  type: v.literal('session:claude-id-detected'),
+const _SessionAgentIdDetectedSchema = v.object({
+  type: v.literal('session:agent-id-detected'),
   sessionId: v.string(),
-  claudeSessionId: v.string(),
+  agentSessionId: v.string(),
   timestamp: v.number(),
 });
 
@@ -167,7 +167,7 @@ const DaemonSyncSessionSchema = v.object({
   startedAt: v.number(),
   status: v.picklist(['active', 'ended', 'error']),
   exitCode: v.optional(v.number()),
-  claudeSessionId: v.optional(v.string()),
+  agentSessionId: v.optional(v.string()),
   terminalChunks: v.array(
     v.object({
       data: v.string(),

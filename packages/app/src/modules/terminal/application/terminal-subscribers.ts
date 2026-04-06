@@ -1,4 +1,4 @@
-import { Layer, ServiceMap } from 'effect';
+import { Effect, Layer, ServiceMap } from 'effect';
 
 function createTerminalSubscribers(): TerminalSubscribersShape {
   const subscribers = new Map<string, Set<(data: string) => void>>();
@@ -16,15 +16,17 @@ function createTerminalSubscribers(): TerminalSubscribersShape {
         }
       };
     },
-    publish(sessionId: string, data: string): void {
-      const subs = subscribers.get(sessionId);
-      if (subs) {
-        for (const cb of subs) {
-          try {
-            cb(data);
-          } catch {}
+    publish(sessionId: string, data: string): Effect.Effect<void> {
+      return Effect.gen(function* () {
+        const subs = subscribers.get(sessionId);
+        if (subs) {
+          for (const cb of subs) {
+            yield* Effect.try({ try: () => cb(data), catch: (err) => err }).pipe(
+              Effect.catch((err) => Effect.logError(`terminal subscriber error: ${err}`))
+            );
+          }
         }
-      }
+      });
     },
     hasSubscribers(sessionId: string): boolean {
       return (subscribers.get(sessionId)?.size ?? 0) > 0;
@@ -34,7 +36,7 @@ function createTerminalSubscribers(): TerminalSubscribersShape {
 
 export type TerminalSubscribersShape = {
   subscribe(sessionId: string, callback: (data: string) => void): () => void;
-  publish(sessionId: string, data: string): void;
+  publish(sessionId: string, data: string): Effect.Effect<void>;
   hasSubscribers(sessionId: string): boolean;
 };
 
