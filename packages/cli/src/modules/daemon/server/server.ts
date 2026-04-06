@@ -52,15 +52,12 @@ export function createRoutesLayer(deps: ServerDeps) {
     const uiPath = deps.uiDistPath;
 
     routes.push(
-      HttpRouter.route('GET', '*', (request) =>
+      HttpRouter.route('GET', '/spa/*', (request) =>
         Effect.sync(() => {
           const urlPath = new URL(request.url, 'http://localhost').pathname;
+          const spaRelative = urlPath.slice('/spa'.length) || '/';
 
-          if (urlPath.startsWith('/api/') || urlPath.startsWith('/ws/')) {
-            return HttpServerResponse.empty({ status: 404 });
-          }
-
-          const filePath = join(uiPath, urlPath === '/' ? 'index.html' : urlPath);
+          const filePath = join(uiPath, spaRelative === '/' ? 'index.html' : spaRelative);
           if (existsSync(filePath)) {
             const ext = extname(filePath);
             const contentType = MIME_TYPES[ext] ?? 'application/octet-stream';

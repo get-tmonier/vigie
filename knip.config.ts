@@ -25,7 +25,7 @@ export default {
       ],
     },
     'packages/cli': {
-      project: ['src/**/*.ts'],
+      project: ['src/**/*.{ts,tsx}'],
     },
     'packages/shared': {
       project: ['src/**/*.ts'],

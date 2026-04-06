@@ -8,10 +8,13 @@
     "skipLibCheck": true,
     "outDir": "dist",
     "rootDir": "src",
-    "types": ["bun-types"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "types": ["bun-types", "react", "react-dom"],
     "paths": {
       "#modules/*": ["./src/modules/*"],
-      "#lib/*": ["./src/lib/*"]
+      "#lib/*": ["./src/lib/*"],
+      "#infra/*": ["./src/infra/*"]
     }
   },
   "include": ["src"],

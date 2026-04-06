@@ -5,11 +5,13 @@ import type * as HttpServerError from 'effect/unstable/http/HttpServerError';
 import * as HttpServerRequest from 'effect/unstable/http/HttpServerRequest';
 import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse';
 import * as v from 'valibot';
+import { renderPage } from '#infra/ssr/render-page.js';
 import type { createSessionStore } from '../../../daemon/persistence/session-store.js';
 import type { EventBus } from '../../../terminal/event-bus.js';
 import type { PtyEntry } from '../../../terminal/terminal.service.js';
 import type { AgentSession } from '../../schemas.js';
 import { SpawnSessionRequestSchema } from '../../schemas.js';
+import { DashboardPage } from './session.page.js';
 
 type SessionRouteDeps = {
   store: ReturnType<typeof createSessionStore>;
@@ -48,7 +50,7 @@ function mapRowToSession(
   };
 }
 
-const jsonRoute = <E>(
+const jsonRoute = <E,>(
   method: 'GET' | 'POST' | 'DELETE',
   path: HttpRouter.PathInput,
   handler: Effect.Effect<
@@ -74,6 +76,93 @@ const jsonRoute = <E>(
 
 export function createSessionRoutes(deps: SessionRouteDeps): HttpRouter.Route<RouteError, never>[] {
   return [
+    // SSR dashboard
+    HttpRouter.route(
+      'GET',
+      '/',
+      Effect.gen(function* () {
+        const rows = deps.store.getAllSessions();
+        const sessions = rows.map(mapRowToSession);
+        return yield* renderPage(<DashboardPage sessions={sessions} />, { title: 'vigie' });
+      })
+    ),
+
+    // Form actions — mutations POST → redirect to /
+    HttpRouter.route(
+      'POST',
+      '/sessions/create',
+      Effect.gen(function* () {
+        const request = yield* HttpServerRequest.HttpServerRequest;
+        const body = yield* request.text;
+        const params = new URLSearchParams(body);
+        const cwd = params.get('cwd') ?? '~';
+        const agentType = params.get('agentType') ?? 'claude';
+        yield* Effect.tryPromise(() => deps.spawnSession({ agentType, cwd, cols: 220, rows: 50 }));
+        return HttpServerResponse.redirect('/');
+      })
+    ),
+
+    HttpRouter.route(
+      'POST',
+      '/sessions/:id/kill',
+      Effect.gen(function* () {
+        const { id: sessionId } = yield* HttpRouter.params;
+        if (!sessionId) return HttpServerResponse.redirect('/');
+        const entry = deps.ptyHandles.get(sessionId);
+        if (entry) entry.handle.kill();
+        return HttpServerResponse.redirect('/');
+      })
+    ),
+
+    HttpRouter.route(
+      'POST',
+      '/sessions/:id/resume',
+      Effect.gen(function* () {
+        const { id: sessionId } = yield* HttpRouter.params;
+        if (!sessionId) return HttpServerResponse.redirect('/');
+        yield* Effect.tryPromise(() => deps.resumeSession(sessionId, { cols: 220, rows: 50 })).pipe(
+          Effect.catch(() => Effect.void)
+        );
+        return HttpServerResponse.redirect('/');
+      })
+    ),
+
+    HttpRouter.route(
+      'POST',
+      '/sessions/:id/delete',
+      Effect.gen(function* () {
+        const { id: sessionId } = yield* HttpRouter.params;
+        if (!sessionId) return HttpServerResponse.redirect('/');
+        const session = deps.store.getSessionById(sessionId);
+        if (session && session.status !== 'active') {
+          deps.store.deleteSessionById(sessionId);
+          deps.eventBus.publish({ type: 'session:deleted', sessionId, timestamp: Date.now() });
+        }
+        return HttpServerResponse.redirect('/');
+      })
+    ),
+
+    HttpRouter.route(
+      'POST',
+      '/sessions/clear-ended',
+      Effect.sync(() => {
+        deps.store.deleteEndedSessions();
+        deps.eventBus.publish({ type: 'sessions:cleared', timestamp: Date.now() });
+        return HttpServerResponse.redirect('/');
+      })
+    ),
+
+    HttpRouter.route(
+      'POST',
+      '/sessions/kill-all',
+      Effect.sync(() => {
+        for (const entry of deps.ptyHandles.values()) {
+          entry.handle.kill();
+        }
+        return HttpServerResponse.redirect('/');
+      })
+    ),
+
     HttpRouter.route(
       'GET',
       '/api/health',
