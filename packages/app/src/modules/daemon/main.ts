@@ -238,7 +238,23 @@ export const runDaemon = Effect.gen(function* () {
     const httpEffect = yield* HttpRouter.toHttpEffect(routesLayer);
     const server = yield* BunHttpServer.make({ port });
     yield* server.serve(httpEffect, HttpMiddleware.cors());
-  }).pipe(Effect.provide(BunHttpServer.layerHttpServices));
+  }).pipe(
+    Effect.provide(BunHttpServer.layerHttpServices),
+    Effect.catchDefect((defect) =>
+      Effect.sync(() => {
+        const msg = defect instanceof Error ? defect.message : String(defect);
+        if (msg.includes('EADDRINUSE') || msg.includes('address already in use')) {
+          console.error(
+            `[daemon] Port ${port} is already in use. Is another vigie daemon running? Stop it with: vigie daemon stop`
+          );
+        } else {
+          console.error('[daemon] HTTP server failed to start:', msg);
+        }
+        cleanup();
+        process.exit(1);
+      })
+    )
+  );
 
   writeFileSync(PORT_FILE, String(port));
   console.log(`[daemon] HTTP + WebSocket server listening on http://localhost:${port}`);
@@ -689,6 +705,18 @@ if (import.meta.main) {
     process.stdout.write('[daemon] Stopped.\n');
     cleanup();
     process.exit(0);
+  });
+
+  process.on('uncaughtException', (err) => {
+    console.error('[daemon] Uncaught exception:', err);
+    cleanup();
+    process.exit(1);
+  });
+
+  process.on('unhandledRejection', (reason) => {
+    console.error('[daemon] Unhandled rejection:', reason);
+    cleanup();
+    process.exit(1);
   });
 
   Effect.runFork(
