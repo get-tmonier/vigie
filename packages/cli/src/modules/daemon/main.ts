@@ -151,6 +151,15 @@ export const runDaemon = Effect.gen(function* () {
     console.log('[daemon] No UI dist found — API-only mode');
   }
 
+  const clientDistCandidates = [
+    join(dirname(process.execPath), 'client'),
+    resolve(import.meta.dir, '..', '..', '..', '..', '..', 'dist', 'client'),
+  ];
+  const clientDistPath = clientDistCandidates.find((p) => existsSync(p));
+  if (clientDistPath) {
+    console.log(`[daemon] Serving client islands from ${clientDistPath}`);
+  }
+
   const spawnSession = async (opts: {
     agentType: string;
     cwd: string;
@@ -232,6 +241,7 @@ export const runDaemon = Effect.gen(function* () {
     applyResizePriority: (id) => terminalService.applyResizePriority(id),
     inputLineBufferWrite: (id, data, src) => terminalService.inputLineBufferWrite(id, data, src),
     uiDistPath,
+    clientDistPath,
     spawnSession,
     resumeSession,
   });

@@ -25,7 +25,16 @@ export default {
       ],
     },
     'packages/cli': {
+      entry: ['src/infra/ssr/client-entry.tsx'],
       project: ['src/**/*.{ts,tsx}'],
+      ignoreDependencies: [
+        '@fontsource-variable/dm-sans',
+        '@fontsource/instrument-serif',
+        '@fontsource/jetbrains-mono',
+        '@vigie/tokens',
+        'tailwindcss',
+      ],
+      vite: { config: 'vite.config.ts' },
     },
     'packages/shared': {
       project: ['src/**/*.ts'],

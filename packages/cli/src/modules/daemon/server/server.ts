@@ -43,10 +43,32 @@ type ServerDeps = {
   applyResizePriority: (sessionId: string) => { cols: number; rows: number } | null;
   inputLineBufferWrite: (sessionId: string, base64Data: string, source: 'cli' | 'browser') => void;
   uiDistPath?: string;
+  clientDistPath?: string;
 };
 
 export function createRoutesLayer(deps: ServerDeps) {
   const routes = [...createSessionRoutes(deps), ...createTerminalRoutes(deps), ...createFsRoutes()];
+
+  if (deps.clientDistPath && existsSync(deps.clientDistPath)) {
+    const clientPath = deps.clientDistPath;
+
+    routes.push(
+      HttpRouter.route('GET', '/client/*', (request) =>
+        Effect.sync(() => {
+          const urlPath = new URL(request.url, 'http://localhost').pathname;
+          const relative = urlPath.slice('/client/'.length);
+          const filePath = join(clientPath, relative);
+          if (existsSync(filePath)) {
+            const ext = extname(filePath);
+            const contentType = MIME_TYPES[ext] ?? 'application/octet-stream';
+            const content = readFileSync(filePath);
+            return HttpServerResponse.uint8Array(new Uint8Array(content), { contentType });
+          }
+          return HttpServerResponse.empty({ status: 404 });
+        })
+      )
+    );
+  }
 
   if (deps.uiDistPath && existsSync(deps.uiDistPath)) {
     const uiPath = deps.uiDistPath;

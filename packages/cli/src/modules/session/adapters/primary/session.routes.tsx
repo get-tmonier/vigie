@@ -81,9 +81,15 @@ export function createSessionRoutes(deps: SessionRouteDeps): HttpRouter.Route<Ro
       'GET',
       '/',
       Effect.gen(function* () {
+        const request = yield* HttpServerRequest.HttpServerRequest;
+        const url = new URL(request.url, 'http://localhost');
+        const selectedSessionId = url.searchParams.get('session') ?? undefined;
         const rows = deps.store.getAllSessions();
         const sessions = rows.map(mapRowToSession);
-        return yield* renderPage(<DashboardPage sessions={sessions} />, { title: 'vigie' });
+        return yield* renderPage(
+          <DashboardPage sessions={sessions} selectedSessionId={selectedSessionId} />,
+          { title: 'vigie' }
+        );
       })
     ),
 
