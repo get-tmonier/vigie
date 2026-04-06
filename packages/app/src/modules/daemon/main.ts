@@ -141,7 +141,7 @@ export const runDaemon = Effect.gen(function* () {
 
   const clientDistCandidates = [
     join(dirname(process.execPath), 'client'),
-    resolve(import.meta.dir, '..', '..', '..', '..', '..', 'dist', 'client'),
+    resolve(import.meta.dir, '..', '..', '..', 'dist', 'client'),
   ];
   const clientDistPath = clientDistCandidates.find((p) => existsSync(p));
   if (clientDistPath) {
