@@ -7,60 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-### Fixed
-
-- Session resume (`vigie session resume`) no longer creates a new session — it reuses the existing session ID and reactivates the DB row in-place
-- Ctrl+C to end a session no longer marks it "not resumable" — the disconnect handler now checks whether the session already ended before overwriting its resumable state
-- PTY dimensions are now forced to the CLI terminal size on attach, with an immediate resize notification sent to the backend
-- Attached CLI now correctly receives a PTY exit notification when a browser-started session ends
-- Host terminal no longer freezes after Ctrl+C or SIGTERM — raw terminal state is restored in the pty-relay before process exit
-- Terminal output is no longer duplicated when resuming a session — the TUI renderer state is cleared on resume before replaying buffered output
-
 ### Added
 
-- `vigie claude` command for running Claude Code sessions with streaming output and session summaries
-- `vigie daemon start/stop/status/logs` subcommands for daemon lifecycle management
-- Background daemon process for managing persistent backend connections and agent executions
-- IPC communication between CLI and daemon via Unix sockets
-- Effect-TS for declarative, type-safe program construction and error handling
-- Git context detection (repo, branch, dirty state) for session initialization
-- Modular source structure under `src/modules/` (auth, backend, daemon, session)
-- `vigie login` command with browser-based OAuth flow and `--token` manual login
-- `vigie logout` command to clear saved credentials
-- Credential storage in `~/.vigie/credentials.json` with restrictive file permissions (0600)
-- `VIGIE_TOKEN` env var support as alternative to stored credentials
-- `VIGIE_APP_URL` config for auth redirect target
-- WebSocket authentication via `daemon:hello` token field and query parameter on upgrade
-- Tests for credentials I/O, login callback (CSRF/XSS), config defaults, IPC messages, Claude stream, and git context
-- Interactive Claude sessions via PTY spawn and bidirectional terminal relay (`vigie claude` interactive mode)
-- `vigie session list` command to display active and past sessions
-- `vigie session attach <id>` command to reattach to a running session
-- `vigie session resume <id>` command with smart reattach using deterministic Claude session IDs
-- Detach/attach lifecycle: press `Ctrl+D` to detach from a session without stopping it
-- Keybind interceptor for in-session keyboard shortcuts
-- Live status bar footer rendered in gold via TUI renderer, updating every second
-- Virtual terminal emulator (`vterm`) for tracking agent viewport state
-- Event-driven dirty tracking in the virtual terminal for efficient screen updates
-- SQLite persistence for session state with reconnect sync
-- Input history persistence per session with ANSI escape stripping
-- Session management actions from the backend (spawn, kill, resume) with resumable tracking
-- Browser-initiated session spawn, kill, and directory listing handled by daemon
-- Daemon `fg` mode, `restart` subcommand, and accurate uptime reporting
-- Diagnostic logging for terminal resize relay
+- Fully local single-process daemon: no remote API, no cloud dependency — everything runs on `localhost:19191`
+- `@effect/platform-bun` HTTP server embedded in daemon (replaced Hono) — serves REST, WebSocket, and React SSR from one process
+- React SSR rendered by the daemon; client interactivity via Vite-bundled islands (`*.island.tsx`)
+- Redux Toolkit slice (`sessions.slice`) + WebSocket event bus for reactive client-side session state
+- DDD hexagonal architecture: rich `Session` domain entity, `AgentAdapter` port, `AgentRegistry` — agent-agnostic by design
+- Full Effect-TS adoption: `SessionService`, `EventPublisher`, PTY relay, intervals, and WebSocket deferreds all effectified
+- `DashboardLayout` component in `#shared/ui` — layout shell extracted from the session module (FSD alignment)
+- Test file colocation with source modules (`*.unit.test.ts` / `*.integration.test.ts`)
+- `vigie claude` command for interactive Claude Code sessions with PTY relay
+- `vigie daemon start/stop/status` subcommands for daemon lifecycle management
+- `vigie session list / attach / resume` CLI commands
+- Detach/attach lifecycle: `Ctrl+B d` to detach without stopping the session
+- SQLite persistence for sessions, terminal chunks, and input history (`~/.vigie/data.db`)
+- Unix socket IPC between CLI and daemon (`~/.vigie/daemon.sock`)
+- Git context detection (repo, branch, dirty state) attached to each session
+- Keybind interceptor and live status bar footer in the CLI TUI
 
 ### Fixed
 
-- WebSocket inactivity timeout (60 s) to prevent stale connections
-- Ping/pong heartbeat to keep connections alive and verify responsiveness
-- Login callback server now binds to `127.0.0.1` instead of all interfaces
-- Force process exit after `claude` command completes to prevent hanging
+- Session resume reuses the existing session ID and reactivates the DB row in-place (no duplicate session)
+- `Ctrl+C` no longer marks a session non-resumable — disconnect handler checks whether session already ended
+- PTY dimensions forced to CLI terminal size on attach, with immediate resize notification
+- CLI attached to a browser-started session now receives the PTY exit notification
+- Raw terminal state restored before process exit — host terminal no longer freezes after `Ctrl+C` / SIGTERM
+- Terminal output no longer duplicated on resume — TUI renderer state cleared before replaying buffered output
+- Client bundle built before daemon starts in dev mode
+- `Effect.catchAllDefect` replaced with `catchDefect`; process exit handlers added for uncaught errors
 
 ### Changed
 
-- Refactored CLI to daemon-based architecture for persistent agent sessions
-- WebSocket client moved under `modules/backend` with adapter/port separation
-- PTY ownership moved from CLI to daemon process
-- Initial project scaffolding (Bun, Biome, TypeScript strict, ESM only)
-- Build pipeline: `bun run verify` (knip, biome check, typecheck, test, build)
-- Standalone binary compilation via `bun build --compile`
-- Valibot message schemas for downstream and upstream message contracts
+- Removed remote API and all cloud dependencies — vigie is now fully local
+- Source structure aligned with Feature-Sliced Design: `src/modules/` with `#modules/*` subpath aliases
+- `@vigie/ui` package removed; UI colocated in `packages/app` under `src/modules/`
+- All logging migrated from `console.log/error` to `Effect.log*`
+- Build pipeline: `bun run verify` (knip → biome → typecheck → test → build)
