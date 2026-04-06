@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { RootState } from '#app/store';
 import type {
   AgentSession,
   SessionClaudeIdDetected,
@@ -6,8 +7,7 @@ import type {
   SessionErrorUpstream,
   SessionSpawnFailed,
   SessionStarted,
-} from '@vigie/shared';
-import type { RootState } from '#app/store';
+} from '#shared/types/api';
 
 interface ResumableChangedEvent {
   type: 'session:resumable-changed';

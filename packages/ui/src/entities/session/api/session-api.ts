@@ -1,6 +1,6 @@
-import type { AgentSession, FsEntry } from '@vigie/shared';
-import { ListSessionsResponseSchema } from '@vigie/shared';
 import { apiFetch } from '#shared/api/client';
+import type { AgentSession, FsEntry } from '#shared/types/api';
+import { ListSessionsResponseSchema } from '#shared/types/api';
 
 export type { AgentSession, FsEntry };
 

@@ -1,4 +1,4 @@
-import type { BrowserEvent } from '@vigie/shared';
+import type { BrowserEvent } from './schemas.js';
 
 export function createEventBus() {
   const listeners = new Set<(event: BrowserEvent) => void>();

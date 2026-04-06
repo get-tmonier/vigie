@@ -1,5 +1,5 @@
 import { afterAll, beforeEach, describe, expect, it } from 'bun:test';
-import { openDatabase } from '../modules/daemon/persistence/database.js';
+import { openDatabase } from '../infra/database.js';
 import { createSessionStore } from '../modules/daemon/persistence/session-store.js';
 import type { AgentSession } from '../modules/session/domain/session.js';
 

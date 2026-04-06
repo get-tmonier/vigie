@@ -1,5 +1,5 @@
-import type { SessionOutput } from '@vigie/shared';
 import { useMemo } from 'react';
+import type { SessionOutput } from '#shared/types/api';
 import type { DaemonEvent } from '#shared/types/daemon-event';
 
 export type SessionChunk =

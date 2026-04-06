@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import type { SessionEnded, SessionStarted } from '@vigie/shared';
+import type { SessionEnded, SessionStarted } from '#shared/types/api';
 import {
   endedSessionsCleared,
   resumableChanged,

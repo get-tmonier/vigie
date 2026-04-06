@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { TerminalInputEcho } from '@vigie/shared';
 import type { RootState } from '#app/store';
+import type { TerminalInputEcho } from '#shared/types/api';
 
 export interface HistoryEntry {
   text: string;
