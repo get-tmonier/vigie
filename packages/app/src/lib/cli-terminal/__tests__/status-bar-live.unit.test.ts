@@ -1,9 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, mock } from 'bun:test';
-import {
-  initStatusBar,
-  resizeStatusBar,
-  teardownStatusBar,
-} from '../lib/cli-terminal/status-bar-live';
+import { initStatusBar, resizeStatusBar, teardownStatusBar } from '../status-bar-live';
 
 function createMockRenderer() {
   return {

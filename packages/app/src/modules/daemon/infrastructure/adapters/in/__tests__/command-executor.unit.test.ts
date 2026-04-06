@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect } from 'effect';
-import { executeCommand } from '../modules/daemon/infrastructure/adapters/in/command-executor';
 import type {
   CommandDone,
   CommandError,
   CommandOutput,
   CommandRequest,
-} from '../modules/daemon/infrastructure/adapters/ws-schemas';
+} from '#modules/daemon/infrastructure/adapters/ws-schemas';
+import { executeCommand } from '../command-executor';
 
 type UpstreamMessage = CommandOutput | CommandDone | CommandError;
 

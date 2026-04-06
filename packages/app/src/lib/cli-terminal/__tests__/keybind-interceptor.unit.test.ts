@@ -1,5 +1,5 @@
 import { describe, expect, it, mock } from 'bun:test';
-import { createKeybindInterceptor } from '../lib/cli-terminal/keybind-interceptor';
+import { createKeybindInterceptor } from '../keybind-interceptor';
 
 describe('keybind-interceptor', () => {
   it('passes through normal input', () => {
