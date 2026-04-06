@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import * as BunHttpServer from '@effect/platform-bun/BunHttpServer';
-import { Effect, Layer } from 'effect';
+import { Duration, Effect, Fiber, Layer, Schedule } from 'effect';
 import * as HttpMiddleware from 'effect/unstable/http/HttpMiddleware';
 import * as HttpRouter from 'effect/unstable/http/HttpRouter';
 import { makeDatabaseLayer, VigiDatabase } from '#infra/database';
@@ -86,23 +86,28 @@ export const runDaemon = Effect.gen(function* () {
 
   yield* Effect.logInfo('[daemon] SQLite database opened, orphaned sessions cleaned up');
 
-  const pruneInterval = setInterval(
-    () => {
-      sessionRepo.pruneOld();
-      Effect.runFork(Effect.logInfo('[daemon] Pruned old sessions'));
-    },
-    60 * 60 * 1000
+  const pruneFiber = yield* Effect.forkDetach(
+    Effect.repeat(
+      Effect.gen(function* () {
+        sessionRepo.pruneOld();
+        yield* Effect.logInfo('[daemon] Pruned old sessions');
+      }),
+      Schedule.spaced(Duration.hours(1))
+    )
   );
 
-  const resumableCheckInterval = setInterval(() => {
-    sessionService.checkResumableForActive();
-  }, 5_000);
+  const resumableFiber = yield* Effect.forkDetach(
+    Effect.repeat(
+      Effect.sync(() => sessionService.checkResumableForActive()),
+      Schedule.spaced(Duration.seconds(5))
+    )
+  );
 
   yield* Effect.addFinalizer(() =>
     Effect.gen(function* () {
       yield* Effect.logInfo('[daemon] Shutting down...');
-      clearInterval(pruneInterval);
-      clearInterval(resumableCheckInterval);
+      yield* Fiber.interrupt(pruneFiber);
+      yield* Fiber.interrupt(resumableFiber);
       db.close();
       cleanup();
     })

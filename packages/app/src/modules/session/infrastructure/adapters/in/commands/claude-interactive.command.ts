@@ -1,10 +1,17 @@
-import { Console, Effect } from 'effect';
+import { Console, Deferred, Effect, Exit } from 'effect';
 import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
 import { createBunProcessManager } from '#modules/daemon/infrastructure/adapters/out/bun-process-manager.adapter';
 import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
 import { getGitContext } from '#modules/session/infrastructure/adapters/out/git-context';
 import { attachPtyRelay } from '../pty-relay';
 import { createUnixSocketClient } from '../unix-socket-client.adapter';
+
+const flushStdoutAndExit = Effect.callback<never, never>((resume) => {
+  process.stdout.write('', () => {
+    process.exit(0);
+    resume(Exit.succeed(undefined as never));
+  });
+});
 
 export function claudeInteractiveCommand() {
   return Effect.gen(function* () {
@@ -34,22 +41,17 @@ export function claudeInteractiveCommand() {
     // onOutput, which happens right after sending session:spawned + session:started.
     // If our handler isn't ready, the initial TUI render is silently lost.
 
-    let resolveSpawn: (pid: number) => void;
-    let rejectSpawn: (error: Error) => void;
-    const spawnPromise = new Promise<number>((resolve, reject) => {
-      resolveSpawn = resolve;
-      rejectSpawn = reject;
-    });
+    const spawnDeferred = yield* Deferred.make<number>();
 
     client.onMessage((msg) => {
       if (!('sessionId' in msg) || msg.sessionId !== sessionId) return;
 
       switch (msg.type) {
         case 'session:spawned':
-          resolveSpawn(msg.pid);
+          Effect.runFork(Deferred.succeed(spawnDeferred, msg.pid));
           break;
         case 'session:spawn-failed':
-          rejectSpawn(new Error(msg.error));
+          Effect.runFork(Deferred.die(spawnDeferred, new Error(msg.error)));
           break;
       }
     });
@@ -67,8 +69,8 @@ export function claudeInteractiveCommand() {
       repoName: gitCtx.repoName,
     });
 
-    // Wait for spawn confirmation (no timeout — handled by onMessage above)
-    yield* Effect.promise(() => spawnPromise);
+    // Wait for spawn confirmation
+    yield* Deferred.await(spawnDeferred);
 
     const startedAt = Date.now();
 
@@ -85,14 +87,6 @@ export function claudeInteractiveCommand() {
   }).pipe(
     Effect.catchTag('DaemonNotRunningError', (e) => Console.error(e.message)),
     Effect.catchTag('IpcConnectionError', (e) => Console.error(`IPC error: ${e.message}`)),
-    Effect.ensuring(
-      Effect.promise(async () => {
-        // Wait for stdout to flush before exiting
-        await new Promise<void>((resolve) => {
-          process.stdout.write('', () => resolve());
-        });
-        process.exit(0);
-      })
-    )
+    Effect.ensuring(flushStdoutAndExit)
   );
 }

@@ -1,4 +1,4 @@
-import { Console, Effect } from 'effect';
+import { Console, Deferred, Duration, Effect, Exit } from 'effect';
 import { createKeybindInterceptor } from '#lib/cli-terminal/keybind-interceptor';
 import {
   initStatusBar,
@@ -31,29 +31,62 @@ type PtyRelayResult =
   | { type: 'detach' }
   | { type: 'disconnect' };
 
+interface StdinSocket {
+  write(data: string | Uint8Array): number;
+  terminate(): void;
+}
+
+function connectStdinSocket(stdinSocketPath: string) {
+  return Effect.callback<StdinSocket, DaemonNotRunningError>((resume) => {
+    Bun.connect({
+      unix: stdinSocketPath,
+      socket: {
+        open(s) {
+          resume(Exit.succeed(s as unknown as StdinSocket));
+        },
+        data() {},
+        close() {},
+        error(_s, err) {
+          resume(
+            Exit.fail(
+              new DaemonNotRunningError({
+                message: `Failed to connect stdin socket: ${err.message}`,
+              })
+            )
+          );
+        },
+      },
+    }).catch((err) =>
+      resume(
+        Exit.fail(
+          new DaemonNotRunningError({
+            message: `Failed to connect stdin socket: ${err instanceof Error ? err.message : String(err)}`,
+          })
+        )
+      )
+    );
+  }).pipe(
+    Effect.timeout(Duration.seconds(5)),
+    Effect.mapError((err) =>
+      err._tag === 'TimeoutError'
+        ? new DaemonNotRunningError({ message: 'Stdin socket timeout' })
+        : err
+    )
+  );
+}
+
 export function attachPtyRelay(client: IpcClientShape, options: PtyRelayOptions) {
   return Effect.gen(function* () {
     const { stdinSocketPath } = yield* DaemonConfig;
     const { sessionId } = options;
     const startedAt = options.startedAt ?? Date.now();
 
-    let resolveExit: (exitCode: number) => void;
-    const exitPromise = new Promise<number>((resolve) => {
-      resolveExit = resolve;
-    });
-
-    let resolveDetach: () => void;
-    const detachPromise = new Promise<void>((resolve) => {
-      resolveDetach = resolve;
-    });
-
-    let resolveDisconnect: () => void;
-    const disconnectPromise = new Promise<void>((resolve) => {
-      resolveDisconnect = resolve;
-    });
+    const exitDeferred = yield* Deferred.make<number>();
+    const detachDeferred = yield* Deferred.make<void>();
+    const disconnectDeferred = yield* Deferred.make<void>();
 
     client.onClose(() => {
-      resolveDisconnect();
+      Effect.runFork(Deferred.succeed(disconnectDeferred, undefined));
     });
 
     const cols = process.stdout.columns ?? 80;
@@ -73,7 +106,7 @@ export function attachPtyRelay(client: IpcClientShape, options: PtyRelayOptions)
           break;
         }
         case 'session:pty-exited':
-          resolveExit(msg.exitCode);
+          Effect.runFork(Deferred.succeed(exitDeferred, msg.exitCode));
           break;
       }
     });
@@ -128,41 +161,13 @@ export function attachPtyRelay(client: IpcClientShape, options: PtyRelayOptions)
     // Forward stdin to daemon via a dedicated stdin socket.
     // The main IPC socket has a Bun bug where heavy server->client writes
     // (PTY output) prevent the data handler from firing for client->server data.
-    interface StdinSocket {
-      write(data: string | Uint8Array): number;
-      terminate(): void;
-    }
-    const stdinSocket = yield* Effect.tryPromise({
-      try: () =>
-        new Promise<StdinSocket>((resolve, reject) => {
-          const timeout = setTimeout(() => reject(new Error('Stdin socket timeout')), 5000);
-          Bun.connect({
-            unix: stdinSocketPath,
-            socket: {
-              open(s) {
-                clearTimeout(timeout);
-                resolve(s as unknown as StdinSocket);
-              },
-              data() {},
-              close() {},
-              error(_s, err) {
-                clearTimeout(timeout);
-                reject(err);
-              },
-            },
-          }).catch(reject);
-        }),
-      catch: (err) =>
-        new DaemonNotRunningError({
-          message: `Failed to connect stdin socket: ${err instanceof Error ? err.message : String(err)}`,
-        }),
-    });
+    const stdinSocket = yield* connectStdinSocket(stdinSocketPath);
 
     const triggerDetach = () => {
       Effect.runFork(
         client.send({ type: 'session:detach', sessionId }).pipe(Effect.catch(() => Effect.void))
       );
-      resolveDetach();
+      Effect.runFork(Deferred.succeed(detachDeferred, undefined));
     };
 
     const interceptor = createKeybindInterceptor({ onDetach: triggerDetach });
@@ -196,13 +201,11 @@ export function attachPtyRelay(client: IpcClientShape, options: PtyRelayOptions)
 
     // Wait for PTY exit, detach, or daemon disconnect
     const result = yield* Effect.raceAll([
-      Effect.promise(() => exitPromise).pipe(
+      Deferred.await(exitDeferred).pipe(
         Effect.map((exitCode): PtyRelayResult => ({ type: 'exit', exitCode }))
       ),
-      Effect.promise(() => detachPromise).pipe(
-        Effect.map((): PtyRelayResult => ({ type: 'detach' }))
-      ),
-      Effect.promise(() => disconnectPromise).pipe(
+      Deferred.await(detachDeferred).pipe(Effect.map((): PtyRelayResult => ({ type: 'detach' }))),
+      Deferred.await(disconnectDeferred).pipe(
         Effect.map((): PtyRelayResult => ({ type: 'disconnect' }))
       ),
     ]);

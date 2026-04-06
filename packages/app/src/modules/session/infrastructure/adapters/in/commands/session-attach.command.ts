@@ -1,6 +1,6 @@
 import { Database } from 'bun:sqlite';
 import { existsSync } from 'node:fs';
-import { Console, Effect } from 'effect';
+import { Console, Deferred, Duration, Effect, Exit } from 'effect';
 import { createKeybindInterceptor } from '#lib/cli-terminal/keybind-interceptor';
 import {
   initStatusBar,
@@ -31,6 +31,57 @@ interface SessionRow {
   git_branch: string | null;
   agent_session_id: string | null;
 }
+
+interface StdinSocket {
+  write(data: string | Uint8Array): number;
+  terminate(): void;
+}
+
+function connectStdinSocket(stdinSocketPath: string) {
+  return Effect.callback<StdinSocket, DaemonNotRunningError>((resume) => {
+    Bun.connect({
+      unix: stdinSocketPath,
+      socket: {
+        open(s) {
+          resume(Exit.succeed(s as unknown as StdinSocket));
+        },
+        data() {},
+        close() {},
+        error(_s, err) {
+          resume(
+            Exit.fail(
+              new DaemonNotRunningError({
+                message: `Failed to connect stdin socket: ${err.message}`,
+              })
+            )
+          );
+        },
+      },
+    }).catch((err) =>
+      resume(
+        Exit.fail(
+          new DaemonNotRunningError({
+            message: `Failed to connect stdin socket: ${err instanceof Error ? err.message : String(err)}`,
+          })
+        )
+      )
+    );
+  }).pipe(
+    Effect.timeout(Duration.seconds(5)),
+    Effect.mapError((err) =>
+      err._tag === 'TimeoutError'
+        ? new DaemonNotRunningError({ message: 'Stdin socket timeout' })
+        : err
+    )
+  );
+}
+
+const flushStdoutAndExit = Effect.callback<never, never>((resume) => {
+  process.stdout.write('', () => {
+    process.exit(0);
+    resume(Exit.succeed(undefined as never));
+  });
+});
 
 export function sessionAttachCommand(partialId: string) {
   return Effect.gen(function* () {
@@ -107,34 +158,12 @@ export function sessionAttachCommand(partialId: string) {
     // The daemon replays terminal history right after session:spawned, so
     // our pty-output handler must be ready to receive it immediately.
 
-    let resolveSpawn: () => void;
-    let rejectSpawn: (error: Error) => void;
-    const spawnPromise = new Promise<void>((resolve, reject) => {
-      resolveSpawn = resolve;
-      rejectSpawn = reject;
-    });
+    const spawnDeferred = yield* Deferred.make<void>();
+    const exitDeferred = yield* Deferred.make<number>();
+    const detachDeferred = yield* Deferred.make<void>();
+    const disconnectDeferred = yield* Deferred.make<void>();
+    const replayDrainDeferred = yield* Deferred.make<void>();
 
-    let resolveExit: (exitCode: number) => void;
-    const exitPromise = new Promise<number>((resolve) => {
-      resolveExit = resolve;
-    });
-
-    let resolveDetach: () => void;
-    const detachPromise = new Promise<void>((resolve) => {
-      resolveDetach = resolve;
-    });
-
-    let resolveDisconnect: () => void;
-    const disconnectPromise = new Promise<void>((resolve) => {
-      resolveDisconnect = resolve;
-    });
-
-    // replayDrainPromise resolves when the daemon has sent all replay chunks
-    // AND all those writes have been fully parsed by xterm (write counter hits 0).
-    let resolveReplayDrain: () => void;
-    const replayDrainPromise = new Promise<void>((resolve) => {
-      resolveReplayDrain = resolve;
-    });
     let replayMsgReceived = false;
     let pendingReplayWrites = 0;
     let spawnForcedResize = false;
@@ -146,11 +175,13 @@ export function sessionAttachCommand(partialId: string) {
     let currentRowOffset = 0;
 
     function checkReplayDrain() {
-      if (replayMsgReceived && pendingReplayWrites === 0) resolveReplayDrain();
+      if (replayMsgReceived && pendingReplayWrites === 0) {
+        Effect.runFork(Deferred.succeed(replayDrainDeferred, undefined));
+      }
     }
 
     client.onClose(() => {
-      resolveDisconnect();
+      Effect.runFork(Deferred.succeed(disconnectDeferred, undefined));
     });
 
     client.onMessage((msg) => {
@@ -162,13 +193,13 @@ export function sessionAttachCommand(partialId: string) {
             vterm.resize(msg.ptyCols, msg.ptyRows);
           }
           spawnForcedResize = msg.forcedResize ?? false;
-          resolveSpawn();
+          Effect.runFork(Deferred.succeed(spawnDeferred, undefined));
           break;
         case 'session:spawn-failed':
-          rejectSpawn(new Error(msg.error));
+          Effect.runFork(Deferred.die(spawnDeferred, new Error(msg.error)));
           break;
         case 'session:error-response':
-          rejectSpawn(new Error(msg.error));
+          Effect.runFork(Deferred.die(spawnDeferred, new Error(msg.error)));
           break;
         case 'session:replay-complete':
           replayMsgReceived = true;
@@ -203,7 +234,7 @@ export function sessionAttachCommand(partialId: string) {
           break;
         }
         case 'session:pty-exited':
-          resolveExit(msg.exitCode);
+          Effect.runFork(Deferred.succeed(exitDeferred, msg.exitCode));
           break;
         case 'session:pty-resized':
           vterm.resize(msg.ptyCols, msg.ptyRows);
@@ -225,12 +256,14 @@ export function sessionAttachCommand(partialId: string) {
       rows: rows_,
     });
 
-    yield* Effect.promise(() => spawnPromise);
+    yield* Deferred.await(spawnDeferred);
     // Wait until all replay chunks are fully parsed by xterm.
     // 500ms fallback for daemons that predate session:replay-complete.
-    yield* Effect.promise(() =>
-      Promise.race([replayDrainPromise, new Promise<void>((r) => setTimeout(r, 500))])
-    );
+    yield* Effect.raceAll([
+      Deferred.await(replayDrainDeferred),
+      Effect.sleep(Duration.millis(500)),
+    ]);
+
     // When the daemon forced a PTY resize (CLI-only session), Claude Code redraws
     // its TUI in response to SIGWINCH. Those bytes arrive as live pty-output and
     // must be fully parsed before we snapshot the screen with fullRender.
@@ -293,35 +326,7 @@ export function sessionAttachCommand(partialId: string) {
     initStatusBar(renderer, session.id, startedAt);
 
     // Forward stdin via dedicated stdin socket (Bun write-blocking bug workaround)
-    interface StdinSocket {
-      write(data: string | Uint8Array): number;
-      terminate(): void;
-    }
-    const stdinSocket = yield* Effect.tryPromise({
-      try: () =>
-        new Promise<StdinSocket>((resolve, reject) => {
-          const timeout = setTimeout(() => reject(new Error('Stdin socket timeout')), 5000);
-          Bun.connect({
-            unix: stdinSocketPath,
-            socket: {
-              open(s) {
-                clearTimeout(timeout);
-                resolve(s as unknown as StdinSocket);
-              },
-              data() {},
-              close() {},
-              error(_s, err) {
-                clearTimeout(timeout);
-                reject(err);
-              },
-            },
-          }).catch(reject);
-        }),
-      catch: (err) =>
-        new DaemonNotRunningError({
-          message: `Failed to connect stdin socket: ${err instanceof Error ? err.message : String(err)}`,
-        }),
-    });
+    const stdinSocket = yield* connectStdinSocket(stdinSocketPath);
 
     const triggerDetach = () => {
       Effect.runFork(
@@ -329,7 +334,7 @@ export function sessionAttachCommand(partialId: string) {
           .send({ type: 'session:detach', sessionId: session.id })
           .pipe(Effect.catch(() => Effect.void))
       );
-      resolveDetach();
+      Effect.runFork(Deferred.succeed(detachDeferred, undefined));
     };
 
     const interceptor = createKeybindInterceptor({ onDetach: triggerDetach });
@@ -370,13 +375,11 @@ export function sessionAttachCommand(partialId: string) {
       | { type: 'detach' }
       | { type: 'disconnect' };
     const result = yield* Effect.raceAll([
-      Effect.promise(() => exitPromise).pipe(
+      Deferred.await(exitDeferred).pipe(
         Effect.map((exitCode): AttachResult => ({ type: 'exit', exitCode }))
       ),
-      Effect.promise(() => detachPromise).pipe(
-        Effect.map((): AttachResult => ({ type: 'detach' }))
-      ),
-      Effect.promise(() => disconnectPromise).pipe(
+      Deferred.await(detachDeferred).pipe(Effect.map((): AttachResult => ({ type: 'detach' }))),
+      Deferred.await(disconnectDeferred).pipe(
         Effect.map((): AttachResult => ({ type: 'disconnect' }))
       ),
     ]);
@@ -424,13 +427,6 @@ export function sessionAttachCommand(partialId: string) {
   }).pipe(
     Effect.catchTag('DaemonNotRunningError', (e) => Console.error(e.message)),
     Effect.catchTag('IpcConnectionError', (e) => Console.error(`IPC error: ${e.message}`)),
-    Effect.ensuring(
-      Effect.promise(async () => {
-        await new Promise<void>((resolve) => {
-          process.stdout.write('', () => resolve());
-        });
-        process.exit(0);
-      })
-    )
+    Effect.ensuring(flushStdoutAndExit)
   );
 }
