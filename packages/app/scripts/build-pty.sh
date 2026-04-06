@@ -1,13 +1,13 @@
 #!/bin/sh
 set -e
 
-SRC="src/modules/session/adapters/pty/native/vigie_pty.c"
+SRC="src/modules/terminal/infrastructure/adapters/out/pty/native/vigie_pty.c"
 OUT_DIR="dist"
 mkdir -p "$OUT_DIR"
 
 OS=$(uname -s)
 
-NATIVE_DIR="src/modules/session/adapters/pty/native"
+NATIVE_DIR="src/modules/terminal/infrastructure/adapters/out/pty/native"
 
 if [ "$OS" = "Darwin" ]; then
   cc -shared -o "$OUT_DIR/libvigie_pty.dylib" "$SRC" -lutil -lpthread

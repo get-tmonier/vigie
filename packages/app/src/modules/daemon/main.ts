@@ -1,19 +1,33 @@
 import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import * as BunHttpServer from '@effect/platform-bun/BunHttpServer';
-import { Effect } from 'effect';
+import { Effect, Layer } from 'effect';
 import * as HttpMiddleware from 'effect/unstable/http/HttpMiddleware';
 import * as HttpRouter from 'effect/unstable/http/HttpRouter';
-import { openDatabase } from '#infra/database';
-import { createSqliteSessionRepository } from '#modules/session/adapters/secondary/sqlite-session-repository';
-import { SessionId } from '#modules/session/domain/session-id';
-import { createSessionService } from '#modules/session/session.service';
-import { createBunPtySpawner } from '#modules/terminal/adapters/secondary/bun-pty-spawner';
-import { createSqliteTerminalRepository } from '#modules/terminal/adapters/secondary/sqlite-terminal-repository';
-import { createTerminalSubscribers } from '#modules/terminal/terminal-subscribers';
-import { createEventPublisher } from '../daemon/adapters/event-publisher.adapter';
-import { createUnixSocketServer } from './adapters/unix-socket-server.adapter';
-import type { SessionToDaemon } from './ipc/schemas';
+import { makeDatabaseLayer, VigiDatabase } from '#infra/database';
+import { IpcServer } from '#modules/daemon/application/ports/out/ipc-server.port';
+import { createIpcRouter } from '#modules/daemon/infrastructure/adapters/in/ipc-router';
+import { UnixSocketServerLayer } from '#modules/daemon/infrastructure/adapters/out/unix-socket-server.adapter';
+import { createRoutesLayer } from '#modules/daemon/infrastructure/server';
+import { ResumabilityChecker } from '#modules/session/application/ports/out/resumability-checker.port';
+import { SessionRepository } from '#modules/session/application/ports/out/session-repository.port';
+import {
+  SessionServiceLayer,
+  SessionServiceTag,
+} from '#modules/session/application/session.service';
+import { AgentRegistryLayer } from '#modules/session/infrastructure/adapters/out/agents/agent-registry';
+import { FsResumabilityCheckerLayer } from '#modules/session/infrastructure/adapters/out/fs-resumability-checker';
+import { SqliteSessionRepositoryLayer } from '#modules/session/infrastructure/adapters/out/sqlite-session-repository';
+import {
+  TerminalSubscribers,
+  TerminalSubscribersLayer,
+} from '#modules/terminal/application/terminal-subscribers';
+import { BunPtySpawnerLayer } from '#modules/terminal/infrastructure/adapters/out/bun-pty-spawner';
+import {
+  AppEventPublisherTag,
+  EventPublisherLayer,
+} from '#modules/terminal/infrastructure/adapters/out/event-publisher.adapter';
+import { SqliteTerminalRepositoryLayer } from '#modules/terminal/infrastructure/adapters/out/sqlite-terminal-repository';
 import {
   DB_FILE,
   DEFAULT_PORT,
@@ -23,8 +37,6 @@ import {
   STDIN_SOCKET_PATH,
   VIGIE_HOME,
 } from './paths';
-import type { IpcConnection } from './ports/ipc-server.port';
-import { createRoutesLayer } from './server/server';
 
 function cleanup() {
   try {
@@ -46,45 +58,25 @@ export const runDaemon = Effect.gen(function* () {
   writeFileSync(PID_FILE, `${process.pid}\n${Date.now()}`);
   console.log(`[daemon] Started (pid ${process.pid})`);
 
-  // ── 1. Bootstrap: DB, repos, adapters ──────────────────────────────
-  const db = openDatabase(DB_FILE);
-  const sessionRepo = createSqliteSessionRepository(db);
-  const terminalRepo = createSqliteTerminalRepository(db);
-  const eventPublisher = createEventPublisher();
-  const ptySpawner = createBunPtySpawner();
-  const ipcServer = createUnixSocketServer();
-  const terminalSubs = createTerminalSubscribers();
+  // ── 1. Get services from context ───────────────────────────────────
+  const db = yield* VigiDatabase;
+  const sessionService = yield* SessionServiceTag;
+  const ipcServer = yield* IpcServer;
+  const eventPublisher = yield* AppEventPublisherTag;
+  const terminalSubs = yield* TerminalSubscribers;
+  const sessionRepo = yield* SessionRepository;
+  const resumabilityChecker = yield* ResumabilityChecker;
 
-  // ── 2. Application service ─────────────────────────────────────────
-  const sessionService = createSessionService({
-    sessionRepo,
-    terminalRepo,
-    ptySpawner,
-    eventPublisher,
-  });
-
-  // Wire IPC + terminal subscriber callbacks
-  sessionService.setIpcSendCallback((connId, msg) => {
-    Effect.runSync(ipcServer.sendTo(connId, msg));
-  });
-  sessionService.setTerminalSubscribersCallback((sessionId, data) => {
-    terminalSubs.publish(sessionId, data);
-  });
-
-  // ── 3. Startup tasks ──────────────────────────────────────────────
+  // ── 2. Startup tasks ──────────────────────────────────────────────
   sessionRepo.markOrphanedEnded();
   sessionRepo.pruneOld();
 
   sessionRepo.findAll().forEach((session) => {
     if (session.agentType === 'claude' && session.claudeSessionId) {
-      const resumable = sessionService.checkClaudeSessionResumable(
-        session.claudeSessionId,
-        session.cwd
-      );
+      const resumable = resumabilityChecker.isResumable(session.claudeSessionId, session.cwd);
       if (resumable !== session.resumable) {
         session.setResumable(resumable);
         sessionRepo.save(session);
-        // Don't publish events during startup
         session.pullEvents();
       }
     }
@@ -114,7 +106,7 @@ export const runDaemon = Effect.gen(function* () {
     })
   );
 
-  // ── 4. HTTP + WebSocket server ─────────────────────────────────────
+  // ── 3. HTTP + WebSocket server ─────────────────────────────────────
   const clientDistCandidates = [
     join(dirname(process.execPath), 'client'),
     resolve(import.meta.dir, '..', '..', '..', 'dist', 'client'),
@@ -157,19 +149,18 @@ export const runDaemon = Effect.gen(function* () {
   writeFileSync(PORT_FILE, String(port));
   console.log(`[daemon] HTTP + WebSocket server listening on http://localhost:${port}`);
 
-  // ── 5. IPC Server ─────────────────────────────────────────────────
+  // ── 4. IPC Server ─────────────────────────────────────────────────
   if (existsSync(SOCKET_PATH)) unlinkSync(SOCKET_PATH);
   if (existsSync(STDIN_SOCKET_PATH)) unlinkSync(STDIN_SOCKET_PATH);
 
-  yield* ipcServer.start(
-    SOCKET_PATH,
-    (conn, msg) => routeIpcMessage(conn, msg, sessionService, ipcServer),
-    (connId) => Effect.sync(() => sessionService.handleDisconnect(connId))
+  const router = createIpcRouter(sessionService);
+  yield* ipcServer.start(SOCKET_PATH, router, (connId) =>
+    Effect.sync(() => sessionService.handleDisconnect(connId))
   );
 
   console.log(`[daemon] IPC server listening on ${SOCKET_PATH}`);
 
-  // ── 6. Stdin socket ───────────────────────────────────────────────
+  // ── 5. Stdin socket ───────────────────────────────────────────────
   Bun.listen({
     unix: STDIN_SOCKET_PATH,
     socket: {
@@ -201,207 +192,23 @@ export const runDaemon = Effect.gen(function* () {
   yield* Effect.never;
 }).pipe(Effect.scoped);
 
-// ── IPC message router ─────────────────────────────────────────────
+// ── Composition root ──────────────────────────────────────────────────
 
-function routeIpcMessage(
-  conn: IpcConnection,
-  msg: SessionToDaemon,
-  svc: ReturnType<typeof createSessionService>,
-  _ipcServer: { sendTo: (connId: string, data: string) => Effect.Effect<void> }
-): Effect.Effect<void> {
-  return Effect.gen(function* () {
-    switch (msg.type) {
-      case 'session:register': {
-        svc.register({
-          sessionId: msg.sessionId,
-          agentType: msg.agentType,
-          cwd: msg.cwd,
-          mode: msg.mode as 'prompt' | 'interactive' | undefined,
-          gitBranch: msg.gitBranch,
-          gitRemoteUrl: msg.gitRemoteUrl,
-          repoName: msg.repoName,
-          connId: conn.id,
-        });
-        conn.send(JSON.stringify({ type: 'session:registered', sessionId: msg.sessionId }));
-        break;
-      }
-      case 'session:spawn-interactive': {
-        svc.connSessions.set(conn.id, msg.sessionId);
-        const spawnResult = yield* Effect.result(
-          Effect.tryPromise(() =>
-            svc.spawnInteractive({
-              sessionId: msg.sessionId,
-              agentType: msg.agentType,
-              cwd: msg.cwd,
-              cols: msg.cols,
-              rows: msg.rows - 1,
-              connId: conn.id,
-              claudeSessionId: msg.sessionId,
-              gitBranch: msg.gitBranch,
-              repoName: msg.repoName,
-            })
-          )
-        );
+const DatabaseLayer = makeDatabaseLayer(DB_FILE);
 
-        if (spawnResult._tag === 'Failure') {
-          const err = spawnResult.failure;
-          conn.send(
-            JSON.stringify({
-              type: 'session:spawn-failed',
-              sessionId: msg.sessionId,
-              error: err instanceof Error ? err.message : String(err),
-            })
-          );
-          break;
-        }
+const InfraLayer = Layer.mergeAll(
+  DatabaseLayer,
+  SqliteSessionRepositoryLayer.pipe(Layer.provide(DatabaseLayer)),
+  SqliteTerminalRepositoryLayer.pipe(Layer.provide(DatabaseLayer)),
+  EventPublisherLayer,
+  BunPtySpawnerLayer,
+  FsResumabilityCheckerLayer,
+  AgentRegistryLayer,
+  TerminalSubscribersLayer,
+  UnixSocketServerLayer
+);
 
-        const { sessionId, entry } = spawnResult.success;
-        entry.cliChannels.set(conn.id, { cols: msg.cols, rows: msg.rows });
-        conn.send(
-          JSON.stringify({
-            type: 'session:spawned',
-            sessionId,
-            pid: entry.handle.pid,
-          })
-        );
-        break;
-      }
-      case 'session:stdin': {
-        svc.writeInput(msg.sessionId, msg.data, 'cli');
-        break;
-      }
-      case 'session:cli-resize': {
-        const entry = svc.ptyHandles.get(msg.sessionId);
-        if (entry?.cliChannels.has(conn.id)) {
-          entry.cliChannels.set(conn.id, { cols: msg.cols, rows: msg.rows });
-          svc.applyResizePriority(msg.sessionId);
-          console.log(
-            `[daemon] cli-resize sessionId=${msg.sessionId} cols=${msg.cols} rows=${msg.rows}`
-          );
-        }
-        break;
-      }
-      case 'session:detach': {
-        svc.detach(SessionId(msg.sessionId), conn.id);
-        break;
-      }
-      case 'session:attach': {
-        const result = svc.attach(SessionId(msg.sessionId), conn.id, {
-          cols: msg.cols,
-          rows: msg.rows,
-        });
-        if (result) {
-          const entry = svc.ptyHandles.get(msg.sessionId);
-          conn.send(
-            JSON.stringify({
-              type: 'session:spawned',
-              sessionId: msg.sessionId,
-              pid: entry?.handle.pid,
-              ptyCols: msg.cols,
-              ptyRows: msg.rows - 1,
-              forcedResize: true,
-            })
-          );
-          for (const chunk of result.chunks) {
-            conn.send(
-              JSON.stringify({
-                type: 'session:pty-output',
-                sessionId: msg.sessionId,
-                data: chunk.data,
-              })
-            );
-          }
-          conn.send(
-            JSON.stringify({
-              type: 'session:replay-complete',
-              sessionId: msg.sessionId,
-            })
-          );
-          console.log(
-            `[daemon] CLI attached to session ${msg.sessionId} (replayed ${result.chunks.length} chunks)`
-          );
-        } else {
-          conn.send(
-            JSON.stringify({
-              type: 'session:spawn-failed',
-              sessionId: msg.sessionId,
-              error: 'Session not found or PTY not running',
-            })
-          );
-        }
-        break;
-      }
-      case 'session:output': {
-        // Forwarded from CLI runner — publish to event bus
-        svc.ptyHandles; // no-op, this event type is for prompt mode
-        break;
-      }
-      case 'session:done': {
-        svc.markEnded(SessionId(msg.sessionId), msg.exitCode);
-        console.log(`[daemon] Session done: ${msg.sessionId} (exit ${msg.exitCode})`);
-        break;
-      }
-      case 'session:error': {
-        svc.markError(SessionId(msg.sessionId), msg.error);
-        console.log(`[daemon] Session error: ${msg.sessionId}: ${msg.error}`);
-        break;
-      }
-      case 'session:terminal-output': {
-        // Terminal output from CLI prompt mode
-        svc.ptyHandles; // stored + broadcast handled elsewhere for prompt sessions
-        break;
-      }
-      case 'session:resume': {
-        svc.connSessions.set(conn.id, msg.sessionId);
-        const resumeResult = yield* Effect.result(
-          Effect.tryPromise(() =>
-            svc.resume(SessionId(msg.sessionId), {
-              cols: msg.cols,
-              rows: msg.rows,
-              connId: conn.id,
-              gitBranch: msg.gitBranch,
-              repoName: msg.repoName,
-            })
-          )
-        );
-
-        if (resumeResult._tag === 'Failure') {
-          const err = resumeResult.failure;
-          conn.send(
-            JSON.stringify({
-              type: 'session:spawn-failed',
-              sessionId: msg.sessionId,
-              error: err instanceof Error ? err.message : String(err),
-            })
-          );
-          break;
-        }
-
-        const { sessionId: resumedId, entry: resumedEntry } = resumeResult.success;
-        resumedEntry.cliChannels.set(conn.id, { cols: msg.cols, rows: msg.rows });
-        conn.send(
-          JSON.stringify({
-            type: 'session:spawned',
-            sessionId: resumedId,
-            pid: resumedEntry.handle.pid,
-          })
-        );
-        break;
-      }
-      case 'session:claude-id': {
-        svc.setClaudeSessionId(SessionId(msg.sessionId), msg.claudeSessionId);
-        console.log(
-          `[daemon] Claude session ID detected for ${msg.sessionId}: ${msg.claudeSessionId}`
-        );
-        break;
-      }
-      case 'session:deregister': {
-        svc.deregister(SessionId(msg.sessionId));
-        break;
-      }
-    }
-  });
-}
+export const AppLayer = SessionServiceLayer.pipe(Layer.provideMerge(InfraLayer));
 
 if (import.meta.main) {
   process.on('SIGTERM', () => {
@@ -427,6 +234,7 @@ if (import.meta.main) {
 
   Effect.runFork(
     runDaemon.pipe(
+      Effect.provide(AppLayer),
       Effect.catch((err) =>
         Effect.sync(() => {
           console.error('[daemon] Fatal error:', err);

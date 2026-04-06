@@ -8,10 +8,14 @@ export class IpcConnectionError extends Data.TaggedError('IpcConnectionError')<{
   readonly message: string;
 }> {}
 
-export class SessionNotFoundError extends Error {
-  readonly _tag = 'SessionNotFoundError';
+export class SessionNotFoundError extends Data.TaggedError('SessionNotFoundError')<{
+  readonly sessionId: string;
+}> {
   constructor(sessionId: string) {
-    super(`Session not found: ${sessionId}`);
+    super({ sessionId });
+  }
+  override get message(): string {
+    return `Session not found: ${this.sessionId}`;
   }
 }
 
@@ -29,9 +33,14 @@ export class CannotDeleteActiveSessionError extends Error {
   }
 }
 
-export class CannotResumeSessionError extends Error {
-  readonly _tag = 'CannotResumeSessionError';
+export class CannotResumeSessionError extends Data.TaggedError('CannotResumeSessionError')<{
+  readonly sessionId: string;
+  readonly reason: string;
+}> {
   constructor(sessionId: string, reason: string) {
-    super(`Cannot resume session ${sessionId}: ${reason}`);
+    super({ sessionId, reason });
+  }
+  override get message(): string {
+    return `Cannot resume session ${this.sessionId}: ${this.reason}`;
   }
 }

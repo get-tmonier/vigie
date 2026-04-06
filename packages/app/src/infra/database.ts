@@ -1,4 +1,5 @@
 import { Database } from 'bun:sqlite';
+import { Layer, ServiceMap } from 'effect';
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS sessions (
@@ -55,3 +56,8 @@ export function openDatabase(path: string): Database {
   } catch {}
   return db;
 }
+
+export class VigiDatabase extends ServiceMap.Service<VigiDatabase, Database>()('@vigie/Database') {}
+
+export const makeDatabaseLayer = (dbFile: string) =>
+  Layer.sync(VigiDatabase)(() => openDatabase(dbFile));

@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import { InteractiveTerminal } from '#modules/terminal/adapters/primary/ui/InteractiveTerminal.island';
+import { InteractiveTerminal } from '#modules/terminal/infrastructure/adapters/in/ui/InteractiveTerminal.island';
 import { EventsSocket } from '#shared/events-socket.island';
 import '#shared/styles/global.css';
 

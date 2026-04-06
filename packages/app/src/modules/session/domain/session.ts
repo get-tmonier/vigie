@@ -5,19 +5,7 @@ import { SessionId as makeSessionId } from './session-id';
 import type { SessionStatus } from './session-status';
 import { canTransition } from './session-status';
 
-export type AgentType = 'claude' | 'aider' | 'codex' | 'generic' | (string & {});
-
-/** @deprecated Use Session entity directly. Kept for backward compatibility during migration. */
-export interface AgentSession {
-  readonly id: string;
-  readonly agentType: AgentType;
-  readonly cwd: string;
-  readonly gitBranch?: string;
-  readonly gitRemoteUrl?: string;
-  readonly repoName?: string;
-  readonly startedAt: number;
-  readonly status: SessionStatus;
-}
+type AgentType = 'claude' | 'aider' | 'codex' | 'generic' | (string & {});
 
 interface CreateSessionProps {
   readonly id?: string;

@@ -10,11 +10,11 @@ import {
   daemonStopCommand,
 } from '#modules/daemon/commands/daemon.command';
 import { openCommand } from '#modules/daemon/commands/open.command';
-import { claudeCommand } from '#modules/session/commands/claude.command';
-import { claudeInteractiveCommand } from '#modules/session/commands/claude-interactive.command';
-import { sessionAttachCommand } from '#modules/session/commands/session-attach.command';
-import { sessionListCommand } from '#modules/session/commands/session-list.command';
-import { sessionResumeCommand } from '#modules/session/commands/session-resume.command';
+import { claudeCommand } from '#modules/session/infrastructure/adapters/in/commands/claude.command';
+import { claudeInteractiveCommand } from '#modules/session/infrastructure/adapters/in/commands/claude-interactive.command';
+import { sessionAttachCommand } from '#modules/session/infrastructure/adapters/in/commands/session-attach.command';
+import { sessionListCommand } from '#modules/session/infrastructure/adapters/in/commands/session-list.command';
+import { sessionResumeCommand } from '#modules/session/infrastructure/adapters/in/commands/session-resume.command';
 
 // ── Daemon subcommands ��─
 

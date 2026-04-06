@@ -1,6 +1,6 @@
 import { Console, Effect } from 'effect';
-import { createBunProcessManager } from '../adapters/bun-process-manager.adapter';
-import { runDaemon } from '../main';
+import { createBunProcessManager } from '#modules/daemon/infrastructure/adapters/out/bun-process-manager.adapter';
+import { AppLayer, runDaemon } from '../main';
 import { LOG_FILE } from '../paths';
 
 const manager = createBunProcessManager();
@@ -26,7 +26,7 @@ export function daemonStartCommand(foreground: boolean): Effect.Effect<void> {
         return;
       }
       yield* Console.log('Starting daemon in foreground...');
-      yield* runDaemon;
+      yield* runDaemon.pipe(Effect.provide(AppLayer));
     }).pipe(Effect.catchTag('DaemonNotRunningError', () => Effect.void));
   }
 
