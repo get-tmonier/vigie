@@ -1,4 +1,4 @@
-import type { AgentChunk } from '#modules/session/ports/agent-runner.port';
+import type { AgentChunk } from '#modules/agent/ports/agent-runner.port';
 
 const DIM = '\x1b[2m';
 const ITALIC = '\x1b[3m';

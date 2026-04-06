@@ -2,10 +2,10 @@ import { Console, Effect, Stream } from 'effect';
 import { printChunk } from '#lib/cli-terminal/chunk-printer';
 import { printHeader } from '#lib/cli-terminal/header';
 import { printSessionSummary } from '#lib/cli-terminal/status-bar';
+import { createClaudeRunner } from '#modules/agent/adapters/claude-runner.adapter';
 import { createBunProcessManager } from '#modules/daemon/adapters/bun-process-manager.adapter';
 import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
 import { SOCKET_PATH } from '#modules/daemon/paths';
-import { createClaudeRunner } from '../adapters/agents/claude-runner.adapter';
 import { createUnixSocketClient } from '../adapters/unix-socket-client.adapter';
 import { getGitContext } from '../domain/git-context';
 

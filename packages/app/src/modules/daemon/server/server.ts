@@ -4,13 +4,12 @@ import { Effect } from 'effect';
 import * as Layer from 'effect/Layer';
 import * as HttpRouter from 'effect/unstable/http/HttpRouter';
 import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse';
+import type { AppEventPublisher } from '#modules/daemon/adapters/event-publisher.adapter';
 import { createFsRoutes } from '#modules/filesystem/adapters/primary/fs.routes';
 import { createSessionRoutes } from '#modules/session/adapters/primary/session.routes';
+import type { SessionService } from '#modules/session/session.service';
 import { createTerminalRoutes } from '#modules/terminal/adapters/primary/terminal.routes';
-import type { EventBus } from '#modules/terminal/event-bus';
-import type { PtyEntry } from '#modules/terminal/terminal.service';
 import type { TerminalSubscribers } from '#modules/terminal/terminal-subscribers';
-import type { createSessionStore } from '../persistence/session-store';
 
 const MIME_TYPES: Record<string, string> = {
   '.html': 'text/html',
@@ -26,22 +25,9 @@ const MIME_TYPES: Record<string, string> = {
 };
 
 type ServerDeps = {
-  store: ReturnType<typeof createSessionStore>;
-  ptyHandles: Map<string, PtyEntry>;
-  eventBus: EventBus;
+  sessionService: SessionService;
+  eventPublisher: AppEventPublisher;
   terminalSubs: TerminalSubscribers;
-  spawnSession: (opts: {
-    agentType: string;
-    cwd: string;
-    cols: number;
-    rows: number;
-  }) => Promise<{ sessionId: string }>;
-  resumeSession: (
-    sessionId: string,
-    opts: { cols: number; rows: number }
-  ) => Promise<{ sessionId: string }>;
-  applyResizePriority: (sessionId: string) => { cols: number; rows: number } | null;
-  inputLineBufferWrite: (sessionId: string, base64Data: string, source: 'cli' | 'browser') => void;
   clientDistPath?: string;
 };
 
