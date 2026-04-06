@@ -8,15 +8,11 @@ import {
   DaemonNotRunningError,
   DaemonStartError,
 } from '#modules/daemon/domain/errors';
-import { LOG_FILE, PID_FILE, SOCKET_PATH, VERSION, VIGIE_HOME } from '#modules/daemon/paths';
+import type { DaemonConfigShape } from '#modules/daemon/infrastructure/daemon-config';
 
-function ensureHome() {
-  mkdirSync(VIGIE_HOME, { recursive: true, mode: 0o700 });
-}
-
-function readPidFile(): { pid: number; startedAt: number } | null {
+function readPidFile(pidFile: string): { pid: number; startedAt: number } | null {
   try {
-    const lines = readFileSync(PID_FILE, 'utf-8').trim().split('\n');
+    const lines = readFileSync(pidFile, 'utf-8').trim().split('\n');
     const pid = Number.parseInt(lines[0], 10);
     const startedAt = Number.parseInt(lines[1] ?? '0', 10);
     if (Number.isNaN(pid)) return null;
@@ -35,32 +31,32 @@ function isProcessAlive(pid: number): boolean {
   }
 }
 
-function cleanupStaleFiles() {
+function cleanupStaleFiles(pidFile: string, socketPath: string) {
   try {
-    unlinkSync(PID_FILE);
+    unlinkSync(pidFile);
   } catch {}
   try {
-    unlinkSync(SOCKET_PATH);
+    unlinkSync(socketPath);
   } catch {}
 }
 
-export function createBunProcessManager(): ProcessManagerShape {
+export function createBunProcessManager(config: DaemonConfigShape): ProcessManagerShape {
   return {
     start: () =>
       Effect.gen(function* () {
-        ensureHome();
+        mkdirSync(config.vigieHome, { recursive: true, mode: 0o700 });
 
-        const existing = readPidFile();
+        const existing = readPidFile(config.pidFile);
         if (existing !== null && isProcessAlive(existing.pid)) {
           return yield* new DaemonAlreadyRunningError({ pid: existing.pid });
         }
 
         if (existing !== null) {
-          cleanupStaleFiles();
+          cleanupStaleFiles(config.pidFile, config.socketPath);
         }
 
         const entryPoint = new URL('../main.js', import.meta.url).pathname;
-        const logFd = openSync(LOG_FILE, 'a');
+        const logFd = openSync(config.logFile, 'a');
 
         const proc = Bun.spawn(['bun', 'run', entryPoint], {
           env: { ...process.env, VIGIE_INTERNAL_DAEMON: '1' },
@@ -76,14 +72,14 @@ export function createBunProcessManager(): ProcessManagerShape {
           return yield* new DaemonStartError({ message: 'Failed to spawn daemon process' });
         }
 
-        writeFileSync(PID_FILE, `${proc.pid}\n${Date.now()}`);
+        writeFileSync(config.pidFile, `${proc.pid}\n${Date.now()}`);
 
         proc.unref();
 
         yield* Effect.sleep('500 millis');
 
         if (!isProcessAlive(proc.pid)) {
-          cleanupStaleFiles();
+          cleanupStaleFiles(config.pidFile, config.socketPath);
           return yield* new DaemonStartError({
             message: 'Daemon process exited immediately after spawn',
           });
@@ -91,10 +87,10 @@ export function createBunProcessManager(): ProcessManagerShape {
 
         const info: DaemonInfo = {
           pid: proc.pid,
-          socketPath: SOCKET_PATH,
+          socketPath: config.socketPath,
           startedAt: Date.now(),
           hostname: hostname(),
-          version: VERSION,
+          version: config.version,
         };
 
         return info;
@@ -102,7 +98,7 @@ export function createBunProcessManager(): ProcessManagerShape {
 
     stop: () =>
       Effect.gen(function* () {
-        const entry = readPidFile();
+        const entry = readPidFile(config.pidFile);
         if (entry === null || !isProcessAlive(entry.pid)) {
           return yield* new DaemonNotRunningError({ message: 'No daemon is running' });
         }
@@ -121,22 +117,22 @@ export function createBunProcessManager(): ProcessManagerShape {
           yield* Effect.sleep('500 millis');
         }
 
-        cleanupStaleFiles();
+        cleanupStaleFiles(config.pidFile, config.socketPath);
       }),
 
     status: () =>
       Effect.gen(function* () {
-        const entry = readPidFile();
+        const entry = readPidFile(config.pidFile);
         if (entry === null || !isProcessAlive(entry.pid)) {
           return yield* new DaemonNotRunningError({ message: 'No daemon is running' });
         }
 
         const info: DaemonInfo = {
           pid: entry.pid,
-          socketPath: SOCKET_PATH,
+          socketPath: config.socketPath,
           startedAt: entry.startedAt,
           hostname: hostname(),
-          version: VERSION,
+          version: config.version,
         };
 
         return info;
@@ -144,7 +140,7 @@ export function createBunProcessManager(): ProcessManagerShape {
 
     isRunning: () =>
       Effect.sync(() => {
-        const entry = readPidFile();
+        const entry = readPidFile(config.pidFile);
         return entry !== null && isProcessAlive(entry.pid);
       }),
   };

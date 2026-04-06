@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'bun:test';
-import { executeCommand } from '../modules/filesystem/executor';
+import { Effect } from 'effect';
+import { executeCommand } from '../modules/daemon/infrastructure/adapters/in/command-executor';
 import type {
   CommandDone,
   CommandError,
   CommandOutput,
   CommandRequest,
-} from '../modules/filesystem/schemas';
+} from '../modules/daemon/infrastructure/adapters/ws-schemas';
 
 type UpstreamMessage = CommandOutput | CommandDone | CommandError;
 
@@ -18,7 +19,7 @@ describe('executeCommand', () => {
       command: 'echo hello',
     };
 
-    await executeCommand(request, (msg) => messages.push(msg));
+    await Effect.runPromise(executeCommand(request, (msg) => messages.push(msg)));
 
     const outputs = messages.filter((m) => m.type === 'command:output');
     const done = messages.find((m) => m.type === 'command:done');
@@ -39,7 +40,7 @@ describe('executeCommand', () => {
       command: 'echo err >&2',
     };
 
-    await executeCommand(request, (msg) => messages.push(msg));
+    await Effect.runPromise(executeCommand(request, (msg) => messages.push(msg)));
 
     const stderrOutputs = messages.filter(
       (m) => m.type === 'command:output' && (m as CommandOutput).stream === 'stderr'
@@ -55,7 +56,7 @@ describe('executeCommand', () => {
       command: 'exit 42',
     };
 
-    await executeCommand(request, (msg) => messages.push(msg));
+    await Effect.runPromise(executeCommand(request, (msg) => messages.push(msg)));
 
     const done = messages.find((m) => m.type === 'command:done') as CommandDone;
     expect(done).toBeDefined();

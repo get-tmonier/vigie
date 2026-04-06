@@ -1,14 +1,15 @@
 import { Console, Effect } from 'effect';
 import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
 import { createBunProcessManager } from '#modules/daemon/infrastructure/adapters/out/bun-process-manager.adapter';
-import { SOCKET_PATH } from '#modules/daemon/paths';
+import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
 import { getGitContext } from '#modules/session/infrastructure/adapters/out/git-context';
 import { attachPtyRelay } from '../pty-relay';
 import { createUnixSocketClient } from '../unix-socket-client.adapter';
 
-export function claudeInteractiveCommand(): Effect.Effect<void> {
+export function claudeInteractiveCommand() {
   return Effect.gen(function* () {
-    const manager = createBunProcessManager();
+    const config = yield* DaemonConfig;
+    const manager = createBunProcessManager(config);
     const running = yield* manager.isRunning();
 
     if (!running) {
@@ -26,7 +27,7 @@ export function claudeInteractiveCommand(): Effect.Effect<void> {
 
     // Connect to daemon via IPC
     const client = createUnixSocketClient();
-    yield* client.connect(SOCKET_PATH);
+    yield* client.connect(config.socketPath);
 
     // CRITICAL: Register ALL message handlers BEFORE sending spawn request.
     // The daemon drains buffered PTY output synchronously when it registers

@@ -1,9 +1,7 @@
 import { Console, Effect } from 'effect';
 import { createBunProcessManager } from '#modules/daemon/infrastructure/adapters/out/bun-process-manager.adapter';
-import { AppLayer, runDaemon } from '../main';
-import { LOG_FILE } from '../paths';
-
-const manager = createBunProcessManager();
+import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
+import { AppLayer, runDaemon } from '#modules/daemon/main';
 
 const exit0 = Effect.ensuring(Effect.sync(() => process.exit(0)));
 
@@ -14,9 +12,11 @@ function formatUptime(startedAt: number): string {
   return `${Math.floor(s / 3600)}h ${Math.floor((s % 3600) / 60)}m`;
 }
 
-export function daemonStartCommand(foreground: boolean): Effect.Effect<void> {
+export function daemonStartCommand(foreground: boolean) {
   if (foreground) {
     return Effect.gen(function* () {
+      const config = yield* DaemonConfig;
+      const manager = createBunProcessManager(config);
       const running = yield* manager.isRunning();
       if (running) {
         const info = yield* manager.status();
@@ -31,11 +31,13 @@ export function daemonStartCommand(foreground: boolean): Effect.Effect<void> {
   }
 
   return Effect.gen(function* () {
+    const config = yield* DaemonConfig;
+    const manager = createBunProcessManager(config);
     yield* Console.log('Starting vigie daemon...');
     const info = yield* manager.start();
     yield* Console.log(`Daemon started (pid ${info.pid})`);
     yield* Console.log(`Socket: ${info.socketPath}`);
-    yield* Console.log(`Logs:   ${LOG_FILE}`);
+    yield* Console.log(`Logs:   ${config.logFile}`);
   }).pipe(
     Effect.catchTag('DaemonAlreadyRunningError', (e) =>
       Console.log(`Daemon is already running (pid ${e.pid})`)
@@ -47,8 +49,10 @@ export function daemonStartCommand(foreground: boolean): Effect.Effect<void> {
   );
 }
 
-export function daemonStopCommand(): Effect.Effect<void> {
+export function daemonStopCommand() {
   return Effect.gen(function* () {
+    const config = yield* DaemonConfig;
+    const manager = createBunProcessManager(config);
     yield* Console.log('Stopping vigie daemon...');
     yield* manager.stop();
     yield* Console.log('Daemon stopped.');
@@ -58,8 +62,10 @@ export function daemonStopCommand(): Effect.Effect<void> {
   );
 }
 
-export function daemonStatusCommand(): Effect.Effect<void> {
+export function daemonStatusCommand() {
   return Effect.gen(function* () {
+    const config = yield* DaemonConfig;
+    const manager = createBunProcessManager(config);
     const info = yield* manager.status();
     yield* Console.log(`Daemon status: running (pid ${info.pid})`);
     yield* Console.log(`Uptime:  ${formatUptime(info.startedAt)}`);
@@ -71,13 +77,14 @@ export function daemonStatusCommand(): Effect.Effect<void> {
   );
 }
 
-export function daemonLogsCommand(follow: boolean): Effect.Effect<void> {
+export function daemonLogsCommand(follow: boolean) {
   if (follow) {
     return Effect.gen(function* () {
-      yield* Console.log(`Tailing ${LOG_FILE}...`);
+      const { logFile } = yield* DaemonConfig;
+      yield* Console.log(`Tailing ${logFile}...`);
       yield* Effect.tryPromise({
         try: async () => {
-          const proc = Bun.spawn(['tail', '-f', LOG_FILE], {
+          const proc = Bun.spawn(['tail', '-f', logFile], {
             stdout: 'inherit',
             stderr: 'inherit',
           });
@@ -92,9 +99,10 @@ export function daemonLogsCommand(follow: boolean): Effect.Effect<void> {
   }
 
   return Effect.gen(function* () {
+    const { logFile } = yield* DaemonConfig;
     yield* Effect.tryPromise({
       try: async () => {
-        const file = Bun.file(LOG_FILE);
+        const file = Bun.file(logFile);
         if (!(await file.exists())) {
           console.log('No daemon logs found.');
           return;
@@ -112,8 +120,10 @@ export function daemonLogsCommand(follow: boolean): Effect.Effect<void> {
   );
 }
 
-export function daemonRestartCommand(): Effect.Effect<void> {
+export function daemonRestartCommand() {
   return Effect.gen(function* () {
+    const config = yield* DaemonConfig;
+    const manager = createBunProcessManager(config);
     if (yield* manager.isRunning()) {
       yield* Console.log('Stopping daemon...');
       yield* manager.stop();
@@ -122,7 +132,7 @@ export function daemonRestartCommand(): Effect.Effect<void> {
     const info = yield* manager.start();
     yield* Console.log(`Daemon started (pid ${info.pid})`);
     yield* Console.log(`Socket: ${info.socketPath}`);
-    yield* Console.log(`Logs:   ${LOG_FILE}`);
+    yield* Console.log(`Logs:   ${config.logFile}`);
   }).pipe(
     Effect.catchTag('DaemonNotRunningError', () => Effect.void),
     Effect.catchTag('DaemonAlreadyRunningError', (e) =>
@@ -133,17 +143,22 @@ export function daemonRestartCommand(): Effect.Effect<void> {
   );
 }
 
-export function daemonAttachCommand(): Effect.Effect<void> {
+export function daemonAttachCommand() {
   return Effect.gen(function* () {
+    const config = yield* DaemonConfig;
+    const manager = createBunProcessManager(config);
     const info = yield* manager.status();
     yield* Console.log(
       `Attached to daemon (pid ${info.pid}, uptime ${formatUptime(info.startedAt)})`
     );
-    yield* Console.log(`Tailing ${LOG_FILE}...`);
+    yield* Console.log(`Tailing ${config.logFile}...`);
     yield* Effect.gen(function* () {
       yield* Effect.tryPromise({
         try: async () => {
-          const p = Bun.spawn(['tail', '-f', LOG_FILE], { stdout: 'inherit', stderr: 'inherit' });
+          const p = Bun.spawn(['tail', '-f', config.logFile], {
+            stdout: 'inherit',
+            stderr: 'inherit',
+          });
           await p.exited;
         },
         catch: (e) => (e instanceof Error ? e : new Error(String(e))),

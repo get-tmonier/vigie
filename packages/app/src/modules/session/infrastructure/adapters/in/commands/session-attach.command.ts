@@ -11,7 +11,7 @@ import { createTuiRenderer } from '#lib/vterm/tui-renderer';
 import { createVTerm } from '#lib/vterm/vterm';
 import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
 import { createBunProcessManager } from '#modules/daemon/infrastructure/adapters/out/bun-process-manager.adapter';
-import { DB_FILE, SOCKET_PATH, STDIN_SOCKET_PATH } from '#modules/daemon/paths';
+import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
 import { createUnixSocketClient } from '../unix-socket-client.adapter';
 
 function formatDuration(ms: number): string {
@@ -32,14 +32,17 @@ interface SessionRow {
   agent_session_id: string | null;
 }
 
-export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
+export function sessionAttachCommand(partialId: string) {
   return Effect.gen(function* () {
-    if (!existsSync(DB_FILE)) {
+    const config = yield* DaemonConfig;
+    const { dbFile, socketPath, stdinSocketPath } = config;
+
+    if (!existsSync(dbFile)) {
       yield* Console.error('No sessions found. Start the daemon first.');
       return;
     }
 
-    const db = new Database(DB_FILE, { readonly: true });
+    const db = new Database(dbFile, { readonly: true });
     const rows = db
       .prepare('SELECT * FROM sessions WHERE id LIKE $prefix')
       .all({ $prefix: `${partialId}%` }) as SessionRow[];
@@ -81,7 +84,7 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
       return;
     }
 
-    const manager = createBunProcessManager();
+    const manager = createBunProcessManager(config);
     const running = yield* manager.isRunning();
 
     if (!running) {
@@ -98,7 +101,7 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
     const renderer = createTuiRenderer({ cols, rows: rows_, reservedBottom: 1 });
 
     const client = createUnixSocketClient();
-    yield* client.connect(SOCKET_PATH);
+    yield* client.connect(socketPath);
 
     // CRITICAL: Register ALL message handlers BEFORE sending attach request.
     // The daemon replays terminal history right after session:spawned, so
@@ -299,7 +302,7 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
         new Promise<StdinSocket>((resolve, reject) => {
           const timeout = setTimeout(() => reject(new Error('Stdin socket timeout')), 5000);
           Bun.connect({
-            unix: STDIN_SOCKET_PATH,
+            unix: stdinSocketPath,
             socket: {
               open(s) {
                 clearTimeout(timeout);

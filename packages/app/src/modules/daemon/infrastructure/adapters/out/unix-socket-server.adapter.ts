@@ -5,7 +5,7 @@ import {
   IpcServer,
   type IpcServerShape,
 } from '#modules/daemon/application/ports/out/ipc-server.port';
-import { SessionToDaemonSchema } from '#modules/daemon/ipc/schemas';
+import { SessionToDaemonSchema } from '#modules/daemon/infrastructure/adapters/ipc-schemas';
 
 interface ConnectionState {
   readonly id: string;

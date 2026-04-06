@@ -1,6 +1,6 @@
 import type { Effect } from 'effect';
 import { ServiceMap } from 'effect';
-import type { SessionToDaemon } from '#modules/daemon/ipc/schemas';
+import type { SessionToDaemon } from '#modules/daemon/infrastructure/adapters/ipc-schemas';
 
 export interface IpcConnection {
   readonly id: string;

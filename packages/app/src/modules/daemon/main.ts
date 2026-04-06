@@ -1,4 +1,5 @@
 import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import * as BunHttpServer from '@effect/platform-bun/BunHttpServer';
 import { Effect, Layer } from 'effect';
@@ -8,6 +9,7 @@ import { makeDatabaseLayer, VigiDatabase } from '#infra/database';
 import { IpcServer } from '#modules/daemon/application/ports/out/ipc-server.port';
 import { createIpcRouter } from '#modules/daemon/infrastructure/adapters/in/ipc-router';
 import { UnixSocketServerLayer } from '#modules/daemon/infrastructure/adapters/out/unix-socket-server.adapter';
+import { DaemonConfig, DaemonConfigLayer } from '#modules/daemon/infrastructure/daemon-config';
 import { createRoutesLayer } from '#modules/daemon/infrastructure/server';
 import { ResumabilityChecker } from '#modules/session/application/ports/out/resumability-checker.port';
 import { SessionRepository } from '#modules/session/application/ports/out/session-repository.port';
@@ -28,34 +30,34 @@ import {
   EventPublisherLayer,
 } from '#modules/terminal/infrastructure/adapters/out/event-publisher.adapter';
 import { SqliteTerminalRepositoryLayer } from '#modules/terminal/infrastructure/adapters/out/sqlite-terminal-repository';
-import {
-  DB_FILE,
-  DEFAULT_PORT,
-  PID_FILE,
-  PORT_FILE,
-  SOCKET_PATH,
-  STDIN_SOCKET_PATH,
-  VIGIE_HOME,
-} from './paths';
+
+// Module-level paths for use in signal handlers (computed from env at startup)
+const _HOME = process.env.VIGIE_HOME ?? join(homedir(), '.vigie');
+const _PID_FILE = join(_HOME, 'daemon.pid');
+const _SOCKET_PATH = join(_HOME, 'daemon.sock');
+const _STDIN_SOCKET_PATH = join(_HOME, 'daemon-stdin.sock');
+const _PORT_FILE = join(_HOME, 'port');
 
 function cleanup() {
   try {
-    unlinkSync(PID_FILE);
+    unlinkSync(_PID_FILE);
   } catch {}
   try {
-    unlinkSync(SOCKET_PATH);
+    unlinkSync(_SOCKET_PATH);
   } catch {}
   try {
-    unlinkSync(STDIN_SOCKET_PATH);
+    unlinkSync(_STDIN_SOCKET_PATH);
   } catch {}
   try {
-    unlinkSync(PORT_FILE);
+    unlinkSync(_PORT_FILE);
   } catch {}
 }
 
 export const runDaemon = Effect.gen(function* () {
-  mkdirSync(VIGIE_HOME, { recursive: true, mode: 0o700 });
-  writeFileSync(PID_FILE, `${process.pid}\n${Date.now()}`);
+  const config = yield* DaemonConfig;
+
+  mkdirSync(config.vigieHome, { recursive: true, mode: 0o700 });
+  writeFileSync(config.pidFile, `${process.pid}\n${Date.now()}`);
   yield* Effect.logInfo(`[daemon] Started (pid ${process.pid})`);
 
   // ── 1. Get services from context ───────────────────────────────────
@@ -123,7 +125,7 @@ export const runDaemon = Effect.gen(function* () {
     clientDistPath,
   });
 
-  const port = Number(process.env.VIGIE_PORT) || DEFAULT_PORT;
+  const port = config.port;
   yield* Effect.gen(function* () {
     const httpEffect = yield* HttpRouter.toHttpEffect(routesLayer);
     const server = yield* BunHttpServer.make({ port });
@@ -146,23 +148,23 @@ export const runDaemon = Effect.gen(function* () {
     )
   );
 
-  writeFileSync(PORT_FILE, String(port));
+  writeFileSync(config.portFile, String(port));
   yield* Effect.logInfo(`[daemon] HTTP + WebSocket server listening on http://localhost:${port}`);
 
   // ── 4. IPC Server ─────────────────────────────────────────────────
-  if (existsSync(SOCKET_PATH)) unlinkSync(SOCKET_PATH);
-  if (existsSync(STDIN_SOCKET_PATH)) unlinkSync(STDIN_SOCKET_PATH);
+  if (existsSync(config.socketPath)) unlinkSync(config.socketPath);
+  if (existsSync(config.stdinSocketPath)) unlinkSync(config.stdinSocketPath);
 
   const router = createIpcRouter(sessionService);
-  yield* ipcServer.start(SOCKET_PATH, router, (connId) =>
+  yield* ipcServer.start(config.socketPath, router, (connId) =>
     Effect.sync(() => sessionService.handleDisconnect(connId))
   );
 
-  yield* Effect.logInfo(`[daemon] IPC server listening on ${SOCKET_PATH}`);
+  yield* Effect.logInfo(`[daemon] IPC server listening on ${config.socketPath}`);
 
   // ── 5. Stdin socket ───────────────────────────────────────────────
   Bun.listen({
-    unix: STDIN_SOCKET_PATH,
+    unix: config.stdinSocketPath,
     socket: {
       data(_socket, raw) {
         const text = typeof raw === 'string' ? raw : new TextDecoder().decode(raw);
@@ -187,14 +189,14 @@ export const runDaemon = Effect.gen(function* () {
       },
     },
   });
-  yield* Effect.logInfo(`[daemon] Stdin socket listening on ${STDIN_SOCKET_PATH}`);
+  yield* Effect.logInfo(`[daemon] Stdin socket listening on ${config.stdinSocketPath}`);
 
   yield* Effect.never;
 }).pipe(Effect.scoped);
 
 // ── Composition root ──────────────────────────────────────────────────
 
-const DatabaseLayer = makeDatabaseLayer(DB_FILE);
+const DatabaseLayer = makeDatabaseLayer(`${_HOME}/data.db`);
 
 const InfraLayer = Layer.mergeAll(
   DatabaseLayer,
@@ -205,7 +207,8 @@ const InfraLayer = Layer.mergeAll(
   FsResumabilityCheckerLayer,
   AgentRegistryLayer,
   TerminalSubscribersLayer,
-  UnixSocketServerLayer
+  UnixSocketServerLayer,
+  DaemonConfigLayer
 );
 
 export const AppLayer = SessionServiceLayer.pipe(Layer.provideMerge(InfraLayer));

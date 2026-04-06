@@ -2,16 +2,17 @@ import { Console, Effect, Stream } from 'effect';
 import { printChunk } from '#lib/cli-terminal/chunk-printer';
 import { printHeader } from '#lib/cli-terminal/header';
 import { printSessionSummary } from '#lib/cli-terminal/status-bar';
-import { createClaudeRunner } from '#modules/agent/adapters/claude-runner.adapter';
 import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
 import { createBunProcessManager } from '#modules/daemon/infrastructure/adapters/out/bun-process-manager.adapter';
-import { SOCKET_PATH } from '#modules/daemon/paths';
+import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
+import { createClaudeRunner } from '#modules/session/infrastructure/adapters/out/agents/claude-runner.adapter';
 import { getGitContext } from '#modules/session/infrastructure/adapters/out/git-context';
 import { createUnixSocketClient } from '../unix-socket-client.adapter';
 
-export function claudeCommand(prompt: string): Effect.Effect<void> {
+export function claudeCommand(prompt: string) {
   return Effect.gen(function* () {
-    const manager = createBunProcessManager();
+    const config = yield* DaemonConfig;
+    const manager = createBunProcessManager(config);
     const running = yield* manager.isRunning();
 
     if (!running) {
@@ -26,7 +27,7 @@ export function claudeCommand(prompt: string): Effect.Effect<void> {
 
     // Connect to daemon via IPC
     const client = createUnixSocketClient();
-    yield* client.connect(SOCKET_PATH);
+    yield* client.connect(config.socketPath);
 
     // Register session
     yield* client.send({

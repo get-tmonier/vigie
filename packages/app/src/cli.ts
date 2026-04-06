@@ -1,5 +1,5 @@
 import { BunRuntime, BunServices } from '@effect/platform-bun';
-import { Console, Effect } from 'effect';
+import { Console, Effect, Layer } from 'effect';
 import { Command, Flag } from 'effect/unstable/cli';
 import {
   daemonAttachCommand,
@@ -8,8 +8,9 @@ import {
   daemonStartCommand,
   daemonStatusCommand,
   daemonStopCommand,
-} from '#modules/daemon/commands/daemon.command';
-import { openCommand } from '#modules/daemon/commands/open.command';
+} from '#modules/daemon/infrastructure/adapters/in/commands/daemon.command';
+import { openCommand } from '#modules/daemon/infrastructure/adapters/in/commands/open.command';
+import { DaemonConfigLayer } from '#modules/daemon/infrastructure/daemon-config';
 import { claudeCommand } from '#modules/session/infrastructure/adapters/in/commands/claude.command';
 import { claudeInteractiveCommand } from '#modules/session/infrastructure/adapters/in/commands/claude-interactive.command';
 import { sessionAttachCommand } from '#modules/session/infrastructure/adapters/in/commands/session-attach.command';
@@ -138,4 +139,7 @@ const app = Command.make('vigie', {}, () =>
 
 const program = Command.run(app, { version: '0.3.0' });
 
-program.pipe(Effect.provide(BunServices.layer), BunRuntime.runMain());
+program.pipe(
+  Effect.provide(Layer.merge(BunServices.layer, DaemonConfigLayer)),
+  BunRuntime.runMain()
+);

@@ -1,7 +1,7 @@
 import { Database } from 'bun:sqlite';
 import { existsSync } from 'node:fs';
 import { Console, Effect } from 'effect';
-import { DB_FILE } from '#modules/daemon/paths';
+import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
 
 interface SessionRow {
   id: string;
@@ -58,14 +58,16 @@ function padRight(str: string, len: number): string {
   return str.length >= len ? str.slice(0, len) : `${str}${' '.repeat(len - str.length)}`;
 }
 
-export function sessionListCommand(activeOnly: boolean, all: boolean): Effect.Effect<void> {
+export function sessionListCommand(activeOnly: boolean, all: boolean) {
   return Effect.gen(function* () {
-    if (!existsSync(DB_FILE)) {
+    const { dbFile } = yield* DaemonConfig;
+
+    if (!existsSync(dbFile)) {
       yield* Console.log('No sessions found. Start the daemon first.');
       return;
     }
 
-    const db = new Database(DB_FILE, { readonly: true });
+    const db = new Database(dbFile, { readonly: true });
 
     let query = 'SELECT * FROM sessions';
     if (activeOnly) {

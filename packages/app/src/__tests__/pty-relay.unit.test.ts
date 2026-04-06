@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, spyOn } from 'bun:test';
 import { Effect } from 'effect';
+import { DaemonConfigLayer } from '#modules/daemon/infrastructure/daemon-config';
 import type { IpcClientShape } from '#modules/session/application/ports/out/ipc-client.port';
 import { attachPtyRelay } from '#modules/session/infrastructure/adapters/in/pty-relay';
 
@@ -48,7 +49,7 @@ describe('pty-relay: signal handlers', () => {
     Effect.runPromise(
       attachPtyRelay(createMockClient(), {
         sessionId: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
-      })
+      }).pipe(Effect.provide(DaemonConfigLayer))
     ).catch(() => {});
     // Let the synchronous part of the Effect fiber run (up to first async op)
     await Promise.resolve();

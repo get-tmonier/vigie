@@ -4,7 +4,7 @@ import { Effect } from 'effect';
 import * as Layer from 'effect/Layer';
 import * as HttpRouter from 'effect/unstable/http/HttpRouter';
 import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse';
-import { createFsRoutes } from '#modules/filesystem/adapters/primary/fs.routes';
+import { createFsRoutes } from '#modules/daemon/infrastructure/adapters/in/fs.routes';
 import type { SessionService } from '#modules/session/application/session.service';
 import { createSessionRoutes } from '#modules/session/infrastructure/adapters/in/session.routes';
 import type { TerminalSubscribersShape } from '#modules/terminal/application/terminal-subscribers';

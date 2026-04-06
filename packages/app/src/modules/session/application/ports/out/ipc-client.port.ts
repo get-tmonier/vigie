@@ -1,5 +1,8 @@
 import type { Effect } from 'effect';
-import type { DaemonToSession, SessionToDaemon } from '#modules/daemon/ipc/schemas';
+import type {
+  DaemonToSession,
+  SessionToDaemon,
+} from '#modules/daemon/infrastructure/adapters/ipc-schemas';
 import type { IpcConnectionError } from '#modules/session/domain/errors';
 
 export interface IpcClientShape {

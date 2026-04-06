@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { Console, Effect } from 'effect';
 import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
 import { createBunProcessManager } from '#modules/daemon/infrastructure/adapters/out/bun-process-manager.adapter';
-import { DB_FILE, SOCKET_PATH } from '#modules/daemon/paths';
+import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
 import { getGitContext } from '#modules/session/infrastructure/adapters/out/git-context';
 import { attachPtyRelay } from '../pty-relay';
 import { createUnixSocketClient } from '../unix-socket-client.adapter';
@@ -20,14 +20,17 @@ interface SessionRow {
   agent_session_id: string | null;
 }
 
-export function sessionResumeCommand(partialId: string): Effect.Effect<void> {
+export function sessionResumeCommand(partialId: string) {
   return Effect.gen(function* () {
-    if (!existsSync(DB_FILE)) {
+    const config = yield* DaemonConfig;
+    const { dbFile, socketPath } = config;
+
+    if (!existsSync(dbFile)) {
       yield* Console.error('No sessions found. Start the daemon first.');
       return;
     }
 
-    const db = new Database(DB_FILE, { readonly: true });
+    const db = new Database(dbFile, { readonly: true });
     const rows = db
       .prepare('SELECT * FROM sessions WHERE id LIKE $prefix')
       .all({ $prefix: `${partialId}%` }) as SessionRow[];
@@ -76,7 +79,7 @@ export function sessionResumeCommand(partialId: string): Effect.Effect<void> {
       return;
     }
 
-    const manager = createBunProcessManager();
+    const manager = createBunProcessManager(config);
     const running = yield* manager.isRunning();
 
     if (!running) {
@@ -102,7 +105,7 @@ export function sessionResumeCommand(partialId: string): Effect.Effect<void> {
     const rows_ = process.stdout.rows ?? 24;
 
     const client = createUnixSocketClient();
-    yield* client.connect(SOCKET_PATH);
+    yield* client.connect(socketPath);
 
     let resolveSpawn: () => void;
     let rejectSpawn: (error: Error) => void;

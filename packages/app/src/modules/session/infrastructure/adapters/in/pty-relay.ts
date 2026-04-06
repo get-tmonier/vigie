@@ -8,7 +8,7 @@ import {
 import { createTuiRenderer } from '#lib/vterm/tui-renderer';
 import { createVTerm } from '#lib/vterm/vterm';
 import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
-import { STDIN_SOCKET_PATH } from '#modules/daemon/paths';
+import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
 import type { IpcClientShape } from '#modules/session/application/ports/out/ipc-client.port';
 
 function formatDuration(ms: number): string {
@@ -31,11 +31,9 @@ type PtyRelayResult =
   | { type: 'detach' }
   | { type: 'disconnect' };
 
-export function attachPtyRelay(
-  client: IpcClientShape,
-  options: PtyRelayOptions
-): Effect.Effect<PtyRelayResult, DaemonNotRunningError> {
+export function attachPtyRelay(client: IpcClientShape, options: PtyRelayOptions) {
   return Effect.gen(function* () {
+    const { stdinSocketPath } = yield* DaemonConfig;
     const { sessionId } = options;
     const startedAt = options.startedAt ?? Date.now();
 
@@ -139,7 +137,7 @@ export function attachPtyRelay(
         new Promise<StdinSocket>((resolve, reject) => {
           const timeout = setTimeout(() => reject(new Error('Stdin socket timeout')), 5000);
           Bun.connect({
-            unix: STDIN_SOCKET_PATH,
+            unix: stdinSocketPath,
             socket: {
               open(s) {
                 clearTimeout(timeout);

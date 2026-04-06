@@ -1,8 +1,11 @@
 import { Stream } from 'effect';
 import * as v from 'valibot';
-import type { AgentChunk, AgentRunnerShape } from '#modules/agent/ports/agent-runner.port';
-import { ClaudeStreamEventSchema } from '#modules/agent/schemas';
+import type {
+  AgentChunk,
+  AgentRunnerShape,
+} from '#modules/session/application/ports/out/agent-runner.port';
 import { AgentRunnerError } from '#modules/session/domain/errors';
+import { ClaudeStreamEventSchema } from '#modules/session/infrastructure/adapters/out/agents/claude-stream-schemas';
 
 function mapClaudeEvent(
   event: v.InferOutput<typeof ClaudeStreamEventSchema>,

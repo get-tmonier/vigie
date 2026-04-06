@@ -1,13 +1,15 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { Effect } from 'effect';
-import { DEFAULT_PORT, PORT_FILE } from '../paths';
+import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
 
-export function openCommand(): Effect.Effect<void> {
-  return Effect.sync(() => {
-    let port = DEFAULT_PORT;
+export function openCommand() {
+  return Effect.gen(function* () {
+    const { port: defaultPort, portFile } = yield* DaemonConfig;
 
-    if (existsSync(PORT_FILE)) {
-      const stored = readFileSync(PORT_FILE, 'utf-8').trim();
+    let port = defaultPort;
+
+    if (existsSync(portFile)) {
+      const stored = readFileSync(portFile, 'utf-8').trim();
       const parsed = Number.parseInt(stored, 10);
       if (!Number.isNaN(parsed)) {
         port = parsed;

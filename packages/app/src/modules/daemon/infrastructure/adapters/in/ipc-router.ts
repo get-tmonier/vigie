@@ -1,6 +1,6 @@
 import { Effect } from 'effect';
 import type { IpcConnection } from '#modules/daemon/application/ports/out/ipc-server.port';
-import type { SessionToDaemon } from '#modules/daemon/ipc/schemas';
+import type { SessionToDaemon } from '#modules/daemon/infrastructure/adapters/ipc-schemas';
 import type { SessionService } from '#modules/session/application/session.service';
 import { SessionId } from '#modules/session/domain/session-id';
 import { expandPath } from '#modules/session/infrastructure/adapters/expand-path';
