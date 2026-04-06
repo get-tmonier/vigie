@@ -3,17 +3,6 @@ import type { KnipConfig } from 'knip';
 export default {
   workspaces: {
     '.': {},
-    'packages/ui': {
-      project: ['src/**/*.{ts,tsx}'],
-      ignoreDependencies: [
-        '@fontsource-variable/dm-sans',
-        '@fontsource/instrument-serif',
-        '@fontsource/jetbrains-mono',
-        '@vigie/tokens',
-        'tailwindcss',
-      ],
-      vite: { config: 'vite.config.ts' },
-    },
     'packages/landing': {
       entry: ['src/pages/**/*.astro', 'src/layouts/**/*.astro', 'src/components/**/*.astro'],
       project: ['src/**/*.{astro,ts,tsx}'],
@@ -24,7 +13,7 @@ export default {
         'tailwindcss',
       ],
     },
-    'packages/cli': {
+    'packages/app': {
       entry: ['src/infra/ssr/client-entry.tsx'],
       project: ['src/**/*.{ts,tsx}'],
       ignoreDependencies: [
@@ -35,9 +24,6 @@ export default {
         'tailwindcss',
       ],
       vite: { config: 'vite.config.ts' },
-    },
-    'packages/shared': {
-      project: ['src/**/*.ts'],
     },
     'packages/tokens': {
       project: ['**/*.ts'],

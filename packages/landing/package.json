@@ -21,6 +21,8 @@
     "format:fix": "biome format --write .",
     "check": "biome check .",
     "check:fix": "biome check --write .",
+    "check-imports": "bun ../../scripts/check-imports.ts",
+    "fix-imports": "bun ../../scripts/fix-imports.ts",
     "typecheck": "astro check"
   },
   "dependencies": {

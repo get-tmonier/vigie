@@ -16,9 +16,7 @@ vigie is built by **Tmonier SRL** (Damien Meur's freelance company). The freelan
 
 | Package | Path | Key libraries |
 |---|---|---|
-| `@vigie/cli` | `packages/cli/` | Effect, @effect/platform-bun HTTP, Bun PTY, xterm headless, SQLite |
-| `@vigie/ui` | `packages/ui/` | React, Redux Toolkit, xterm.js, Vite SPA |
-| `@vigie/shared` | `packages/shared/` | Valibot schemas — single source of truth for API/WS contracts between CLI and UI |
+| `@vigie/app` | `packages/app/` | Effect, @effect/platform-bun HTTP, Bun PTY, xterm headless, SQLite, React SSR |
 | `@vigie/tokens` | `packages/tokens/` | Design tokens — CSS + JS exports |
 | `@vigie/landing` | `packages/landing/` | Astro 5 + Tailwind v4 (vigie product page) |
 

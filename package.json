@@ -9,7 +9,7 @@
     "workerd"
   ],
   "scripts": {
-    "dev": "turbo run dev --filter=@vigie/app --filter=@vigie/ui",
+    "dev": "turbo run dev --filter=@vigie/app",
     "dev:landing": "turbo run dev --filter=@vigie/landing",
     "dev:all": "turbo run dev",
     "build": "turbo run build",

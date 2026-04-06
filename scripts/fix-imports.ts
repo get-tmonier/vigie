@@ -75,6 +75,11 @@ for (const file of walkSrc('src')) {
       totalImports++;
       return `from ${quote}${specifier.replace(/\.js$/, '')}${quote}`;
     }
+    // Fix 4: .js extension in subpath imports (#alias/...)
+    if (specifier.startsWith('#') && specifier.endsWith('.js')) {
+      totalImports++;
+      return `from ${quote}${specifier.replace(/\.js$/, '')}${quote}`;
+    }
     return match;
   });
 
