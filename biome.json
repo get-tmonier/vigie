@@ -42,16 +42,6 @@
           }
         }
       }
-    },
-    {
-      "includes": ["packages/api/**"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noConsole": "error"
-          }
-        }
-      }
     }
   ]
 }

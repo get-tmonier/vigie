@@ -59,17 +59,16 @@ describe('DaemonSyncSessionSchema', () => {
     }
   });
 
-  it('rejects invalid agentType', () => {
-    expect(() =>
-      v.parse(DaemonSyncSessionSchema, {
-        sessionId: 's-1',
-        agentType: 'unknown-agent',
-        cwd: '/',
-        startedAt: 0,
-        status: 'active',
-        terminalChunks: [],
-      })
-    ).toThrow();
+  it('accepts custom agentType strings', () => {
+    const session = v.parse(DaemonSyncSessionSchema, {
+      sessionId: 's-1',
+      agentType: 'custom-agent',
+      cwd: '/',
+      startedAt: 0,
+      status: 'active',
+      terminalChunks: [],
+    });
+    expect(session.agentType).toBe('custom-agent');
   });
 
   it('optional fields are omitted when not provided', () => {

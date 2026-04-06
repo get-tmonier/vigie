@@ -20,15 +20,13 @@ const connectionSlice = createSlice({
   name: 'connection',
   initialState,
   reducers: {
-    daemonConnected: (state, action: PayloadAction<DaemonEvent>) => {
+    daemonConnected: (state) => {
       state.daemonOnline = true;
-      state.hostname = (action.payload.hostname as string) ?? null;
       state.reconnectCount += 1;
     },
 
-    daemonDisconnected: (state, action: PayloadAction<DaemonEvent>) => {
+    daemonDisconnected: (state) => {
       state.daemonOnline = false;
-      state.hostname = (action.payload.hostname as string) ?? null;
     },
 
     eventAdded: (state, action: PayloadAction<DaemonEvent>) => {

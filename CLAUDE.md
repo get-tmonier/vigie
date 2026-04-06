@@ -16,9 +16,9 @@ vigie is built by **Tmonier SRL** (Damien Meur's freelance company). The freelan
 
 | Package | Path | Key libraries |
 |---|---|---|
-| `@vigie/cli` | `packages/cli/` | Effect, Hono, Bun PTY, xterm headless, SQLite |
+| `@vigie/cli` | `packages/cli/` | Effect, @effect/platform-bun HTTP, Bun PTY, xterm headless, SQLite |
 | `@vigie/ui` | `packages/ui/` | React, Redux Toolkit, xterm.js, Vite SPA |
-| `@vigie/shared` | `packages/shared/` | Valibot schemas |
+| `@vigie/shared` | `packages/shared/` | Valibot schemas — single source of truth for API/WS contracts between CLI and UI |
 | `@vigie/tokens` | `packages/tokens/` | Design tokens — CSS + JS exports |
 | `@vigie/landing` | `packages/landing/` | Astro 5 + Tailwind v4 (vigie product page) |
 
@@ -26,11 +26,11 @@ The freelance portfolio (`tmonier.com`) is a separate repo: `get-tmonier/landing
 
 ## Architecture
 
-**Overall:** `Browser (SPA, localhost:19191) ↔ Hono HTTP+WS (embedded in daemon) ↔ PTY manager ↔ spawn(claude, aider, ...)`
+**Overall:** `Browser (SPA, localhost:19191) ↔ Effect HTTP+WS (embedded in daemon) ↔ PTY manager ↔ spawn(claude, aider, ...)`
 
 **Single process, fully local:**
 - **CLI daemon** (`@vigie/cli`): single Bun process that runs everything
-  - **Embedded Hono HTTP server** on `localhost:19191` — serves REST API + WebSocket + static UI
+  - **Embedded Effect HTTP server** on `localhost:19191` — serves REST API + WebSocket + static UI
   - **PTY manager** — spawns and manages agent sessions (Claude, aider, codex, generic)
   - **SQLite database** at `~/.vigie/data.db` — sessions, terminal chunks, input history
   - **Unix socket IPC** at `~/.vigie/daemon.sock` — CLI-to-daemon communication

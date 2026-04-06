@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "imports": {
-    "#contracts/*": "./src/contracts/*",
     "#schemas/*": "./src/schemas/*"
   },
   "exports": {
@@ -23,7 +22,6 @@
     "fix-imports": "bun ../../scripts/fix-imports.ts"
   },
   "dependencies": {
-    "@ts-rest/core": "3.52.1",
     "valibot": "1.2.0"
   },
   "devDependencies": {

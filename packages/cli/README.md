@@ -1,43 +1,39 @@
 # @vigie/cli
 
-The local daemon for [vigie](https://vigie.com). Runs on your machine, under your control.
+The local daemon for [vigie](https://vigie.tmonier.com). Runs on your machine, under your control.
 
 ## What this is
 
-The daemon that spawns and monitors AI agents locally. It connects to `api.vigie.com` via WebSocket. No business logic lives here — it's a pure proxy: spawn, stream, control signals.
+A single Bun process that runs everything locally:
+
+- **Embedded HTTP server** on `localhost:19191` — REST API + WebSocket + static UI
+- **PTY manager** — spawns and manages AI agent sessions (Claude, aider, codex, generic)
+- **SQLite database** at `~/.vigie/data.db` — sessions, terminal chunks, input history
+- **Unix socket IPC** at `~/.vigie/daemon.sock` — CLI-to-daemon communication
 
 ```
-api.vigie.com ↔ WebSocket ↔ Daemon (this repo) ↔ spawn(git, claude...)
+Browser (SPA) <-> HTTP+WS (localhost:19191) <-> PTY manager <-> spawn(claude, aider, ...)
 ```
 
-## What it does
-
-- Spawns local processes (git, AI agents) on command from the backend
-- Streams stdout/stderr back to the backend via WebSocket
-- Receives control signals (pause, resume, checkpoint, rollback)
-
-## What it doesn't do
-
-- Does **not** parse, validate, or persist anything — all logic lives in the backend
-- Does **not** send telemetry or phone home beyond the authenticated WebSocket
+No remote servers. No cloud dependency. No auth required.
 
 ## Tech
 
-Bun (runtime + compiler), TypeScript strict, ESM only.
+Bun, Effect, @effect/platform-bun, TypeScript strict, ESM only.
 
 ## Build
 
 ```bash
 bun install
-bun run build        # → standalone dist/vigie binary
+bun run build        # -> standalone dist/vigie binary
 ```
 
 ## Verify
 
 ```bash
-bun run verify       # knip → biome check → typecheck → test → build
+bun run verify       # knip -> biome check -> typecheck -> test -> build
 ```
 
 ## License
 
-[GPL-3.0](LICENSE)
+[MIT](../../LICENSE)

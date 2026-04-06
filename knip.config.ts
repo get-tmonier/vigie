@@ -3,9 +3,6 @@ import type { KnipConfig } from 'knip';
 export default {
   workspaces: {
     '.': {},
-    'packages/api': {
-      project: ['src/**/*.ts'],
-    },
     'packages/ui': {
       project: ['src/**/*.{ts,tsx}'],
       ignoreDependencies: [

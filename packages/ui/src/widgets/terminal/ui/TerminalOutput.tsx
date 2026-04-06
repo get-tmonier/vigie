@@ -29,14 +29,12 @@ export function TerminalOutput({ events }: TerminalOutputProps) {
     >
       {events.map((event, i) => {
         const key = eventKey(event, i);
-        const ts = event.timestamp as number;
-        const sid = event.sessionId as string | undefined;
         switch (event.type) {
           case 'command:output':
             return (
               <div key={key} className="flex gap-2">
                 <span className="text-cream-50-200 text-[0.6875rem] shrink-0">
-                  {new Date(ts).toLocaleTimeString()}
+                  {new Date(event.timestamp).toLocaleTimeString()}
                 </span>
                 <span
                   className={cn(
@@ -44,7 +42,7 @@ export function TerminalOutput({ events }: TerminalOutputProps) {
                     event.stream === 'stderr' ? 'text-danger' : 'text-cream-50'
                   )}
                 >
-                  {String(event.data)}
+                  {event.data}
                 </span>
               </div>
             );
@@ -57,42 +55,40 @@ export function TerminalOutput({ events }: TerminalOutputProps) {
                   event.exitCode === 0 ? 'text-success' : 'text-danger'
                 )}
               >
-                Process exited with code {String(event.exitCode)}
+                Process exited with code {event.exitCode}
               </div>
             );
           case 'command:error':
             return (
               <div key={key} className="text-danger py-1">
-                Error: {String(event.error)}
+                Error: {event.error}
               </div>
             );
           case 'daemon:connected':
             return (
               <div key={key} className="text-success py-1">
-                Daemon connected: {String(event.hostname)}
+                Daemon connected
               </div>
             );
           case 'daemon:disconnected':
             return (
               <div key={key} className="text-danger py-1">
-                Daemon disconnected: {String(event.hostname)}
+                Daemon disconnected
               </div>
             );
           case 'session:started':
             return (
               <div key={key} className="text-vigie-400 py-1">
-                Session started: {(sid ?? '').slice(0, 8)} ({String(event.agentType)})
+                Session started: {event.sessionId.slice(0, 8)} ({event.agentType})
               </div>
             );
           case 'session:output':
             return (
               <div key={key} className="flex gap-2">
                 <span className="text-cream-50-200 text-[0.6875rem] shrink-0">
-                  {new Date(ts).toLocaleTimeString()}
+                  {new Date(event.timestamp).toLocaleTimeString()}
                 </span>
-                <span className="whitespace-pre-wrap break-all text-cream-50">
-                  {String(event.data)}
-                </span>
+                <span className="whitespace-pre-wrap break-all text-cream-50">{event.data}</span>
               </div>
             );
           case 'session:ended':
@@ -104,13 +100,13 @@ export function TerminalOutput({ events }: TerminalOutputProps) {
                   event.exitCode === 0 ? 'text-success' : 'text-danger'
                 )}
               >
-                Session {(sid ?? '').slice(0, 8)} ended (code {String(event.exitCode)})
+                Session {event.sessionId.slice(0, 8)} ended (code {event.exitCode})
               </div>
             );
           case 'session:error':
             return (
               <div key={key} className="text-danger py-1">
-                Session {(sid ?? '').slice(0, 8)} error: {String(event.error)}
+                Session {event.sessionId.slice(0, 8)} error: {event.error}
               </div>
             );
           default:

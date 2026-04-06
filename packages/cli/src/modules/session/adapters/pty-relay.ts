@@ -80,7 +80,7 @@ export function attachPtyRelay(
     const shortId = sessionId.slice(0, 8);
     const bannerWidth = 50;
     const line1 = `  \u2699 vigie session ${shortId}`;
-    const line2 = '  Ctrl-B d: detach | dashboard: app.vigie.com';
+    const line2 = '  Ctrl-B d: detach | dashboard: localhost:19191';
     const pad1 = ' '.repeat(Math.max(0, bannerWidth - line1.length));
     const pad2 = ' '.repeat(Math.max(0, bannerWidth - line2.length));
     let banner =

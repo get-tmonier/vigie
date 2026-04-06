@@ -1,8 +1,10 @@
 import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import type { ServerWebSocket } from 'bun';
+import * as BunHttpServer from '@effect/platform-bun/BunHttpServer';
 import { Effect, Ref } from 'effect';
+import * as HttpMiddleware from 'effect/unstable/http/HttpMiddleware';
+import * as HttpRouter from 'effect/unstable/http/HttpRouter';
 import type { InteractiveRunnerHandle } from '../session/adapters/agents/agent-interactive-runner.adapter.js';
 import { spawnAgentInteractive } from '../session/adapters/agents/agent-interactive-runner.adapter.js';
 import { resolveAgent } from '../session/domain/agent-config.js';
@@ -22,11 +24,9 @@ import {
 import { openDatabase } from './persistence/database.js';
 import { createSessionStore } from './persistence/session-store.js';
 import type { PtyEntry } from './server/app.js';
-import { createServerApp } from './server/app.js';
+import { createRoutesLayer } from './server/app.js';
 import { createEventBus } from './server/event-bus.js';
 import { createTerminalSubscribers } from './server/terminal-subscribers.js';
-import type { WsData } from './server/websocket.js';
-import { createWebSocketHandlers } from './server/websocket.js';
 
 function cleanup() {
   try {
@@ -350,7 +350,7 @@ export const runDaemon = Effect.gen(function* () {
     console.log('[daemon] No UI dist found — API-only mode');
   }
 
-  const serverApp = createServerApp({
+  const routesLayer = createRoutesLayer({
     store,
     ptyHandles,
     eventBus,
@@ -425,70 +425,16 @@ export const runDaemon = Effect.gen(function* () {
     },
   });
 
-  const wsHandlers = createWebSocketHandlers({
-    store,
-    ptyHandles,
-    eventBus,
-    terminalSubs,
-    applyResizePriority,
-    inputLineBufferWrite,
-  });
-
+  // Build the HTTP effect from route layers and start the server
   const port = Number(process.env.VIGIE_PORT) || DEFAULT_PORT;
-  const httpServer = Bun.serve<WsData>({
-    port,
-    fetch(req, server) {
-      const url = new URL(req.url);
-
-      // WebSocket upgrade for /ws/events
-      if (url.pathname === '/ws/events') {
-        const upgraded = server.upgrade(req, {
-          data: { type: 'events' as const },
-        });
-        if (upgraded) return undefined;
-        return new Response('WebSocket upgrade failed', { status: 400 });
-      }
-
-      // WebSocket upgrade for /ws/terminal/:sessionId
-      const terminalMatch = url.pathname.match(/^\/ws\/terminal\/(.+)$/);
-      if (terminalMatch) {
-        const sessionId = terminalMatch[1];
-        const browserConnId = crypto.randomUUID();
-        const upgraded = server.upgrade(req, {
-          data: {
-            type: 'terminal' as const,
-            sessionId,
-            browserConnId,
-          },
-        });
-        if (upgraded) return undefined;
-        return new Response('WebSocket upgrade failed', { status: 400 });
-      }
-
-      // Regular HTTP requests → Hono
-      return serverApp.fetch(req);
-    },
-    websocket: {
-      open(ws: ServerWebSocket<WsData>) {
-        wsHandlers.open(ws);
-      },
-      message(ws: ServerWebSocket<WsData>, message: string | Buffer) {
-        wsHandlers.message(ws, message);
-      },
-      close(ws: ServerWebSocket<WsData>) {
-        wsHandlers.close(ws);
-      },
-    },
-  });
+  yield* Effect.gen(function* () {
+    const httpEffect = yield* HttpRouter.toHttpEffect(routesLayer);
+    const server = yield* BunHttpServer.make({ port });
+    yield* server.serve(httpEffect, HttpMiddleware.cors());
+  }).pipe(Effect.provide(BunHttpServer.layerHttpServices));
 
   writeFileSync(PORT_FILE, String(port));
   console.log(`[daemon] HTTP + WebSocket server listening on http://localhost:${port}`);
-
-  yield* Effect.addFinalizer(() =>
-    Effect.sync(() => {
-      httpServer.stop();
-    })
-  );
 
   // ── IPC Server (Unix socket for CLI commands) ─────────────────────
 

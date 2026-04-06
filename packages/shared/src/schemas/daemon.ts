@@ -18,7 +18,7 @@ export type Ping = v.InferOutput<typeof PingSchema>;
 export const SessionSpawnRequestSchema = v.object({
   type: v.literal('session:spawn-request'),
   sessionId: v.string(),
-  agentType: v.picklist(['claude', 'opencode', 'generic']),
+  agentType: v.string(),
   cwd: v.string(),
   cols: v.number(),
   rows: v.number(),
@@ -123,7 +123,7 @@ export type Pong = v.InferOutput<typeof PongSchema>;
 export const SessionStartedSchema = v.object({
   type: v.literal('session:started'),
   sessionId: v.string(),
-  agentType: v.picklist(['claude', 'opencode', 'generic']),
+  agentType: v.string(),
   mode: v.optional(v.picklist(['prompt', 'interactive']), 'prompt'),
   cwd: v.string(),
   gitBranch: v.optional(v.string()),
@@ -209,7 +209,7 @@ export type SessionSpawnFailed = v.InferOutput<typeof SessionSpawnFailedSchema>;
 
 export const DaemonSyncSessionSchema = v.object({
   sessionId: v.string(),
-  agentType: v.picklist(['claude', 'opencode', 'generic']),
+  agentType: v.string(),
   mode: v.optional(v.picklist(['prompt', 'interactive']), 'prompt'),
   cwd: v.string(),
   gitBranch: v.optional(v.string()),
@@ -326,3 +326,78 @@ export const DownstreamTerminalMessageSchema = v.variant('type', [
   TerminalBrowserDisconnectedSchema,
 ]);
 export type DownstreamTerminalMessage = v.InferOutput<typeof DownstreamTerminalMessageSchema>;
+
+// ── REST API schemas ──
+
+export const AgentSessionSchema = v.object({
+  id: v.string(),
+  agentType: v.string(),
+  mode: v.string(),
+  cwd: v.string(),
+  gitBranch: v.optional(v.string()),
+  repoName: v.optional(v.string()),
+  startedAt: v.number(),
+  endedAt: v.optional(v.number()),
+  status: v.picklist(['registering', 'active', 'ended', 'error']),
+  exitCode: v.optional(v.number()),
+  claudeSessionId: v.optional(v.string()),
+  resumable: v.optional(v.boolean()),
+});
+export type AgentSession = v.InferOutput<typeof AgentSessionSchema>;
+
+export const ListSessionsResponseSchema = v.object({
+  sessions: v.array(AgentSessionSchema),
+});
+export type ListSessionsResponse = v.InferOutput<typeof ListSessionsResponseSchema>;
+
+export const SpawnSessionResponseSchema = v.object({
+  sessionId: v.string(),
+});
+export type SpawnSessionResponse = v.InferOutput<typeof SpawnSessionResponseSchema>;
+
+export const SpawnSessionRequestSchema = v.object({
+  agentType: v.optional(v.string()),
+  cwd: v.optional(v.string()),
+  cols: v.optional(v.number()),
+  rows: v.optional(v.number()),
+});
+export type SpawnSessionRequest = v.InferOutput<typeof SpawnSessionRequestSchema>;
+
+export const KilledCountResponseSchema = v.object({
+  killedCount: v.number(),
+});
+export type KilledCountResponse = v.InferOutput<typeof KilledCountResponseSchema>;
+
+export const FsEntrySchema = v.object({
+  name: v.string(),
+  isDirectory: v.boolean(),
+});
+export type FsEntry = v.InferOutput<typeof FsEntrySchema>;
+
+export const FsListDirRestResponseSchema = v.object({
+  entries: v.array(FsEntrySchema),
+  error: v.optional(v.string()),
+});
+export type FsListDirRestResponse = v.InferOutput<typeof FsListDirRestResponseSchema>;
+
+// ── Browser broadcast events (sent over /ws/events) ──
+
+export const SessionDeletedEventSchema = v.object({
+  type: v.literal('session:deleted'),
+  sessionId: v.string(),
+  timestamp: v.number(),
+});
+export type SessionDeletedEvent = v.InferOutput<typeof SessionDeletedEventSchema>;
+
+export const SessionsClearedEventSchema = v.object({
+  type: v.literal('sessions:cleared'),
+  timestamp: v.number(),
+});
+export type SessionsClearedEvent = v.InferOutput<typeof SessionsClearedEventSchema>;
+
+export const BrowserEventSchema = v.variant('type', [
+  ...UpstreamMessageSchema.options,
+  SessionDeletedEventSchema,
+  SessionsClearedEventSchema,
+]);
+export type BrowserEvent = v.InferOutput<typeof BrowserEventSchema>;

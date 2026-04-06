@@ -1,19 +1,16 @@
-export interface DaemonEvent {
-  type: string;
-  [key: string]: unknown;
-}
+import type { BrowserEvent } from '@vigie/shared';
 
 export function createEventBus() {
-  const listeners = new Set<(event: DaemonEvent) => void>();
+  const listeners = new Set<(event: BrowserEvent) => void>();
 
   return {
-    subscribe(listener: (event: DaemonEvent) => void): () => void {
+    subscribe(listener: (event: BrowserEvent) => void): () => void {
       listeners.add(listener);
       return () => {
         listeners.delete(listener);
       };
     },
-    publish(event: DaemonEvent): void {
+    publish(event: BrowserEvent): void {
       for (const listener of listeners) {
         try {
           listener(event);

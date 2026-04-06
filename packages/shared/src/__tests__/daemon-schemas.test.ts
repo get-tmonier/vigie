@@ -16,12 +16,6 @@ import {
   TerminalResizeSchema,
   UpstreamMessageSchema,
 } from '../schemas/daemon';
-import {
-  SSECommandOutputSchema,
-  SSEDaemonConnectedSchema,
-  SSEDaemonDisconnectedSchema,
-  SSEEventSchema,
-} from '../schemas/sse-events';
 
 describe('daemon downstream schemas', () => {
   it('parses command:request', () => {
@@ -261,64 +255,5 @@ describe('terminal schemas', () => {
     if (result.type === 'session:started') {
       expect(result.mode).toBe('prompt');
     }
-  });
-});
-
-describe('SSE event schemas', () => {
-  it('parses command:output SSE event', () => {
-    const event = {
-      type: 'command:output',
-      id: 'cmd-1',
-      stream: 'stdout' as const,
-      data: 'output',
-      timestamp: Date.now(),
-    };
-    const result = v.parse(SSECommandOutputSchema, event);
-    expect(result.type).toBe('command:output');
-  });
-
-  it('parses daemon:connected SSE event', () => {
-    const event = {
-      type: 'daemon:connected',
-      daemonId: 'd-1',
-      hostname: 'host1',
-      timestamp: Date.now(),
-    };
-    const result = v.parse(SSEDaemonConnectedSchema, event);
-    expect(result.daemonId).toBe('d-1');
-  });
-
-  it('parses daemon:disconnected SSE event', () => {
-    const event = {
-      type: 'daemon:disconnected',
-      daemonId: 'd-1',
-      hostname: 'host1',
-      timestamp: Date.now(),
-    };
-    const result = v.parse(SSEDaemonDisconnectedSchema, event);
-    expect(result.daemonId).toBe('d-1');
-  });
-
-  it('parses SSE discriminated union', () => {
-    const connected = v.parse(SSEEventSchema, {
-      type: 'daemon:connected',
-      daemonId: 'd-1',
-      hostname: 'h',
-      timestamp: 0,
-    });
-    expect(connected.type).toBe('daemon:connected');
-
-    const output = v.parse(SSEEventSchema, {
-      type: 'command:output',
-      id: 'x',
-      stream: 'stdout',
-      data: 'd',
-      timestamp: 0,
-    });
-    expect(output.type).toBe('command:output');
-  });
-
-  it('rejects unknown SSE event type', () => {
-    expect(() => v.parse(SSEEventSchema, { type: 'unknown' })).toThrow();
   });
 });

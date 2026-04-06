@@ -260,7 +260,7 @@ export function sessionAttachCommand(partialId: string): Effect.Effect<void> {
     // Pre-launch banner — visible before Claude Code's TUI takes over
     const bannerWidth = 50;
     const line1 = `  \u2699 vigie session ${shortId}`;
-    const line2 = '  Ctrl-B d: detach | dashboard: app.vigie.com';
+    const line2 = '  Ctrl-B d: detach | dashboard: localhost:19191';
     const pad1 = ' '.repeat(Math.max(0, bannerWidth - line1.length));
     const pad2 = ' '.repeat(Math.max(0, bannerWidth - line2.length));
     process.stdout.write(

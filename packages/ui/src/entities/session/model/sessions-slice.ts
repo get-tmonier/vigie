@@ -1,7 +1,20 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type {
+  AgentSession,
+  SessionClaudeIdDetected,
+  SessionEnded,
+  SessionErrorUpstream,
+  SessionSpawnFailed,
+  SessionStarted,
+} from '@vigie/shared';
 import type { RootState } from '#app/store';
-import type { DaemonEvent } from '#shared/types/daemon-event';
-import type { AgentSession } from '../api/session-api';
+
+interface ResumableChangedEvent {
+  type: 'session:resumable-changed';
+  sessionId: string;
+  resumable: boolean;
+  timestamp: number;
+}
 
 export interface SessionsState {
   byId: Record<string, AgentSession>;
@@ -36,30 +49,26 @@ const sessionsSlice = createSlice({
       state.loading = false;
     },
 
-    sessionStarted: (state, action: PayloadAction<DaemonEvent>) => {
+    sessionStarted: (state, action: PayloadAction<SessionStarted>) => {
       const event = action.payload;
-      const sessionId = event.sessionId as string;
+      const sessionId = event.sessionId;
       const existing = state.byId[sessionId];
       const isResume = existing?.status === 'ended';
       const session: AgentSession = {
         id: sessionId,
-        agentType: (event.agentType as string) ?? 'claude',
-        mode: (event.mode as string) ?? 'prompt',
-        cwd: (event.cwd as string) ?? '',
-        gitBranch: event.gitBranch as string | undefined,
-        repoName: event.repoName as string | undefined,
-        startedAt: (event.timestamp as number) ?? Date.now(),
+        agentType: event.agentType ?? 'claude',
+        mode: event.mode ?? 'prompt',
+        cwd: event.cwd ?? '',
+        gitBranch: event.gitBranch,
+        repoName: event.repoName,
+        startedAt: event.timestamp ?? Date.now(),
         status: 'active',
-        ...(event.resumable !== undefined && { resumable: event.resumable as boolean }),
-        ...(event.claudeSessionId !== undefined && {
-          claudeSessionId: event.claudeSessionId as string,
-        }),
       };
       if (existing) {
         state.byId[sessionId] = {
           ...existing,
           ...session,
-          resumable: (event.resumable as boolean) ?? existing.resumable,
+          resumable: existing.resumable,
         };
       } else {
         state.byId[sessionId] = session;
@@ -70,38 +79,38 @@ const sessionsSlice = createSlice({
       }
     },
 
-    sessionEnded: (state, action: PayloadAction<DaemonEvent>) => {
-      const sessionId = action.payload.sessionId as string;
-      const session = state.byId[sessionId];
+    sessionEnded: (state, action: PayloadAction<SessionEnded>) => {
+      const event = action.payload;
+      const session = state.byId[event.sessionId];
       if (session) {
         session.status = 'ended';
-        session.exitCode = action.payload.exitCode as number | undefined;
-        session.resumable = (action.payload.resumable as boolean) ?? false;
+        session.exitCode = event.exitCode;
+        session.resumable = event.resumable ?? false;
       }
     },
 
-    sessionErrored: (state, action: PayloadAction<DaemonEvent>) => {
-      const sessionId = action.payload.sessionId as string;
-      const session = state.byId[sessionId];
+    sessionErrored: (state, action: PayloadAction<SessionErrorUpstream | SessionSpawnFailed>) => {
+      const event = action.payload;
+      const session = state.byId[event.sessionId];
       if (session) {
         session.status = 'ended';
         session.exitCode = -1;
       }
     },
 
-    claudeIdDetected: (state, action: PayloadAction<DaemonEvent>) => {
-      const sessionId = action.payload.sessionId as string;
-      const session = state.byId[sessionId];
+    claudeIdDetected: (state, action: PayloadAction<SessionClaudeIdDetected>) => {
+      const event = action.payload;
+      const session = state.byId[event.sessionId];
       if (session) {
-        session.claudeSessionId = action.payload.claudeSessionId as string;
+        session.claudeSessionId = event.claudeSessionId;
       }
     },
 
-    resumableChanged: (state, action: PayloadAction<DaemonEvent>) => {
-      const sessionId = action.payload.sessionId as string;
-      const session = state.byId[sessionId];
+    resumableChanged: (state, action: PayloadAction<ResumableChangedEvent>) => {
+      const event = action.payload;
+      const session = state.byId[event.sessionId];
       if (session) {
-        session.resumable = action.payload.resumable as boolean;
+        session.resumable = event.resumable;
       }
     },
 

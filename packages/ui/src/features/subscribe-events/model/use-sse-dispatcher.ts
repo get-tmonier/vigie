@@ -62,7 +62,7 @@ export function useSSEDispatcher(events: DaemonEvent[]) {
 
       switch (event.type) {
         case 'daemon:connected':
-          dispatch(daemonConnected(event));
+          dispatch(daemonConnected());
           if (fetchTimerRef.current) clearTimeout(fetchTimerRef.current);
           fetchTimerRef.current = setTimeout(() => {
             listSessions()
@@ -73,26 +73,26 @@ export function useSSEDispatcher(events: DaemonEvent[]) {
           }, 500);
           break;
         case 'daemon:disconnected':
-          dispatch(daemonDisconnected(event));
+          dispatch(daemonDisconnected());
           break;
         case 'session:started':
-          dispatch(sessionStarted(event as never));
+          dispatch(sessionStarted(event));
           break;
         case 'session:ended':
-          dispatch(sessionEnded(event as never));
+          dispatch(sessionEnded(event));
           break;
         case 'session:error':
         case 'session:spawn-failed':
-          dispatch(sessionErrored(event as never));
+          dispatch(sessionErrored(event));
           break;
         case 'session:claude-id-detected':
-          dispatch(claudeIdDetected(event as never));
+          dispatch(claudeIdDetected(event));
           break;
         case 'session:resumable-changed':
-          dispatch(resumableChanged(event as never));
+          dispatch(resumableChanged(event));
           break;
         case 'terminal:input-echo':
-          dispatch(inputEchoReceived(event as never));
+          dispatch(inputEchoReceived(event));
           break;
         // command:output, command:done, command:error, session:output → raw events only
       }

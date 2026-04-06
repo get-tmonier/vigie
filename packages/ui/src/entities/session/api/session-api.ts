@@ -1,22 +1,11 @@
+import type { AgentSession, FsEntry } from '@vigie/shared';
+import { ListSessionsResponseSchema } from '@vigie/shared';
 import { apiFetch } from '#shared/api/client';
 
-export interface AgentSession {
-  id: string;
-  agentType: string;
-  mode: string;
-  cwd: string;
-  gitBranch?: string;
-  repoName?: string;
-  startedAt: number;
-  endedAt?: number;
-  status: 'active' | 'ended' | 'error';
-  claudeSessionId?: string;
-  exitCode?: number;
-  resumable?: boolean;
-}
+export type { AgentSession, FsEntry };
 
 export async function listSessions(): Promise<AgentSession[]> {
-  const data = await apiFetch<{ sessions: AgentSession[] }>('/api/sessions');
+  const data = await apiFetch('/api/sessions', { schema: ListSessionsResponseSchema });
   return data.sessions;
 }
 
@@ -60,11 +49,6 @@ export async function killAllSessions(): Promise<{ killedCount: number }> {
   return apiFetch<{ killedCount: number }>('/api/sessions/kill-all', {
     method: 'POST',
   });
-}
-
-export interface FsEntry {
-  name: string;
-  isDirectory: boolean;
 }
 
 export async function listDirectory(path: string): Promise<{ entries: FsEntry[]; error?: string }> {

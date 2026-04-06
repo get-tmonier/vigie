@@ -13,7 +13,6 @@
     "rootDir": "src",
     "types": ["bun-types"],
     "paths": {
-      "#contracts/*": ["./src/contracts/*"],
       "#schemas/*": ["./src/schemas/*"]
     }
   },

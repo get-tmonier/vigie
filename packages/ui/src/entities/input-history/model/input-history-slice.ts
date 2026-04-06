@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import type { TerminalInputEcho } from '@vigie/shared';
 import type { RootState } from '#app/store';
-import type { DaemonEvent } from '#shared/types/daemon-event';
 
 export interface HistoryEntry {
   text: string;
@@ -22,13 +22,8 @@ const inputHistorySlice = createSlice({
   name: 'inputHistory',
   initialState,
   reducers: {
-    inputEchoReceived: (state, action: PayloadAction<DaemonEvent>) => {
-      const { sessionId, text, source, timestamp } = action.payload as DaemonEvent & {
-        sessionId: string;
-        text: string;
-        source?: 'cli' | 'browser';
-        timestamp: number;
-      };
+    inputEchoReceived: (state, action: PayloadAction<TerminalInputEcho>) => {
+      const { sessionId, text, source, timestamp } = action.payload;
       const key = `${timestamp}:${text}`;
       const seenKeys = state.seenKeysBySessionId[sessionId] ?? [];
       if (seenKeys.includes(key)) return;
