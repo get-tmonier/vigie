@@ -69,12 +69,12 @@ const en: SiteContent = {
           {
             question: 'How does it work?',
             answer:
-              'Run vigie start in your project. A lightweight daemon spawns Claude Code, captures every event \u2014 file edits, shell commands, token usage \u2014 and streams them to a real-time dashboard. No code leaves your machine.',
+              'Run vigie daemon start in your project. A lightweight daemon spawns Claude Code, captures every event \u2014 file edits, shell commands, token usage \u2014 and streams them to a real-time dashboard. No code leaves your machine.',
           },
           {
             question: 'What does \u201Clocal-first\u201D mean?',
             answer:
-              'The daemon runs entirely on your machine. It observes session metadata \u2014 files touched, commands run, token counts \u2014 but never reads or stores your source code. The dashboard connects via a local websocket and just streams command output \u2014 your codebase stays on your machine.',
+              'The daemon runs entirely on your machine. It captures terminal activity \u2014 including agent output and session data \u2014 and stores it locally in a SQLite database at ~/.vigie/. The dashboard connects via a local websocket to display this data. Nothing ever leaves your machine \u2014 no telemetry, no cloud sync.',
           },
           {
             question: 'How do I install vigie?',
@@ -169,17 +169,17 @@ const en: SiteContent = {
           {
             question: 'Does vigie access my source code?',
             answer:
-              'No. vigie observes session metadata only \u2014 file-change counts, token usage, context window percentage, session duration. It never reads, parses, or stores your source code.',
+              'vigie captures terminal activity \u2014 including agent output streamed to the dashboard \u2014 and stores session data locally in a SQLite database at ~/.vigie/. Everything stays on your machine. Nothing is sent to any remote server.',
           },
           {
             question: 'What data does vigie collect?',
             answer:
-              'Token counts, context window utilisation percentages, session durations, file-change counts (not contents), and checkpoint events. Never file contents, diffs, prompts, or AI responses.',
+              'Session metadata (start time, duration, exit code), terminal output for the dashboard replay feature, and input history. All data is stored locally at ~/.vigie/data.db. No data is sent anywhere.',
           },
           {
             question: 'Is vigie GDPR compliant?',
             answer:
-              'Yes. vigie is local-first \u2014 your data stays on your machine. For hosted dashboard features, all data is processed in EU-based infrastructure.',
+              'Yes. vigie is fully local-first \u2014 your data never leaves your machine. There are no remote servers, no telemetry, and no cloud sync.',
           },
           {
             question: 'Can I self-host vigie?',

@@ -30,26 +30,26 @@
 
 ## Architecture
 
+Fully local — single process, no remote servers, no cloud dependency.
+
 ```
-Browser ↔ TanStack Start (SSR) ↔ Hono + Effect (API/WS) ↔ WebSocket ↔ CLI daemon (local) ↔ spawn(git, claude…)
+Browser (SSR, localhost:19191) <-> Effect HTTP+WS (embedded in daemon) <-> PTY manager <-> spawn(claude, aider, ...)
 ```
 
-| Layer | Description | Deployment |
-|---|---|---|
-| **App** | TanStack Start SSR | `app.vigie.tmonier.com` |
-| **API** | Hono + Effect + PostgreSQL | `api.vigie.tmonier.com` |
-| **CLI** | Local Bun binary (`@vigie/cli`) | Your machine |
+| Component | Description |
+|---|---|
+| **CLI daemon** | Single Bun process — embedded HTTP server, PTY manager, SQLite |
+| **Dashboard** | React SSR rendered by the daemon at `localhost:19191` |
+| **Agents** | Claude Code, aider, codex, or any CLI tool — spawned via PTY |
 
 ## Monorepo
 
 | Package | Path | Stack |
 |---|---|---|
-| `@vigie/api` | `packages/api/` | Hono, Effect, Kysely, PostgreSQL |
-| `@vigie/ui` | `packages/ui/` | React, TanStack Start/Router |
-| `@vigie/cli` | `packages/cli/` | Effect, Bun PTY, xterm headless |
-| `@vigie/shared` | `packages/shared/` | ts-rest, Valibot |
+| `@vigie/app` | `packages/app/` | Effect, @effect/platform-bun, React SSR, Bun PTY, xterm headless, SQLite |
 | `@vigie/tokens` | `packages/tokens/` | Design tokens (CSS + JS) |
 | `@vigie/landing` | `packages/landing/` | Astro 5, Tailwind v4 |
+| `@vigie/video` | `packages/video/` | Remotion feature clips |
 
 ## Tech stack
 
@@ -59,15 +59,29 @@ Bun · Turborepo · Biome · TypeScript strict · ESM only
 
 ```bash
 bun install            # install all dependencies
-bun turbo dev          # dev servers (api + ui)
+bun turbo dev          # daemon + ui on localhost:19191 (SSR)
 bun turbo build        # build all packages
 bun turbo test         # run tests
+```
+
+## CLI
+
+```bash
+vigie daemon start          # start daemon in background
+vigie daemon start --fg     # start in foreground
+vigie daemon stop           # stop daemon
+vigie open                  # open dashboard in browser
+vigie claude                # run Claude Code (interactive)
+vigie claude -p "..."       # run Claude Code with prompt
+vigie session list          # list sessions
+vigie session attach --id   # attach to active session
+vigie session resume --id   # resume ended session
 ```
 
 ## Verify pipeline
 
 ```bash
-bun run verify         # knip → biome check → typecheck → test → build
+bun run verify         # knip -> biome check -> typecheck -> test -> build
 bun run verify:fix     # auto-fix then verify
 ```
 

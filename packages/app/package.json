@@ -1,0 +1,61 @@
+{
+  "name": "@vigie/app",
+  "version": "0.3.0",
+  "type": "module",
+  "bin": {
+    "vigie": "./dist/index.js"
+  },
+  "imports": {
+    "#modules/*": "./src/modules/*",
+    "#lib/*": "./src/lib/*",
+    "#infra/*": "./src/infra/*",
+    "#shared/*": "./src/shared/*"
+  },
+  "scripts": {
+    "dev": "bun run build:client && VIGIE_DEV=true bun run --watch src/modules/daemon/main.ts",
+    "dev:watch-client": "vite build --watch",
+    "dev:claude": "bun run src/cli.ts claude",
+    "build:pty": "sh scripts/build-pty.sh",
+    "build:client": "vite build",
+    "build": "bun run build:pty && bun run build:client && bun build --compile --target=bun src/cli.ts --outfile dist/vigie",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome lint ./src",
+    "lint:fix": "biome lint --write ./src",
+    "format": "biome format --write ./src",
+    "format:fix": "biome format --write ./src",
+    "check": "biome check ./src",
+    "check:fix": "biome check --write ./src",
+    "check-imports": "bun ../../scripts/check-imports.ts",
+    "fix-imports": "bun ../../scripts/fix-imports.ts",
+    "test": "bun test",
+    "test:unit": "bun test unit.test",
+    "test:integration": "bun test integration.test"
+  },
+  "dependencies": {
+    "@effect/platform-bun": "4.0.0-beta.24",
+    "@reduxjs/toolkit": "2.11.2",
+    "@xterm/headless": "5.5.0",
+    "effect": "4.0.0-beta.24",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-redux": "9.2.0",
+    "tailwind-merge": "3.5.0",
+    "valibot": "1.2.0"
+  },
+  "devDependencies": {
+    "@fontsource-variable/dm-sans": "5.2.8",
+    "@fontsource/instrument-serif": "5.2.8",
+    "@fontsource/jetbrains-mono": "5.2.8",
+    "@tailwindcss/vite": "4.2.1",
+    "@types/bun": "1.3.9",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vigie/tokens": "workspace:*",
+    "@vitejs/plugin-react": "5.1.4",
+    "@xterm/addon-fit": "0.11.0",
+    "@xterm/xterm": "6.0.0",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3",
+    "vite": "7.3.1"
+  }
+}

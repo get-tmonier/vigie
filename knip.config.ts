@@ -3,22 +3,6 @@ import type { KnipConfig } from 'knip';
 export default {
   workspaces: {
     '.': {},
-    'packages/api': {
-      project: ['src/**/*.ts'],
-    },
-    'packages/ui': {
-      entry: ['src/routes/**/*.tsx', 'src/router.tsx'],
-      project: ['src/**/*.{ts,tsx}'],
-      ignoreDependencies: [
-        '@tanstack/react-router-devtools',
-        '@fontsource-variable/dm-sans',
-        '@fontsource/instrument-serif',
-        '@fontsource/jetbrains-mono',
-        '@vigie/tokens',
-        'tailwindcss',
-      ],
-      vite: { config: 'vite.config.ts' },
-    },
     'packages/landing': {
       entry: ['src/pages/**/*.astro', 'src/layouts/**/*.astro', 'src/components/**/*.astro'],
       project: ['src/**/*.{astro,ts,tsx}'],
@@ -26,15 +10,20 @@ export default {
         '@fontsource-variable/dm-sans',
         '@fontsource/instrument-serif',
         '@fontsource/jetbrains-mono',
-        '@vigie/tokens',
         'tailwindcss',
       ],
     },
-    'packages/cli': {
-      project: ['src/**/*.ts'],
-    },
-    'packages/shared': {
-      project: ['src/**/*.ts'],
+    'packages/app': {
+      entry: ['src/infra/ssr/client-entry.tsx'],
+      project: ['src/**/*.{ts,tsx}'],
+      ignoreDependencies: [
+        '@fontsource-variable/dm-sans',
+        '@fontsource/instrument-serif',
+        '@fontsource/jetbrains-mono',
+        '@vigie/tokens',
+        'tailwindcss',
+      ],
+      vite: { config: 'vite.config.ts' },
     },
     'packages/tokens': {
       project: ['**/*.ts'],
