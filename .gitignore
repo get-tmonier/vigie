@@ -32,3 +32,6 @@ pnpm-debug.log*
 
 # jetbrains
 .idea/
+
+# session memory (claude hooks)
+.remember/
