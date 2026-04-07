@@ -10,7 +10,7 @@ vigie is built by **Tmonier SRL** (Damien Meur's freelance company). The freelan
 - **Bun** everywhere — runtime, package manager, test runner, daemon compilation
 - **Turborepo** monorepo with Bun workspaces
 - **Biome** for lint + format (no ESLint, no Prettier) — config at root `biome.json`
-- **TypeScript strict** across all packages, ESM only
+- **TypeScript strict** across all packages, ESM only — **use `tsgo` (`@typescript/native-preview`) not `tsc`**
 
 ## Packages
 

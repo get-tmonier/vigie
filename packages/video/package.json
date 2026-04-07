@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "typecheck": "tsgo --noEmit",
     "dev": "remotion studio",
     "render": "remotion render AppShowcase out/vigie-demo.mp4",
     "render:clips": "bash render-clips.sh",
@@ -12,12 +13,13 @@
   "dependencies": {
     "@remotion/cli": "4.0.293",
     "@remotion/gif": "4.0.293",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
     "remotion": "4.0.293"
   },
   "devDependencies": {
-    "@types/react": "19.1.8",
-    "typescript": "5.9.3"
+    "@typescript/native-preview": "7.0.0-dev.20260407.1",
+    "@types/react": "19.2.14",
+    "typescript": "6.0.2"
   }
 }

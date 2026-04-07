@@ -6,6 +6,7 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "allowArbitraryExtensions": true,
     "outDir": "dist",
     "rootDir": "src",
     "jsx": "react-jsx",
