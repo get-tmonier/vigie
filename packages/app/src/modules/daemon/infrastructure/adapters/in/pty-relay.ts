@@ -7,9 +7,9 @@ import {
 } from '#lib/cli-terminal/status-bar-live';
 import { createTuiRenderer } from '#lib/vterm/tui-renderer';
 import { createVTerm } from '#lib/vterm/vterm';
-import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
+import type { IpcClientShape } from '#modules/daemon/application/ports/in/ipc-client.port';
 import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
-import type { IpcClientShape } from '#modules/session/application/ports/out/ipc-client.port';
+import { DaemonNotRunningError } from '#shared/kernel/errors';
 
 function formatDuration(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
@@ -111,7 +111,6 @@ export function attachPtyRelay(client: IpcClientShape, options: PtyRelayOptions)
       }
     });
 
-    // Pre-launch banner — visible before alt screen hides it
     const shortId = sessionId.slice(0, 8);
     const bannerWidth = 50;
     const line1 = `  \u2699 vigie session ${shortId}`;
@@ -130,7 +129,6 @@ export function attachPtyRelay(client: IpcClientShape, options: PtyRelayOptions)
     banner += `\u2570${'─'.repeat(bannerWidth)}\u256F\x1b[0m\n`;
     process.stdout.write(banner);
 
-    // Raw mode so keystrokes are delivered immediately (not line-buffered)
     if (process.stdin.isTTY) {
       process.stdin.setRawMode(true);
     }
@@ -138,8 +136,6 @@ export function attachPtyRelay(client: IpcClientShape, options: PtyRelayOptions)
     renderer.activate();
     initStatusBar(renderer, sessionId, startedAt, options.infoLine);
 
-    // Restore terminal on unexpected signals — without this, the process would
-    // exit with raw mode + alt screen still active, leaving the terminal frozen.
     const restoreTerminal = () => {
       renderer.deactivate();
       teardownStatusBar(false);
@@ -158,9 +154,6 @@ export function attachPtyRelay(client: IpcClientShape, options: PtyRelayOptions)
     process.once('SIGINT', onSigint);
     process.once('SIGTERM', onSigterm);
 
-    // Forward stdin to daemon via a dedicated stdin socket.
-    // The main IPC socket has a Bun bug where heavy server->client writes
-    // (PTY output) prevent the data handler from firing for client->server data.
     const stdinSocket = yield* connectStdinSocket(stdinSocketPath);
 
     const triggerDetach = () => {
@@ -181,7 +174,6 @@ export function attachPtyRelay(client: IpcClientShape, options: PtyRelayOptions)
     process.stdin.on('data', onStdinData);
     process.stdin.resume();
 
-    // Local terminal resize -> daemon + vterm + renderer
     const onResize = () => {
       const newCols = process.stdout.columns ?? 80;
       const newRows = process.stdout.rows ?? 24;
@@ -190,7 +182,6 @@ export function attachPtyRelay(client: IpcClientShape, options: PtyRelayOptions)
       renderer.resize(newCols, newRows);
       renderer.fullRender(vterm.getScreen());
       resizeStatusBar();
-      // daemon does its own rows-1, so send full newRows
       Effect.runFork(
         client
           .send({ type: 'session:cli-resize', sessionId, cols: newCols, rows: newRows })
@@ -199,7 +190,6 @@ export function attachPtyRelay(client: IpcClientShape, options: PtyRelayOptions)
     };
     process.stdout.on('resize', onResize);
 
-    // Wait for PTY exit, detach, or daemon disconnect
     const result = yield* Effect.raceAll([
       Deferred.await(exitDeferred).pipe(
         Effect.map((exitCode): PtyRelayResult => ({ type: 'exit', exitCode }))
@@ -210,7 +200,6 @@ export function attachPtyRelay(client: IpcClientShape, options: PtyRelayOptions)
       ),
     ]);
 
-    // Cleanup
     process.off('SIGINT', onSigint);
     process.off('SIGTERM', onSigterm);
 

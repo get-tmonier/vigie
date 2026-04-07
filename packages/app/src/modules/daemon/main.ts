@@ -17,21 +17,27 @@ import {
   SessionServiceLayer,
   SessionServiceTag,
 } from '#modules/session/application/session.service';
+import { createSessionRoutes } from '#modules/session/infrastructure/adapters/in/session.routes';
 import { AgentRegistryLayer } from '#modules/session/infrastructure/adapters/out/agents/agent-registry';
 import { FsResumabilityCheckerLayer } from '#modules/session/infrastructure/adapters/out/fs-resumability-checker';
 import { SqliteSessionRepositoryLayer } from '#modules/session/infrastructure/adapters/out/sqlite-session-repository';
+import { EventPublisher } from '#modules/terminal/application/ports/out/event-publisher.port';
+import { PtySpawner } from '#modules/terminal/application/ports/out/pty-spawner.port';
+import { TerminalRepository } from '#modules/terminal/application/ports/out/terminal-repository.port';
 import {
   TerminalSubscribers,
   TerminalSubscribersLayer,
 } from '#modules/terminal/application/terminal-subscribers';
+import { createTerminalRoutes } from '#modules/terminal/infrastructure/adapters/in/terminal.routes';
 import { BunPtySpawnerLayer } from '#modules/terminal/infrastructure/adapters/out/bun-pty-spawner';
 import {
   AppEventPublisherTag,
   EventPublisherLayer,
 } from '#modules/terminal/infrastructure/adapters/out/event-publisher.adapter';
 import { SqliteTerminalRepositoryLayer } from '#modules/terminal/infrastructure/adapters/out/sqlite-terminal-repository';
+import { createTerminalGateway } from '#modules/terminal/infrastructure/adapters/out/terminal-gateway.adapter';
+import { TerminalGateway } from '#shared/kernel/terminal-gateway';
 
-// Module-level paths for use in signal handlers (computed from env at startup)
 const _HOME = process.env.VIGIE_HOME ?? join(homedir(), '.vigie');
 const _PID_FILE = join(_HOME, 'daemon.pid');
 const _SOCKET_PATH = join(_HOME, 'daemon.sock');
@@ -123,12 +129,12 @@ export const runDaemon = Effect.gen(function* () {
     yield* Effect.logInfo(`[daemon] Serving client islands from ${clientDistPath}`);
   }
 
-  const routesLayer = createRoutesLayer({
-    sessionService,
-    eventPublisher,
-    terminalSubs,
-    clientDistPath,
-  });
+  const appRoutes = [
+    ...createSessionRoutes({ sessionService, eventPublisher }),
+    ...createTerminalRoutes({ sessionService, terminalSubs }),
+  ];
+
+  const routesLayer = createRoutesLayer({ appRoutes, clientDistPath });
 
   const port = config.port;
   yield* Effect.gen(function* () {
@@ -216,7 +222,29 @@ const InfraLayer = Layer.mergeAll(
   DaemonConfigLayer
 );
 
-export const AppLayer = SessionServiceLayer.pipe(Layer.provideMerge(InfraLayer));
+const TerminalGatewayLayer = Layer.effect(TerminalGateway)(
+  Effect.gen(function* () {
+    const ptySpawner = yield* PtySpawner;
+    const terminalRepo = yield* TerminalRepository;
+    const eventPublisher = yield* EventPublisher;
+    const terminalSubs = yield* TerminalSubscribers;
+    const ipcServer = yield* IpcServer;
+    return createTerminalGateway({
+      ptySpawner,
+      terminalRepo,
+      eventPublisher,
+      terminalSubs,
+      sendToCliClient: (connId, msg) => Effect.runSync(ipcServer.sendTo(connId, msg)),
+    });
+  })
+);
+
+const TerminalGatewayWithDeps = TerminalGatewayLayer.pipe(Layer.provide(InfraLayer));
+
+export const AppLayer = SessionServiceLayer.pipe(
+  Layer.provideMerge(TerminalGatewayWithDeps),
+  Layer.provideMerge(InfraLayer)
+);
 
 if (import.meta.main) {
   process.on('SIGTERM', () => {
@@ -250,6 +278,6 @@ if (import.meta.main) {
           process.exit(1);
         })
       )
-    )
+    ) as Effect.Effect<void, never, never>
   );
 }

@@ -1,10 +1,10 @@
 import { Effect, Layer, ServiceMap } from 'effect';
 import {
-  type DomainEvent,
   EventPublisher,
   type EventPublisherShape,
 } from '#modules/terminal/application/ports/out/event-publisher.port';
 import type { BrowserEvent } from '#modules/terminal/infrastructure/adapters/in/browser-events';
+import type { DomainEvent } from '#shared/kernel/domain-events';
 
 function domainEventToBrowserEvent(event: DomainEvent): BrowserEvent | null {
   switch (event.type) {
@@ -117,7 +117,7 @@ export function createEventPublisher(): AppEventPublisher {
   };
 }
 
-export type AppEventPublisher = EventPublisherShape & {
+type AppEventPublisher = EventPublisherShape & {
   subscribeBrowser: (listener: (event: BrowserEvent) => void) => () => void;
 };
 

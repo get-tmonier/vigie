@@ -2,7 +2,7 @@ import type { Database } from 'bun:sqlite';
 import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
 import { openDatabase } from '#infra/database';
 import { Session } from '#modules/session/domain/session';
-import { SessionId } from '#modules/session/domain/session-id';
+import { SessionId } from '#shared/kernel/session-id';
 import { createSqliteSessionRepository } from '../sqlite-session-repository';
 
 let db: Database;

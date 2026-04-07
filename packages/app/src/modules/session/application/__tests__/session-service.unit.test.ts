@@ -1,22 +1,16 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect } from 'effect';
-import type { IpcServerShape } from '#modules/daemon/application/ports/out/ipc-server.port';
 import type { AgentRegistryShape } from '#modules/session/application/ports/out/agent-adapter.port';
 import type { ResumabilityCheckerShape } from '#modules/session/application/ports/out/resumability-checker.port';
 import type {
   ResumableSessionInfo,
   SessionRepositoryShape,
 } from '#modules/session/application/ports/out/session-repository.port';
+import type { TerminalGatewayShape } from '#modules/session/application/ports/out/terminal-gateway.port';
 import { createSessionService } from '#modules/session/application/session.service';
 import type { Session } from '#modules/session/domain/session';
-import { SessionId } from '#modules/session/domain/session-id';
-import type {
-  DomainEvent,
-  EventPublisherShape,
-} from '#modules/terminal/application/ports/out/event-publisher.port';
-import type { PtySpawnerShape } from '#modules/terminal/application/ports/out/pty-spawner.port';
-import type { TerminalRepositoryShape } from '#modules/terminal/application/ports/out/terminal-repository.port';
-import type { TerminalSubscribersShape } from '#modules/terminal/application/terminal-subscribers';
+import type { DomainEvent } from '#shared/kernel/domain-events';
+import { SessionId } from '#shared/kernel/session-id';
 
 function makeRepo(): SessionRepositoryShape {
   const store = new Map<string, Session>();
@@ -50,24 +44,36 @@ function makeRepo(): SessionRepositoryShape {
   };
 }
 
-function makePublisher() {
+function makeGateway() {
   const events: DomainEvent[] = [];
-  const publisher: EventPublisherShape & {
+  const chunks = new Map<string, Array<{ data: string }>>();
+
+  const gateway: TerminalGatewayShape & {
     getEventsOfType<T extends DomainEvent['type']>(type: T): Extract<DomainEvent, { type: T }>[];
-    clear(): void;
+    clearEvents(): void;
   } = {
-    publish: (e) => {
+    spawnPty: () => Effect.die(new Error('unexpected spawnPty call')),
+    appendChunk: (sessionId, base64) => {
+      if (!chunks.has(sessionId)) chunks.set(sessionId, []);
+      chunks.get(sessionId)!.push({ data: base64 });
+    },
+    getAllChunks: (sessionId) => chunks.get(sessionId) ?? [],
+    appendInput: () => {},
+    getInputHistory: () => [],
+    broadcastOutput: () => {},
+    sendToCliClient: () => {},
+    bufferInput: () => {},
+    publishEvent: (e) => {
       events.push(e);
       return Effect.void;
     },
-    subscribe: () => () => {},
     getEventsOfType: <T extends DomainEvent['type']>(type: T) =>
       events.filter((e) => e.type === type) as Extract<DomainEvent, { type: T }>[],
-    clear: () => {
+    clearEvents: () => {
       events.length = 0;
     },
   };
-  return publisher;
+  return gateway;
 }
 
 function makeResumabilityChecker(
@@ -82,18 +88,6 @@ function makeResumabilityChecker(
   };
 }
 
-const noopTerminalRepo: TerminalRepositoryShape = {
-  appendChunk: () => {},
-  getChunks: () => [],
-  getAllChunks: () => [],
-  appendInput: () => {},
-  getInputHistory: () => [],
-};
-
-const noopPtySpawner: PtySpawnerShape = {
-  spawn: () => Effect.die(new Error('unexpected spawn call')),
-};
-
 const noopAgentRegistry: AgentRegistryShape = {
   resolve: (agentType) => ({
     agentType,
@@ -103,39 +97,23 @@ const noopAgentRegistry: AgentRegistryShape = {
   }),
 };
 
-const noopIpcServer: IpcServerShape = {
-  start: () => Effect.void,
-  sendTo: () => Effect.void,
-  shutdown: () => Effect.void,
-};
-
-const noopTerminalSubs: TerminalSubscribersShape = {
-  subscribe: () => () => {},
-  publish: () => Effect.void,
-  hasSubscribers: () => false,
-};
-
 function makeService() {
   const sessionRepo = makeRepo();
-  const eventPublisher = makePublisher();
+  const gateway = makeGateway();
   const resumabilityChecker = makeResumabilityChecker(false);
   const service = createSessionService({
     sessionRepo,
-    terminalRepo: noopTerminalRepo,
-    ptySpawner: noopPtySpawner,
-    eventPublisher,
+    gateway,
     resumabilityChecker,
     agentRegistry: noopAgentRegistry,
-    ipcServer: noopIpcServer,
-    terminalSubs: noopTerminalSubs,
   });
-  return { service, sessionRepo, eventPublisher, resumabilityChecker };
+  return { service, sessionRepo, gateway, resumabilityChecker };
 }
 
 describe('SessionService', () => {
   describe('register', () => {
     it('saves session and publishes session:started', () => {
-      const { service, sessionRepo, eventPublisher } = makeService();
+      const { service, sessionRepo, gateway } = makeService();
       service.register({
         sessionId: 'sess-1',
         agentType: 'claude',
@@ -143,7 +121,7 @@ describe('SessionService', () => {
         connId: 'conn-1',
       });
       expect(sessionRepo.findById(SessionId('sess-1'))).not.toBeNull();
-      const events = eventPublisher.getEventsOfType('session:started');
+      const events = gateway.getEventsOfType('session:started');
       expect(events).toHaveLength(1);
       expect(events[0].sessionId).toBe(SessionId('sess-1'));
     });
@@ -158,9 +136,9 @@ describe('SessionService', () => {
 
   describe('markEnded', () => {
     it('marks session ended, checks resumability via port, publishes session:ended', () => {
-      const { service, sessionRepo, eventPublisher, resumabilityChecker } = makeService();
+      const { service, sessionRepo, gateway, resumabilityChecker } = makeService();
       service.register({ sessionId: 'sess-1', agentType: 'claude', cwd: '/tmp', connId: 'conn-1' });
-      eventPublisher.clear();
+      gateway.clearEvents();
 
       // Seed a agentSessionId so resumability check runs
       const session = sessionRepo.findById(SessionId('sess-1'));
@@ -177,7 +155,7 @@ describe('SessionService', () => {
       expect(saved.status).toBe('ended');
       expect(saved.resumable).toBe(true);
 
-      const events = eventPublisher.getEventsOfType('session:ended');
+      const events = gateway.getEventsOfType('session:ended');
       expect(events).toHaveLength(1);
     });
 
@@ -189,14 +167,14 @@ describe('SessionService', () => {
 
   describe('markError', () => {
     it('marks session in error state and publishes session:error', () => {
-      const { service, sessionRepo, eventPublisher } = makeService();
+      const { service, sessionRepo, gateway } = makeService();
       service.register({ sessionId: 'sess-1', agentType: 'claude', cwd: '/tmp', connId: 'conn-1' });
-      eventPublisher.clear();
+      gateway.clearEvents();
       service.markError(SessionId('sess-1'), 'something broke');
       const saved = sessionRepo.findById(SessionId('sess-1'));
       if (!saved) throw new Error('session not found');
       expect(saved.status).toBe('error');
-      const events = eventPublisher.getEventsOfType('session:error');
+      const events = gateway.getEventsOfType('session:error');
       expect(events).toHaveLength(1);
       if (events[0].type === 'session:error') {
         expect(events[0].error).toBe('something broke');
@@ -206,14 +184,14 @@ describe('SessionService', () => {
 
   describe('delete', () => {
     it('removes ended session from repo and publishes session:deleted', () => {
-      const { service, sessionRepo, eventPublisher } = makeService();
+      const { service, sessionRepo, gateway } = makeService();
       service.register({ sessionId: 'sess-1', agentType: 'claude', cwd: '/tmp', connId: 'conn-1' });
       service.markEnded(SessionId('sess-1'), 0);
-      eventPublisher.clear();
+      gateway.clearEvents();
 
       service.delete(SessionId('sess-1'));
       expect(sessionRepo.findById(SessionId('sess-1'))).toBeNull();
-      const events = eventPublisher.getEventsOfType('session:deleted');
+      const events = gateway.getEventsOfType('session:deleted');
       expect(events).toHaveLength(1);
     });
 
@@ -225,29 +203,29 @@ describe('SessionService', () => {
 
   describe('deleteAllEnded', () => {
     it('delegates to repo and publishes sessions:cleared', () => {
-      const { service, sessionRepo, eventPublisher } = makeService();
+      const { service, sessionRepo, gateway } = makeService();
       service.register({ sessionId: 'sess-1', agentType: 'claude', cwd: '/tmp', connId: 'conn-1' });
       service.markEnded(SessionId('sess-1'), 0);
-      eventPublisher.clear();
+      gateway.clearEvents();
 
       service.deleteAllEnded();
       expect(sessionRepo.findAll()).toHaveLength(0);
-      const events = eventPublisher.getEventsOfType('sessions:cleared');
+      const events = gateway.getEventsOfType('sessions:cleared');
       expect(events).toHaveLength(1);
     });
   });
 
   describe('setAgentSessionId', () => {
     it('sets id on session, saves, and publishes session:agent-id-detected', () => {
-      const { service, sessionRepo, eventPublisher } = makeService();
+      const { service, sessionRepo, gateway } = makeService();
       service.register({ sessionId: 'sess-1', agentType: 'claude', cwd: '/tmp', connId: 'conn-1' });
-      eventPublisher.clear();
+      gateway.clearEvents();
 
       service.setAgentSessionId(SessionId('sess-1'), 'cid-123');
       const saved = sessionRepo.findById(SessionId('sess-1'));
       if (!saved) throw new Error('session not found');
       expect(saved.agentSessionId).toBe('cid-123');
-      const events = eventPublisher.getEventsOfType('session:agent-id-detected');
+      const events = gateway.getEventsOfType('session:agent-id-detected');
       expect(events).toHaveLength(1);
     });
   });
@@ -289,14 +267,14 @@ describe('SessionService', () => {
 
   describe('checkResumableForActive', () => {
     it('updates session and publishes session:resumable-changed when value changes', () => {
-      const { service, sessionRepo, eventPublisher, resumabilityChecker } = makeService();
+      const { service, sessionRepo, gateway, resumabilityChecker } = makeService();
       service.register({ sessionId: 'sess-1', agentType: 'claude', cwd: '/tmp', connId: 'c1' });
       const session = sessionRepo.findById(SessionId('sess-1'));
       if (!session) throw new Error('session not found');
       session.setAgentSessionId('cid');
       sessionRepo.save(session);
       session.pullEvents();
-      eventPublisher.clear();
+      gateway.clearEvents();
 
       resumabilityChecker.setReturn(true);
       service.checkResumableForActive();
@@ -304,23 +282,23 @@ describe('SessionService', () => {
       const saved = sessionRepo.findById(SessionId('sess-1'));
       if (!saved) throw new Error('session not found');
       expect(saved.resumable).toBe(true);
-      const events = eventPublisher.getEventsOfType('session:resumable-changed');
+      const events = gateway.getEventsOfType('session:resumable-changed');
       expect(events).toHaveLength(1);
     });
 
     it('does not emit event when resumable value is unchanged', () => {
-      const { service, sessionRepo, eventPublisher } = makeService();
+      const { service, sessionRepo, gateway } = makeService();
       service.register({ sessionId: 'sess-1', agentType: 'claude', cwd: '/tmp', connId: 'c1' });
       const session = sessionRepo.findById(SessionId('sess-1'));
       if (!session) throw new Error('session not found');
       session.setAgentSessionId('cid');
       sessionRepo.save(session);
       session.pullEvents();
-      eventPublisher.clear();
+      gateway.clearEvents();
 
       // resumabilityChecker returns false (default), session.resumable is already false
       service.checkResumableForActive();
-      const events = eventPublisher.getEventsOfType('session:resumable-changed');
+      const events = gateway.getEventsOfType('session:resumable-changed');
       expect(events).toHaveLength(0);
     });
   });

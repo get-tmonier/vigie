@@ -1,5 +1,7 @@
 import type { SessionId } from './session-id';
 
+// ── Session domain events ──
+
 export type SessionStarted = {
   readonly type: 'session:started';
   readonly sessionId: SessionId;
@@ -59,3 +61,33 @@ export type SessionDomainEvent =
   | SessionsCleared
   | AgentSessionIdDetected
   | ResumableChanged;
+
+// ── Terminal events ──
+
+export type TerminalOutputEvent = {
+  readonly type: 'terminal:output';
+  readonly sessionId: string;
+  readonly data: string;
+  readonly timestamp: number;
+};
+
+export type TerminalInputEchoEvent = {
+  readonly type: 'terminal:input-echo';
+  readonly sessionId: string;
+  readonly text: string;
+  readonly source: 'cli' | 'browser';
+  readonly timestamp: number;
+};
+
+export type TerminalResizedEvent = {
+  readonly type: 'terminal:pty-resized';
+  readonly sessionId: string;
+  readonly cols: number;
+  readonly rows: number;
+};
+
+export type DomainEvent =
+  | SessionDomainEvent
+  | TerminalOutputEvent
+  | TerminalInputEchoEvent
+  | TerminalResizedEvent;

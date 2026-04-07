@@ -5,9 +5,7 @@ import { createEventPublisher } from '../event-publisher.adapter';
 function makeStartedEvent() {
   return {
     type: 'session:started' as const,
-    sessionId: 'sess-1' as ReturnType<
-      typeof import('#modules/session/domain/session-id').SessionId
-    >,
+    sessionId: 'sess-1' as ReturnType<typeof import('#shared/kernel/session-id').SessionId>,
     agentType: 'claude',
     mode: 'prompt' as const,
     cwd: '/tmp',

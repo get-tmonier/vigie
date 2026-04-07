@@ -1,12 +1,12 @@
 import { Effect } from 'effect';
+import type { SessionCommandShape } from '#modules/daemon/application/ports/in/session-command.port';
 import type { IpcConnection } from '#modules/daemon/application/ports/out/ipc-server.port';
-import type { SessionToDaemon } from '#modules/daemon/infrastructure/adapters/ipc-schemas';
-import type { SessionService } from '#modules/session/application/session.service';
-import { SessionId } from '#modules/session/domain/session-id';
-import { expandPath } from '#modules/session/infrastructure/adapters/expand-path';
+import type { SessionToDaemon } from '#shared/kernel/ipc-protocol';
+import { SessionId } from '#shared/kernel/session-id';
+import { expandPath } from '#shared/lib/path';
 
 export function createIpcRouter(
-  svc: SessionService
+  svc: SessionCommandShape
 ): (conn: IpcConnection, msg: SessionToDaemon) => Effect.Effect<void> {
   return (conn, msg) =>
     Effect.gen(function* () {
@@ -26,7 +26,6 @@ export function createIpcRouter(
           break;
         }
         case 'session:spawn-interactive': {
-          svc.connSessions.set(conn.id, msg.sessionId);
           const spawnResult = yield* Effect.result(
             svc.spawnInteractive({
               sessionId: msg.sessionId,
@@ -53,13 +52,12 @@ export function createIpcRouter(
             break;
           }
 
-          const { sessionId, entry } = spawnResult.success;
-          entry.cliChannels.set(conn.id, { cols: msg.cols, rows: msg.rows });
+          const { sessionId, pid } = spawnResult.success;
           conn.send(
             JSON.stringify({
               type: 'session:spawned',
               sessionId,
-              pid: entry.handle.pid,
+              pid,
             })
           );
           break;
@@ -69,14 +67,10 @@ export function createIpcRouter(
           break;
         }
         case 'session:cli-resize': {
-          const entry = svc.ptyHandles.get(msg.sessionId);
-          if (entry?.cliChannels.has(conn.id)) {
-            entry.cliChannels.set(conn.id, { cols: msg.cols, rows: msg.rows });
-            svc.applyResizePriority(msg.sessionId);
-            yield* Effect.logInfo(
-              `[daemon] cli-resize sessionId=${msg.sessionId} cols=${msg.cols} rows=${msg.rows}`
-            );
-          }
+          svc.updateCliResize(msg.sessionId, conn.id, msg.cols, msg.rows);
+          yield* Effect.logInfo(
+            `[daemon] cli-resize sessionId=${msg.sessionId} cols=${msg.cols} rows=${msg.rows}`
+          );
           break;
         }
         case 'session:detach': {
@@ -89,12 +83,11 @@ export function createIpcRouter(
             rows: msg.rows,
           });
           if (result) {
-            const entry = svc.ptyHandles.get(msg.sessionId);
             conn.send(
               JSON.stringify({
                 type: 'session:spawned',
                 sessionId: msg.sessionId,
-                pid: entry?.handle.pid,
+                pid: result.pid,
                 ptyCols: msg.cols,
                 ptyRows: msg.rows - 1,
                 forcedResize: true,
@@ -130,7 +123,6 @@ export function createIpcRouter(
           break;
         }
         case 'session:output': {
-          // Forwarded from CLI runner — no-op for prompt mode
           break;
         }
         case 'session:done': {
@@ -144,11 +136,9 @@ export function createIpcRouter(
           break;
         }
         case 'session:terminal-output': {
-          // Terminal output from CLI prompt mode — no-op
           break;
         }
         case 'session:resume': {
-          svc.connSessions.set(conn.id, msg.sessionId);
           const resumeResult = yield* Effect.result(
             svc.resume(SessionId(msg.sessionId), {
               cols: msg.cols,
@@ -171,13 +161,12 @@ export function createIpcRouter(
             break;
           }
 
-          const { sessionId: resumedId, entry: resumedEntry } = resumeResult.success;
-          resumedEntry.cliChannels.set(conn.id, { cols: msg.cols, rows: msg.rows });
+          const { sessionId: resumedId, pid: resumedPid } = resumeResult.success;
           conn.send(
             JSON.stringify({
               type: 'session:spawned',
               sessionId: resumedId,
-              pid: resumedEntry.handle.pid,
+              pid: resumedPid,
             })
           );
           break;

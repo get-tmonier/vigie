@@ -7,9 +7,9 @@ import {
   type SessionRepositoryShape,
 } from '#modules/session/application/ports/out/session-repository.port';
 import { Session } from '#modules/session/domain/session';
-import type { SessionId } from '#modules/session/domain/session-id';
-import { SessionId as makeSessionId } from '#modules/session/domain/session-id';
 import type { SessionStatus } from '#modules/session/domain/session-status';
+import type { SessionId } from '#shared/kernel/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/session-id';
 
 interface SessionRow {
   id: string;

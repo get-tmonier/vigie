@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect } from 'effect';
-import { getGitContext } from '#modules/session/infrastructure/adapters/out/git-context';
+import { getGitContext } from '#lib/git-context';
 
 describe('getGitContext', () => {
   it('returns branch and remote for a git repo', async () => {

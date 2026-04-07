@@ -1,6 +1,6 @@
 import { ServiceMap } from 'effect';
 import type { Session } from '#modules/session/domain/session';
-import type { SessionId } from '#modules/session/domain/session-id';
+import type { SessionId } from '#shared/kernel/session-id';
 
 export interface ResumableSessionInfo {
   readonly id: SessionId;

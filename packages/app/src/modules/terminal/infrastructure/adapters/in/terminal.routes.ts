@@ -6,13 +6,10 @@ import * as HttpServerRequest from 'effect/unstable/http/HttpServerRequest';
 import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse';
 import type * as Socket from 'effect/unstable/socket/Socket';
 import type { SessionService } from '#modules/session/application/session.service';
-import { sessionToDTO } from '#modules/session/infrastructure/adapters/in/session.mapper';
 import type { TerminalSubscribersShape } from '#modules/terminal/application/terminal-subscribers';
-import type { AppEventPublisher } from '#modules/terminal/infrastructure/adapters/out/event-publisher.adapter';
 
 type TerminalRouteDeps = {
   sessionService: SessionService;
-  eventPublisher: AppEventPublisher;
   terminalSubs: TerminalSubscribersShape;
 };
 
@@ -21,7 +18,7 @@ type RouteError = HttpServerError.HttpServerError | Socket.SocketError | Cause.U
 export function createTerminalRoutes(
   deps: TerminalRouteDeps
 ): HttpRouter.Route<RouteError, never>[] {
-  const { sessionService, eventPublisher, terminalSubs } = deps;
+  const { sessionService, terminalSubs } = deps;
 
   return [
     HttpRouter.route(
@@ -51,30 +48,6 @@ export function createTerminalRoutes(
         const limit = limitParam ? Number.parseInt(limitParam, 10) : 200;
         const history = sessionService.getInputHistory(sessionId, limit);
         return HttpServerResponse.jsonUnsafe({ history });
-      })
-    ),
-
-    HttpRouter.route(
-      'GET',
-      '/ws/events',
-      Effect.gen(function* () {
-        const request = yield* HttpServerRequest.HttpServerRequest;
-        const socket = yield* request.upgrade;
-        const write = yield* socket.writer;
-
-        yield* Effect.logInfo('[server] Events WS client connected');
-
-        const sessions = sessionService.listAll().map(sessionToDTO);
-        yield* write(JSON.stringify({ type: 'snapshot', sessions }));
-
-        const unsub = eventPublisher.subscribeBrowser((event) => {
-          Effect.runFork(write(JSON.stringify(event)));
-        });
-
-        yield* socket.runRaw(() => {});
-        unsub();
-
-        return HttpServerResponse.empty();
       })
     ),
 

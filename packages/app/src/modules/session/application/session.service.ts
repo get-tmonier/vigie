@@ -1,27 +1,17 @@
 import { Effect, Layer, ServiceMap } from 'effect';
-import type { IpcServerShape } from '#modules/daemon/application/ports/out/ipc-server.port';
-import { IpcServer } from '#modules/daemon/application/ports/out/ipc-server.port';
 import type { AgentRegistryShape } from '#modules/session/application/ports/out/agent-adapter.port';
 import { AgentRegistry } from '#modules/session/application/ports/out/agent-adapter.port';
-import type { EventPublisherShape } from '#modules/terminal/application/ports/out/event-publisher.port';
-import { EventPublisher } from '#modules/terminal/application/ports/out/event-publisher.port';
 import type {
   PtyHandle,
-  PtySpawnerShape,
-} from '#modules/terminal/application/ports/out/pty-spawner.port';
-import { PtySpawner } from '#modules/terminal/application/ports/out/pty-spawner.port';
-import type { TerminalRepositoryShape } from '#modules/terminal/application/ports/out/terminal-repository.port';
-import { TerminalRepository } from '#modules/terminal/application/ports/out/terminal-repository.port';
-import type { TerminalSubscribersShape } from '#modules/terminal/application/terminal-subscribers';
-import { TerminalSubscribers } from '#modules/terminal/application/terminal-subscribers';
-import type { LineBuffer } from '#modules/terminal/domain/input-line-buffer';
-import { stripAnsiAndBuffer } from '#modules/terminal/domain/input-line-buffer';
-import type { AgentRunnerError } from '../domain/errors';
+  TerminalGatewayShape,
+} from '#modules/session/application/ports/out/terminal-gateway.port';
+import { TerminalGateway } from '#modules/session/application/ports/out/terminal-gateway.port';
+import type { SessionDomainEvent } from '#shared/kernel/domain-events';
+import type { AgentRunnerError } from '#shared/kernel/errors';
+import type { SessionId } from '#shared/kernel/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/session-id';
 import { CannotResumeSessionError, SessionNotFoundError } from '../domain/errors';
-import type { SessionDomainEvent } from '../domain/events';
 import { Session } from '../domain/session';
-import type { SessionId } from '../domain/session-id';
-import { SessionId as makeSessionId } from '../domain/session-id';
 import type { ResumabilityCheckerShape } from './ports/out/resumability-checker.port';
 import { ResumabilityChecker } from './ports/out/resumability-checker.port';
 import type { SessionRepositoryShape } from './ports/out/session-repository.port';
@@ -34,92 +24,23 @@ interface PtyEntry {
   ptyDimensions: { cols: number; rows: number };
 }
 
-interface SpawnResult {
-  sessionId: SessionId;
-  entry: PtyEntry;
-}
-
 interface SessionServiceDeps {
   sessionRepo: SessionRepositoryShape;
-  terminalRepo: TerminalRepositoryShape;
-  ptySpawner: PtySpawnerShape;
-  eventPublisher: EventPublisherShape;
+  gateway: TerminalGatewayShape;
   resumabilityChecker: ResumabilityCheckerShape;
   agentRegistry: AgentRegistryShape;
-  ipcServer: IpcServerShape;
-  terminalSubs: TerminalSubscribersShape;
 }
 
 export function createSessionService(deps: SessionServiceDeps) {
-  const {
-    sessionRepo,
-    terminalRepo,
-    ptySpawner,
-    eventPublisher,
-    resumabilityChecker,
-    agentRegistry,
-    ipcServer,
-    terminalSubs,
-  } = deps;
+  const { sessionRepo, gateway, resumabilityChecker, agentRegistry } = deps;
 
   const ptyHandles = new Map<string, PtyEntry>();
   const sessionConnections = new Map<string, string>(); // sessionId → connId
   const connSessions = new Map<string, string>(); // connId → sessionId
 
   function publishEvents(events: SessionDomainEvent[]): Effect.Effect<void> {
-    return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
+    return Effect.forEach(events, (event) => gateway.publishEvent(event), { discard: true });
   }
-
-  function setupPtyLifecycle(sessionId: SessionId, entry: PtyEntry): void {
-    entry.handle.onOutput((data: Uint8Array) => {
-      const base64 = Buffer.from(data).toString('base64');
-      const ts = Date.now();
-      terminalRepo.appendChunk(sessionId, base64, ts);
-
-      for (const connId of entry.cliChannels.keys()) {
-        const msg = JSON.stringify({ type: 'session:pty-output', sessionId, data: base64 });
-        Effect.runSync(ipcServer.sendTo(connId, msg));
-      }
-
-      Effect.runFork(terminalSubs.publish(sessionId, base64));
-    });
-
-    Effect.runFork(
-      Effect.promise(() => entry.handle.wait()).pipe(
-        Effect.flatMap((exitCode) =>
-          Effect.sync(() => {
-            const session = sessionRepo.findById(sessionId);
-            if (!session) return;
-
-            const adapter = agentRegistry.resolve(session.agentType);
-            const resumable =
-              adapter.canResume &&
-              session.agentSessionId != null &&
-              resumabilityChecker.isResumable(session.agentSessionId, session.cwd);
-
-            session.markEnded(exitCode, resumable);
-            sessionRepo.save(session);
-            Effect.runFork(publishEvents(session.pullEvents()));
-
-            for (const connId of entry.cliChannels.keys()) {
-              Effect.runSync(
-                ipcServer.sendTo(
-                  connId,
-                  JSON.stringify({ type: 'session:pty-exited', sessionId, exitCode })
-                )
-              );
-            }
-
-            ptyHandles.delete(sessionId);
-          })
-        )
-      )
-    );
-  }
-
-  // ── Internal helpers ────────────────────────────────────────────────
-
-  const inputLineBuffers = new Map<string, LineBuffer>();
 
   function applyResizePriority(sessionId: string): { cols: number; rows: number } | null {
     const entry = ptyHandles.get(sessionId);
@@ -145,16 +66,61 @@ export function createSessionService(deps: SessionServiceDeps) {
     entry.ptyDimensions = { cols, rows };
 
     for (const connId of entry.cliChannels.keys()) {
-      Effect.runSync(
-        ipcServer.sendTo(
-          connId,
-          JSON.stringify({ type: 'session:pty-resized', sessionId, ptyCols: cols, ptyRows: rows })
-        )
+      gateway.sendToCliClient(
+        connId,
+        JSON.stringify({ type: 'session:pty-resized', sessionId, ptyCols: cols, ptyRows: rows })
       );
     }
 
-    Effect.runFork(eventPublisher.publish({ type: 'terminal:pty-resized', sessionId, cols, rows }));
+    Effect.runFork(gateway.publishEvent({ type: 'terminal:pty-resized', sessionId, cols, rows }));
     return { cols, rows };
+  }
+
+  function setupPtyLifecycle(sessionId: SessionId, entry: PtyEntry): void {
+    entry.handle.onOutput((data: Uint8Array) => {
+      const base64 = Buffer.from(data).toString('base64');
+      const ts = Date.now();
+      gateway.appendChunk(sessionId, base64, ts);
+
+      for (const connId of entry.cliChannels.keys()) {
+        gateway.sendToCliClient(
+          connId,
+          JSON.stringify({ type: 'session:pty-output', sessionId, data: base64 })
+        );
+      }
+
+      gateway.broadcastOutput(sessionId, base64);
+    });
+
+    Effect.runFork(
+      Effect.promise(() => entry.handle.wait()).pipe(
+        Effect.flatMap((exitCode) =>
+          Effect.sync(() => {
+            const session = sessionRepo.findById(sessionId);
+            if (!session) return;
+
+            const adapter = agentRegistry.resolve(session.agentType);
+            const resumable =
+              adapter.canResume &&
+              session.agentSessionId != null &&
+              resumabilityChecker.isResumable(session.agentSessionId, session.cwd);
+
+            session.markEnded(exitCode, resumable);
+            sessionRepo.save(session);
+            Effect.runFork(publishEvents(session.pullEvents()));
+
+            for (const connId of entry.cliChannels.keys()) {
+              gateway.sendToCliClient(
+                connId,
+                JSON.stringify({ type: 'session:pty-exited', sessionId, exitCode })
+              );
+            }
+
+            ptyHandles.delete(sessionId);
+          })
+        )
+      )
+    );
   }
 
   // ── Public API ──────────────────────────────────────────────────────
@@ -173,7 +139,7 @@ export function createSessionService(deps: SessionServiceDeps) {
       gitRemoteUrl?: string;
       repoName?: string;
       connId: string;
-    }): Session {
+    }): void {
       const session = Session.create({
         id: props.sessionId,
         agentType: props.agentType,
@@ -188,8 +154,6 @@ export function createSessionService(deps: SessionServiceDeps) {
       sessionConnections.set(props.sessionId, props.connId);
       connSessions.set(props.connId, props.sessionId);
       Effect.runFork(publishEvents(session.pullEvents()));
-
-      return session;
     },
 
     spawnInteractive(props: {
@@ -203,7 +167,7 @@ export function createSessionService(deps: SessionServiceDeps) {
       resume?: boolean;
       gitBranch?: string;
       repoName?: string;
-    }): Effect.Effect<SpawnResult, AgentRunnerError> {
+    }): Effect.Effect<{ sessionId: SessionId; pid: number }, AgentRunnerError> {
       return Effect.gen(function* () {
         const session = Session.create({
           id: props.sessionId,
@@ -228,7 +192,7 @@ export function createSessionService(deps: SessionServiceDeps) {
           agentSessionId,
           resume: props.resume,
         });
-        const handle = yield* ptySpawner.spawn(command, args, props.cwd, props.cols, props.rows);
+        const handle = yield* gateway.spawnPty(command, args, props.cwd, props.cols, props.rows);
 
         const entry: PtyEntry = {
           handle,
@@ -240,12 +204,13 @@ export function createSessionService(deps: SessionServiceDeps) {
 
         if (props.connId) {
           connSessions.set(props.connId, session.id);
+          entry.cliChannels.set(props.connId, { cols: props.cols, rows: props.rows });
         }
 
         Effect.runFork(publishEvents(session.pullEvents()));
         setupPtyLifecycle(session.id, entry);
 
-        return { sessionId: session.id, entry };
+        return { sessionId: session.id, pid: handle.pid };
       });
     },
 
@@ -253,7 +218,7 @@ export function createSessionService(deps: SessionServiceDeps) {
       sessionId: SessionId,
       opts: { cols: number; rows: number; connId?: string; gitBranch?: string; repoName?: string }
     ): Effect.Effect<
-      SpawnResult,
+      { sessionId: SessionId; pid: number },
       SessionNotFoundError | CannotResumeSessionError | AgentRunnerError
     > {
       return Effect.gen(function* () {
@@ -277,7 +242,7 @@ export function createSessionService(deps: SessionServiceDeps) {
           agentSessionId: session.agentSessionId,
           resume: true,
         });
-        const handle = yield* ptySpawner.spawn(command, args, session.cwd, opts.cols, opts.rows);
+        const handle = yield* gateway.spawnPty(command, args, session.cwd, opts.cols, opts.rows);
 
         const entry: PtyEntry = {
           handle,
@@ -289,12 +254,13 @@ export function createSessionService(deps: SessionServiceDeps) {
 
         if (opts.connId) {
           connSessions.set(opts.connId, sessionId);
+          entry.cliChannels.set(opts.connId, { cols: opts.cols, rows: opts.rows });
         }
 
         Effect.runFork(publishEvents(session.pullEvents()));
         setupPtyLifecycle(sessionId, entry);
 
-        return { sessionId, entry };
+        return { sessionId, pid: handle.pid };
       });
     },
 
@@ -313,7 +279,7 @@ export function createSessionService(deps: SessionServiceDeps) {
 
     deleteAllEnded(): void {
       sessionRepo.deleteAllEnded();
-      Effect.runFork(eventPublisher.publish({ type: 'sessions:cleared', timestamp: Date.now() }));
+      Effect.runFork(gateway.publishEvent({ type: 'sessions:cleared', timestamp: Date.now() }));
     },
 
     markEnded(sessionId: SessionId, exitCode: number): void {
@@ -366,7 +332,7 @@ export function createSessionService(deps: SessionServiceDeps) {
       sessionId: SessionId,
       connId: string,
       dims: { cols: number; rows: number }
-    ): { chunks: Array<{ data: string }> } | null {
+    ): { chunks: Array<{ data: string }>; pid: number } | null {
       const entry = ptyHandles.get(sessionId);
       if (!entry) return null;
 
@@ -378,7 +344,7 @@ export function createSessionService(deps: SessionServiceDeps) {
       entry.ptyDimensions = { cols: dims.cols, rows: cliRows };
 
       Effect.runFork(
-        eventPublisher.publish({
+        gateway.publishEvent({
           type: 'terminal:pty-resized',
           sessionId,
           cols: dims.cols,
@@ -386,8 +352,8 @@ export function createSessionService(deps: SessionServiceDeps) {
         })
       );
 
-      const chunks = terminalRepo.getAllChunks(sessionId);
-      return { chunks };
+      const chunks = gateway.getAllChunks(sessionId);
+      return { chunks, pid: entry.handle.pid };
     },
 
     detach(sessionId: SessionId, connId: string): void {
@@ -396,6 +362,14 @@ export function createSessionService(deps: SessionServiceDeps) {
       entry.cliChannels.delete(connId);
       connSessions.delete(connId);
       applyResizePriority(sessionId);
+    },
+
+    updateCliResize(sessionId: string, connId: string, cols: number, rows: number): void {
+      const entry = ptyHandles.get(sessionId);
+      if (entry?.cliChannels.has(connId)) {
+        entry.cliChannels.set(connId, { cols, rows });
+        applyResizePriority(sessionId);
+      }
     },
 
     handleDisconnect(connId: string): void {
@@ -431,11 +405,11 @@ export function createSessionService(deps: SessionServiceDeps) {
     },
 
     getAllChunks(sessionId: string) {
-      return terminalRepo.getAllChunks(sessionId);
+      return gateway.getAllChunks(sessionId);
     },
 
     getInputHistory(sessionId: string, limit?: number) {
-      return terminalRepo.getInputHistory(sessionId, limit);
+      return gateway.getInputHistory(sessionId, limit);
     },
 
     checkResumableForActive(): void {
@@ -470,10 +444,10 @@ export function createSessionService(deps: SessionServiceDeps) {
       if (entry) {
         const bytes = Uint8Array.from(atob(data), (c) => c.charCodeAt(0));
         entry.handle.write(bytes);
-        stripAnsiAndBuffer(inputLineBuffers, sessionId, data, source, (text, src, ts) => {
-          terminalRepo.appendInput(sessionId, text, src, ts);
+        gateway.bufferInput(sessionId, data, source, (text, src, ts) => {
+          gateway.appendInput(sessionId, text, src, ts);
           Effect.runFork(
-            eventPublisher.publish({
+            gateway.publishEvent({
               type: 'terminal:input-echo',
               sessionId,
               text,
@@ -500,22 +474,9 @@ export class SessionServiceTag extends ServiceMap.Service<SessionServiceTag, Ses
 export const SessionServiceLayer = Layer.effect(SessionServiceTag)(
   Effect.gen(function* () {
     const sessionRepo = yield* SessionRepository;
-    const terminalRepo = yield* TerminalRepository;
-    const ptySpawner = yield* PtySpawner;
-    const eventPublisher = yield* EventPublisher;
+    const gateway = yield* TerminalGateway;
     const resumabilityChecker = yield* ResumabilityChecker;
     const agentRegistry = yield* AgentRegistry;
-    const ipcServer = yield* IpcServer;
-    const terminalSubs = yield* TerminalSubscribers;
-    return createSessionService({
-      sessionRepo,
-      terminalRepo,
-      ptySpawner,
-      eventPublisher,
-      resumabilityChecker,
-      agentRegistry,
-      ipcServer,
-      terminalSubs,
-    });
+    return createSessionService({ sessionRepo, gateway, resumabilityChecker, agentRegistry });
   })
 );

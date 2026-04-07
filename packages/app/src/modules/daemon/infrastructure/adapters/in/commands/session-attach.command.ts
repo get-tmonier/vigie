@@ -9,9 +9,9 @@ import {
 } from '#lib/cli-terminal/status-bar-live';
 import { createTuiRenderer } from '#lib/vterm/tui-renderer';
 import { createVTerm } from '#lib/vterm/vterm';
-import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
 import { createBunProcessManager } from '#modules/daemon/infrastructure/adapters/out/bun-process-manager.adapter';
 import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
+import { DaemonNotRunningError } from '#shared/kernel/errors';
 import { createUnixSocketClient } from '../unix-socket-client.adapter';
 
 function formatDuration(ms: number): string {

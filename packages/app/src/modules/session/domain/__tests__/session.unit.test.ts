@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
+import { SessionId } from '#shared/kernel/session-id';
 import { CannotDeleteActiveSessionError, InvalidStatusTransitionError } from '../errors';
 import { Session } from '../session';
-import { SessionId } from '../session-id';
 
 describe('Session', () => {
   describe('create', () => {

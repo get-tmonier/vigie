@@ -1,15 +1,9 @@
 import type { Effect } from 'effect';
 import { ServiceMap } from 'effect';
-import type { AgentRunnerError } from '#modules/session/domain/errors';
+import type { AgentRunnerError } from '#shared/kernel/errors';
+import type { PtyHandle } from '#shared/kernel/pty';
 
-export interface PtyHandle {
-  readonly pid: number;
-  write(data: Uint8Array): void;
-  resize(cols: number, rows: number): void;
-  kill(): void;
-  onOutput(callback: (data: Uint8Array) => void): void;
-  wait(): Promise<number>;
-}
+export type { PtyHandle } from '#shared/kernel/pty';
 
 export interface PtySpawnerShape {
   spawn(

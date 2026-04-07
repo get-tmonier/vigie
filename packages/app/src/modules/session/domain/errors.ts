@@ -1,12 +1,6 @@
 import { Data } from 'effect';
 
-export class AgentRunnerError extends Data.TaggedError('AgentRunnerError')<{
-  readonly message: string;
-}> {}
-
-export class IpcConnectionError extends Data.TaggedError('IpcConnectionError')<{
-  readonly message: string;
-}> {}
+export { AgentRunnerError, IpcConnectionError } from '#shared/kernel/errors';
 
 export class SessionNotFoundError extends Data.TaggedError('SessionNotFoundError')<{
   readonly sessionId: string;

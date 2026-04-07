@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, spyOn } from 'bun:test';
 import { Effect } from 'effect';
+import type { IpcClientShape } from '#modules/daemon/application/ports/in/ipc-client.port';
+import { attachPtyRelay } from '#modules/daemon/infrastructure/adapters/in/pty-relay';
 import { DaemonConfigLayer } from '#modules/daemon/infrastructure/daemon-config';
-import type { IpcClientShape } from '#modules/session/application/ports/out/ipc-client.port';
-import { attachPtyRelay } from '#modules/session/infrastructure/adapters/in/pty-relay';
 
 function createMockClient(): IpcClientShape {
   return {

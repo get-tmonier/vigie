@@ -19,7 +19,7 @@ import {
   SessionSpawnInteractiveSchema,
   SessionStdinSchema,
   SessionToDaemonSchema,
-} from '../ipc-schemas';
+} from '#shared/kernel/ipc-protocol';
 
 describe('SessionToDaemon schemas', () => {
   it('parses session:register', () => {
@@ -185,15 +185,14 @@ describe('SessionToDaemon schemas', () => {
     expect(stdin.type).toBe('session:stdin');
   });
 
-  it('rejects invalid agent type', () => {
-    expect(() =>
-      v.parse(SessionRegisterSchema, {
-        type: 'session:register',
-        sessionId: 'x',
-        agentType: 'invalid',
-        cwd: '/',
-      })
-    ).toThrow();
+  it('accepts any agentType string', () => {
+    const result = v.parse(SessionRegisterSchema, {
+      type: 'session:register',
+      sessionId: 'x',
+      agentType: 'custom-agent',
+      cwd: '/',
+    });
+    expect(result.agentType).toBe('custom-agent');
   });
 });
 

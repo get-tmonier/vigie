@@ -2,11 +2,11 @@ import { Console, Effect, Stream } from 'effect';
 import { printChunk } from '#lib/cli-terminal/chunk-printer';
 import { printHeader } from '#lib/cli-terminal/header';
 import { printSessionSummary } from '#lib/cli-terminal/status-bar';
-import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
+import { getGitContext } from '#lib/git-context';
+import { createClaudeRunner } from '#modules/daemon/infrastructure/adapters/out/agents/claude-runner.adapter';
 import { createBunProcessManager } from '#modules/daemon/infrastructure/adapters/out/bun-process-manager.adapter';
 import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
-import { createClaudeRunner } from '#modules/session/infrastructure/adapters/out/agents/claude-runner.adapter';
-import { getGitContext } from '#modules/session/infrastructure/adapters/out/git-context';
+import { DaemonNotRunningError } from '#shared/kernel/errors';
 import { createUnixSocketClient } from '../unix-socket-client.adapter';
 
 export function claudeCommand(prompt: string) {

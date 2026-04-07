@@ -5,20 +5,24 @@ import * as HttpRouter from 'effect/unstable/http/HttpRouter';
 import type * as HttpServerError from 'effect/unstable/http/HttpServerError';
 import * as HttpServerRequest from 'effect/unstable/http/HttpServerRequest';
 import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse';
+import type * as Socket from 'effect/unstable/socket/Socket';
 import * as v from 'valibot';
 import { renderPage } from '#infra/ssr/render-page';
 import type { SessionService } from '#modules/session/application/session.service';
-import { SessionId } from '#modules/session/domain/session-id';
-import { expandPath } from '#modules/session/infrastructure/adapters/expand-path';
 import { SpawnSessionRequestSchema } from '#modules/session/infrastructure/adapters/in/session.dto';
+import { SessionId } from '#shared/kernel/session-id';
+import { expandPath } from '#shared/lib/path';
 import { sessionToDTO } from './session.mapper';
 import { DashboardPage } from './session.page';
 
 type SessionRouteDeps = {
   sessionService: SessionService;
+  eventPublisher: {
+    subscribeBrowser: (listener: (event: unknown) => void) => () => void;
+  };
 };
 
-type RouteError = HttpServerError.HttpServerError | Cause.UnknownError | never;
+type RouteError = HttpServerError.HttpServerError | Socket.SocketError | Cause.UnknownError | never;
 
 const jsonRoute = <E,>(
   method: 'GET' | 'POST' | 'DELETE',
@@ -45,7 +49,7 @@ const jsonRoute = <E,>(
   );
 
 export function createSessionRoutes(deps: SessionRouteDeps): HttpRouter.Route<RouteError, never>[] {
-  const { sessionService } = deps;
+  const { sessionService, eventPublisher } = deps;
 
   return [
     // SSR dashboard
@@ -267,6 +271,30 @@ export function createSessionRoutes(deps: SessionRouteDeps): HttpRouter.Route<Ro
           yield* Effect.logInfo(`[server] Kill requested for session ${sessionId}`);
         }
         return HttpServerResponse.jsonUnsafe({ killedCount });
+      })
+    ),
+
+    HttpRouter.route(
+      'GET',
+      '/ws/events',
+      Effect.gen(function* () {
+        const request = yield* HttpServerRequest.HttpServerRequest;
+        const socket = yield* request.upgrade;
+        const write = yield* socket.writer;
+
+        yield* Effect.logInfo('[server] Events WS client connected');
+
+        const sessions = sessionService.listAll().map(sessionToDTO);
+        yield* write(JSON.stringify({ type: 'snapshot', sessions }));
+
+        const unsub = eventPublisher.subscribeBrowser((event) => {
+          Effect.runFork(write(JSON.stringify(event)));
+        });
+
+        yield* socket.runRaw(() => {});
+        unsub();
+
+        return HttpServerResponse.empty();
       })
     ),
   ];

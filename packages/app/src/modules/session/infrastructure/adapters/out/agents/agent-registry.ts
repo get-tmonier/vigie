@@ -4,10 +4,7 @@ import {
   AgentRegistry,
   type AgentRegistryShape,
 } from '#modules/session/application/ports/out/agent-adapter.port';
-import { aiderAdapter } from './aider.adapter';
 import { claudeAdapter } from './claude.adapter';
-import { codexAdapter } from './codex.adapter';
-import { opencodeAdapter } from './opencode.adapter';
 
 function genericAdapter(agentType: string): AgentAdapter {
   return {
@@ -23,9 +20,24 @@ function genericAdapter(agentType: string): AgentAdapter {
 export function createAgentRegistry(): AgentRegistryShape {
   const registry: Record<string, AgentAdapter> = {
     claude: claudeAdapter,
-    aider: aiderAdapter,
-    codex: codexAdapter,
-    opencode: opencodeAdapter,
+    aider: {
+      agentType: 'aider',
+      canResume: false,
+      detectSessionId: false,
+      buildSpawnArgs: () => ({ command: 'aider', args: ['aider'] }),
+    },
+    codex: {
+      agentType: 'codex',
+      canResume: false,
+      detectSessionId: false,
+      buildSpawnArgs: () => ({ command: 'codex', args: ['codex'] }),
+    },
+    opencode: {
+      agentType: 'opencode',
+      canResume: false,
+      detectSessionId: false,
+      buildSpawnArgs: () => ({ command: 'opencode', args: ['opencode'] }),
+    },
   };
 
   return {

@@ -5,7 +5,7 @@ import * as v from 'valibot';
 export const SessionRegisterSchema = v.object({
   type: v.literal('session:register'),
   sessionId: v.string(),
-  agentType: v.picklist(['claude', 'opencode', 'generic']),
+  agentType: v.string(),
   mode: v.optional(v.picklist(['prompt', 'interactive']), 'prompt'),
   cwd: v.string(),
   gitBranch: v.optional(v.string()),
@@ -56,7 +56,7 @@ export const SessionTerminalOutputSchema = v.object({
 export const SessionSpawnInteractiveSchema = v.object({
   type: v.literal('session:spawn-interactive'),
   sessionId: v.string(),
-  agentType: v.picklist(['claude', 'opencode', 'generic']),
+  agentType: v.string(),
   cwd: v.string(),
   cols: v.number(),
   rows: v.number(),
@@ -151,8 +151,6 @@ export const SessionSpawnedSchema = v.object({
   pid: v.number(),
   ptyCols: v.optional(v.number()),
   ptyRows: v.optional(v.number()),
-  // true when daemon forced a PTY resize to CLI dims (no browser connected)
-  // client must wait ~300ms for Claude Code to redraw before activating renderer
   forcedResize: v.optional(v.boolean()),
 });
 

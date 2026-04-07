@@ -5,11 +5,6 @@ import * as Layer from 'effect/Layer';
 import * as HttpRouter from 'effect/unstable/http/HttpRouter';
 import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse';
 import { createFsRoutes } from '#modules/daemon/infrastructure/adapters/in/fs.routes';
-import type { SessionService } from '#modules/session/application/session.service';
-import { createSessionRoutes } from '#modules/session/infrastructure/adapters/in/session.routes';
-import type { TerminalSubscribersShape } from '#modules/terminal/application/terminal-subscribers';
-import { createTerminalRoutes } from '#modules/terminal/infrastructure/adapters/in/terminal.routes';
-import type { AppEventPublisher } from '#modules/terminal/infrastructure/adapters/out/event-publisher.adapter';
 
 const MIME_TYPES: Record<string, string> = {
   '.html': 'text/html',
@@ -25,14 +20,12 @@ const MIME_TYPES: Record<string, string> = {
 };
 
 type ServerDeps = {
-  sessionService: SessionService;
-  eventPublisher: AppEventPublisher;
-  terminalSubs: TerminalSubscribersShape;
+  appRoutes: HttpRouter.Route<any, any>[];
   clientDistPath?: string;
 };
 
 export function createRoutesLayer(deps: ServerDeps) {
-  const routes = [...createSessionRoutes(deps), ...createTerminalRoutes(deps), ...createFsRoutes()];
+  const routes = [...deps.appRoutes, ...createFsRoutes()];
 
   if (deps.clientDistPath && existsSync(deps.clientDistPath)) {
     const clientPath = deps.clientDistPath;

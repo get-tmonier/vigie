@@ -1,10 +1,10 @@
 import { Effect, Layer } from 'effect';
-import { AgentRunnerError } from '#modules/session/domain/errors';
 import {
   type PtyHandle,
   PtySpawner,
   type PtySpawnerShape,
 } from '#modules/terminal/application/ports/out/pty-spawner.port';
+import { AgentRunnerError } from '#shared/kernel/errors';
 import { createPtyLibrary } from './pty/bun-pty';
 
 function createBunPtySpawner(): PtySpawnerShape {

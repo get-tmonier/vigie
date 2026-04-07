@@ -1,7 +1,7 @@
+import type { SessionDomainEvent } from '#shared/kernel/domain-events';
+import type { SessionId } from '#shared/kernel/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/session-id';
 import { CannotDeleteActiveSessionError, InvalidStatusTransitionError } from './errors';
-import type { SessionDomainEvent } from './events';
-import type { SessionId } from './session-id';
-import { SessionId as makeSessionId } from './session-id';
 import type { SessionStatus } from './session-status';
 import { canTransition } from './session-status';
 

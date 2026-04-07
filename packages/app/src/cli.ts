@@ -1,6 +1,8 @@
 import { BunRuntime, BunServices } from '@effect/platform-bun';
 import { Console, Effect, Layer } from 'effect';
 import { Command, Flag } from 'effect/unstable/cli';
+import { claudeCommand } from '#modules/daemon/infrastructure/adapters/in/commands/claude.command';
+import { claudeInteractiveCommand } from '#modules/daemon/infrastructure/adapters/in/commands/claude-interactive.command';
 import {
   daemonAttachCommand,
   daemonLogsCommand,
@@ -10,12 +12,10 @@ import {
   daemonStopCommand,
 } from '#modules/daemon/infrastructure/adapters/in/commands/daemon.command';
 import { openCommand } from '#modules/daemon/infrastructure/adapters/in/commands/open.command';
+import { sessionAttachCommand } from '#modules/daemon/infrastructure/adapters/in/commands/session-attach.command';
+import { sessionListCommand } from '#modules/daemon/infrastructure/adapters/in/commands/session-list.command';
+import { sessionResumeCommand } from '#modules/daemon/infrastructure/adapters/in/commands/session-resume.command';
 import { DaemonConfigLayer } from '#modules/daemon/infrastructure/daemon-config';
-import { claudeCommand } from '#modules/session/infrastructure/adapters/in/commands/claude.command';
-import { claudeInteractiveCommand } from '#modules/session/infrastructure/adapters/in/commands/claude-interactive.command';
-import { sessionAttachCommand } from '#modules/session/infrastructure/adapters/in/commands/session-attach.command';
-import { sessionListCommand } from '#modules/session/infrastructure/adapters/in/commands/session-list.command';
-import { sessionResumeCommand } from '#modules/session/infrastructure/adapters/in/commands/session-resume.command';
 
 // ── Daemon subcommands ��─
 
@@ -139,7 +139,10 @@ const app = Command.make('vigie', {}, () =>
 
 const program = Command.run(app, { version: '0.3.0' });
 
-program.pipe(
-  Effect.provide(Layer.merge(BunServices.layer, DaemonConfigLayer)),
-  BunRuntime.runMain()
-);
+(
+  program.pipe(Effect.provide(Layer.merge(BunServices.layer, DaemonConfigLayer))) as Effect.Effect<
+    void,
+    never,
+    never
+  >
+).pipe(BunRuntime.runMain());
