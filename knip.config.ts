@@ -14,7 +14,7 @@ export default {
       ],
     },
     'packages/app': {
-      entry: ['src/infra/ssr/client-entry.tsx', 'src/daemon.ts'],
+      entry: ['src/shared/ssr/client-entry.tsx', 'src/daemon.ts'],
       project: ['src/**/*.{ts,tsx}'],
       ignoreDependencies: [
         '@fontsource-variable/dm-sans',

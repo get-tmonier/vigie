@@ -1,9 +1,9 @@
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { Layer } from 'effect';
-import { makeDatabaseLayer } from '#infra/database';
 import { AgentSessionLive } from '#modules/agent-session/dependencies';
 import { DaemonLive, runDaemon } from '#modules/daemon/dependencies';
+import { makeDatabaseLayer } from '#shared/db/database';
 
 const _HOME = process.env.VIGIE_HOME ?? join(homedir(), '.vigie');
 

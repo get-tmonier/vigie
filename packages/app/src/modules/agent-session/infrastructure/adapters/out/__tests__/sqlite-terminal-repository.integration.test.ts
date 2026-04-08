@@ -1,9 +1,9 @@
 import { Database } from 'bun:sqlite';
 import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
-import { VigiDatabase } from '#infra/database';
 import { TerminalRepository } from '#modules/agent-session/application/ports/out/terminal-repository.port';
 import { SqliteTerminalRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-terminal-repository';
+import { VigiDatabase } from '#shared/db/database';
 
 function makeTestDb(): Database {
   const db = new Database(':memory:');

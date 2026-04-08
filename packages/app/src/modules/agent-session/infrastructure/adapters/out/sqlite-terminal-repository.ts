@@ -1,12 +1,12 @@
 import type { Database } from 'bun:sqlite';
 import { Effect, Layer } from 'effect';
-import { VigiDatabase } from '#infra/database';
 import {
   type InputEntry,
   type TerminalChunk,
   TerminalRepository,
   type TerminalRepositoryShape,
 } from '#modules/agent-session/application/ports/out/terminal-repository.port';
+import { VigiDatabase } from '#shared/db/database';
 
 function createSqliteTerminalRepository(db: Database): TerminalRepositoryShape {
   const getMaxSeqStmt = db.prepare(

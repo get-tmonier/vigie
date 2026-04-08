@@ -11,7 +11,6 @@ import * as HttpServerRequest from 'effect/unstable/http/HttpServerRequest';
 import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse';
 import type * as Socket from 'effect/unstable/socket/Socket';
 import * as v from 'valibot';
-import { renderPage } from '#infra/ssr/render-page';
 import type { EventFeedShape } from '#modules/agent-session/application/ports/out/event-feed.port';
 import type { SessionCleanupShape } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
@@ -19,6 +18,7 @@ import type { SpawnSessionShape } from '#modules/agent-session/application/use-c
 import type { TerminalConnectionShape } from '#modules/agent-session/application/use-cases/terminal-connection.use-case';
 import { SpawnSessionRequestSchema } from '#modules/agent-session/infrastructure/adapters/in/session.dto';
 import { expandPath } from '#shared/lib/path';
+import { renderPage } from '#shared/ssr/render-page';
 import { DashboardPage } from './dashboard.view';
 import { sessionToDTO } from './session.mapper';
 

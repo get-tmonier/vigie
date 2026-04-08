@@ -4,7 +4,6 @@ import * as BunHttpServer from '@effect/platform-bun/BunHttpServer';
 import { Duration, Effect, Fiber, Schedule } from 'effect';
 import * as HttpMiddleware from 'effect/unstable/http/HttpMiddleware';
 import * as HttpRouter from 'effect/unstable/http/HttpRouter';
-import { VigiDatabase } from '#infra/database';
 import type { SessionLifecycleShape } from '#modules/daemon/application/ports/in/session-lifecycle.port';
 import type { SpawnSessionShape } from '#modules/daemon/application/ports/in/spawn-session.port';
 import type { StartupOpsShape } from '#modules/daemon/application/ports/in/startup-ops.port';
@@ -14,6 +13,7 @@ import { createIpcRouter } from '#modules/daemon/infrastructure/adapters/in/ipc-
 import type { DaemonConfigShape } from '#modules/daemon/infrastructure/daemon-config';
 import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
 import type { createRoutesLayer } from '#modules/daemon/infrastructure/server';
+import { VigiDatabase } from '#shared/db/database';
 
 interface RunDaemonDeps {
   startupOps: StartupOpsShape;

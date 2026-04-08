@@ -24,6 +24,7 @@ module.exports = {
       severity: 'error',
       from: {
         path: '^src/shared/',
+        pathNot: '^src/shared/ssr/client-entry\\.tsx$',
       },
       to: {
         path: '^src/modules/',

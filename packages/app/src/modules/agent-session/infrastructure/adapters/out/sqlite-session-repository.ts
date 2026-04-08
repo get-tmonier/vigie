@@ -1,6 +1,5 @@
 import type { Database } from 'bun:sqlite';
 import { Effect, Layer } from 'effect';
-import { VigiDatabase } from '#infra/database';
 import {
   type ResumableSessionInfo,
   SessionRepository,
@@ -10,6 +9,7 @@ import { Session } from '#modules/agent-session/domain/session';
 import type { SessionId } from '#modules/agent-session/domain/session-id';
 import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
 import type { SessionStatus } from '#modules/agent-session/domain/session-status';
+import { VigiDatabase } from '#shared/db/database';
 
 interface SessionRow {
   id: string;
