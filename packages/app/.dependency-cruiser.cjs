@@ -1,85 +1,33 @@
 /** @type {import('dependency-cruiser').IConfiguration} */
 module.exports = {
   forbidden: [
-    // ── Cross-module boundaries ────────────────────────────────────────────────
-    //
-    // Three modules: daemon / session / terminal.
-    // Cross-module imports are forbidden except in:
-    //   - daemon composition root: main.ts (wires all layers via Effect Layers)
-    //   - UI islands: cross-module UI composition is allowed in ui/ adapters
-    //
-    // Shared types (IPC protocol, domain events, errors, SessionId) must live in
-    // #shared/kernel/* — never re-imported across module boundaries.
-
     {
-      name: 'no-daemon-imports-session',
+      name: 'no-cross-module-imports',
       comment:
-        'daemon must not import from session. Move shared types to #shared/kernel/* or introduce a SessionCommandShape port in daemon.',
+        'Modules must not import from each other. Only dependencies.ts files may cross module boundaries.',
       severity: 'error',
       from: {
-        path: '^src/modules/daemon',
+        path: '^src/modules/([^/]+)/',
         pathNot: [
-          '^src/modules/daemon/main\\.ts$',
-          'src/modules/daemon/.*/ui/.*',
+          '^src/modules/[^/]+/dependencies\\.ts$',
+          'src/modules/[^/]+/infrastructure/adapters/in/ui/.*',
         ],
       },
-      to: { path: '^src/modules/session' },
+      to: {
+        path: '^src/modules/([^/]+)/',
+        pathNot: '^src/modules/$1/',
+      },
     },
     {
-      name: 'no-daemon-imports-terminal',
-      comment:
-        'daemon must not import from terminal. Only the composition root (main.ts) may wire terminal layers.',
+      name: 'no-shared-kernel-imports-modules',
+      comment: 'Shared kernel must not import from any module.',
       severity: 'error',
       from: {
-        path: '^src/modules/daemon',
-        pathNot: [
-          '^src/modules/daemon/main\\.ts$',
-          'src/modules/daemon/.*/ui/.*',
-        ],
+        path: '^src/shared/',
       },
-      to: { path: '^src/modules/terminal' },
-    },
-    {
-      name: 'no-session-imports-daemon',
-      comment:
-        'session must not import from daemon. Move DaemonConfig / DaemonNotRunningError to #shared/kernel/errors. CLI commands belong in daemon/infrastructure/adapters/in/commands.',
-      severity: 'error',
-      from: {
-        path: '^src/modules/session',
-        pathNot: 'src/modules/session/.*/ui/.*',
+      to: {
+        path: '^src/modules/',
       },
-      to: { path: '^src/modules/daemon' },
-    },
-    {
-      name: 'no-session-imports-terminal',
-      comment: 'session must not import from terminal.',
-      severity: 'error',
-      from: {
-        path: '^src/modules/session',
-        pathNot: 'src/modules/session/.*/ui/.*',
-      },
-      to: { path: '^src/modules/terminal' },
-    },
-    {
-      name: 'no-terminal-imports-daemon',
-      comment: 'terminal must not import from daemon.',
-      severity: 'error',
-      from: {
-        path: '^src/modules/terminal',
-        pathNot: 'src/modules/terminal/.*/ui/.*',
-      },
-      to: { path: '^src/modules/daemon' },
-    },
-    {
-      name: 'no-terminal-imports-session',
-      comment:
-        'terminal must not import from session. Move SessionDomainEvent to #shared/kernel/domain-events.',
-      severity: 'error',
-      from: {
-        path: '^src/modules/terminal',
-        pathNot: 'src/modules/terminal/.*/ui/.*',
-      },
-      to: { path: '^src/modules/session' },
     },
   ],
 
