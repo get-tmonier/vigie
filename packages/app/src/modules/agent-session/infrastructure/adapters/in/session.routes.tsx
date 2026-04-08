@@ -46,14 +46,27 @@ const jsonRoute = <E,>(
     method,
     path,
     handler.pipe(
-      Effect.catch((err) =>
-        Effect.succeed(
+      Effect.catch((err) => {
+        if (err instanceof Error) {
+          const tag = (err as { _tag?: string })._tag;
+          if (tag === 'SessionNotFoundError') {
+            return Effect.succeed(
+              HttpServerResponse.jsonUnsafe({ error: err.message }, { status: 404 })
+            );
+          }
+          if (tag === 'CannotDeleteActiveSessionError' || tag === 'CannotResumeSessionError') {
+            return Effect.succeed(
+              HttpServerResponse.jsonUnsafe({ error: err.message }, { status: 409 })
+            );
+          }
+        }
+        return Effect.succeed(
           HttpServerResponse.jsonUnsafe(
             { error: err instanceof Error ? err.message : String(err) },
             { status: 500 }
           )
-        )
-      )
+        );
+      })
     )
   );
 
@@ -215,7 +228,7 @@ export function createSessionRoutes(deps: SessionRouteDeps): HttpRouter.Route<Ro
         if (!session.canResume) {
           return HttpServerResponse.jsonUnsafe(
             { error: 'This session cannot be resumed' },
-            { status: 400 }
+            { status: 409 }
           );
         }
 
@@ -248,7 +261,7 @@ export function createSessionRoutes(deps: SessionRouteDeps): HttpRouter.Route<Ro
         if (!session.canDelete) {
           return HttpServerResponse.jsonUnsafe(
             { error: 'Cannot delete an active session' },
-            { status: 400 }
+            { status: 409 }
           );
         }
         sessionCleanup.delete(sessionId);
