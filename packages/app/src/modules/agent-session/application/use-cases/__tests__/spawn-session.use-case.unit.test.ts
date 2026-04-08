@@ -1,0 +1,281 @@
+import { describe, expect, it } from 'bun:test';
+import { Effect } from 'effect';
+import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import type { EventPublisherShape } from '#modules/agent-session/application/ports/out/event-publisher.port';
+import type { PtySpawnerShape } from '#modules/agent-session/application/ports/out/pty-spawner.port';
+import type {
+  ResumableSessionInfo,
+  SessionRepositoryShape,
+} from '#modules/agent-session/application/ports/out/session-repository.port';
+import { createSpawnSessionUseCase } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
+import {
+  CannotResumeSessionError,
+  SessionNotFoundError,
+} from '#modules/agent-session/domain/errors';
+import type { DomainEvent } from '#modules/agent-session/domain/events';
+import { Session } from '#modules/agent-session/domain/session';
+import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
+import type { PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
+
+function makeSessionRepo(): SessionRepositoryShape & { store: Map<string, Session> } {
+  const store = new Map<string, Session>();
+  return {
+    store,
+    findById: (id) => store.get(id) ?? null,
+    findAll: () => Array.from(store.values()),
+    findActive: () => Array.from(store.values()).filter((s) => s.isActive),
+    findActiveWithAgentId: (): ResumableSessionInfo[] => [],
+    findRecentlyEnded: (): ResumableSessionInfo[] => [],
+    save: (session) => {
+      store.set(session.id, session);
+    },
+    delete: (id) => {
+      store.delete(id);
+    },
+    deleteAllEnded: () => {
+      for (const [k, v] of store) {
+        if (v.status === 'ended') store.delete(k);
+      }
+    },
+    markOrphanedEnded: () => {},
+    pruneOld: () => {},
+  };
+}
+
+function makeEventPublisher(): EventPublisherShape & { published: DomainEvent[] } {
+  const published: DomainEvent[] = [];
+  return {
+    published,
+    publish: (event) => {
+      published.push(event);
+      return Effect.void;
+    },
+    subscribe: (_listener) => () => {},
+  };
+}
+
+function makeAgentRegistry(canResume = false, detectSessionId = false): AgentRegistryShape {
+  return {
+    resolve: (_agentType) => ({
+      agentType: 'claude',
+      canResume,
+      detectSessionId,
+      buildSpawnArgs: (opts) => ({
+        command: 'claude',
+        args: opts?.resume ? ['--resume', opts.agentSessionId ?? ''] : [],
+      }),
+    }),
+  };
+}
+
+function makePtySpawner(): PtySpawnerShape {
+  return {
+    spawn: (_command, _args, _cwd, _cols, _rows) =>
+      Effect.succeed({
+        pid: 1234,
+        write: () => {},
+        resize: () => {},
+        kill: () => {},
+        onOutput: () => {},
+        wait: () => Promise.resolve(0),
+      }),
+  };
+}
+
+function makePtyRegistry(): PtyRegistry {
+  return {
+    ptyHandles: new Map(),
+    sessionConnections: new Map(),
+    connSessions: new Map(),
+  };
+}
+
+describe('SpawnSessionUseCase.register', () => {
+  it('saves session to repository', () => {
+    const sessionRepo = makeSessionRepo();
+    const useCase = createSpawnSessionUseCase({
+      sessionRepo,
+      ptySpawner: makePtySpawner(),
+      agentRegistry: makeAgentRegistry(),
+      eventPublisher: makeEventPublisher(),
+      registry: makePtyRegistry(),
+      setupPtyLifecycle: () => {},
+    });
+
+    useCase.register({
+      sessionId: 'sess-1',
+      agentType: 'claude',
+      cwd: '/tmp',
+      connId: 'conn-1',
+    });
+
+    expect(sessionRepo.findById(makeSessionId('sess-1'))).not.toBeNull();
+  });
+
+  it('maps connId ↔ sessionId in registry', () => {
+    const registry = makePtyRegistry();
+    const useCase = createSpawnSessionUseCase({
+      sessionRepo: makeSessionRepo(),
+      ptySpawner: makePtySpawner(),
+      agentRegistry: makeAgentRegistry(),
+      eventPublisher: makeEventPublisher(),
+      registry,
+      setupPtyLifecycle: () => {},
+    });
+
+    useCase.register({
+      sessionId: 'sess-1',
+      agentType: 'claude',
+      cwd: '/tmp',
+      connId: 'conn-1',
+    });
+
+    expect(registry.sessionConnections.get('sess-1')).toBe('conn-1');
+    expect(registry.connSessions.get('conn-1')).toBe('sess-1');
+  });
+});
+
+describe('SpawnSessionUseCase.spawnInteractive', () => {
+  it('returns sessionId and pid on success', async () => {
+    const useCase = createSpawnSessionUseCase({
+      sessionRepo: makeSessionRepo(),
+      ptySpawner: makePtySpawner(),
+      agentRegistry: makeAgentRegistry(),
+      eventPublisher: makeEventPublisher(),
+      registry: makePtyRegistry(),
+      setupPtyLifecycle: () => {},
+    });
+
+    const result = await Effect.runPromise(
+      useCase.spawnInteractive({
+        agentType: 'claude',
+        cwd: '/tmp',
+        cols: 80,
+        rows: 24,
+      })
+    );
+
+    expect(result.pid).toBe(1234);
+    expect(result.sessionId).toBeDefined();
+  });
+
+  it('sets agentSessionId when detectSessionId is true', async () => {
+    const sessionRepo = makeSessionRepo();
+    const useCase = createSpawnSessionUseCase({
+      sessionRepo,
+      ptySpawner: makePtySpawner(),
+      agentRegistry: makeAgentRegistry(false, true),
+      eventPublisher: makeEventPublisher(),
+      registry: makePtyRegistry(),
+      setupPtyLifecycle: () => {},
+    });
+
+    const result = await Effect.runPromise(
+      useCase.spawnInteractive({
+        sessionId: 'sess-detect',
+        agentType: 'claude',
+        cwd: '/tmp',
+        cols: 80,
+        rows: 24,
+      })
+    );
+
+    const session = sessionRepo.findById(result.sessionId);
+    expect(session?.agentSessionId).toBeDefined();
+  });
+
+  it('registers pty handle in registry', async () => {
+    const registry = makePtyRegistry();
+    const useCase = createSpawnSessionUseCase({
+      sessionRepo: makeSessionRepo(),
+      ptySpawner: makePtySpawner(),
+      agentRegistry: makeAgentRegistry(),
+      eventPublisher: makeEventPublisher(),
+      registry,
+      setupPtyLifecycle: () => {},
+    });
+
+    const result = await Effect.runPromise(
+      useCase.spawnInteractive({
+        agentType: 'claude',
+        cwd: '/tmp',
+        cols: 80,
+        rows: 24,
+      })
+    );
+
+    expect(registry.ptyHandles.has(result.sessionId)).toBe(true);
+  });
+});
+
+describe('SpawnSessionUseCase.resume', () => {
+  it('fails with SessionNotFoundError when session does not exist', async () => {
+    const useCase = createSpawnSessionUseCase({
+      sessionRepo: makeSessionRepo(),
+      ptySpawner: makePtySpawner(),
+      agentRegistry: makeAgentRegistry(true),
+      eventPublisher: makeEventPublisher(),
+      registry: makePtyRegistry(),
+      setupPtyLifecycle: () => {},
+    });
+
+    let caught: unknown = null;
+    await Effect.runPromise(
+      Effect.catch(useCase.resume('nonexistent', { cols: 80, rows: 24 }), (err) => {
+        caught = err;
+        return Effect.void;
+      })
+    );
+    expect(caught).toBeInstanceOf(SessionNotFoundError);
+  });
+
+  it('fails with CannotResumeSessionError when session is not resumable', async () => {
+    const sessionRepo = makeSessionRepo();
+    // ended but not resumable (no agentSessionId)
+    const session = Session.create({ id: 'sess-1', agentType: 'claude', cwd: '/tmp' });
+    session.markEnded(0, false);
+    session.pullEvents();
+    sessionRepo.save(session);
+
+    const useCase = createSpawnSessionUseCase({
+      sessionRepo,
+      ptySpawner: makePtySpawner(),
+      agentRegistry: makeAgentRegistry(true),
+      eventPublisher: makeEventPublisher(),
+      registry: makePtyRegistry(),
+      setupPtyLifecycle: () => {},
+    });
+
+    let caught: unknown = null;
+    await Effect.runPromise(
+      Effect.catch(useCase.resume('sess-1', { cols: 80, rows: 24 }), (err) => {
+        caught = err;
+        return Effect.void;
+      })
+    );
+    expect(caught).toBeInstanceOf(CannotResumeSessionError);
+  });
+
+  it('resumes a resumable session and returns pid', async () => {
+    const sessionRepo = makeSessionRepo();
+    const session = Session.create({ id: 'sess-resume', agentType: 'claude', cwd: '/tmp' });
+    session.setAgentSessionId('agent-abc');
+    session.markEnded(0, true);
+    session.pullEvents();
+    sessionRepo.save(session);
+
+    const useCase = createSpawnSessionUseCase({
+      sessionRepo,
+      ptySpawner: makePtySpawner(),
+      agentRegistry: makeAgentRegistry(true),
+      eventPublisher: makeEventPublisher(),
+      registry: makePtyRegistry(),
+      setupPtyLifecycle: () => {},
+    });
+
+    const result = await Effect.runPromise(useCase.resume('sess-resume', { cols: 80, rows: 24 }));
+
+    expect(result.pid).toBe(1234);
+    expect(sessionRepo.findById(makeSessionId('sess-resume'))?.status).toBe('active');
+  });
+});
