@@ -15,7 +15,7 @@ import { openCommand } from '#modules/daemon/infrastructure/adapters/in/commands
 import { sessionAttachCommand } from '#modules/daemon/infrastructure/adapters/in/commands/session-attach.command';
 import { sessionListCommand } from '#modules/daemon/infrastructure/adapters/in/commands/session-list.command';
 import { sessionResumeCommand } from '#modules/daemon/infrastructure/adapters/in/commands/session-resume.command';
-import { DaemonConfigLayer } from '#modules/daemon/infrastructure/daemon-config';
+import { DaemonConfigLive } from '#modules/daemon/infrastructure/daemon-config';
 
 // ── Daemon subcommands ��─
 
@@ -140,7 +140,7 @@ const app = Command.make('vigie', {}, () =>
 const program = Command.run(app, { version: '0.3.0' });
 
 (
-  program.pipe(Effect.provide(Layer.merge(BunServices.layer, DaemonConfigLayer))) as Effect.Effect<
+  program.pipe(Effect.provide(Layer.merge(BunServices.layer, DaemonConfigLive))) as Effect.Effect<
     void,
     never,
     never

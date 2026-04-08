@@ -1,5 +1,5 @@
 import { Console, Data, Effect } from 'effect';
-import { AppLayer, runDaemon } from '#dependencies';
+import { AppLive, runDaemon } from '#dependencies';
 import { createBunProcessManager } from '#modules/daemon/infrastructure/adapters/out/bun-process-manager.adapter';
 import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
 
@@ -31,7 +31,7 @@ export function daemonStartCommand(foreground: boolean) {
         return;
       }
       yield* Console.log('Starting daemon in foreground...');
-      return yield* runDaemon.pipe(Effect.provide(AppLayer));
+      return yield* runDaemon.pipe(Effect.provide(AppLive));
     });
   }
 

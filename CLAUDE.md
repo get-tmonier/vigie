@@ -117,7 +117,7 @@ vigie session resume --id   # resume ended session
 - **Tailwind only** — no `style` attributes in UI/Landing (exception: CSS custom property usage in complex gradients). Never use CSS modules or `@apply`
 - **`cn()` utility** — use `cn()` from `#shared/lib/cn` (ui) or `#lib/cn` (landing) for conditional Tailwind class merging via `tailwind-merge`
 - **No barrel exports** — import from specific files, not `index.ts` re-exports
-- **No shortcuts** — never use `// @ts-ignore`, `as any`, `biome-ignore` unless truly unavoidable. Never add entries to knip's ignore lists to hide unused code — fix the root cause instead
+- **No shortcuts** — never use `// @ts-ignore`, `as any`, `biome-ignore` unless truly unavoidable. Never add entries to knip's ignore lists to hide unused code — fix the root cause instead. When a type error occurs, find the correct type (e.g. `ReturnType<typeof fn>`, a concrete Effect type, or a proper interface) — never widen to `any` as a shortcut. Type casts like `as Effect.Effect<never, never, never>` are acceptable only when TypeScript inference breaks on well-understood Effect patterns.
 - **Self-documenting code** — minimal comments. Code should be self-explanatory. No JSDoc unless for public library APIs
 - **Clean code** — no dead code, no commented-out code, no TODO comments without linked issues
 - **Bun test runner** — `import { describe, expect, it } from 'bun:test'`

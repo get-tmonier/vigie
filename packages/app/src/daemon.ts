@@ -1,19 +1,7 @@
-import { unlinkSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { join } from 'node:path';
 import * as BunRuntime from '@effect/platform-bun/BunRuntime';
 import { Effect } from 'effect';
-import { AppLayer, runDaemon } from './dependencies';
-
-const _HOME = process.env.VIGIE_HOME ?? join(homedir(), '.vigie');
-
-function cleanup() {
-  for (const file of ['daemon.pid', 'daemon.sock', 'daemon-stdin.sock', 'port']) {
-    try {
-      unlinkSync(join(_HOME, file));
-    } catch {}
-  }
-}
+import { cleanup } from '#modules/daemon/dependencies';
+import { AppLive, runDaemon } from './dependencies';
 
 process.on('SIGTERM', () => {
   process.stdout.write('[daemon] Stopped.\n');
@@ -36,4 +24,4 @@ process.on('unhandledRejection', (reason) => {
   process.exit(1);
 });
 
-BunRuntime.runMain(runDaemon.pipe(Effect.provide(AppLayer)));
+BunRuntime.runMain(runDaemon.pipe(Effect.provide(AppLive)) as Effect.Effect<never, never, never>);
