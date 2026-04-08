@@ -50,6 +50,8 @@ describe('Session state transitions', () => {
     session.pullEvents();
     session.markError('something went wrong');
     expect(session.status).toBe('error');
+    const events = session.pullEvents();
+    expect(events.some((e) => e.type === 'session:error')).toBe(true);
   });
 
   it('ended → active via reactivate', () => {
