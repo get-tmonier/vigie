@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS event_queue (
 );
 `;
 
-export function openDatabase(path: string): Database {
+function openDatabase(path: string): Database {
   const db = new Database(path);
   db.run('PRAGMA journal_mode = WAL');
   db.run('PRAGMA synchronous = NORMAL');

@@ -1,7 +1,7 @@
 import { Console, Data, Effect } from 'effect';
+import { AppLayer, runDaemon } from '#dependencies';
 import { createBunProcessManager } from '#modules/daemon/infrastructure/adapters/out/bun-process-manager.adapter';
 import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
-import { AppLayer, runDaemon } from '#modules/daemon/main';
 
 class DaemonCommandError extends Data.TaggedError('DaemonCommandError')<{
   readonly message: string;
