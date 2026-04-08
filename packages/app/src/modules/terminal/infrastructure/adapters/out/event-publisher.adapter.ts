@@ -1,10 +1,15 @@
-import { Effect, Layer, ServiceMap } from 'effect';
+import { Data, Effect, Layer, ServiceMap } from 'effect';
 import {
   EventPublisher,
   type EventPublisherShape,
 } from '#modules/terminal/application/ports/out/event-publisher.port';
 import type { BrowserEvent } from '#modules/terminal/infrastructure/adapters/in/browser-events';
 import type { DomainEvent } from '#shared/kernel/domain-events';
+
+class EventPublisherError extends Data.TaggedError('EventPublisherError')<{
+  readonly message: string;
+  readonly cause?: unknown;
+}> {}
 
 function domainEventToBrowserEvent(event: DomainEvent): BrowserEvent | null {
   switch (event.type) {
@@ -86,16 +91,18 @@ export function createEventPublisher(): AppEventPublisher {
     publish(event: DomainEvent): Effect.Effect<void> {
       return Effect.gen(function* () {
         for (const listener of listeners) {
-          yield* Effect.try({ try: () => listener(event), catch: (err) => err }).pipe(
-            Effect.catch((err) => Effect.logError(`domain listener error: ${err}`))
-          );
+          yield* Effect.try({
+            try: () => listener(event),
+            catch: (cause) => new EventPublisherError({ message: String(cause), cause }),
+          }).pipe(Effect.catch((err) => Effect.logError(`domain listener error: ${err}`)));
         }
         const browserEvent = domainEventToBrowserEvent(event);
         if (browserEvent) {
           for (const listener of browserListeners) {
-            yield* Effect.try({ try: () => listener(browserEvent), catch: (err) => err }).pipe(
-              Effect.catch((err) => Effect.logError(`browser listener error: ${err}`))
-            );
+            yield* Effect.try({
+              try: () => listener(browserEvent),
+              catch: (cause) => new EventPublisherError({ message: String(cause), cause }),
+            }).pipe(Effect.catch((err) => Effect.logError(`browser listener error: ${err}`)));
           }
         }
       });
@@ -131,7 +138,5 @@ export class AppEventPublisherTag extends ServiceMap.Service<
 // - EventPublisher (base interface, used in session.service)
 // Use provideMerge so AppEventPublisherTag satisfies EventPublisher layer's requirement (no circular dep)
 export const EventPublisherLayer = Layer.effect(EventPublisher)(
-  Effect.gen(function* () {
-    return yield* AppEventPublisherTag;
-  })
+  Effect.service(AppEventPublisherTag)
 ).pipe(Layer.provideMerge(Layer.sync(AppEventPublisherTag)(() => createEventPublisher())));

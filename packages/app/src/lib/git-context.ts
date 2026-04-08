@@ -1,4 +1,9 @@
-import { Effect } from 'effect';
+import { Data, Effect } from 'effect';
+
+class GitError extends Data.TaggedError('GitError')<{
+  readonly message: string;
+  readonly cause?: unknown;
+}> {}
 
 interface GitContext {
   readonly branch?: string;
@@ -6,17 +11,22 @@ interface GitContext {
   readonly repoName?: string;
 }
 
-function runGit(args: string[], cwd: string): Effect.Effect<string, Error> {
+function runGit(args: string[], cwd: string): Effect.Effect<string, GitError> {
   return Effect.tryPromise({
     try: async () => {
       const proc = Bun.spawn(['git', ...args], { cwd, stdout: 'pipe', stderr: 'ignore' });
       const text = await new Response(proc.stdout).text();
       const exitCode = await proc.exited;
-      if (exitCode !== 0) throw new Error(`git exited with ${exitCode}`);
-      return text.trim();
+      return { text: text.trim(), exitCode };
     },
-    catch: (err) => (err instanceof Error ? err : new Error(String(err))),
-  });
+    catch: (cause) => new GitError({ message: String(cause), cause }),
+  }).pipe(
+    Effect.flatMap(({ text, exitCode }) =>
+      exitCode !== 0
+        ? Effect.fail(new GitError({ message: `git exited with ${exitCode}` }))
+        : Effect.succeed(text)
+    )
+  );
 }
 
 function deriveRepoName(remoteUrl: string): string {

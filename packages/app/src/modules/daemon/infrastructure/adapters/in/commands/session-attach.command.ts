@@ -32,10 +32,7 @@ interface SessionRow {
   agent_session_id: string | null;
 }
 
-interface StdinSocket {
-  write(data: string | Uint8Array): number;
-  terminate(): void;
-}
+type StdinSocket = Pick<Bun.Socket<undefined>, 'write' | 'terminate'>;
 
 function connectStdinSocket(stdinSocketPath: string) {
   return Effect.callback<StdinSocket, DaemonNotRunningError>((resume) => {
@@ -43,7 +40,7 @@ function connectStdinSocket(stdinSocketPath: string) {
       unix: stdinSocketPath,
       socket: {
         open(s) {
-          resume(Exit.succeed(s as unknown as StdinSocket));
+          resume(Exit.succeed(s));
         },
         data() {},
         close() {},
@@ -173,15 +170,16 @@ export function sessionAttachCommand(partialId: string) {
     let onLivePtyOutput: (() => void) | null = null;
     // Tracks the current rowOffset so we can detect when the cursor scrolls outside the viewport
     let currentRowOffset = 0;
+    const services = yield* Effect.services();
 
     function checkReplayDrain() {
       if (replayMsgReceived && pendingReplayWrites === 0) {
-        Effect.runFork(Deferred.succeed(replayDrainDeferred, undefined));
+        Effect.runForkWith(services)(Deferred.succeed(replayDrainDeferred, undefined));
       }
     }
 
     client.onClose(() => {
-      Effect.runFork(Deferred.succeed(disconnectDeferred, undefined));
+      Effect.runForkWith(services)(Deferred.succeed(disconnectDeferred, undefined));
     });
 
     client.onMessage((msg) => {
@@ -193,13 +191,13 @@ export function sessionAttachCommand(partialId: string) {
             vterm.resize(msg.ptyCols, msg.ptyRows);
           }
           spawnForcedResize = msg.forcedResize ?? false;
-          Effect.runFork(Deferred.succeed(spawnDeferred, undefined));
+          Effect.runForkWith(services)(Deferred.succeed(spawnDeferred, undefined));
           break;
         case 'session:spawn-failed':
-          Effect.runFork(Deferred.die(spawnDeferred, new Error(msg.error)));
+          Effect.runForkWith(services)(Deferred.die(spawnDeferred, new Error(msg.error)));
           break;
         case 'session:error-response':
-          Effect.runFork(Deferred.die(spawnDeferred, new Error(msg.error)));
+          Effect.runForkWith(services)(Deferred.die(spawnDeferred, new Error(msg.error)));
           break;
         case 'session:replay-complete':
           replayMsgReceived = true;
@@ -234,7 +232,7 @@ export function sessionAttachCommand(partialId: string) {
           break;
         }
         case 'session:pty-exited':
-          Effect.runFork(Deferred.succeed(exitDeferred, msg.exitCode));
+          Effect.runForkWith(services)(Deferred.succeed(exitDeferred, msg.exitCode));
           break;
         case 'session:pty-resized':
           vterm.resize(msg.ptyCols, msg.ptyRows);
@@ -329,12 +327,12 @@ export function sessionAttachCommand(partialId: string) {
     const stdinSocket = yield* connectStdinSocket(stdinSocketPath);
 
     const triggerDetach = () => {
-      Effect.runFork(
+      Effect.runForkWith(services)(
         client
           .send({ type: 'session:detach', sessionId: session.id })
           .pipe(Effect.catch(() => Effect.void))
       );
-      Effect.runFork(Deferred.succeed(detachDeferred, undefined));
+      Effect.runForkWith(services)(Deferred.succeed(detachDeferred, undefined));
     };
 
     const interceptor = createKeybindInterceptor({ onDetach: triggerDetach });
@@ -361,7 +359,7 @@ export function sessionAttachCommand(partialId: string) {
       renderer.fullRender(resizeScreen);
       resizeStatusBar();
       // daemon does its own rows-1, so send full newRows
-      Effect.runFork(
+      Effect.runForkWith(services)(
         client
           .send({ type: 'session:cli-resize', sessionId: session.id, cols: newCols, rows: newRows })
           .pipe(Effect.catch(() => Effect.void))

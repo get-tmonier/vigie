@@ -71,7 +71,7 @@ bun run dev:landing                            # dev server for vigie landing
 bun turbo build                                # build all packages
 bun turbo check                                # biome check
 bun turbo check -- --fix                       # biome check + fix
-bun turbo typecheck                            # typescript check
+bun turbo typecheck                            # typescript check (also shows Effect LSP diagnostics for @vigie/app)
 bun turbo test                                 # run tests
 bun run verify                                 # full pipeline: knip → check → typecheck → test → build
 bun run verify:fix                             # auto-fix then verify

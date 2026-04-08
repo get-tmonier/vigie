@@ -1,9 +1,12 @@
 import { Effect } from 'effect';
+import * as Schema from 'effect/Schema';
 import type { SessionCommandShape } from '#modules/daemon/application/ports/in/session-command.port';
 import type { IpcConnection } from '#modules/daemon/application/ports/out/ipc-server.port';
 import type { SessionToDaemon } from '#shared/kernel/ipc-protocol';
 import { SessionId } from '#shared/kernel/session-id';
 import { expandPath } from '#shared/lib/path';
+
+const encodeJson = Schema.encodeSync(Schema.UnknownFromJsonString);
 
 export function createIpcRouter(
   svc: SessionCommandShape
@@ -22,7 +25,7 @@ export function createIpcRouter(
             repoName: msg.repoName,
             connId: conn.id,
           });
-          conn.send(JSON.stringify({ type: 'session:registered', sessionId: msg.sessionId }));
+          conn.send(encodeJson({ type: 'session:registered', sessionId: msg.sessionId }));
           break;
         }
         case 'session:spawn-interactive': {
@@ -43,7 +46,7 @@ export function createIpcRouter(
           if (spawnResult._tag === 'Failure') {
             const err = spawnResult.failure;
             conn.send(
-              JSON.stringify({
+              encodeJson({
                 type: 'session:spawn-failed',
                 sessionId: msg.sessionId,
                 error: err instanceof Error ? err.message : String(err),
@@ -54,7 +57,7 @@ export function createIpcRouter(
 
           const { sessionId, pid } = spawnResult.success;
           conn.send(
-            JSON.stringify({
+            encodeJson({
               type: 'session:spawned',
               sessionId,
               pid,
@@ -84,7 +87,7 @@ export function createIpcRouter(
           });
           if (result) {
             conn.send(
-              JSON.stringify({
+              encodeJson({
                 type: 'session:spawned',
                 sessionId: msg.sessionId,
                 pid: result.pid,
@@ -95,7 +98,7 @@ export function createIpcRouter(
             );
             for (const chunk of result.chunks) {
               conn.send(
-                JSON.stringify({
+                encodeJson({
                   type: 'session:pty-output',
                   sessionId: msg.sessionId,
                   data: chunk.data,
@@ -103,7 +106,7 @@ export function createIpcRouter(
               );
             }
             conn.send(
-              JSON.stringify({
+              encodeJson({
                 type: 'session:replay-complete',
                 sessionId: msg.sessionId,
               })
@@ -113,7 +116,7 @@ export function createIpcRouter(
             );
           } else {
             conn.send(
-              JSON.stringify({
+              encodeJson({
                 type: 'session:spawn-failed',
                 sessionId: msg.sessionId,
                 error: 'Session not found or PTY not running',
@@ -152,7 +155,7 @@ export function createIpcRouter(
           if (resumeResult._tag === 'Failure') {
             const err = resumeResult.failure;
             conn.send(
-              JSON.stringify({
+              encodeJson({
                 type: 'session:spawn-failed',
                 sessionId: msg.sessionId,
                 error: err instanceof Error ? err.message : String(err),
@@ -163,7 +166,7 @@ export function createIpcRouter(
 
           const { sessionId: resumedId, pid: resumedPid } = resumeResult.success;
           conn.send(
-            JSON.stringify({
+            encodeJson({
               type: 'session:spawned',
               sessionId: resumedId,
               pid: resumedPid,

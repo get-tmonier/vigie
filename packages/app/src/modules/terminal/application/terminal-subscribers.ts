@@ -1,4 +1,9 @@
-import { Effect, Layer, ServiceMap } from 'effect';
+import { Data, Effect, Layer, ServiceMap } from 'effect';
+
+class TerminalSubscriberError extends Data.TaggedError('TerminalSubscriberError')<{
+  readonly message: string;
+  readonly cause?: unknown;
+}> {}
 
 function createTerminalSubscribers(): TerminalSubscribersShape {
   const subscribers = new Map<string, Set<(data: string) => void>>();
@@ -21,9 +26,10 @@ function createTerminalSubscribers(): TerminalSubscribersShape {
         const subs = subscribers.get(sessionId);
         if (subs) {
           for (const cb of subs) {
-            yield* Effect.try({ try: () => cb(data), catch: (err) => err }).pipe(
-              Effect.catch((err) => Effect.logError(`terminal subscriber error: ${err}`))
-            );
+            yield* Effect.try({
+              try: () => cb(data),
+              catch: (cause) => new TerminalSubscriberError({ message: String(cause), cause }),
+            }).pipe(Effect.catch((err) => Effect.logError(`terminal subscriber error: ${err}`)));
           }
         }
       });

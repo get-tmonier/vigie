@@ -58,13 +58,14 @@ export function claudeCommand(prompt: string) {
     const startTime = Date.now();
     let inputTokens = 0;
     let outputTokens = 0;
+    const services = yield* Effect.services();
 
     yield* runner
       .spawn({
         prompt,
         cwd,
         onSessionId: (agentSessionId) => {
-          Effect.runPromise(
+          Effect.runPromiseWith(services)(
             client.send({
               type: 'session:agent-id',
               sessionId,

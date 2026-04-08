@@ -75,9 +75,10 @@ export function createTerminalRoutes(
 
         const entry = sessionService.ptyHandles.get(sessionId);
 
+        const services = yield* Effect.services();
         const unsub = terminalSubs.subscribe(sessionId, (data: string) => {
           const payload = Uint8Array.from(atob(data), (c) => c.charCodeAt(0));
-          Effect.runFork(write(payload));
+          Effect.runForkWith(services)(write(payload));
         });
 
         if (entry) {

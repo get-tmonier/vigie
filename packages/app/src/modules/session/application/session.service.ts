@@ -207,7 +207,7 @@ export function createSessionService(deps: SessionServiceDeps) {
           entry.cliChannels.set(props.connId, { cols: props.cols, rows: props.rows });
         }
 
-        Effect.runFork(publishEvents(session.pullEvents()));
+        yield* Effect.forkChild(publishEvents(session.pullEvents()));
         setupPtyLifecycle(session.id, entry);
 
         return { sessionId: session.id, pid: handle.pid };
@@ -223,15 +223,13 @@ export function createSessionService(deps: SessionServiceDeps) {
     > {
       return Effect.gen(function* () {
         const session = sessionRepo.findById(sessionId);
-        if (!session) return yield* Effect.fail(new SessionNotFoundError(sessionId));
+        if (!session) return yield* new SessionNotFoundError(sessionId);
 
         const adapter = agentRegistry.resolve(session.agentType);
         if (!adapter.canResume || !session.canResume) {
-          return yield* Effect.fail(
-            new CannotResumeSessionError(
-              sessionId,
-              session.agentSessionId ? 'session is not resumable' : 'no session ID'
-            )
+          return yield* new CannotResumeSessionError(
+            sessionId,
+            session.agentSessionId ? 'session is not resumable' : 'no session ID'
           );
         }
 
@@ -257,7 +255,7 @@ export function createSessionService(deps: SessionServiceDeps) {
           entry.cliChannels.set(opts.connId, { cols: opts.cols, rows: opts.rows });
         }
 
-        Effect.runFork(publishEvents(session.pullEvents()));
+        yield* Effect.forkChild(publishEvents(session.pullEvents()));
         setupPtyLifecycle(sessionId, entry);
 
         return { sessionId, pid: handle.pid };

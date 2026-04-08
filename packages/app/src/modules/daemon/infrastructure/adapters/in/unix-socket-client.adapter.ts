@@ -92,11 +92,12 @@ export function createUnixSocketClient(): IpcClientShape {
     waitForMessage: (type) =>
       Effect.gen(function* () {
         const deferred = yield* Deferred.make<DaemonToSession>();
+        const services = yield* Effect.services();
         const handler = (msg: DaemonToSession) => {
           if (msg.type === type) {
             const idx = messageHandlers.indexOf(handler);
             if (idx !== -1) messageHandlers.splice(idx, 1);
-            Effect.runFork(Deferred.succeed(deferred, msg));
+            Effect.runForkWith(services)(Deferred.succeed(deferred, msg));
           }
         };
         messageHandlers.push(handler);

@@ -42,16 +42,17 @@ export function claudeInteractiveCommand() {
     // If our handler isn't ready, the initial TUI render is silently lost.
 
     const spawnDeferred = yield* Deferred.make<number>();
+    const services = yield* Effect.services();
 
     client.onMessage((msg) => {
       if (!('sessionId' in msg) || msg.sessionId !== sessionId) return;
 
       switch (msg.type) {
         case 'session:spawned':
-          Effect.runFork(Deferred.succeed(spawnDeferred, msg.pid));
+          Effect.runForkWith(services)(Deferred.succeed(spawnDeferred, msg.pid));
           break;
         case 'session:spawn-failed':
-          Effect.runFork(Deferred.die(spawnDeferred, new Error(msg.error)));
+          Effect.runForkWith(services)(Deferred.die(spawnDeferred, new Error(msg.error)));
           break;
       }
     });

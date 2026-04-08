@@ -1,5 +1,9 @@
 import { homedir as homedirFn } from 'node:os';
 import { Effect } from 'effect';
+import * as Schema from 'effect/Schema';
+
+const encodeJson = Schema.encodeSync(Schema.UnknownFromJsonString);
+
 import type * as Cause from 'effect/Cause';
 import * as HttpRouter from 'effect/unstable/http/HttpRouter';
 import type * as HttpServerError from 'effect/unstable/http/HttpServerError';
@@ -285,10 +289,12 @@ export function createSessionRoutes(deps: SessionRouteDeps): HttpRouter.Route<Ro
         yield* Effect.logInfo('[server] Events WS client connected');
 
         const sessions = sessionService.listAll().map(sessionToDTO);
-        yield* write(JSON.stringify({ type: 'snapshot', sessions }));
+        const snapshotMsg = encodeJson({ type: 'snapshot', sessions });
+        yield* write(snapshotMsg);
 
+        const services = yield* Effect.services();
         const unsub = eventPublisher.subscribeBrowser((event) => {
-          Effect.runFork(write(JSON.stringify(event)));
+          Effect.runForkWith(services)(write(encodeJson(event)));
         });
 
         yield* socket.runRaw(() => {});

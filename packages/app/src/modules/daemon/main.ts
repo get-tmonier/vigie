@@ -196,23 +196,20 @@ export const runDaemon = Effect.gen(function* () {
       open() {},
       close() {},
       error(_socket, err) {
-        Effect.runFork(Effect.logError(`[stdin-server] error: ${err.message}`));
+        console.error(`[stdin-server] error: ${err.message}`);
       },
     },
   });
   yield* Effect.logInfo(`[daemon] Stdin socket listening on ${config.stdinSocketPath}`);
 
-  yield* Effect.never;
+  return yield* Effect.never;
 }).pipe(Effect.scoped);
 
 // ── Composition root ──────────────────────────────────────────────────
 
 const DatabaseLayer = makeDatabaseLayer(`${_HOME}/data.db`);
 
-const InfraLayer = Layer.mergeAll(
-  DatabaseLayer,
-  SqliteSessionRepositoryLayer.pipe(Layer.provide(DatabaseLayer)),
-  SqliteTerminalRepositoryLayer.pipe(Layer.provide(DatabaseLayer)),
+const BaseInfraLayer = Layer.mergeAll(
   EventPublisherLayer,
   BunPtySpawnerLayer,
   FsResumabilityCheckerLayer,
@@ -222,6 +219,11 @@ const InfraLayer = Layer.mergeAll(
   DaemonConfigLayer
 );
 
+const InfraLayer = Layer.mergeAll(SqliteSessionRepositoryLayer, SqliteTerminalRepositoryLayer).pipe(
+  Layer.provideMerge(DatabaseLayer),
+  Layer.provideMerge(BaseInfraLayer)
+);
+
 const TerminalGatewayLayer = Layer.effect(TerminalGateway)(
   Effect.gen(function* () {
     const ptySpawner = yield* PtySpawner;
@@ -229,12 +231,14 @@ const TerminalGatewayLayer = Layer.effect(TerminalGateway)(
     const eventPublisher = yield* EventPublisher;
     const terminalSubs = yield* TerminalSubscribers;
     const ipcServer = yield* IpcServer;
+    const gatewayServices = yield* Effect.services<never>();
     return createTerminalGateway({
       ptySpawner,
       terminalRepo,
       eventPublisher,
       terminalSubs,
-      sendToCliClient: (connId, msg) => Effect.runSync(ipcServer.sendTo(connId, msg)),
+      sendToCliClient: (connId, msg) =>
+        Effect.runSyncWith(gatewayServices)(ipcServer.sendTo(connId, msg)),
     });
   })
 );
@@ -268,16 +272,5 @@ if (import.meta.main) {
     process.exit(1);
   });
 
-  Effect.runFork(
-    runDaemon.pipe(
-      Effect.provide(AppLayer),
-      Effect.catch((err) =>
-        Effect.gen(function* () {
-          yield* Effect.logError('[daemon] Fatal error:', err);
-          cleanup();
-          process.exit(1);
-        })
-      )
-    ) as Effect.Effect<void, never, never>
-  );
+  Effect.runFork(runDaemon.pipe(Effect.provide(AppLayer)));
 }

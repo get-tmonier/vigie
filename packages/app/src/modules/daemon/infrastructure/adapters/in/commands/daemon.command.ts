@@ -1,7 +1,12 @@
-import { Console, Effect } from 'effect';
+import { Console, Data, Effect } from 'effect';
 import { createBunProcessManager } from '#modules/daemon/infrastructure/adapters/out/bun-process-manager.adapter';
 import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
 import { AppLayer, runDaemon } from '#modules/daemon/main';
+
+class DaemonCommandError extends Data.TaggedError('DaemonCommandError')<{
+  readonly message: string;
+  readonly cause?: unknown;
+}> {}
 
 const exit0 = Effect.ensuring(Effect.sync(() => process.exit(0)));
 
@@ -26,8 +31,8 @@ export function daemonStartCommand(foreground: boolean) {
         return;
       }
       yield* Console.log('Starting daemon in foreground...');
-      yield* runDaemon.pipe(Effect.provide(AppLayer));
-    }).pipe(Effect.catchTag('DaemonNotRunningError', () => Effect.void));
+      return yield* runDaemon.pipe(Effect.provide(AppLayer));
+    });
   }
 
   return Effect.gen(function* () {
@@ -90,7 +95,11 @@ export function daemonLogsCommand(follow: boolean) {
           });
           await proc.exited;
         },
-        catch: (err) => (err instanceof Error ? err : new Error(String(err))),
+        catch: (err) =>
+          new DaemonCommandError({
+            message: err instanceof Error ? err.message : String(err),
+            cause: err,
+          }),
       });
     }).pipe(
       Effect.catchCause(() => Console.error('Failed to tail logs')),
@@ -112,7 +121,11 @@ export function daemonLogsCommand(follow: boolean) {
         const tail = lines.slice(-50);
         console.log(tail.join('\n'));
       },
-      catch: (err) => (err instanceof Error ? err : new Error(String(err))),
+      catch: (err) =>
+        new DaemonCommandError({
+          message: err instanceof Error ? err.message : String(err),
+          cause: err,
+        }),
     });
   }).pipe(
     Effect.catchCause(() => Console.error('Failed to read logs')),
@@ -152,17 +165,16 @@ export function daemonAttachCommand() {
       `Attached to daemon (pid ${info.pid}, uptime ${formatUptime(info.startedAt)})`
     );
     yield* Console.log(`Tailing ${config.logFile}...`);
-    yield* Effect.gen(function* () {
-      yield* Effect.tryPromise({
-        try: async () => {
-          const p = Bun.spawn(['tail', '-f', config.logFile], {
-            stdout: 'inherit',
-            stderr: 'inherit',
-          });
-          await p.exited;
-        },
-        catch: (e) => (e instanceof Error ? e : new Error(String(e))),
-      });
+    yield* Effect.tryPromise({
+      try: async () => {
+        const p = Bun.spawn(['tail', '-f', config.logFile], {
+          stdout: 'inherit',
+          stderr: 'inherit',
+        });
+        await p.exited;
+      },
+      catch: (e) =>
+        new DaemonCommandError({ message: e instanceof Error ? e.message : String(e), cause: e }),
     }).pipe(Effect.catchCause(() => Console.error('Failed to tail logs')));
   }).pipe(
     Effect.catchTag('DaemonNotRunningError', () =>

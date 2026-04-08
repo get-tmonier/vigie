@@ -19,12 +19,12 @@ const MIME_TYPES: Record<string, string> = {
   '.ttf': 'font/ttf',
 };
 
-type ServerDeps = {
-  appRoutes: HttpRouter.Route<any, any>[];
+type ServerDeps<E, R> = {
+  appRoutes: HttpRouter.Route<E, R>[];
   clientDistPath?: string;
 };
 
-export function createRoutesLayer(deps: ServerDeps) {
+export function createRoutesLayer<E, R>(deps: ServerDeps<E, R>) {
   const routes = [...deps.appRoutes, ...createFsRoutes()];
 
   if (deps.clientDistPath && existsSync(deps.clientDistPath)) {
@@ -48,5 +48,5 @@ export function createRoutesLayer(deps: ServerDeps) {
     );
   }
 
-  return Layer.mergeAll(HttpRouter.layer, HttpRouter.addAll(routes));
+  return HttpRouter.layer.pipe(Layer.provideMerge(HttpRouter.addAll(routes)));
 }

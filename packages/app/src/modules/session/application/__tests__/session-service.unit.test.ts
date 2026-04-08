@@ -55,7 +55,7 @@ function makeGateway() {
     spawnPty: () => Effect.die(new Error('unexpected spawnPty call')),
     appendChunk: (sessionId, base64) => {
       if (!chunks.has(sessionId)) chunks.set(sessionId, []);
-      chunks.get(sessionId)!.push({ data: base64 });
+      chunks.get(sessionId)?.push({ data: base64 });
     },
     getAllChunks: (sessionId) => chunks.get(sessionId) ?? [],
     appendInput: () => {},

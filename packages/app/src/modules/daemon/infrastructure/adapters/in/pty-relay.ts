@@ -31,10 +31,7 @@ type PtyRelayResult =
   | { type: 'detach' }
   | { type: 'disconnect' };
 
-interface StdinSocket {
-  write(data: string | Uint8Array): number;
-  terminate(): void;
-}
+type StdinSocket = Pick<Bun.Socket<undefined>, 'write' | 'terminate'>;
 
 function connectStdinSocket(stdinSocketPath: string) {
   return Effect.callback<StdinSocket, DaemonNotRunningError>((resume) => {
@@ -42,7 +39,7 @@ function connectStdinSocket(stdinSocketPath: string) {
       unix: stdinSocketPath,
       socket: {
         open(s) {
-          resume(Exit.succeed(s as unknown as StdinSocket));
+          resume(Exit.succeed(s));
         },
         data() {},
         close() {},
@@ -84,9 +81,10 @@ export function attachPtyRelay(client: IpcClientShape, options: PtyRelayOptions)
     const exitDeferred = yield* Deferred.make<number>();
     const detachDeferred = yield* Deferred.make<void>();
     const disconnectDeferred = yield* Deferred.make<void>();
+    const services = yield* Effect.services();
 
     client.onClose(() => {
-      Effect.runFork(Deferred.succeed(disconnectDeferred, undefined));
+      Effect.runForkWith(services)(Deferred.succeed(disconnectDeferred, undefined));
     });
 
     const cols = process.stdout.columns ?? 80;
@@ -106,7 +104,7 @@ export function attachPtyRelay(client: IpcClientShape, options: PtyRelayOptions)
           break;
         }
         case 'session:pty-exited':
-          Effect.runFork(Deferred.succeed(exitDeferred, msg.exitCode));
+          Effect.runForkWith(services)(Deferred.succeed(exitDeferred, msg.exitCode));
           break;
       }
     });
@@ -157,10 +155,10 @@ export function attachPtyRelay(client: IpcClientShape, options: PtyRelayOptions)
     const stdinSocket = yield* connectStdinSocket(stdinSocketPath);
 
     const triggerDetach = () => {
-      Effect.runFork(
+      Effect.runForkWith(services)(
         client.send({ type: 'session:detach', sessionId }).pipe(Effect.catch(() => Effect.void))
       );
-      Effect.runFork(Deferred.succeed(detachDeferred, undefined));
+      Effect.runForkWith(services)(Deferred.succeed(detachDeferred, undefined));
     };
 
     const interceptor = createKeybindInterceptor({ onDetach: triggerDetach });
@@ -182,7 +180,7 @@ export function attachPtyRelay(client: IpcClientShape, options: PtyRelayOptions)
       renderer.resize(newCols, newRows);
       renderer.fullRender(vterm.getScreen());
       resizeStatusBar();
-      Effect.runFork(
+      Effect.runForkWith(services)(
         client
           .send({ type: 'session:cli-resize', sessionId, cols: newCols, rows: newRows })
           .pipe(Effect.catch(() => Effect.void))
