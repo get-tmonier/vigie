@@ -91,13 +91,37 @@ HTTP server, IPC server, Unix socket server, config layer, process manager.
 
 **`src/modules/agent-session/dependencies.ts`**
 SQLite session repo, SQLite terminal repo, PTY spawner, agent registry, event publisher,
-resumability checker, terminal subscribers, session service.
+resumability checker, terminal subscribers, all use case layers.
 
 **`src/dependencies.ts`** (root)
 - Merges module dependencies
 - Provides shared infra (database layer)
-- Wires `SessionCommandShape` port: daemon calls into agent-session
 - Wires event adaptation: agent-session EventPublisher → daemon WS broadcaster
+
+---
+
+## Use case decomposition (agent-session)
+
+`session.service.ts` is deleted. No facade. IPC router and HTTP routes call use cases directly.
+
+**Commands:**
+
+| Use case | Responsibilities |
+|----------|-----------------|
+| `SpawnSessionUseCase` | `register`, `spawnInteractive`, `resume` — all "start a session" operations, share PTY spawn logic |
+| `SessionLifecycleUseCase` | `markEnded`, `markError`, `deregister`, `setAgentSessionId` — IPC-driven state transitions |
+| `SessionCleanupUseCase` | `delete`, `deleteAllEnded` — user-initiated cleanup |
+| `TerminalConnectionUseCase` | `attach`, `detach`, `updateCliResize`, `handleDisconnect`, `writeInput` — CLI connection management around a live PTY |
+| `CheckResumabilityUseCase` | Background job — runs every 5s, updates resumability for active sessions |
+
+**Queries:**
+
+| Use case | Responsibilities |
+|----------|-----------------|
+| `SessionQueriesUseCase` | `listAll`, `findById`, `getAllChunks`, `getInputHistory` — pure reads, no side effects |
+
+Each is its own file under `agent-session/application/use-cases/`.
+The daemon's `SessionCommandShape` port (used by IPC router and HTTP routes) is shaped after these use case interfaces directly — no intermediate service layer.
 
 ---
 
@@ -190,7 +214,13 @@ src/
       application/
         ports/
           out/             (SessionRepository, AgentRegistry, ResumabilityChecker, EventPublisher)
-        use-cases/         (session service, terminal subscribers)
+        use-cases/
+          spawn-session.use-case.ts
+          session-lifecycle.use-case.ts
+          session-cleanup.use-case.ts
+          terminal-connection.use-case.ts
+          check-resumability.use-case.ts
+          session-queries.use-case.ts
       infrastructure/
         adapters/
           in/              (session routes, terminal routes, UI)
