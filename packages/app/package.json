@@ -12,7 +12,7 @@
     "#shared/*": "./src/shared/*"
   },
   "scripts": {
-    "dev": "bun run build:client && VIGIE_DEV=true bun run --watch src/modules/daemon/main.ts",
+    "dev": "bun run build:client && VIGIE_DEV=true bun run --watch src/daemon.ts",
     "dev:watch-client": "vite build --watch",
     "dev:claude": "bun run src/cli.ts claude",
     "build:pty": "sh scripts/build-pty.sh",

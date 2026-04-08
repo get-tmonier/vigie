@@ -8,7 +8,7 @@ import type * as HttpServerError from 'effect/unstable/http/HttpServerError';
 import * as HttpServerRequest from 'effect/unstable/http/HttpServerRequest';
 import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse';
 
-type RouteError = HttpServerError.HttpServerError | Cause.UnknownError | never;
+type RouteError = HttpServerError.HttpServerError | Cause.UnknownError;
 
 function expandPath(p: string): string {
   if (p === '~' || p.startsWith('~/')) {

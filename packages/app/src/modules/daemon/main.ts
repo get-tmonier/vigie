@@ -166,7 +166,18 @@ export const runDaemon = Effect.gen(function* () {
   if (existsSync(config.socketPath)) unlinkSync(config.socketPath);
   if (existsSync(config.stdinSocketPath)) unlinkSync(config.stdinSocketPath);
 
-  const router = createIpcRouter(sessionService);
+  const router = createIpcRouter({
+    spawnSession: sessionService,
+    sessionLifecycle: sessionService,
+    terminalConnection: {
+      ...sessionService,
+      killAll: () => {},
+      addBrowserChannel: () => null,
+      updateBrowserChannel: () => {},
+      removeBrowserChannel: () => {},
+      writeBinaryInput: () => {},
+    },
+  });
   yield* ipcServer.start(config.socketPath, router, (connId) =>
     Effect.sync(() => sessionService.handleDisconnect(connId))
   );

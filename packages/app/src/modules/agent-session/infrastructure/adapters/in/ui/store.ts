@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit';
-import type { AgentSession } from '#modules/session/infrastructure/adapters/in/session.dto';
+import type { AgentSession } from '#modules/agent-session/infrastructure/adapters/in/session.dto';
 import { sessionsSlice } from './sessions.slice';
 
 function readInitialData() {

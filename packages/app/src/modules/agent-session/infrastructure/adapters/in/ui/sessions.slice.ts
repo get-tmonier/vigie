@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import type { AgentSession } from '#modules/session/infrastructure/adapters/in/session.dto';
+import type { AgentSession } from '#modules/agent-session/infrastructure/adapters/in/session.dto';
 
 interface SessionsState {
   sessions: AgentSession[];

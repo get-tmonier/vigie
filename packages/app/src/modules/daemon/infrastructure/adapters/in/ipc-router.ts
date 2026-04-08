@@ -1,21 +1,30 @@
 import { Effect } from 'effect';
 import * as Schema from 'effect/Schema';
-import type { SessionCommandShape } from '#modules/daemon/application/ports/in/session-command.port';
+import type { SessionLifecycleShape } from '#modules/daemon/application/ports/in/session-lifecycle.port';
+import type { SpawnSessionShape } from '#modules/daemon/application/ports/in/spawn-session.port';
+import type { TerminalConnectionShape } from '#modules/daemon/application/ports/in/terminal-connection.port';
 import type { IpcConnection } from '#modules/daemon/application/ports/out/ipc-server.port';
 import type { SessionToDaemon } from '#shared/kernel/ipc-protocol';
-import { SessionId } from '#shared/kernel/session-id';
 import { expandPath } from '#shared/lib/path';
 
 const encodeJson = Schema.encodeSync(Schema.UnknownFromJsonString);
 
+interface IpcRouterDeps {
+  spawnSession: SpawnSessionShape;
+  sessionLifecycle: SessionLifecycleShape;
+  terminalConnection: TerminalConnectionShape;
+}
+
 export function createIpcRouter(
-  svc: SessionCommandShape
+  deps: IpcRouterDeps
 ): (conn: IpcConnection, msg: SessionToDaemon) => Effect.Effect<void> {
+  const { spawnSession, sessionLifecycle, terminalConnection } = deps;
+
   return (conn, msg) =>
     Effect.gen(function* () {
       switch (msg.type) {
         case 'session:register': {
-          svc.register({
+          spawnSession.register({
             sessionId: msg.sessionId,
             agentType: msg.agentType,
             cwd: msg.cwd,
@@ -30,7 +39,7 @@ export function createIpcRouter(
         }
         case 'session:spawn-interactive': {
           const spawnResult = yield* Effect.result(
-            svc.spawnInteractive({
+            spawnSession.spawnInteractive({
               sessionId: msg.sessionId,
               agentType: msg.agentType,
               cwd: expandPath(msg.cwd),
@@ -56,32 +65,26 @@ export function createIpcRouter(
           }
 
           const { sessionId, pid } = spawnResult.success;
-          conn.send(
-            encodeJson({
-              type: 'session:spawned',
-              sessionId,
-              pid,
-            })
-          );
+          conn.send(encodeJson({ type: 'session:spawned', sessionId, pid }));
           break;
         }
         case 'session:stdin': {
-          svc.writeInput(msg.sessionId, msg.data, 'cli');
+          terminalConnection.writeInput(msg.sessionId, msg.data, 'cli');
           break;
         }
         case 'session:cli-resize': {
-          svc.updateCliResize(msg.sessionId, conn.id, msg.cols, msg.rows);
+          terminalConnection.updateCliResize(msg.sessionId, conn.id, msg.cols, msg.rows);
           yield* Effect.logInfo(
             `[daemon] cli-resize sessionId=${msg.sessionId} cols=${msg.cols} rows=${msg.rows}`
           );
           break;
         }
         case 'session:detach': {
-          svc.detach(SessionId(msg.sessionId), conn.id);
+          terminalConnection.detach(msg.sessionId, conn.id);
           break;
         }
         case 'session:attach': {
-          const result = svc.attach(SessionId(msg.sessionId), conn.id, {
+          const result = terminalConnection.attach(msg.sessionId, conn.id, {
             cols: msg.cols,
             rows: msg.rows,
           });
@@ -105,12 +108,7 @@ export function createIpcRouter(
                 })
               );
             }
-            conn.send(
-              encodeJson({
-                type: 'session:replay-complete',
-                sessionId: msg.sessionId,
-              })
-            );
+            conn.send(encodeJson({ type: 'session:replay-complete', sessionId: msg.sessionId }));
             yield* Effect.logInfo(
               `[daemon] CLI attached to session ${msg.sessionId} (replayed ${result.chunks.length} chunks)`
             );
@@ -125,25 +123,23 @@ export function createIpcRouter(
           }
           break;
         }
-        case 'session:output': {
+        case 'session:output':
+        case 'session:terminal-output': {
           break;
         }
         case 'session:done': {
-          svc.markEnded(SessionId(msg.sessionId), msg.exitCode);
+          sessionLifecycle.markEnded(msg.sessionId, msg.exitCode);
           yield* Effect.logInfo(`[daemon] Session done: ${msg.sessionId} (exit ${msg.exitCode})`);
           break;
         }
         case 'session:error': {
-          svc.markError(SessionId(msg.sessionId), msg.error);
+          sessionLifecycle.markError(msg.sessionId, msg.error);
           yield* Effect.logError(`[daemon] Session error: ${msg.sessionId}: ${msg.error}`);
-          break;
-        }
-        case 'session:terminal-output': {
           break;
         }
         case 'session:resume': {
           const resumeResult = yield* Effect.result(
-            svc.resume(SessionId(msg.sessionId), {
+            spawnSession.resume(msg.sessionId, {
               cols: msg.cols,
               rows: msg.rows,
               connId: conn.id,
@@ -165,24 +161,18 @@ export function createIpcRouter(
           }
 
           const { sessionId: resumedId, pid: resumedPid } = resumeResult.success;
-          conn.send(
-            encodeJson({
-              type: 'session:spawned',
-              sessionId: resumedId,
-              pid: resumedPid,
-            })
-          );
+          conn.send(encodeJson({ type: 'session:spawned', sessionId: resumedId, pid: resumedPid }));
           break;
         }
         case 'session:agent-id': {
-          svc.setAgentSessionId(SessionId(msg.sessionId), msg.agentSessionId);
+          sessionLifecycle.setAgentSessionId(msg.sessionId, msg.agentSessionId);
           yield* Effect.logInfo(
             `[daemon] Agent session ID detected for ${msg.sessionId}: ${msg.agentSessionId}`
           );
           break;
         }
         case 'session:deregister': {
-          svc.deregister(SessionId(msg.sessionId));
+          sessionLifecycle.deregister(msg.sessionId);
           break;
         }
       }

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Provider, useDispatch, useSelector } from 'react-redux';
-import type { AgentSession } from '#modules/session/infrastructure/adapters/in/session.dto';
-import { InteractiveTerminal } from '#modules/terminal/infrastructure/adapters/in/ui/InteractiveTerminal.island';
+import type { AgentSession } from '#modules/agent-session/infrastructure/adapters/in/session.dto';
+import { InteractiveTerminal } from '#modules/agent-session/infrastructure/adapters/in/ui/InteractiveTerminal.island';
 import { cn } from '#shared/lib/cn';
 import { DashboardLayout } from '#shared/ui/DashboardLayout';
 import { Header } from '#shared/ui/Header';

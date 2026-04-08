@@ -8,8 +8,8 @@ import {
 import { createTuiRenderer } from '#lib/vterm/tui-renderer';
 import { createVTerm } from '#lib/vterm/vterm';
 import type { IpcClientShape } from '#modules/daemon/application/ports/in/ipc-client.port';
+import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
 import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
-import { DaemonNotRunningError } from '#shared/kernel/errors';
 
 function formatDuration(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);

@@ -3,10 +3,10 @@ import { printChunk } from '#lib/cli-terminal/chunk-printer';
 import { printHeader } from '#lib/cli-terminal/header';
 import { printSessionSummary } from '#lib/cli-terminal/status-bar';
 import { getGitContext } from '#lib/git-context';
+import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
 import { createClaudeRunner } from '#modules/daemon/infrastructure/adapters/out/agents/claude-runner.adapter';
 import { createBunProcessManager } from '#modules/daemon/infrastructure/adapters/out/bun-process-manager.adapter';
 import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
-import { DaemonNotRunningError } from '#shared/kernel/errors';
 import { createUnixSocketClient } from '../unix-socket-client.adapter';
 
 export function claudeCommand(prompt: string) {

@@ -1,6 +1,12 @@
 import { Data } from 'effect';
 
-export { DaemonNotRunningError } from '#shared/kernel/errors';
+export class DaemonNotRunningError extends Data.TaggedError('DaemonNotRunningError')<{
+  readonly message: string;
+}> {}
+
+export class IpcConnectionError extends Data.TaggedError('IpcConnectionError')<{
+  readonly message: string;
+}> {}
 
 export class DaemonAlreadyRunningError extends Data.TaggedError('DaemonAlreadyRunningError')<{
   readonly pid: number;
