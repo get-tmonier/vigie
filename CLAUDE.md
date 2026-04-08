@@ -128,7 +128,7 @@ All cross-folder imports must use ESM subpath aliases (`#alias/...`), never rela
 
 | Package | Aliases |
 |---|---|
-| `@vigie/app` | `#modules/*`, `#lib/*`, `#infra/*`, `#shared/*` |
+| `@vigie/app` | `#modules/*`, `#shared/*`, `#dependencies` |
 | `@vigie/landing` | `#components/*`, `#layouts/*`, `#assets/*`, `#styles/*`, `#lib/*` |
 
 ## Multi-agent extensibility
