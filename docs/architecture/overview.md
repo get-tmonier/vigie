@@ -10,7 +10,7 @@ graph TB
     end
 
     subgraph daemon["Daemon (single Bun process)"]
-        subgraph daemon_mod["daemon module"]
+        subgraph shell["shell (application host)"]
             IPC["Unix Socket IPC<br/>~/.vigie/daemon.sock"]
             HTTP["HTTP + WebSocket<br/>localhost:19191"]
         end

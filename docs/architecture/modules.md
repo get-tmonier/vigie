@@ -1,6 +1,6 @@
 # Module architecture
 
-vigie follows hexagonal architecture (ports & adapters) with two bounded modules.
+vigie follows hexagonal architecture (ports & adapters) with one bounded domain module (`agent-session`) and an application shell (`shell`).
 
 ## Module map
 
@@ -21,18 +21,14 @@ graph LR
             end
         end
 
-        subgraph daemon_mod["daemon module"]
-            subgraph d_domain["Domain"]
-                D_E["DaemonInfo<br/>Errors"]
+        subgraph shell_mod["shell (application host)"]
+            subgraph s_app["Application"]
+                S_UC["run-daemon<br/>(startup loop)"]
+                S_PORT_OUT["Out ports<br/>IpcServer<br/>ProcessManager"]
             end
-            subgraph d_app["Application"]
-                D_UC["Use Cases<br/>run-daemon (main loop)"]
-                D_PORT_IN["In ports<br/>spawn-session · session-lifecycle<br/>terminal-connection · startup-ops<br/>ipc-client"]
-                D_PORT_OUT["Out ports<br/>IpcServer<br/>ProcessManager"]
-            end
-            subgraph d_infra["Infrastructure"]
-                D_IN["Adapters in<br/>IPC router<br/>CLI commands<br/>Unix socket client<br/>PTY relay"]
-                D_OUT["Adapters out<br/>Unix socket server<br/>Bun process manager<br/>Claude runner adapter"]
+            subgraph s_infra["Infrastructure"]
+                S_IN["Adapters in<br/>IPC router<br/>CLI commands<br/>Unix socket client<br/>PTY relay"]
+                S_OUT["Adapters out<br/>Unix socket server<br/>Bun process manager<br/>Claude runner adapter"]
             end
         end
 
@@ -45,12 +41,12 @@ graph LR
     AS_PORT_OUT --> AS_OUT
     AS_IN --> AS_UC
     AS_UC --> AS_PORT_OUT
-    D_PORT_IN -.->|"delegates to"| AS_UC
-    D_IN --> D_UC
-    D_UC --> D_PORT_OUT
-    D_PORT_OUT --> D_OUT
+    S_IN -->|"delegates to"| AS_UC
+    S_IN --> S_UC
+    S_UC --> S_PORT_OUT
+    S_PORT_OUT --> S_OUT
     AS_OUT --> DB
-    D_OUT --> KERNEL
+    S_OUT --> KERNEL
     AS_OUT --> KERNEL
 ```
 
@@ -101,21 +97,17 @@ graph LR
 
 ---
 
-## daemon module
+## shell
 
-**Bounded context:** daemon lifecycle, IPC server, CLI command dispatch.
+**Role:** Application host — not a domain module. No bounded context, no domain model.
 
-### Application — use cases
-
-| Use case | Responsibility |
-|---|---|
-| `run-daemon` | Startup sequence, HTTP+WS server, IPC server, periodic maintenance |
+Owns process lifecycle, HTTP/IPC server wiring, and CLI commands. Delegates all business logic to `agent-session`.
 
 ### Startup sequence (`run-daemon`)
 
 ```mermaid
 sequenceDiagram
-    participant D as Daemon
+    participant D as shell
     participant DB as SQLite
     participant HTTP as HTTP Server
     participant IPC as IPC Server
@@ -147,16 +139,15 @@ sequenceDiagram
 graph BT
     DB["DatabaseLive"]
     AS["AgentSessionLive"]
-    D["DaemonLive"]
+    SH["DaemonLive (shell)"]
     APP["AppLive"]
 
     DB --> AS
-    DB --> D
+    SH --> APP
     AS --> APP
-    D --> APP
 ```
 
-`AppLive` is the root composition provided to the daemon entry point.
+`AppLive` is the root composition in `src/dependencies.ts` — the single wiring point for `agent-session` + shell infrastructure.
 
 ## See also
 
