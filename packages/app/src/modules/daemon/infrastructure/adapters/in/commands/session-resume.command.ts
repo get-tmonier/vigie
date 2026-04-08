@@ -1,7 +1,5 @@
 import { Database } from 'bun:sqlite';
 import { existsSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { join } from 'node:path';
 import { Console, Effect } from 'effect';
 import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
 import { createBunProcessManager } from '#modules/daemon/infrastructure/adapters/out/bun-process-manager.adapter';
@@ -18,6 +16,7 @@ interface SessionRow {
   cwd: string;
   git_branch: string | null;
   agent_session_id: string | null;
+  resumable: number;
 }
 
 export function sessionResumeCommand(partialId: string) {
@@ -58,20 +57,6 @@ export function sessionResumeCommand(partialId: string) {
       return;
     }
 
-    if (session.agent_type !== 'claude') {
-      yield* Console.error(
-        `Session ${session.id.slice(0, 8)} is a ${session.agent_type} session. Only Claude sessions can be resumed.`
-      );
-      return;
-    }
-
-    if (!session.agent_session_id) {
-      yield* Console.error(
-        `Session ${session.id.slice(0, 8)} has no Claude session ID stored. Cannot resume.`
-      );
-      return;
-    }
-
     if (session.mode !== 'interactive') {
       yield* Console.error(
         `Session ${session.id.slice(0, 8)} is in ${session.mode} mode. Only interactive sessions can be resumed.`
@@ -88,16 +73,7 @@ export function sessionResumeCommand(partialId: string) {
       });
     }
 
-    // Check if the Claude session file actually exists on disk
-    const projectKey = session.cwd.replace(/\//g, '-');
-    const claudeSessionFile = join(
-      homedir(),
-      '.claude',
-      'projects',
-      projectKey,
-      `${session.agent_session_id}.jsonl`
-    );
-    const canResume = existsSync(claudeSessionFile);
+    const canResume = session.resumable === 1 && !!session.agent_session_id;
 
     const gitContext = yield* getGitContext(session.cwd);
 
@@ -134,7 +110,8 @@ export function sessionResumeCommand(partialId: string) {
       yield* client.send({
         type: 'session:resume',
         sessionId: session.id,
-        agentSessionId: session.agent_session_id,
+        // canResume guarantees agent_session_id is non-null
+        agentSessionId: session.agent_session_id!,
         cwd: session.cwd,
         cols,
         rows: rows_,
@@ -146,7 +123,7 @@ export function sessionResumeCommand(partialId: string) {
       yield* client.send({
         type: 'session:spawn-interactive',
         sessionId: session.id,
-        agentType: 'claude',
+        agentType: session.agent_type,
         cwd: session.cwd,
         cols,
         rows: rows_,
