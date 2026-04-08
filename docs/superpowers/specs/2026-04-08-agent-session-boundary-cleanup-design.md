@@ -18,24 +18,28 @@ Two boundary violations in the `agent-session` module:
 
 ## Solution
 
-Introduce a `BrowserEventPublisher` OUT port so that the browser event concern has a proper home in the application layer. Split `AppEventPublisher` into two single-responsibility adapters.
+Introduce an `EventFeed` OUT port so that the browser event concern has a proper home in the application layer. Port names follow the application's perspective, not the adapter's technology. Split `AppEventPublisher` into two single-responsibility adapters.
+
+## Naming rationale
+
+The port is named `EventFeed` — it describes what the application provides (a subscribable feed of events) without encoding the consumer technology (browser). The event type stays `BrowserEvent` because it IS a browser WebSocket wire format — it is honest about what it is.
 
 ## Architecture
 
 ```
 application/ports/out/
-  event-publisher.port.ts              (unchanged)
-  browser-event-publisher.port.ts      (NEW)
+  event-publisher.port.ts     (unchanged)
+  event-feed.port.ts          (NEW — EventFeed port + BrowserEvent type)
 
 infrastructure/adapters/out/
-  event-publisher.adapter.ts           (simplified)
-  browser-event-publisher.adapter.ts   (NEW)
+  event-publisher.adapter.ts  (simplified)
+  event-feed.adapter.ts       (NEW)
 
 infrastructure/adapters/in/
-  browser-events.ts                    (DELETED)
-  session.routes.tsx                   (updated — depends on port)
+  browser-events.ts           (DELETED)
+  session.routes.tsx          (updated — depends on port)
 
-agent-session/dependencies.ts          (updated — wires new adapter)
+agent-session/dependencies.ts (updated — wires new adapter)
 ```
 
 ### Data flow
@@ -52,40 +56,40 @@ After:
   publish(DomainEvent)
     → event-publisher.adapter
         └─ domain listeners
-    → browser-event-publisher.adapter   (subscribed to EventPublisher)
+    → event-feed.adapter   (subscribed to EventPublisher)
         ├─ domainEventToBrowserEvent()  ← BrowserEvent defined in port
         └─ browser listeners
 ```
 
 ## Components
 
-### `application/ports/out/browser-event-publisher.port.ts` (new)
+### `application/ports/out/event-feed.port.ts` (new)
 
 Defines the wire format for browser WebSocket events and the subscription interface.
 
 ```ts
 export type BrowserEvent = /* tagged union — moved verbatim from browser-events.ts */
 
-export interface BrowserEventPublisherShape {
-  subscribeBrowser(listener: (event: BrowserEvent) => void): () => void;
+export interface EventFeedShape {
+  subscribe(listener: (event: BrowserEvent) => void): () => void;
 }
 
-export class BrowserEventPublisher
-  extends ServiceMap.Service<BrowserEventPublisher, BrowserEventPublisherShape>()(
-    '@vigie/BrowserEventPublisher'
+export class EventFeed
+  extends ServiceMap.Service<EventFeed, EventFeedShape>()(
+    '@vigie/EventFeed'
   ) {}
 ```
 
 `BrowserEvent` is the complete tagged union currently in `infrastructure/adapters/in/browser-events.ts`. It moves here unchanged — this is its canonical definition.
 
-### `infrastructure/adapters/out/browser-event-publisher.adapter.ts` (new)
+### `infrastructure/adapters/out/event-feed.adapter.ts` (new)
 
-Subscribes to the `EventPublisher` domain stream, transforms events, and dispatches to browser listeners.
+Subscribes to the `EventPublisher` domain stream, transforms events, and dispatches to feed listeners.
 
 - On `Layer` init: calls `EventPublisher.subscribe(listener)` to wire up the domain stream
 - Holds `domainEventToBrowserEvent(event: DomainEvent): BrowserEvent | null` (moved from `event-publisher.adapter.ts`)
 - Per-listener errors caught with `Effect.catch → Effect.logError` (same pattern as today)
-- Exports `BrowserEventPublisherLive: Layer<BrowserEventPublisher, never, EventPublisher>`
+- Exports `EventFeedLive: Layer<EventFeed, never, EventPublisher>`
 
 ### `infrastructure/adapters/out/event-publisher.adapter.ts` (simplified)
 
@@ -106,11 +110,11 @@ type SessionRouteDeps = {
 };
 
 // After
-import type { BrowserEventPublisherShape } from
-  '#modules/agent-session/application/ports/out/browser-event-publisher.port';
+import type { EventFeedShape } from
+  '#modules/agent-session/application/ports/out/event-feed.port';
 
 type SessionRouteDeps = {
-  eventPublisher: BrowserEventPublisherShape;
+  eventFeed: EventFeedShape;
   ...
 };
 ```
@@ -131,10 +135,10 @@ No shared constant across modules — `daemon/ws-schemas.ts` and `agent-session/
 
 ### `agent-session/dependencies.ts` (updated)
 
-Wire `BrowserEventPublisherLive` alongside `EventPublisherLive`:
+Wire `EventFeedLive` alongside `EventPublisherLive`:
 
 ```ts
-BrowserEventPublisherLive  // Layer<BrowserEventPublisher, never, EventPublisher>
+EventFeedLive  // Layer<EventFeed, never, EventPublisher>
   .pipe(Layer.provide(EventPublisherLive))
 ```
 
@@ -155,5 +159,5 @@ All consumers now import `BrowserEvent` from the port.
 
 ## Testing
 
-- `browser-event-publisher.adapter.ts` can be tested by injecting a mock `EventPublisher`, triggering `publish()`, and asserting that `subscribeBrowser` listeners receive the correct `BrowserEvent`.
+- `event-feed.adapter.ts` can be tested by injecting a mock `EventPublisher`, triggering `publish()`, and asserting that `subscribe` listeners receive the correct `BrowserEvent`.
 - `event-publisher.adapter.ts` tests are unaffected — no behavior change, only removal of browser concern.
