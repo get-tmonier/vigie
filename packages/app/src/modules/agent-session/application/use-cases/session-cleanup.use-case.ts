@@ -1,12 +1,12 @@
 import { Effect } from 'effect';
-import type { EventPublisherShape } from '#modules/agent-session/application/ports/out/event-publisher.port';
+import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
 import type { SessionDomainEvent } from '#modules/agent-session/domain/events';
 import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
 
 interface SessionCleanupDeps {
   sessionRepo: SessionRepositoryShape;
-  eventPublisher: EventPublisherShape;
+  eventPublisher: DomainEventBusShape;
 }
 
 export type SessionCleanupShape = ReturnType<typeof createSessionCleanupUseCase>;

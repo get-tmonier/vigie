@@ -1,6 +1,6 @@
 import { Effect } from 'effect';
 import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
-import type { EventPublisherShape } from '#modules/agent-session/application/ports/out/event-publisher.port';
+import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
 import type { TerminalRepositoryShape } from '#modules/agent-session/application/ports/out/terminal-repository.port';
@@ -14,7 +14,7 @@ import { type LineBuffer, stripAnsiAndBuffer } from '#shared/lib/input-line-buff
 interface TerminalConnectionDeps {
   sessionRepo: SessionRepositoryShape;
   terminalRepo: TerminalRepositoryShape;
-  eventPublisher: EventPublisherShape;
+  eventPublisher: DomainEventBusShape;
   terminalSubs: TerminalSubscribersShape;
   agentRegistry: AgentRegistryShape;
   resumabilityChecker: ResumabilityCheckerShape;

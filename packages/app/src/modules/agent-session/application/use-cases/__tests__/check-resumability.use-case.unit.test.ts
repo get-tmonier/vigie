@@ -3,7 +3,7 @@ import type { ResumabilityCheckerShape } from '#modules/agent-session/applicatio
 import { createCheckResumabilityUseCase } from '#modules/agent-session/application/use-cases/check-resumability.use-case';
 import { Session } from '#modules/agent-session/domain/session';
 import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
-import { makeEventPublisher, makeSessionRepo } from './test-helpers';
+import { makeDomainEventBus, makeSessionRepo } from './test-helpers';
 
 function makeResumabilityChecker(resumable = false): ResumabilityCheckerShape {
   return {
@@ -18,7 +18,7 @@ describe('CheckResumabilityUseCase.checkResumableForAll', () => {
     session.pullEvents();
 
     const sessionRepo = makeSessionRepo([session]);
-    const eventPublisher = makeEventPublisher();
+    const eventPublisher = makeDomainEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
@@ -41,7 +41,7 @@ describe('CheckResumabilityUseCase.checkResumableForAll', () => {
     session.pullEvents();
 
     const sessionRepo = makeSessionRepo([session]);
-    const eventPublisher = makeEventPublisher();
+    const eventPublisher = makeDomainEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
@@ -63,7 +63,7 @@ describe('CheckResumabilityUseCase.checkResumableForAll', () => {
     session.pullEvents(); // no agentSessionId set
 
     const sessionRepo = makeSessionRepo([session]);
-    const eventPublisher = makeEventPublisher();
+    const eventPublisher = makeDomainEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
@@ -84,7 +84,7 @@ describe('CheckResumabilityUseCase.checkResumableForAll', () => {
     session.pullEvents();
 
     const sessionRepo = makeSessionRepo([session]);
-    const eventPublisher = makeEventPublisher();
+    const eventPublisher = makeDomainEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
@@ -115,7 +115,7 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
       resumable: false,
     });
 
-    const eventPublisher = makeEventPublisher();
+    const eventPublisher = makeDomainEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
@@ -144,7 +144,7 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
       resumable: false, // matches checker result of false
     });
 
-    const eventPublisher = makeEventPublisher();
+    const eventPublisher = makeDomainEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
@@ -175,7 +175,7 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
       resumable: false,
     });
 
-    const eventPublisher = makeEventPublisher();
+    const eventPublisher = makeDomainEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
@@ -205,7 +205,7 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
       resumable: false,
     });
 
-    const eventPublisher = makeEventPublisher();
+    const eventPublisher = makeDomainEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
@@ -239,7 +239,7 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
       resumabilityChecker: makeResumabilityChecker(false),
-      eventPublisher: makeEventPublisher(),
+      eventPublisher: makeDomainEventBus(),
     });
 
     useCase.checkResumableForActive();
@@ -263,7 +263,7 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
       resumable: true,
     });
 
-    const eventPublisher = makeEventPublisher();
+    const eventPublisher = makeDomainEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,

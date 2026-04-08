@@ -1,5 +1,5 @@
 import { Effect } from 'effect';
-import type { EventPublisherShape } from '#modules/agent-session/application/ports/out/event-publisher.port';
+import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import type {
   ResumableSessionInfo,
   SessionRepositoryShape,
@@ -49,7 +49,7 @@ export function makeSessionRepo(
   };
 }
 
-export function makeEventPublisher(): EventPublisherShape & { published: DomainEvent[] } {
+export function makeDomainEventBus(): DomainEventBusShape & { published: DomainEvent[] } {
   const published: DomainEvent[] = [];
   return {
     published,

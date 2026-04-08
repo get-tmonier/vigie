@@ -1,9 +1,9 @@
 import { Data, Effect, Layer } from 'effect';
+import { DomainEventBus } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import {
   type BrowserEvent,
   EventFeed,
 } from '#modules/agent-session/application/ports/out/event-feed.port';
-import { EventPublisher } from '#modules/agent-session/application/ports/out/event-publisher.port';
 import type { DomainEvent } from '#modules/agent-session/domain/events';
 
 class EventFeedError extends Data.TaggedError('EventFeedError')<{
@@ -88,7 +88,7 @@ function domainEventToBrowserEvent(event: DomainEvent): BrowserEvent | null {
 
 export const EventFeedLive = Layer.effect(EventFeed)(
   Effect.gen(function* () {
-    const eventPublisher = yield* EventPublisher;
+    const eventPublisher = yield* DomainEventBus;
     const listeners = new Set<(event: BrowserEvent) => void>();
     // Capture service context so fire-and-forget listener dispatch via Effect.runForkWith has access to all services
     const services = yield* Effect.services();

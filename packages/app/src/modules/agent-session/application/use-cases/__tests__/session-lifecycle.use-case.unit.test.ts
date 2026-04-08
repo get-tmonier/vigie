@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
-import type { EventPublisherShape } from '#modules/agent-session/application/ports/out/event-publisher.port';
+import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
 import { createSessionLifecycleUseCase } from '#modules/agent-session/application/use-cases/session-lifecycle.use-case';
@@ -8,7 +8,7 @@ import type { DomainEvent } from '#modules/agent-session/domain/events';
 import { Session } from '#modules/agent-session/domain/session';
 import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
 import type { PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
-import { makeEventPublisher, makeSessionRepo } from './test-helpers';
+import { makeDomainEventBus, makeSessionRepo } from './test-helpers';
 
 function makeAgentRegistry(canResume = false): AgentRegistryShape {
   return {
@@ -37,13 +37,13 @@ function makePtyRegistry(): PtyRegistry {
 
 function makeUseCase(overrides?: {
   sessionRepo?: SessionRepositoryShape & { store: Map<string, Session> };
-  eventPublisher?: EventPublisherShape & { published: DomainEvent[] };
+  eventPublisher?: DomainEventBusShape & { published: DomainEvent[] };
   agentRegistry?: AgentRegistryShape;
   resumabilityChecker?: ResumabilityCheckerShape;
   registry?: PtyRegistry;
 }) {
   const sessionRepo = overrides?.sessionRepo ?? makeSessionRepo();
-  const eventPublisher = overrides?.eventPublisher ?? makeEventPublisher();
+  const eventPublisher = overrides?.eventPublisher ?? makeDomainEventBus();
   return {
     sessionRepo,
     eventPublisher,

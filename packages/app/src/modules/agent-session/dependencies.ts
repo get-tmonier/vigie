@@ -4,8 +4,8 @@ import type * as HttpRouter from 'effect/unstable/http/HttpRouter';
 import type * as HttpServerError from 'effect/unstable/http/HttpServerError';
 import type * as Socket from 'effect/unstable/socket/Socket';
 import { AgentRegistry } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import { DomainEventBus } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import { EventFeed } from '#modules/agent-session/application/ports/out/event-feed.port';
-import { EventPublisher } from '#modules/agent-session/application/ports/out/event-publisher.port';
 import { PtySpawner } from '#modules/agent-session/application/ports/out/pty-spawner.port';
 import { ResumabilityChecker } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import { SessionRepository } from '#modules/agent-session/application/ports/out/session-repository.port';
@@ -20,8 +20,8 @@ import { createSessionRoutes } from '#modules/agent-session/infrastructure/adapt
 import { createTerminalRoutes } from '#modules/agent-session/infrastructure/adapters/in/terminal.routes';
 import { AgentRegistryLive } from '#modules/agent-session/infrastructure/adapters/out/agents/agent-registry';
 import { BunPtySpawnerLive } from '#modules/agent-session/infrastructure/adapters/out/bun-pty-spawner';
+import { DomainEventBusLive } from '#modules/agent-session/infrastructure/adapters/out/domain-event-bus.adapter';
 import { EventFeedLive } from '#modules/agent-session/infrastructure/adapters/out/event-feed.adapter';
-import { EventPublisherLive } from '#modules/agent-session/infrastructure/adapters/out/event-publisher.adapter';
 import { FsResumabilityCheckerLive } from '#modules/agent-session/infrastructure/adapters/out/fs-resumability-checker';
 import { SqliteSessionRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-session-repository';
 import { SqliteTerminalRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-terminal-repository';
@@ -56,7 +56,7 @@ export class AgentSession extends ServiceMap.Service<AgentSession, AgentSessionS
 
 const AgentSessionInfraLive = Layer.mergeAll(
   EventFeedLive,
-  EventPublisherLive,
+  DomainEventBusLive,
   BunPtySpawnerLive,
   FsResumabilityCheckerLive,
   AgentRegistryLive,
@@ -72,7 +72,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
     const ptySpawner = yield* PtySpawner;
     const agentRegistry = yield* AgentRegistry;
     const resumabilityChecker = yield* ResumabilityChecker;
-    const eventPublisher = yield* EventPublisher;
+    const eventPublisher = yield* DomainEventBus;
     const terminalSubs = yield* TerminalSubscribers;
     const eventFeed = yield* EventFeed;
     const cliSender = yield* CliSender;

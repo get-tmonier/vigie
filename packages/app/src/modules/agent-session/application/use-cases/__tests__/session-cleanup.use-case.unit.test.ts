@@ -3,7 +3,7 @@ import { createSessionCleanupUseCase } from '#modules/agent-session/application/
 import { CannotDeleteActiveSessionError } from '#modules/agent-session/domain/errors';
 import { Session } from '#modules/agent-session/domain/session';
 import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
-import { makeEventPublisher, makeSessionRepo } from './test-helpers';
+import { makeDomainEventBus, makeSessionRepo } from './test-helpers';
 
 describe('SessionCleanupUseCase.delete', () => {
   it('removes an ended session from the repository', async () => {
@@ -15,7 +15,7 @@ describe('SessionCleanupUseCase.delete', () => {
 
     const useCase = createSessionCleanupUseCase({
       sessionRepo,
-      eventPublisher: makeEventPublisher(),
+      eventPublisher: makeDomainEventBus(),
     });
     useCase.delete('sess-1');
 
@@ -32,7 +32,7 @@ describe('SessionCleanupUseCase.delete', () => {
 
     const useCase = createSessionCleanupUseCase({
       sessionRepo,
-      eventPublisher: makeEventPublisher(),
+      eventPublisher: makeDomainEventBus(),
     });
     useCase.delete('sess-1');
 
@@ -42,7 +42,7 @@ describe('SessionCleanupUseCase.delete', () => {
 
   it('publishes session:deleted event', async () => {
     const sessionRepo = makeSessionRepo();
-    const eventPublisher = makeEventPublisher();
+    const eventPublisher = makeDomainEventBus();
     const session = Session.create({ id: 'sess-1', agentType: 'claude', cwd: '/tmp' });
     session.markEnded(0, false);
     session.pullEvents();
@@ -59,7 +59,7 @@ describe('SessionCleanupUseCase.delete', () => {
     const sessionRepo = makeSessionRepo();
     const useCase = createSessionCleanupUseCase({
       sessionRepo,
-      eventPublisher: makeEventPublisher(),
+      eventPublisher: makeDomainEventBus(),
     });
     expect(() => useCase.delete('nonexistent')).not.toThrow();
   });
@@ -72,7 +72,7 @@ describe('SessionCleanupUseCase.delete', () => {
 
     const useCase = createSessionCleanupUseCase({
       sessionRepo,
-      eventPublisher: makeEventPublisher(),
+      eventPublisher: makeDomainEventBus(),
     });
     expect(() => useCase.delete('sess-active')).toThrow(CannotDeleteActiveSessionError);
   });
@@ -98,7 +98,7 @@ describe('SessionCleanupUseCase.deleteAllEnded', () => {
 
     const useCase = createSessionCleanupUseCase({
       sessionRepo,
-      eventPublisher: makeEventPublisher(),
+      eventPublisher: makeDomainEventBus(),
     });
     useCase.deleteAllEnded();
 
@@ -110,7 +110,7 @@ describe('SessionCleanupUseCase.deleteAllEnded', () => {
 
   it('publishes sessions:cleared event', async () => {
     const sessionRepo = makeSessionRepo();
-    const eventPublisher = makeEventPublisher();
+    const eventPublisher = makeDomainEventBus();
 
     const useCase = createSessionCleanupUseCase({ sessionRepo, eventPublisher });
     useCase.deleteAllEnded();

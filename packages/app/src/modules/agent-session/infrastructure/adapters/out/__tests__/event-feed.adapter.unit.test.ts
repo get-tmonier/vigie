@@ -1,21 +1,21 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
+import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
+import { DomainEventBus } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import type { BrowserEvent } from '#modules/agent-session/application/ports/out/event-feed.port';
 import { EventFeed } from '#modules/agent-session/application/ports/out/event-feed.port';
-import type { EventPublisherShape } from '#modules/agent-session/application/ports/out/event-publisher.port';
-import { EventPublisher } from '#modules/agent-session/application/ports/out/event-publisher.port';
 import type { DomainEvent } from '#modules/agent-session/domain/events';
 import { EventFeedLive } from '../event-feed.adapter';
 
-// --- Fake EventPublisher ---
+// --- Fake DomainEventBus ---
 
-function makeFakeEventPublisher(): {
-  layer: Layer.Layer<EventPublisher>;
+function makeFakeDomainEventBus(): {
+  layer: Layer.Layer<DomainEventBus>;
   emit: (event: DomainEvent) => void;
 } {
   let capturedListener: ((event: DomainEvent) => void) | null = null;
 
-  const shape: EventPublisherShape = {
+  const shape: DomainEventBusShape = {
     publish: (_event) => Effect.void,
     subscribe: (listener) => {
       capturedListener = listener;
@@ -25,7 +25,7 @@ function makeFakeEventPublisher(): {
     },
   };
 
-  const layer = Layer.succeed(EventPublisher, shape);
+  const layer = Layer.succeed(DomainEventBus, shape);
 
   return {
     layer,
@@ -59,7 +59,7 @@ const makeTerminalOutputEvent = (): DomainEvent => ({
 
 describe('EventFeedLive', () => {
   it('listener receives a BrowserEvent when a matching DomainEvent is published', async () => {
-    const { layer: fakePublisherLayer, emit } = makeFakeEventPublisher();
+    const { layer: fakePublisherLayer, emit } = makeFakeDomainEventBus();
     const testLayer = EventFeedLive.pipe(Layer.provide(fakePublisherLayer));
 
     const received: BrowserEvent[] = [];
@@ -81,7 +81,7 @@ describe('EventFeedLive', () => {
   });
 
   it('listener does NOT receive an event for an unmapped domain event (terminal:output → null)', async () => {
-    const { layer: fakePublisherLayer, emit } = makeFakeEventPublisher();
+    const { layer: fakePublisherLayer, emit } = makeFakeDomainEventBus();
     const testLayer = EventFeedLive.pipe(Layer.provide(fakePublisherLayer));
 
     const received: BrowserEvent[] = [];
@@ -101,7 +101,7 @@ describe('EventFeedLive', () => {
   });
 
   it('unsubscribe stops future deliveries', async () => {
-    const { layer: fakePublisherLayer, emit } = makeFakeEventPublisher();
+    const { layer: fakePublisherLayer, emit } = makeFakeDomainEventBus();
     const testLayer = EventFeedLive.pipe(Layer.provide(fakePublisherLayer));
 
     const received: BrowserEvent[] = [];

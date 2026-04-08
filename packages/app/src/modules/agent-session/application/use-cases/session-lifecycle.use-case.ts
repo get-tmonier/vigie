@@ -1,6 +1,6 @@
 import { Effect } from 'effect';
 import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
-import type { EventPublisherShape } from '#modules/agent-session/application/ports/out/event-publisher.port';
+import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
 import type { SessionDomainEvent } from '#modules/agent-session/domain/events';
@@ -11,7 +11,7 @@ interface SessionLifecycleDeps {
   sessionRepo: SessionRepositoryShape;
   resumabilityChecker: ResumabilityCheckerShape;
   agentRegistry: AgentRegistryShape;
-  eventPublisher: EventPublisherShape;
+  eventPublisher: DomainEventBusShape;
   registry: PtyRegistry;
 }
 
