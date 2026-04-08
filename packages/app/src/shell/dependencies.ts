@@ -1,6 +1,6 @@
 import { unlinkSync } from 'node:fs';
 import { Effect, Layer } from 'effect';
-import { CliSender } from '#shared/kernel/contracts/cli-sender';
+import { SessionSink } from '#modules/agent-session/application/ports/out/session-sink.port';
 import { IpcServer } from '#shell/application/ports/out/ipc-server.port';
 import { UnixSocketServerLive } from '#shell/infrastructure/adapters/out/unix-socket-server.adapter';
 import type { DaemonConfigShape } from '#shell/infrastructure/daemon-config';
@@ -18,7 +18,7 @@ export function cleanup(config: DaemonConfigShape): void {
   }
 }
 
-const CliSenderLive = Layer.effect(CliSender)(
+const SessionSinkLive = Layer.effect(SessionSink)(
   Effect.gen(function* () {
     const ipcServer = yield* IpcServer;
     return {
@@ -29,4 +29,4 @@ const CliSenderLive = Layer.effect(CliSender)(
   })
 );
 
-export const DaemonLive = Layer.mergeAll(UnixSocketServerLive, CliSenderLive);
+export const DaemonLive = Layer.mergeAll(UnixSocketServerLive, SessionSinkLive);

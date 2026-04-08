@@ -9,6 +9,7 @@ import { EventFeed } from '#modules/agent-session/application/ports/out/event-fe
 import { PtySpawner } from '#modules/agent-session/application/ports/out/pty-spawner.port';
 import { ResumabilityChecker } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import { SessionRepository } from '#modules/agent-session/application/ports/out/session-repository.port';
+import { SessionSink } from '#modules/agent-session/application/ports/out/session-sink.port';
 import { TerminalRepository } from '#modules/agent-session/application/ports/out/terminal-repository.port';
 import { createCheckResumabilityUseCase } from '#modules/agent-session/application/use-cases/check-resumability.use-case';
 import { createSessionCleanupUseCase } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
@@ -30,7 +31,6 @@ import {
   TerminalSubscribersLive,
 } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
 import { createPtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
-import { CliSender } from '#shared/kernel/contracts/cli-sender';
 
 type RouteError = HttpServerError.HttpServerError | Socket.SocketError | Cause.UnknownError;
 
@@ -75,7 +75,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
     const eventPublisher = yield* DomainEventBus;
     const terminalSubs = yield* TerminalSubscribers;
     const eventFeed = yield* EventFeed;
-    const cliSender = yield* CliSender;
+    const sessionSink = yield* SessionSink;
 
     const registry = createPtyRegistry();
 
@@ -87,7 +87,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
       agentRegistry,
       resumabilityChecker,
       registry,
-      sendToCliClient: (connId: string, msg: string) => cliSender.send(connId, msg),
+      sendToCliClient: (connId: string, msg: string) => sessionSink.send(connId, msg),
     });
 
     const spawnSession = createSpawnSessionUseCase({
