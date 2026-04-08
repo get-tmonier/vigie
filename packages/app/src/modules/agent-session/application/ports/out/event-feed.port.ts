@@ -86,7 +86,7 @@ export type BrowserEvent =
   | { type: 'session:deleted'; sessionId: string; timestamp: number }
   | { type: 'sessions:cleared'; timestamp: number };
 
-export interface EventFeedShape {
+interface EventFeedShape {
   subscribe(listener: (event: BrowserEvent) => void): () => void;
 }
 

@@ -5,6 +5,7 @@ import { AgentSession, AgentSessionLive } from '#modules/agent-session/dependenc
 import { makeDatabaseLayer } from '#shared/db/database';
 import { createRunDaemon } from '#shell/application/run-daemon';
 import { cleanup, DaemonLive } from '#shell/dependencies';
+import { createDashboardRoutes } from '#shell/infrastructure/adapters/in/dashboard.routes';
 import { createRoutesLayer } from '#shell/infrastructure/server';
 
 const _HOME = process.env.VIGIE_HOME ?? join(homedir(), '.vigie');
@@ -18,7 +19,13 @@ export const AppLive = AgentSessionLive.pipe(
 
 export const runDaemon = Effect.gen(function* () {
   const agentSession = yield* AgentSession;
-  const appRoutes = createRoutesLayer({ appRoutes: agentSession.routes });
+  const dashboardRoutes = createDashboardRoutes({
+    spawnSession: agentSession.spawnSession,
+    sessionCleanup: agentSession.sessionCleanup,
+    sessionQueries: agentSession.sessionQueries,
+    terminalConnection: agentSession.terminalConnection,
+  });
+  const appRoutes = createRoutesLayer({ appRoutes: [...dashboardRoutes, ...agentSession.routes] });
   const runner = createRunDaemon({
     startupOps: agentSession.startupOps,
     spawnSession: agentSession.spawnSession,

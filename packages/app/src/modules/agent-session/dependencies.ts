@@ -5,7 +5,6 @@ import type * as HttpServerError from 'effect/unstable/http/HttpServerError';
 import type * as Socket from 'effect/unstable/socket/Socket';
 import { AgentRegistry } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 import { DomainEventBus } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
-import { EventFeed } from '#modules/agent-session/application/ports/out/event-feed.port';
 import { PtySpawner } from '#modules/agent-session/application/ports/out/pty-spawner.port';
 import { ResumabilityChecker } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import { SessionRepository } from '#modules/agent-session/application/ports/out/session-repository.port';
@@ -17,7 +16,7 @@ import { createSessionLifecycleUseCase } from '#modules/agent-session/applicatio
 import { createSessionQueriesUseCase } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import { createSpawnSessionUseCase } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
 import { createTerminalConnectionUseCase } from '#modules/agent-session/application/use-cases/terminal-connection.use-case';
-import { createSessionRoutes } from '#modules/agent-session/infrastructure/adapters/in/session.routes';
+import { createSessionApiRoutes } from '#modules/agent-session/infrastructure/adapters/in/session.api-routes';
 import { createTerminalRoutes } from '#modules/agent-session/infrastructure/adapters/in/terminal.routes';
 import { AgentRegistryLive } from '#modules/agent-session/infrastructure/adapters/out/agents/agent-registry';
 import { BunPtySpawnerLive } from '#modules/agent-session/infrastructure/adapters/out/bun-pty-spawner';
@@ -74,7 +73,6 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
     const resumabilityChecker = yield* ResumabilityChecker;
     const eventPublisher = yield* DomainEventBus;
     const terminalSubs = yield* TerminalSubscribers;
-    const eventFeed = yield* EventFeed;
     const sessionSink = yield* SessionSink;
 
     const registry = createPtyRegistry();
@@ -131,12 +129,11 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
     };
 
     const routes: HttpRouter.Route<RouteError, never>[] = [
-      ...createSessionRoutes({
+      ...createSessionApiRoutes({
         spawnSession,
         sessionCleanup,
         sessionQueries,
         terminalConnection,
-        eventFeed,
       }),
       ...createTerminalRoutes({
         sessionQueries,

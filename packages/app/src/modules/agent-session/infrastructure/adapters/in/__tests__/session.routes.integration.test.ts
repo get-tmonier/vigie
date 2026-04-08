@@ -1,14 +1,13 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
 import * as HttpRouter from 'effect/unstable/http/HttpRouter';
-import type { BrowserEvent } from '#modules/agent-session/application/ports/out/event-feed.port';
 import type { SessionCleanupShape } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import type { SpawnSessionShape } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
 import type { TerminalConnectionShape } from '#modules/agent-session/application/use-cases/terminal-connection.use-case';
 import { Session } from '#modules/agent-session/domain/session';
 import { SessionId } from '#modules/agent-session/domain/session-id';
-import { createSessionRoutes } from '../session.routes';
+import { createSessionApiRoutes } from '../session.api-routes';
 
 // --- Fake domain objects ---
 
@@ -61,10 +60,6 @@ const fakeTerminalConnection: TerminalConnectionShape = {
   writeBinaryInput: () => {},
 };
 
-const fakeEventFeed = {
-  subscribe: (_listener: (event: BrowserEvent) => void) => () => {},
-};
-
 // --- Helper to build test handler ---
 
 function buildHandler(sessions: Session[] = []) {
@@ -73,9 +68,8 @@ function buildHandler(sessions: Session[] = []) {
     sessionCleanup: fakeSessionCleanup,
     sessionQueries: fakeSessionQueries(sessions),
     terminalConnection: fakeTerminalConnection,
-    eventFeed: fakeEventFeed,
   };
-  const routes = createSessionRoutes(deps);
+  const routes = createSessionApiRoutes(deps);
   const appLayer = Layer.mergeAll(HttpRouter.layer, HttpRouter.addAll(routes));
   return HttpRouter.toWebHandler(appLayer, { disableLogger: true });
 }
