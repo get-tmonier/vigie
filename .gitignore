@@ -41,3 +41,6 @@ pnpm-debug.log*
 
 # git worktrees
 .worktrees/
+
+# AI brainstorming artifacts (local only)
+docs/superpowers/
