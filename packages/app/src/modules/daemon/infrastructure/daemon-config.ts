@@ -18,7 +18,7 @@ export class DaemonConfig extends ServiceMap.Service<DaemonConfig, DaemonConfigS
   '@vigie/DaemonConfig'
 ) {}
 
-export const DaemonConfigLayer = Layer.sync(DaemonConfig)(() => {
+export const DaemonConfigLive = Layer.sync(DaemonConfig)(() => {
   const vigieHome = process.env.VIGIE_HOME ?? join(homedir(), '.vigie');
   const rawPort = process.env.VIGIE_PORT;
   const port = rawPort ? parseInt(rawPort, 10) || 19191 : 19191;

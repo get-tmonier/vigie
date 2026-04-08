@@ -137,6 +137,6 @@ export class AppEventPublisherTag extends ServiceMap.Service<
 // - AppEventPublisherTag (extended type with subscribeBrowser, used in HTTP routes)
 // - EventPublisher (base interface, used in session.service)
 // Use provideMerge so AppEventPublisherTag satisfies EventPublisher layer's requirement (no circular dep)
-export const EventPublisherLayer = Layer.effect(EventPublisher)(
+export const EventPublisherLive = Layer.effect(EventPublisher)(
   Effect.service(AppEventPublisherTag)
 ).pipe(Layer.provideMerge(Layer.sync(AppEventPublisherTag)(() => createEventPublisher())));

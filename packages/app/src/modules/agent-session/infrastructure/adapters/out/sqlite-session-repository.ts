@@ -170,7 +170,7 @@ function createSqliteSessionRepository(db: Database): SessionRepositoryShape {
   };
 }
 
-export const SqliteSessionRepositoryLayer = Layer.effect(SessionRepository)(
+export const SqliteSessionRepositoryLive = Layer.effect(SessionRepository)(
   Effect.gen(function* () {
     const db = yield* VigiDatabase;
     return createSqliteSessionRepository(db);

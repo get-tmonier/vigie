@@ -47,4 +47,4 @@ function createAgentRegistry(): AgentRegistryShape {
   };
 }
 
-export const AgentRegistryLayer = Layer.sync(AgentRegistry)(() => createAgentRegistry());
+export const AgentRegistryLive = Layer.sync(AgentRegistry)(() => createAgentRegistry());

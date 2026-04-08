@@ -1,5 +1,17 @@
-// Re-exports infrastructure layers only. Use cases are created in src/dependencies.ts
-// because they need sendToCliClient from daemon's IpcServer.
+import { Layer } from 'effect';
+import { AgentRegistryLayer } from '#modules/agent-session/infrastructure/adapters/out/agents/agent-registry';
+import { BunPtySpawnerLayer } from '#modules/agent-session/infrastructure/adapters/out/bun-pty-spawner';
+import {
+  AppEventPublisherTag,
+  EventPublisherLayer,
+} from '#modules/agent-session/infrastructure/adapters/out/event-publisher.adapter';
+import { FsResumabilityCheckerLayer } from '#modules/agent-session/infrastructure/adapters/out/fs-resumability-checker';
+import { SqliteSessionRepositoryLayer } from '#modules/agent-session/infrastructure/adapters/out/sqlite-session-repository';
+import { SqliteTerminalRepositoryLayer } from '#modules/agent-session/infrastructure/adapters/out/sqlite-terminal-repository';
+import {
+  TerminalSubscribers,
+  TerminalSubscribersLayer,
+} from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
 
 export { AgentRegistry } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 export { EventPublisher } from '#modules/agent-session/application/ports/out/event-publisher.port';
@@ -15,17 +27,15 @@ export { createSpawnSessionUseCase } from '#modules/agent-session/application/us
 export { createTerminalConnectionUseCase } from '#modules/agent-session/application/use-cases/terminal-connection.use-case';
 export { createSessionRoutes } from '#modules/agent-session/infrastructure/adapters/in/session.routes';
 export { createTerminalRoutes } from '#modules/agent-session/infrastructure/adapters/in/terminal.routes';
-export { AgentRegistryLayer } from '#modules/agent-session/infrastructure/adapters/out/agents/agent-registry';
-export { BunPtySpawnerLayer } from '#modules/agent-session/infrastructure/adapters/out/bun-pty-spawner';
-export {
-  AppEventPublisherTag,
-  EventPublisherLayer,
-} from '#modules/agent-session/infrastructure/adapters/out/event-publisher.adapter';
-export { FsResumabilityCheckerLayer } from '#modules/agent-session/infrastructure/adapters/out/fs-resumability-checker';
-export { SqliteSessionRepositoryLayer } from '#modules/agent-session/infrastructure/adapters/out/sqlite-session-repository';
-export { SqliteTerminalRepositoryLayer } from '#modules/agent-session/infrastructure/adapters/out/sqlite-terminal-repository';
-export {
-  TerminalSubscribers,
-  TerminalSubscribersLayer,
-} from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
 export { createPtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
+export { AppEventPublisherTag, TerminalSubscribers };
+
+export const AgentSessionLayer = Layer.mergeAll(
+  EventPublisherLayer,
+  BunPtySpawnerLayer,
+  FsResumabilityCheckerLayer,
+  AgentRegistryLayer,
+  TerminalSubscribersLayer,
+  SqliteSessionRepositoryLayer,
+  SqliteTerminalRepositoryLayer
+);

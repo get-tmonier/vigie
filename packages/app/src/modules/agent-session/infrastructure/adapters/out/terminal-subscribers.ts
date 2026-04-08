@@ -51,6 +51,6 @@ export class TerminalSubscribers extends ServiceMap.Service<
   TerminalSubscribersShape
 >()('@vigie/TerminalSubscribers') {}
 
-export const TerminalSubscribersLayer = Layer.sync(TerminalSubscribers)(() =>
+export const TerminalSubscribersLive = Layer.sync(TerminalSubscribers)(() =>
   createTerminalSubscribers()
 );

@@ -69,7 +69,7 @@ function createSqliteTerminalRepository(db: Database): TerminalRepositoryShape {
   };
 }
 
-export const SqliteTerminalRepositoryLayer = Layer.effect(TerminalRepository)(
+export const SqliteTerminalRepositoryLive = Layer.effect(TerminalRepository)(
   Effect.gen(function* () {
     const db = yield* VigiDatabase;
     return createSqliteTerminalRepository(db);

@@ -120,4 +120,4 @@ function createBunPtySpawner(): PtySpawnerShape {
   };
 }
 
-export const BunPtySpawnerLayer = Layer.sync(PtySpawner)(() => createBunPtySpawner());
+export const BunPtySpawnerLive = Layer.sync(PtySpawner)(() => createBunPtySpawner());

@@ -17,6 +17,6 @@ function createFsResumabilityChecker(): ResumabilityCheckerShape {
   };
 }
 
-export const FsResumabilityCheckerLayer = Layer.sync(ResumabilityChecker)(() =>
+export const FsResumabilityCheckerLive = Layer.sync(ResumabilityChecker)(() =>
   createFsResumabilityChecker()
 );

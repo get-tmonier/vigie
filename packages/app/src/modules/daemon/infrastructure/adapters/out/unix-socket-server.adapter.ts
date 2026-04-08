@@ -104,4 +104,4 @@ function createUnixSocketServer(): IpcServerShape {
   };
 }
 
-export const UnixSocketServerLayer = Layer.sync(IpcServer)(() => createUnixSocketServer());
+export const UnixSocketServerLive = Layer.sync(IpcServer)(() => createUnixSocketServer());
