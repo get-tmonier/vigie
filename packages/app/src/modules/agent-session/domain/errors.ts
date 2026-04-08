@@ -1,7 +1,9 @@
 import { Data } from 'effect';
 import type { SessionStatus } from '#modules/agent-session/domain/session-status';
 
-export { AgentRunnerError } from '#shared/kernel/errors';
+export class AgentRunnerError extends Data.TaggedError('AgentRunnerError')<{
+  readonly message: string;
+}> {}
 
 export class SessionNotFoundError extends Data.TaggedError('SessionNotFoundError')<{
   readonly sessionId: string;

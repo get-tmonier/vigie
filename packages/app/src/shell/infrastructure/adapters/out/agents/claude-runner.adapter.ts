@@ -1,6 +1,6 @@
 import { Stream } from 'effect';
 import * as v from 'valibot';
-import { AgentRunnerError } from '#shared/kernel/errors';
+import { AgentRunnerError } from '#modules/agent-session/domain/errors';
 import type { AgentChunk, AgentRunnerShape } from '#shared/lib/agent-runner';
 import { ClaudeStreamEventSchema } from '#shell/infrastructure/adapters/out/agents/claude-stream-schemas';
 

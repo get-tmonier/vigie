@@ -1,7 +1,7 @@
 import { Effect } from 'effect';
 import * as Schema from 'effect/Schema';
-import type { SessionToDaemon } from '#shared/kernel/contracts/ipc-protocol';
 import { expandPath } from '#shared/lib/path';
+import type { SessionToDaemon } from '#shell/application/contracts/ipc-protocol';
 import type { IpcConnection } from '#shell/application/ports/out/ipc-server.port';
 
 const encodeJson = Schema.encodeSync(Schema.UnknownFromJsonString);

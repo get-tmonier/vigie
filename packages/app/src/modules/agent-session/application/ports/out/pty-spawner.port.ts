@@ -1,6 +1,6 @@
 import type { Effect } from 'effect';
 import { ServiceMap } from 'effect';
-import type { AgentRunnerError } from '#shared/kernel/errors';
+import type { AgentRunnerError } from '#modules/agent-session/domain/errors';
 
 export interface PtyHandle {
   readonly pid: number;

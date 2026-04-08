@@ -1,7 +1,10 @@
 import type { Socket } from 'bun';
 import { Deferred, Duration, Effect, Exit } from 'effect';
 import * as v from 'valibot';
-import { type DaemonToSession, DaemonToSessionSchema } from '#shared/kernel/contracts/ipc-protocol';
+import {
+  type DaemonToSession,
+  DaemonToSessionSchema,
+} from '#shell/application/contracts/ipc-protocol';
 import type { IpcClientShape } from '#shell/application/ports/in/ipc-client.port';
 import { IpcConnectionError } from '#shell/domain/errors';
 

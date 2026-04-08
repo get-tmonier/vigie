@@ -1,5 +1,5 @@
 import type { Stream } from 'effect';
-import type { AgentRunnerError } from '#shared/kernel/errors';
+import type { AgentRunnerError } from '#modules/agent-session/domain/errors';
 
 export type ChunkType = 'text' | 'thinking' | 'tool_use' | 'tool_result' | 'status' | 'error';
 

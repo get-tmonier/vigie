@@ -1,6 +1,6 @@
 import { Effect, Layer } from 'effect';
 import * as v from 'valibot';
-import { SessionToDaemonSchema } from '#shared/kernel/contracts/ipc-protocol';
+import { SessionToDaemonSchema } from '#shell/application/contracts/ipc-protocol';
 import {
   type IpcConnection,
   IpcServer,

@@ -4,7 +4,7 @@ import {
   PtySpawner,
   type PtySpawnerShape,
 } from '#modules/agent-session/application/ports/out/pty-spawner.port';
-import { AgentRunnerError } from '#shared/kernel/errors';
+import { AgentRunnerError } from '#modules/agent-session/domain/errors';
 import { createPtyLibrary } from './pty/bun-pty';
 
 function createBunPtySpawner(): PtySpawnerShape {

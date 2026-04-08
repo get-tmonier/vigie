@@ -6,7 +6,7 @@ import {
   SessionTerminalOutputSchema,
   SessionTerminalResizeSchema,
   SessionToDaemonSchema,
-} from '#shared/kernel/contracts/ipc-protocol';
+} from '#shell/application/contracts/ipc-protocol';
 import {
   CommandDoneSchema,
   CommandErrorSchema,
