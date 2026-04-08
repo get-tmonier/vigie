@@ -14,6 +14,7 @@
     "types": ["bun-types", "react", "react-dom"],
     "paths": {
       "#modules/*": ["./src/modules/*"],
+      "#shell/*": ["./src/shell/*"],
       "#shared/*": ["./src/shared/*"],
       "#dependencies": ["./src/dependencies.ts"]
     },

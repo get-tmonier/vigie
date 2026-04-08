@@ -7,6 +7,7 @@
   },
   "imports": {
     "#modules/*": "./src/modules/*",
+    "#shell/*": "./src/shell/*",
     "#shared/*": "./src/shared/*",
     "#dependencies": "./src/dependencies.ts"
   },
