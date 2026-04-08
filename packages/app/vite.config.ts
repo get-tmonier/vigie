@@ -24,6 +24,7 @@ export default defineConfig({
       '#shared/db': resolve(__dirname, 'src/shared/db'),
       '#shared/ssr': resolve(__dirname, 'src/shared/ssr'),
       '#shared': resolve(__dirname, 'src/shared'),
+      '#pages': resolve(__dirname, 'src/pages'),
     },
   },
   plugins: [tailwindcss(), react()],
