@@ -1,12 +1,12 @@
 import { unlinkSync } from 'node:fs';
 import { Effect, Layer } from 'effect';
-import { CliSender } from '#modules/agent-session/application/ports/out/cli-sender.port';
 import { AgentSession } from '#modules/agent-session/dependencies';
 import { IpcServer } from '#modules/daemon/application/ports/out/ipc-server.port';
 import { createRunDaemon } from '#modules/daemon/application/use-cases/run-daemon.use-case';
 import { UnixSocketServerLive } from '#modules/daemon/infrastructure/adapters/out/unix-socket-server.adapter';
 import type { DaemonConfigShape } from '#modules/daemon/infrastructure/daemon-config';
 import { createRoutesLayer } from '#modules/daemon/infrastructure/server';
+import { CliSender } from '#shared/kernel/contracts/cli-sender';
 
 export function cleanup(config: DaemonConfigShape): void {
   for (const filePath of [

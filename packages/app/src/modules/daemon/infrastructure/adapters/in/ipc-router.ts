@@ -4,7 +4,7 @@ import type { SessionLifecycleShape } from '#modules/daemon/application/ports/in
 import type { SpawnSessionShape } from '#modules/daemon/application/ports/in/spawn-session.port';
 import type { TerminalConnectionShape } from '#modules/daemon/application/ports/in/terminal-connection.port';
 import type { IpcConnection } from '#modules/daemon/application/ports/out/ipc-server.port';
-import type { SessionToDaemon } from '#shared/kernel/ipc-protocol';
+import type { SessionToDaemon } from '#shared/kernel/contracts/ipc-protocol';
 import { expandPath } from '#shared/lib/path';
 
 const encodeJson = Schema.encodeSync(Schema.UnknownFromJsonString);

@@ -1,6 +1,6 @@
 import type { Effect } from 'effect';
 import type { IpcConnectionError } from '#modules/daemon/domain/errors';
-import type { DaemonToSession, SessionToDaemon } from '#shared/kernel/ipc-protocol';
+import type { DaemonToSession, SessionToDaemon } from '#shared/kernel/contracts/ipc-protocol';
 
 export type { IpcConnectionError } from '#modules/daemon/domain/errors';
 

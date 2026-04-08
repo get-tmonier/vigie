@@ -4,7 +4,6 @@ import type * as HttpRouter from 'effect/unstable/http/HttpRouter';
 import type * as HttpServerError from 'effect/unstable/http/HttpServerError';
 import type * as Socket from 'effect/unstable/socket/Socket';
 import { AgentRegistry } from '#modules/agent-session/application/ports/out/agent-adapter.port';
-import { CliSender } from '#modules/agent-session/application/ports/out/cli-sender.port';
 import { EventFeed } from '#modules/agent-session/application/ports/out/event-feed.port';
 import { EventPublisher } from '#modules/agent-session/application/ports/out/event-publisher.port';
 import { PtySpawner } from '#modules/agent-session/application/ports/out/pty-spawner.port';
@@ -31,6 +30,7 @@ import {
   TerminalSubscribersLive,
 } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
 import { createPtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
+import { CliSender } from '#shared/kernel/contracts/cli-sender';
 
 type RouteError = HttpServerError.HttpServerError | Socket.SocketError | Cause.UnknownError;
 

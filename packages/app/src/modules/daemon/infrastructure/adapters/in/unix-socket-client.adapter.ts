@@ -3,7 +3,7 @@ import { Deferred, Duration, Effect, Exit } from 'effect';
 import * as v from 'valibot';
 import type { IpcClientShape } from '#modules/daemon/application/ports/in/ipc-client.port';
 import { IpcConnectionError } from '#modules/daemon/domain/errors';
-import { type DaemonToSession, DaemonToSessionSchema } from '#shared/kernel/ipc-protocol';
+import { type DaemonToSession, DaemonToSessionSchema } from '#shared/kernel/contracts/ipc-protocol';
 
 export function createUnixSocketClient(): IpcClientShape {
   let socket: Socket<unknown> | null = null;
