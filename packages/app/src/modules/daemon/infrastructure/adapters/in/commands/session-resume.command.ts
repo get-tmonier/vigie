@@ -73,7 +73,7 @@ export function sessionResumeCommand(partialId: string) {
       });
     }
 
-    const canResume = session.resumable === 1 && !!session.agent_session_id;
+    const agentSessionId = session.resumable === 1 ? session.agent_session_id : null;
 
     const gitContext = yield* getGitContext(session.cwd);
 
@@ -106,12 +106,11 @@ export function sessionResumeCommand(partialId: string) {
       }
     });
 
-    if (canResume) {
+    if (agentSessionId) {
       yield* client.send({
         type: 'session:resume',
         sessionId: session.id,
-        // canResume guarantees agent_session_id is non-null
-        agentSessionId: session.agent_session_id!,
+        agentSessionId,
         cwd: session.cwd,
         cols,
         rows: rows_,
@@ -135,7 +134,7 @@ export function sessionResumeCommand(partialId: string) {
 
     yield* Effect.promise(() => spawnPromise);
 
-    const infoLine = canResume
+    const infoLine = agentSessionId
       ? `Resumed from ${session.id.slice(0, 8)}`
       : `Previous session was too short-lived — fresh start`;
 
