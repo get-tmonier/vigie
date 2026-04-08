@@ -1,10 +1,13 @@
-# daemon module
+# shell
+
+Application shell — process lifecycle, HTTP/IPC server, CLI commands.
+Not a domain module. No bounded context, no domain model.
 
 ## Owns
-- Daemon lifecycle (startup, shutdown, signal handling)
+- Process lifecycle (startup, shutdown, signal handling, cleanup)
 - HTTP + WebSocket server (routes, server config)
-- IPC server (Unix socket server, IPC router)
-- CLI command handling (vigie daemon, vigie open, vigie session)
+- IPC server (Unix socket server, IPC router, IPC commands)
+- CLI commands (vigie daemon, vigie open, vigie session, vigie claude)
 - Daemon config (port, socket path, vigie home)
 - Process manager (spawn/kill daemon process)
 
@@ -13,11 +16,9 @@
 - Terminal chunks or input history
 - Agent adapters or agent logic
 
-## Implements ports from other modules
-
-- `CliSender` (`#shared/kernel/contracts/cli-sender.ts`): Implemented in `daemon/dependencies.ts` via callback injection. The port lives in `shared/kernel/contracts/` (cross-module contract) and is used by `agent-session` use cases, but fulfilled by `daemon` (which owns the IPC channel). This is intentional dependency inversion — the composition root wires the adapter without violating module boundaries.
-
 ## Key conventions
-- Session IDs are opaque `string` here — branding is agent-session's concern.
-- Never import from other modules. Use ports in `application/ports/in/`.
-- `daemon/dependencies.ts` only exports daemon-specific infrastructure layers.
+- `src/shell/` may import from `src/modules/agent-session/` — it is the composition host
+- `src/shell/` must NOT be imported from `src/modules/` — domain must not know about its host
+- `src/dependencies.ts` is the single composition root; `src/shell/dependencies.ts` is shell-only wiring
+- `src/shell/application/ports/in/` contains only `ipc-client.port.ts` — the IPC client type for CLI commands
+- `src/shell/application/ports/out/` contains real infrastructure abstractions (`IpcServer`, `ProcessManager`)
