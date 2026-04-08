@@ -1,4 +1,4 @@
-import type { AgentChunk } from '#lib/agent-runner';
+import type { AgentChunk } from '#shared/lib/agent-runner';
 
 const DIM = '\x1b[2m';
 const ITALIC = '\x1b[3m';

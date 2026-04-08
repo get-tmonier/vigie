@@ -1,17 +1,17 @@
 import { Database } from 'bun:sqlite';
 import { existsSync } from 'node:fs';
 import { Console, Deferred, Duration, Effect, Exit } from 'effect';
-import { createKeybindInterceptor } from '#lib/cli-terminal/keybind-interceptor';
+import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
+import { createBunProcessManager } from '#modules/daemon/infrastructure/adapters/out/bun-process-manager.adapter';
+import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
+import { createKeybindInterceptor } from '#shared/lib/cli-terminal/keybind-interceptor';
 import {
   initStatusBar,
   resizeStatusBar,
   teardownStatusBar,
-} from '#lib/cli-terminal/status-bar-live';
-import { createTuiRenderer } from '#lib/vterm/tui-renderer';
-import { createVTerm } from '#lib/vterm/vterm';
-import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
-import { createBunProcessManager } from '#modules/daemon/infrastructure/adapters/out/bun-process-manager.adapter';
-import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
+} from '#shared/lib/cli-terminal/status-bar-live';
+import { createTuiRenderer } from '#shared/lib/vterm/tui-renderer';
+import { createVTerm } from '#shared/lib/vterm/vterm';
 import { createUnixSocketClient } from '../unix-socket-client.adapter';
 
 function formatDuration(ms: number): string {

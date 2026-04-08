@@ -3,10 +3,10 @@ import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { Console, Effect } from 'effect';
-import { getGitContext } from '#lib/git-context';
 import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
 import { createBunProcessManager } from '#modules/daemon/infrastructure/adapters/out/bun-process-manager.adapter';
 import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
+import { getGitContext } from '#shared/lib/git-context';
 import { attachPtyRelay } from '../pty-relay';
 import { createUnixSocketClient } from '../unix-socket-client.adapter';
 

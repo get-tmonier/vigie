@@ -1,5 +1,4 @@
 import { Effect } from 'effect';
-import { type LineBuffer, stripAnsiAndBuffer } from '#lib/input-line-buffer';
 import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 import type { EventPublisherShape } from '#modules/agent-session/application/ports/out/event-publisher.port';
 import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
@@ -10,6 +9,7 @@ import type { SessionId } from '#modules/agent-session/domain/session-id';
 import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
 import type { TerminalSubscribersShape } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
 import type { PtyEntry, PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
+import { type LineBuffer, stripAnsiAndBuffer } from '#shared/lib/input-line-buffer';
 
 interface TerminalConnectionDeps {
   sessionRepo: SessionRepositoryShape;

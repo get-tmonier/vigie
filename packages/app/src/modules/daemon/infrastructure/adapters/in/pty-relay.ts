@@ -1,15 +1,15 @@
 import { Console, Deferred, Duration, Effect, Exit } from 'effect';
-import { createKeybindInterceptor } from '#lib/cli-terminal/keybind-interceptor';
+import type { IpcClientShape } from '#modules/daemon/application/ports/in/ipc-client.port';
+import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
+import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
+import { createKeybindInterceptor } from '#shared/lib/cli-terminal/keybind-interceptor';
 import {
   initStatusBar,
   resizeStatusBar,
   teardownStatusBar,
-} from '#lib/cli-terminal/status-bar-live';
-import { createTuiRenderer } from '#lib/vterm/tui-renderer';
-import { createVTerm } from '#lib/vterm/vterm';
-import type { IpcClientShape } from '#modules/daemon/application/ports/in/ipc-client.port';
-import { DaemonNotRunningError } from '#modules/daemon/domain/errors';
-import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
+} from '#shared/lib/cli-terminal/status-bar-live';
+import { createTuiRenderer } from '#shared/lib/vterm/tui-renderer';
+import { createVTerm } from '#shared/lib/vterm/vterm';
 
 function formatDuration(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
