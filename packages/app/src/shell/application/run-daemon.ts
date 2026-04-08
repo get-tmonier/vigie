@@ -76,11 +76,10 @@ export function createRunDaemon(deps: RunDaemonDeps) {
       yield* Effect.logInfo(`[daemon] Serving client islands from ${clientDistPath}`);
     }
 
-    const routesLayer = deps.appRoutes;
     const port = config.port;
 
     yield* Effect.gen(function* () {
-      const httpEffect = yield* HttpRouter.toHttpEffect(routesLayer);
+      const httpEffect = yield* HttpRouter.toHttpEffect(deps.appRoutes);
       const server = yield* BunHttpServer.make({ port });
       yield* server.serve(httpEffect, HttpMiddleware.cors());
     }).pipe(
