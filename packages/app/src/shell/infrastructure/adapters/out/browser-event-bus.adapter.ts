@@ -1,12 +1,12 @@
 import { Data, Effect, Layer } from 'effect';
 import { DomainEventBus } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
+import type { DomainEvent } from '#modules/agent-session/domain/events';
 import {
   type BrowserEvent,
-  EventFeed,
-} from '#modules/agent-session/application/ports/out/event-feed.port';
-import type { DomainEvent } from '#modules/agent-session/domain/events';
+  BrowserEventBus,
+} from '#shell/application/ports/out/browser-event-bus.port';
 
-class EventFeedError extends Data.TaggedError('EventFeedError')<{
+class BrowserEventBusError extends Data.TaggedError('BrowserEventBusError')<{
   readonly message: string;
   readonly cause?: unknown;
 }> {}
@@ -86,7 +86,7 @@ function domainEventToBrowserEvent(event: DomainEvent): BrowserEvent | null {
   }
 }
 
-export const EventFeedLive = Layer.effect(EventFeed)(
+export const BrowserEventBusLive = Layer.effect(BrowserEventBus)(
   Effect.gen(function* () {
     const eventPublisher = yield* DomainEventBus;
     const listeners = new Set<(event: BrowserEvent) => void>();
@@ -100,7 +100,7 @@ export const EventFeedLive = Layer.effect(EventFeed)(
           Effect.runForkWith(services)(
             Effect.try({
               try: () => listener(browserEvent),
-              catch: (cause) => new EventFeedError({ message: String(cause), cause }),
+              catch: (cause) => new BrowserEventBusError({ message: String(cause), cause }),
             }).pipe(Effect.catch((err) => Effect.logError(`browser listener error: ${err}`)))
           );
         }

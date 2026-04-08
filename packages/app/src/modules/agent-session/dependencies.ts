@@ -1,8 +1,4 @@
 import { Effect, Layer, ServiceMap } from 'effect';
-import type * as Cause from 'effect/Cause';
-import type * as HttpRouter from 'effect/unstable/http/HttpRouter';
-import type * as HttpServerError from 'effect/unstable/http/HttpServerError';
-import type * as Socket from 'effect/unstable/socket/Socket';
 import { AgentRegistry } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 import { DomainEventBus } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import { PtySpawner } from '#modules/agent-session/application/ports/out/pty-spawner.port';
@@ -16,22 +12,18 @@ import { createSessionLifecycleUseCase } from '#modules/agent-session/applicatio
 import { createSessionQueriesUseCase } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import { createSpawnSessionUseCase } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
 import { createTerminalConnectionUseCase } from '#modules/agent-session/application/use-cases/terminal-connection.use-case';
-import { createSessionApiRoutes } from '#modules/agent-session/infrastructure/adapters/in/session.api-routes';
-import { createTerminalRoutes } from '#modules/agent-session/infrastructure/adapters/in/terminal.routes';
 import { AgentRegistryLive } from '#modules/agent-session/infrastructure/adapters/out/agents/agent-registry';
 import { BunPtySpawnerLive } from '#modules/agent-session/infrastructure/adapters/out/bun-pty-spawner';
 import { DomainEventBusLive } from '#modules/agent-session/infrastructure/adapters/out/domain-event-bus.adapter';
-import { EventFeedLive } from '#modules/agent-session/infrastructure/adapters/out/event-feed.adapter';
 import { FsResumabilityCheckerLive } from '#modules/agent-session/infrastructure/adapters/out/fs-resumability-checker';
 import { SqliteSessionRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-session-repository';
 import { SqliteTerminalRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-terminal-repository';
 import {
   TerminalSubscribers,
   TerminalSubscribersLive,
+  type TerminalSubscribersShape,
 } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
 import { createPtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
-
-type RouteError = HttpServerError.HttpServerError | Socket.SocketError | Cause.UnknownError;
 
 export interface AgentSessionServices {
   spawnSession: ReturnType<typeof createSpawnSessionUseCase>;
@@ -40,13 +32,13 @@ export interface AgentSessionServices {
   sessionQueries: ReturnType<typeof createSessionQueriesUseCase>;
   checkResumability: ReturnType<typeof createCheckResumabilityUseCase>;
   terminalConnection: ReturnType<typeof createTerminalConnectionUseCase>;
+  terminalSubs: TerminalSubscribersShape;
   startupOps: {
     cleanupOrphanedSessions: () => void;
     pruneOldSessions: () => void;
     checkResumableForAll: () => void;
     checkResumableForActive: () => void;
   };
-  routes: HttpRouter.Route<RouteError, never>[];
 }
 
 export class AgentSession extends ServiceMap.Service<AgentSession, AgentSessionServices>()(
@@ -54,7 +46,6 @@ export class AgentSession extends ServiceMap.Service<AgentSession, AgentSessionS
 ) {}
 
 const AgentSessionInfraLive = Layer.mergeAll(
-  EventFeedLive,
   DomainEventBusLive,
   BunPtySpawnerLive,
   FsResumabilityCheckerLive,
@@ -128,20 +119,6 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
       checkResumableForActive: () => checkResumability.checkResumableForActive(),
     };
 
-    const routes: HttpRouter.Route<RouteError, never>[] = [
-      ...createSessionApiRoutes({
-        spawnSession,
-        sessionCleanup,
-        sessionQueries,
-        terminalConnection,
-      }),
-      ...createTerminalRoutes({
-        sessionQueries,
-        terminalConnection,
-        terminalSubs,
-      }),
-    ];
-
     return {
       spawnSession,
       sessionLifecycle,
@@ -149,8 +126,8 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
       sessionQueries,
       checkResumability,
       terminalConnection,
+      terminalSubs,
       startupOps,
-      routes,
     };
   })
 ).pipe(Layer.provide(AgentSessionInfraLive));

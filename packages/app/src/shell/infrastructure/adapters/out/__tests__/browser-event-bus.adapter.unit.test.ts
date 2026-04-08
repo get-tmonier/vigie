@@ -2,10 +2,10 @@ import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
 import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import { DomainEventBus } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
-import type { BrowserEvent } from '#modules/agent-session/application/ports/out/event-feed.port';
-import { EventFeed } from '#modules/agent-session/application/ports/out/event-feed.port';
 import type { DomainEvent } from '#modules/agent-session/domain/events';
-import { EventFeedLive } from '../event-feed.adapter';
+import type { BrowserEvent } from '#shell/application/ports/out/browser-event-bus.port';
+import { BrowserEventBus } from '#shell/application/ports/out/browser-event-bus.port';
+import { BrowserEventBusLive } from '../browser-event-bus.adapter';
 
 // --- Fake DomainEventBus ---
 
@@ -57,17 +57,17 @@ const makeTerminalOutputEvent = (): DomainEvent => ({
 
 // --- Tests ---
 
-describe('EventFeedLive', () => {
+describe('BrowserEventBusLive', () => {
   it('listener receives a BrowserEvent when a matching DomainEvent is published', async () => {
     const { layer: fakePublisherLayer, emit } = makeFakeDomainEventBus();
-    const testLayer = EventFeedLive.pipe(Layer.provide(fakePublisherLayer));
+    const testLayer = BrowserEventBusLive.pipe(Layer.provide(fakePublisherLayer));
 
     const received: BrowserEvent[] = [];
 
     await Effect.runPromise(
       Effect.gen(function* () {
-        const eventFeed = yield* EventFeed;
-        eventFeed.subscribe((event) => {
+        const browserEventBus = yield* BrowserEventBus;
+        browserEventBus.subscribe((event) => {
           received.push(event);
         });
         emit(makeSessionStartedEvent());
@@ -82,14 +82,14 @@ describe('EventFeedLive', () => {
 
   it('listener does NOT receive an event for an unmapped domain event (terminal:output → null)', async () => {
     const { layer: fakePublisherLayer, emit } = makeFakeDomainEventBus();
-    const testLayer = EventFeedLive.pipe(Layer.provide(fakePublisherLayer));
+    const testLayer = BrowserEventBusLive.pipe(Layer.provide(fakePublisherLayer));
 
     const received: BrowserEvent[] = [];
 
     await Effect.runPromise(
       Effect.gen(function* () {
-        const eventFeed = yield* EventFeed;
-        eventFeed.subscribe((event) => {
+        const browserEventBus = yield* BrowserEventBus;
+        browserEventBus.subscribe((event) => {
           received.push(event);
         });
         emit(makeTerminalOutputEvent());
@@ -102,14 +102,14 @@ describe('EventFeedLive', () => {
 
   it('unsubscribe stops future deliveries', async () => {
     const { layer: fakePublisherLayer, emit } = makeFakeDomainEventBus();
-    const testLayer = EventFeedLive.pipe(Layer.provide(fakePublisherLayer));
+    const testLayer = BrowserEventBusLive.pipe(Layer.provide(fakePublisherLayer));
 
     const received: BrowserEvent[] = [];
 
     await Effect.runPromise(
       Effect.gen(function* () {
-        const eventFeed = yield* EventFeed;
-        const unsubscribe = eventFeed.subscribe((event) => {
+        const browserEventBus = yield* BrowserEventBus;
+        const unsubscribe = browserEventBus.subscribe((event) => {
           received.push(event);
         });
 

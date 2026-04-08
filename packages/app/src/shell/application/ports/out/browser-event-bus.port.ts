@@ -86,10 +86,10 @@ export type BrowserEvent =
   | { type: 'session:deleted'; sessionId: string; timestamp: number }
   | { type: 'sessions:cleared'; timestamp: number };
 
-interface EventFeedShape {
+export interface BrowserEventBusShape {
   subscribe(listener: (event: BrowserEvent) => void): () => void;
 }
 
-export class EventFeed extends ServiceMap.Service<EventFeed, EventFeedShape>()(
-  '@vigie/EventFeed'
+export class BrowserEventBus extends ServiceMap.Service<BrowserEventBus, BrowserEventBusShape>()(
+  '@vigie/BrowserEventBus'
 ) {}
