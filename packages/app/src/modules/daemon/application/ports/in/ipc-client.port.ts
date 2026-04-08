@@ -1,8 +1,8 @@
 import type { Effect } from 'effect';
-import type { IpcConnectionError } from '#shared/kernel/errors';
+import type { IpcConnectionError } from '#modules/daemon/domain/errors';
 import type { DaemonToSession, SessionToDaemon } from '#shared/kernel/ipc-protocol';
 
-export type { IpcConnectionError } from '#shared/kernel/errors';
+export type { IpcConnectionError } from '#modules/daemon/domain/errors';
 
 export interface IpcClientShape {
   readonly connect: (socketPath: string) => Effect.Effect<void, IpcConnectionError>;
