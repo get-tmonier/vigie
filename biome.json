@@ -14,7 +14,10 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "suspicious": {
+        "noConsole": "error"
+      }
     }
   },
   "javascript": {
@@ -32,6 +35,16 @@
     "includes": ["**", "!node_modules", "!dist", "!.astro", "!.turbo", "!**/routeTree.gen.ts", "!.output"]
   },
   "overrides": [
+    {
+      "includes": ["scripts/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    },
     {
       "includes": ["**/*.astro"],
       "linter": {

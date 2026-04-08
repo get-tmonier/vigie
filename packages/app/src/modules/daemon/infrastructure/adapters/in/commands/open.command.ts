@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
-import { Effect } from 'effect';
+import { Console, Effect } from 'effect';
 import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
 
 export function openCommand() {
@@ -26,10 +26,10 @@ export function openCommand() {
     } else if (platform === 'win32') {
       Bun.spawn(['cmd', '/c', 'start', url]);
     } else {
-      console.log(`Open ${url} in your browser`);
+      yield* Console.log(`Open ${url} in your browser`);
       return;
     }
 
-    console.log(`Opening ${url}`);
+    yield* Console.log(`Opening ${url}`);
   });
 }

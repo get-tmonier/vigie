@@ -109,17 +109,15 @@ export function daemonLogsCommand(follow: boolean) {
 
   return Effect.gen(function* () {
     const { logFile } = yield* DaemonConfig;
-    yield* Effect.tryPromise({
+    const output = yield* Effect.tryPromise({
       try: async () => {
         const file = Bun.file(logFile);
         if (!(await file.exists())) {
-          console.log('No daemon logs found.');
-          return;
+          return null;
         }
         const content = await file.text();
         const lines = content.split('\n');
-        const tail = lines.slice(-50);
-        console.log(tail.join('\n'));
+        return lines.slice(-50).join('\n');
       },
       catch: (err) =>
         new DaemonCommandError({
@@ -127,6 +125,11 @@ export function daemonLogsCommand(follow: boolean) {
           cause: err,
         }),
     });
+    if (output === null) {
+      yield* Console.log('No daemon logs found.');
+    } else {
+      yield* Console.log(output);
+    }
   }).pipe(
     Effect.catchCause(() => Console.error('Failed to read logs')),
     exit0

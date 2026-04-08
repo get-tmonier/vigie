@@ -45,7 +45,7 @@ export function claudeCommand(prompt: string) {
 
     // Print branded header
     const daemonInfo = yield* manager.status();
-    printHeader({
+    yield* printHeader({
       sessionId,
       daemonPid: daemonInfo.pid,
       cwd,
@@ -109,7 +109,7 @@ export function claudeCommand(prompt: string) {
       timestamp: Date.now(),
     });
 
-    printSessionSummary(sessionId, inputTokens, outputTokens, Date.now() - startTime);
+    yield* printSessionSummary(sessionId, inputTokens, outputTokens, Date.now() - startTime);
 
     yield* client.close();
   }).pipe(

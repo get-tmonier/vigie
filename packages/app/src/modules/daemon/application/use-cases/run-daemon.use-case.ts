@@ -141,7 +141,7 @@ export function createRunDaemon(deps: RunDaemonDeps) {
         open() {},
         close() {},
         error(_socket, err) {
-          console.error(`[stdin-server] error: ${err.message}`);
+          Effect.runFork(Effect.logError(`[stdin-server] error: ${err.message}`));
         },
       },
     });
