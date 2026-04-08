@@ -10,7 +10,7 @@ module.exports = {
         path: '^src/modules/([^/]+)/',
         pathNot: [
           '^src/modules/[^/]+/dependencies\\.ts$',
-          'src/modules/[^/]+/infrastructure/adapters/in/ui/.*',
+          '^src/modules/[^/]+/infrastructure/adapters/in/ui/.*',
         ],
       },
       to: {

@@ -1,7 +1,7 @@
 import * as BunRuntime from '@effect/platform-bun/BunRuntime';
 import { Effect } from 'effect';
+import { AppLive, runDaemon } from '#dependencies';
 import { cleanup } from '#modules/daemon/dependencies';
-import { AppLive, runDaemon } from './dependencies';
 
 process.on('SIGTERM', () => {
   process.stdout.write('[daemon] Stopped.\n');

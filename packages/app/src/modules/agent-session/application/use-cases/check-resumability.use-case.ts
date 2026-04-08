@@ -18,6 +18,19 @@ export function createCheckResumabilityUseCase(deps: CheckResumabilityDeps) {
   }
 
   return {
+    checkResumableForAll(): void {
+      sessionRepo.findAll().forEach((session) => {
+        if (session.agentSessionId) {
+          const resumable = resumabilityChecker.isResumable(session.agentSessionId, session.cwd);
+          if (resumable !== session.resumable) {
+            session.setResumable(resumable);
+            sessionRepo.save(session);
+            Effect.runFork(publishEvents(session.pullEvents()));
+          }
+        }
+      });
+    },
+
     checkResumableForActive(): void {
       const activeSessions = sessionRepo.findActiveWithAgentId();
       for (const row of activeSessions) {

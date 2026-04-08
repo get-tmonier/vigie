@@ -126,18 +126,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
     const startupOps = {
       cleanupOrphanedSessions: () => sessionRepo.markOrphanedEnded(),
       pruneOldSessions: () => sessionRepo.pruneOld(),
-      checkResumableForAll: () => {
-        sessionRepo.findAll().forEach((session) => {
-          if (session.agentSessionId) {
-            const resumable = resumabilityChecker.isResumable(session.agentSessionId, session.cwd);
-            if (resumable !== session.resumable) {
-              session.setResumable(resumable);
-              sessionRepo.save(session);
-              session.pullEvents();
-            }
-          }
-        });
-      },
+      checkResumableForAll: () => checkResumability.checkResumableForAll(),
       checkResumableForActive: () => checkResumability.checkResumableForActive(),
     };
 
