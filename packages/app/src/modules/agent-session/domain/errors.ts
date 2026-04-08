@@ -1,4 +1,5 @@
 import { Data } from 'effect';
+import type { SessionStatus } from '#modules/agent-session/domain/session-status';
 
 export { AgentRunnerError } from '#shared/kernel/errors';
 
@@ -13,17 +14,22 @@ export class SessionNotFoundError extends Data.TaggedError('SessionNotFoundError
   }
 }
 
-export class InvalidStatusTransitionError extends Error {
-  readonly _tag = 'InvalidStatusTransitionError';
-  constructor(from: string, to: string) {
-    super(`Cannot transition session from '${from}' to '${to}'`);
+export class InvalidStatusTransitionError extends Data.TaggedError('InvalidStatusTransitionError')<{
+  readonly from: SessionStatus;
+  readonly to: SessionStatus;
+}> {
+  override get message(): string {
+    return `Cannot transition session from '${this.from}' to '${this.to}'`;
   }
 }
 
-export class CannotDeleteActiveSessionError extends Error {
-  readonly _tag = 'CannotDeleteActiveSessionError';
-  constructor(sessionId: string) {
-    super(`Cannot delete active session: ${sessionId}`);
+export class CannotDeleteActiveSessionError extends Data.TaggedError(
+  'CannotDeleteActiveSessionError'
+)<{
+  readonly sessionId: string;
+}> {
+  override get message(): string {
+    return `Cannot delete active session: ${this.sessionId}`;
   }
 }
 

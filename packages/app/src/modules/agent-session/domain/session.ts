@@ -237,7 +237,7 @@ export class Session {
 
   delete(): void {
     if (!this.canDelete) {
-      throw new CannotDeleteActiveSessionError(this.id);
+      throw new CannotDeleteActiveSessionError({ sessionId: this.id });
     }
 
     this._events.push({
@@ -255,7 +255,7 @@ export class Session {
 
   private transitionTo(to: SessionStatus): void {
     if (!canTransition(this._status, to)) {
-      throw new InvalidStatusTransitionError(this._status, to);
+      throw new InvalidStatusTransitionError({ from: this._status, to });
     }
     this._status = to;
   }

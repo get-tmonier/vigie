@@ -25,17 +25,23 @@ describe('SessionNotFoundError', () => {
 
 describe('InvalidStatusTransitionError', () => {
   it('has correct _tag', () => {
-    const err = new InvalidStatusTransitionError('active', 'registering');
+    const err = new InvalidStatusTransitionError({ from: 'active', to: 'registering' });
     expect(err._tag).toBe('InvalidStatusTransitionError');
   });
 
   it('is an instance of Error', () => {
-    const err = new InvalidStatusTransitionError('active', 'registering');
+    const err = new InvalidStatusTransitionError({ from: 'active', to: 'registering' });
     expect(err).toBeInstanceOf(Error);
   });
 
+  it('carries structured from and to fields', () => {
+    const err = new InvalidStatusTransitionError({ from: 'active', to: 'registering' });
+    expect(err.from).toBe('active');
+    expect(err.to).toBe('registering');
+  });
+
   it('message contains from and to states', () => {
-    const err = new InvalidStatusTransitionError('active', 'registering');
+    const err = new InvalidStatusTransitionError({ from: 'active', to: 'registering' });
     expect(err.message).toContain('active');
     expect(err.message).toContain('registering');
   });
@@ -43,17 +49,22 @@ describe('InvalidStatusTransitionError', () => {
 
 describe('CannotDeleteActiveSessionError', () => {
   it('has correct _tag', () => {
-    const err = new CannotDeleteActiveSessionError('session-1');
+    const err = new CannotDeleteActiveSessionError({ sessionId: 'session-1' });
     expect(err._tag).toBe('CannotDeleteActiveSessionError');
   });
 
   it('is an instance of Error', () => {
-    const err = new CannotDeleteActiveSessionError('session-1');
+    const err = new CannotDeleteActiveSessionError({ sessionId: 'session-1' });
     expect(err).toBeInstanceOf(Error);
   });
 
+  it('carries structured sessionId field', () => {
+    const err = new CannotDeleteActiveSessionError({ sessionId: 'session-1' });
+    expect(err.sessionId).toBe('session-1');
+  });
+
   it('message contains sessionId', () => {
-    const err = new CannotDeleteActiveSessionError('session-1');
+    const err = new CannotDeleteActiveSessionError({ sessionId: 'session-1' });
     expect(err.message).toContain('session-1');
   });
 });
