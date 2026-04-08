@@ -153,7 +153,7 @@ describe('SessionToDaemon schemas', () => {
     const register = v.parse(SessionToDaemonSchema, {
       type: 'session:register',
       sessionId: 'x',
-      agentType: 'generic',
+      agentType: 'claude',
       cwd: '/',
     });
     expect(register.type).toBe('session:register');
@@ -185,14 +185,14 @@ describe('SessionToDaemon schemas', () => {
     expect(stdin.type).toBe('session:stdin');
   });
 
-  it('accepts any agentType string', () => {
+  it('accepts claude agentType', () => {
     const result = v.parse(SessionRegisterSchema, {
       type: 'session:register',
       sessionId: 'x',
-      agentType: 'custom-agent',
+      agentType: 'claude',
       cwd: '/',
     });
-    expect(result.agentType).toBe('custom-agent');
+    expect(result.agentType).toBe('claude');
   });
 });
 

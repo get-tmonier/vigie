@@ -5,7 +5,7 @@ import * as v from 'valibot';
 export const SessionRegisterSchema = v.object({
   type: v.literal('session:register'),
   sessionId: v.string(),
-  agentType: v.string(),
+  agentType: v.picklist(['claude']),
   mode: v.optional(v.picklist(['prompt', 'interactive']), 'prompt'),
   cwd: v.string(),
   gitBranch: v.optional(v.string()),
@@ -56,7 +56,7 @@ export const SessionTerminalOutputSchema = v.object({
 export const SessionSpawnInteractiveSchema = v.object({
   type: v.literal('session:spawn-interactive'),
   sessionId: v.string(),
-  agentType: v.string(),
+  agentType: v.picklist(['claude']),
   cwd: v.string(),
   cols: v.number(),
   rows: v.number(),

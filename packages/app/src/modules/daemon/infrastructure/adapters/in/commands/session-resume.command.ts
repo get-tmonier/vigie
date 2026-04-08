@@ -122,7 +122,7 @@ export function sessionResumeCommand(partialId: string) {
       yield* client.send({
         type: 'session:spawn-interactive',
         sessionId: session.id,
-        agentType: session.agent_type,
+        agentType: session.agent_type as 'claude',
         cwd: session.cwd,
         cols,
         rows: rows_,
