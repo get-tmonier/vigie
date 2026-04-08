@@ -42,6 +42,14 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
     return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
   }
 
+  function fireAndForget(effect: Effect.Effect<void>): void {
+    Effect.runFork(
+      Effect.catchCause(effect, (cause) =>
+        Effect.logWarning('Event publish failed (non-fatal)', cause)
+      )
+    );
+  }
+
   function applyResizePriority(sessionId: string): { cols: number; rows: number } | null {
     const entry = registry.ptyHandles.get(sessionId);
     if (!entry) return null;
@@ -72,7 +80,7 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
       );
     }
 
-    Effect.runFork(eventPublisher.publish({ type: 'terminal:pty-resized', sessionId, cols, rows }));
+    fireAndForget(eventPublisher.publish({ type: 'terminal:pty-resized', sessionId, cols, rows }));
     return { cols, rows };
   }
 
@@ -89,7 +97,7 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
         );
       }
 
-      Effect.runFork(terminalSubs.publish(sessionId, base64));
+      fireAndForget(terminalSubs.publish(sessionId, base64));
     });
 
     Effect.runFork(
@@ -107,7 +115,7 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
 
             session.markEnded(exitCode, resumable);
             sessionRepo.save(session);
-            Effect.runFork(publishEvents(session.pullEvents()));
+            fireAndForget(publishEvents(session.pullEvents()));
 
             for (const connId of entry.cliChannels.keys()) {
               sendToCliClient(
@@ -157,7 +165,7 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
       entry.handle.resize(dims.cols, cliRows);
       entry.ptyDimensions = { cols: dims.cols, rows: cliRows };
 
-      Effect.runFork(
+      fireAndForget(
         eventPublisher.publish({
           type: 'terminal:pty-resized',
           sessionId,
@@ -204,7 +212,7 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
         if (!alreadyEnded && session) {
           session.markEnded(-1, false);
           sessionRepo.save(session);
-          Effect.runFork(publishEvents(session.pullEvents()));
+          fireAndForget(publishEvents(session.pullEvents()));
         }
 
         registry.connSessions.delete(connId);
@@ -221,7 +229,7 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
 
       stripAnsiAndBuffer(inputLineBuffers, sessionId, data, source, (text, src, ts) => {
         terminalRepo.appendInput(sessionId, text, src, ts);
-        Effect.runFork(
+        fireAndForget(
           eventPublisher.publish({
             type: 'terminal:input-echo',
             sessionId,

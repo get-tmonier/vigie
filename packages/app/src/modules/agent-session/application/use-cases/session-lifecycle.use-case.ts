@@ -22,6 +22,14 @@ export function createSessionLifecycleUseCase(deps: SessionLifecycleDeps) {
     return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
   }
 
+  function fireAndForget(effect: Effect.Effect<void>): void {
+    Effect.runFork(
+      Effect.catchCause(effect, (cause) =>
+        Effect.logWarning('Event publish failed (non-fatal)', cause)
+      )
+    );
+  }
+
   return {
     markEnded(sessionId: string, exitCode: number): void {
       const id = makeSessionId(sessionId);
@@ -36,7 +44,7 @@ export function createSessionLifecycleUseCase(deps: SessionLifecycleDeps) {
 
       session.markEnded(exitCode, resumable);
       sessionRepo.save(session);
-      Effect.runFork(publishEvents(session.pullEvents()));
+      fireAndForget(publishEvents(session.pullEvents()));
     },
 
     markError(sessionId: string, error: string): void {
@@ -45,7 +53,7 @@ export function createSessionLifecycleUseCase(deps: SessionLifecycleDeps) {
       if (!session) return;
       session.markError(error);
       sessionRepo.save(session);
-      Effect.runFork(publishEvents(session.pullEvents()));
+      fireAndForget(publishEvents(session.pullEvents()));
     },
 
     setAgentSessionId(sessionId: string, agentSessionId: string): void {
@@ -54,7 +62,7 @@ export function createSessionLifecycleUseCase(deps: SessionLifecycleDeps) {
       if (!session) return;
       session.setAgentSessionId(agentSessionId);
       sessionRepo.save(session);
-      Effect.runFork(publishEvents(session.pullEvents()));
+      fireAndForget(publishEvents(session.pullEvents()));
     },
 
     deregister(sessionId: string): void {
@@ -63,7 +71,7 @@ export function createSessionLifecycleUseCase(deps: SessionLifecycleDeps) {
       if (session) {
         session.markEnded(0, false);
         sessionRepo.save(session);
-        Effect.runFork(publishEvents(session.pullEvents()));
+        fireAndForget(publishEvents(session.pullEvents()));
       }
 
       const connId = registry.sessionConnections.get(sessionId);

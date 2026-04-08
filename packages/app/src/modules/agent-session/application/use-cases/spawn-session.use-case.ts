@@ -33,6 +33,14 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
     return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
   }
 
+  function fireAndForget(effect: Effect.Effect<void>): void {
+    Effect.runFork(
+      Effect.catchCause(effect, (cause) =>
+        Effect.logWarning('Event publish failed (non-fatal)', cause)
+      )
+    );
+  }
+
   return {
     register(props: {
       sessionId: string;
@@ -56,7 +64,7 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
       sessionRepo.save(session);
       registry.sessionConnections.set(props.sessionId, props.connId);
       registry.connSessions.set(props.connId, props.sessionId);
-      Effect.runFork(publishEvents(session.pullEvents()));
+      fireAndForget(publishEvents(session.pullEvents()));
     },
 
     spawnInteractive(props: {

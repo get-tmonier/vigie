@@ -18,6 +18,14 @@ export function createSessionCleanupUseCase(deps: SessionCleanupDeps) {
     return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
   }
 
+  function fireAndForget(effect: Effect.Effect<void>): void {
+    Effect.runFork(
+      Effect.catchCause(effect, (cause) =>
+        Effect.logWarning('Event publish failed (non-fatal)', cause)
+      )
+    );
+  }
+
   return {
     delete(sessionId: string): void {
       const id = makeSessionId(sessionId);
@@ -25,12 +33,12 @@ export function createSessionCleanupUseCase(deps: SessionCleanupDeps) {
       if (!session) return;
       session.delete();
       sessionRepo.delete(id);
-      Effect.runFork(publishEvents(session.pullEvents()));
+      fireAndForget(publishEvents(session.pullEvents()));
     },
 
     deleteAllEnded(): void {
       sessionRepo.deleteAllEnded();
-      Effect.runFork(eventPublisher.publish({ type: 'sessions:cleared', timestamp: Date.now() }));
+      fireAndForget(eventPublisher.publish({ type: 'sessions:cleared', timestamp: Date.now() }));
     },
   };
 }

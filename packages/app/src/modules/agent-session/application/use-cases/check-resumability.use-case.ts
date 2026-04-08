@@ -17,6 +17,14 @@ export function createCheckResumabilityUseCase(deps: CheckResumabilityDeps) {
     return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
   }
 
+  function fireAndForget(effect: Effect.Effect<void>): void {
+    Effect.runFork(
+      Effect.catchCause(effect, (cause) =>
+        Effect.logWarning('Event publish failed (non-fatal)', cause)
+      )
+    );
+  }
+
   return {
     checkResumableForAll(): void {
       sessionRepo.findAll().forEach((session) => {
@@ -25,7 +33,7 @@ export function createCheckResumabilityUseCase(deps: CheckResumabilityDeps) {
           if (resumable !== session.resumable) {
             session.setResumable(resumable);
             sessionRepo.save(session);
-            Effect.runFork(publishEvents(session.pullEvents()));
+            fireAndForget(publishEvents(session.pullEvents()));
           }
         }
       });
@@ -40,7 +48,7 @@ export function createCheckResumabilityUseCase(deps: CheckResumabilityDeps) {
           if (session) {
             session.setResumable(isResumable);
             sessionRepo.save(session);
-            Effect.runFork(publishEvents(session.pullEvents()));
+            fireAndForget(publishEvents(session.pullEvents()));
           }
         }
       }
@@ -52,7 +60,7 @@ export function createCheckResumabilityUseCase(deps: CheckResumabilityDeps) {
           if (session) {
             session.setResumable(true);
             sessionRepo.save(session);
-            Effect.runFork(publishEvents(session.pullEvents()));
+            fireAndForget(publishEvents(session.pullEvents()));
           }
         }
       }
