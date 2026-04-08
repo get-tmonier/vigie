@@ -29,6 +29,8 @@
     "test": {},
     "test:unit": {},
     "test:integration": {},
-    "check-imports": {}
+    "check-imports": {},
+    "check-boundaries": {},
+    "check-cycles": {}
   }
 }

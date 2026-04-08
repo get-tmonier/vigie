@@ -39,11 +39,20 @@ jobs:
       - name: Knip (unused code)
         run: bun knip
 
+      - name: Biome check scripts
+        run: bunx biome check ./scripts
+
       - name: Biome check (affected)
         run: bun turbo check --affected
 
       - name: Import conventions (affected)
         run: bun turbo check-imports --affected
+
+      - name: Dependency boundaries (affected)
+        run: bun turbo check-boundaries --affected
+
+      - name: Circular dependencies (affected)
+        run: bun turbo check-cycles --affected
 
       - name: Typecheck (affected)
         run: bun turbo typecheck --affected

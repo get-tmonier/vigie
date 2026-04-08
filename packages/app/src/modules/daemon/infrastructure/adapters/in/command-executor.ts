@@ -1,10 +1,15 @@
-import { Effect } from 'effect';
+import { Data, Effect } from 'effect';
 import type {
   CommandDone,
   CommandError,
   CommandOutput,
   CommandRequest,
 } from '#modules/daemon/infrastructure/adapters/ws-schemas';
+
+class CommandExecutorError extends Data.TaggedError('CommandExecutorError')<{
+  readonly message: string;
+  readonly cause?: unknown;
+}> {}
 
 type UpstreamMessage = CommandOutput | CommandDone | CommandError;
 
@@ -59,7 +64,10 @@ export function executeCommand(request: CommandRequest, send: (msg: UpstreamMess
         error: err instanceof Error ? err.message : String(err),
         timestamp: Date.now(),
       });
-      return err instanceof Error ? err : new Error(String(err));
+      return new CommandExecutorError({
+        message: err instanceof Error ? err.message : String(err),
+        cause: err,
+      });
     },
   });
 }

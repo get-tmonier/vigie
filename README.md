@@ -32,15 +32,13 @@
 
 Fully local — single process, no remote servers, no cloud dependency.
 
-```
-Browser (SSR, localhost:19191) <-> Effect HTTP+WS (embedded in daemon) <-> PTY manager <-> spawn(claude, aider, ...)
-```
-
 | Component | Description |
 |---|---|
 | **CLI daemon** | Single Bun process — embedded HTTP server, PTY manager, SQLite |
 | **Dashboard** | React SSR rendered by the daemon at `localhost:19191` |
 | **Agents** | Claude Code, aider, codex, or any CLI tool — spawned via PTY |
+
+→ [System overview](docs/architecture/overview.md) · [Module architecture](docs/architecture/modules.md)
 
 ## Monorepo
 

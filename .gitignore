@@ -32,3 +32,12 @@ pnpm-debug.log*
 
 # jetbrains
 .idea/
+
+# session memory (claude hooks)
+.remember/
+
+# serena
+.serena/
+
+# git worktrees
+.worktrees/

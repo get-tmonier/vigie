@@ -1,0 +1,71 @@
+# Architecture overview
+
+Fully local — single Bun process, no remote servers, no cloud dependency.
+
+```mermaid
+graph TB
+    subgraph clients["Clients"]
+        CLI["vigie CLI"]
+        Browser["Browser — localhost:19191"]
+    end
+
+    subgraph daemon["Daemon (single Bun process)"]
+        subgraph daemon_mod["daemon module"]
+            IPC["Unix Socket IPC<br/>~/.vigie/daemon.sock"]
+            HTTP["HTTP + WebSocket<br/>localhost:19191"]
+        end
+        subgraph session_mod["agent-session module"]
+            UC["Use Cases<br/>spawn · terminal · lifecycle · queries"]
+            PTY["Bun PTY Spawner"]
+            DB[("SQLite<br/>~/.vigie/data.db")]
+            Events["Event Publisher"]
+        end
+    end
+
+    subgraph agents["Agent Processes (PTY)"]
+        Claude["claude"]
+        Other["aider / codex / any CLI"]
+    end
+
+    CLI -->|"IPC messages"| IPC
+    Browser -->|"HTTP / WebSocket"| HTTP
+    IPC --> UC
+    HTTP --> UC
+    UC --> PTY
+    UC <--> DB
+    PTY -->|spawn| Claude
+    PTY -->|spawn| Other
+    PTY -->|output chunks| Events
+    Events -->|broadcast| HTTP
+    Events -->|broadcast| IPC
+```
+
+## Communication protocols
+
+| Channel | Protocol | Path |
+|---|---|---|
+| CLI → Daemon | Unix socket (JSON messages) | `~/.vigie/daemon.sock` |
+| Browser → Daemon | HTTP REST + WebSocket | `localhost:19191` |
+| Daemon → Agent | PTY (pseudo-terminal) | spawned subprocess |
+| Daemon → CLI | Unix socket (binary + JSON) | same socket, reverse |
+
+## IPC message types
+
+CLI → Daemon: `session:register` · `session:spawn-interactive` · `session:stdin` · `session:cli-resize` · `session:attach` · `session:detach`
+
+Daemon → CLI: `session:registered` · `session:spawned` · `session:pty-output` · `session:pty-exited` · `session:pty-resized`
+
+## Storage
+
+Single SQLite database at `~/.vigie/data.db`:
+
+| Table | Content |
+|---|---|
+| `sessions` | Session metadata, status, agent session ID |
+| `terminal_chunks` | PTY output chunks (binary) |
+| `input_history` | Stdin history per session |
+| `event_queue` | Domain event log |
+
+## See also
+
+- [Module architecture](./modules.md) — hexagonal architecture, ports & adapters per module

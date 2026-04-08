@@ -8,7 +8,7 @@ import type * as HttpServerError from 'effect/unstable/http/HttpServerError';
 import * as HttpServerRequest from 'effect/unstable/http/HttpServerRequest';
 import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse';
 
-type RouteError = HttpServerError.HttpServerError | Cause.UnknownError | never;
+type RouteError = HttpServerError.HttpServerError | Cause.UnknownError;
 
 function expandPath(p: string): string {
   if (p === '~' || p.startsWith('~/')) {
@@ -89,22 +89,25 @@ export function createFsRoutes(): HttpRouter.Route<RouteError, never>[] {
         const request = yield* HttpServerRequest.HttpServerRequest;
         const body = (yield* request.json) as { path?: string };
         const dirPath = expandPath(body.path ?? '~');
-        try {
-          const items = readdirSync(dirPath, { withFileTypes: true });
-          const entries = items
-            .filter((item) => !item.name.startsWith('.'))
-            .map((item) => ({ name: item.name, isDirectory: item.isDirectory() }))
-            .sort((a, b) => {
-              if (a.isDirectory !== b.isDirectory) return a.isDirectory ? -1 : 1;
-              return a.name.localeCompare(b.name);
-            });
-          return HttpServerResponse.jsonUnsafe({ entries });
-        } catch (err) {
-          return HttpServerResponse.jsonUnsafe(
-            { entries: [], error: err instanceof Error ? err.message : String(err) },
-            { status: 500 }
-          );
-        }
+        return yield* Effect.try({
+          try: () => {
+            const items = readdirSync(dirPath, { withFileTypes: true });
+            return items
+              .filter((item) => !item.name.startsWith('.'))
+              .map((item) => ({ name: item.name, isDirectory: item.isDirectory() }))
+              .sort((a, b) => {
+                if (a.isDirectory !== b.isDirectory) return a.isDirectory ? -1 : 1;
+                return a.name.localeCompare(b.name);
+              });
+          },
+          catch: (err) => (err instanceof Error ? err.message : String(err)),
+        }).pipe(
+          Effect.match({
+            onSuccess: (entries) => HttpServerResponse.jsonUnsafe({ entries }),
+            onFailure: (errMsg) =>
+              HttpServerResponse.jsonUnsafe({ entries: [], error: errMsg }, { status: 500 }),
+          })
+        );
       })
     ),
   ];

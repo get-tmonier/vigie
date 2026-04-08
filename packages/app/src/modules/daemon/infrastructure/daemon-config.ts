@@ -1,6 +1,6 @@
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import { Config, Effect, Layer, ServiceMap } from 'effect';
+import { Config } from 'effect';
 
 export interface DaemonConfigShape {
   readonly version: string;
@@ -14,27 +14,23 @@ export interface DaemonConfigShape {
   readonly port: number;
 }
 
-export class DaemonConfig extends ServiceMap.Service<DaemonConfig, DaemonConfigShape>()(
-  '@vigie/DaemonConfig'
-) {}
+const defaultVigieHome = join(homedir(), '.vigie');
 
-export const DaemonConfigLayer = Layer.effect(
-  DaemonConfig,
-  Effect.gen(function* () {
-    const vigieHome = yield* Config.string('VIGIE_HOME').pipe(
-      Config.withDefault(join(homedir(), '.vigie'))
-    );
-    const port = yield* Config.int('VIGIE_PORT').pipe(Config.withDefault(19191));
-    return {
+export const DaemonConfig = Config.all({
+  vigieHome: Config.string('VIGIE_HOME').pipe(Config.withDefault(defaultVigieHome)),
+  port: Config.port('VIGIE_PORT').pipe(Config.withDefault(19191)),
+}).pipe(
+  Config.map(
+    ({ vigieHome, port }): DaemonConfigShape => ({
       version: '0.3.0',
       vigieHome,
+      port,
       pidFile: join(vigieHome, 'daemon.pid'),
       logFile: join(vigieHome, 'daemon.log'),
       socketPath: join(vigieHome, 'daemon.sock'),
       stdinSocketPath: join(vigieHome, 'daemon-stdin.sock'),
       dbFile: join(vigieHome, 'data.db'),
       portFile: join(vigieHome, 'port'),
-      port,
-    };
-  })
+    })
+  )
 );

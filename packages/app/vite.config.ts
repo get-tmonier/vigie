@@ -21,7 +21,6 @@ export default defineConfig({
   resolve: {
     alias: {
       '#modules': resolve(__dirname, 'src/modules'),
-      '#lib': resolve(__dirname, 'src/lib'),
       '#infra': resolve(__dirname, 'src/infra'),
       '#shared': resolve(__dirname, 'src/shared'),
     },

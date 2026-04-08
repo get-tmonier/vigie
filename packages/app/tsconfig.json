@@ -6,6 +6,7 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "allowArbitraryExtensions": true,
     "outDir": "dist",
     "rootDir": "src",
     "jsx": "react-jsx",
@@ -13,10 +14,18 @@
     "types": ["bun-types", "react", "react-dom"],
     "paths": {
       "#modules/*": ["./src/modules/*"],
-      "#lib/*": ["./src/lib/*"],
       "#infra/*": ["./src/infra/*"],
-      "#shared/*": ["./src/shared/*"]
-    }
+      "#shared/*": ["./src/shared/*"],
+      "#dependencies": ["./src/dependencies.ts"]
+    },
+    "plugins": [
+      {
+        "name": "@effect/tsgo",
+        "diagnosticSeverity": {
+          "preferSchemaOverJson": "off"
+        }
+      }
+    ]
   },
   "include": ["src"],
   "exclude": ["dist", "node_modules"]

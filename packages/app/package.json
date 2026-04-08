@@ -7,18 +7,18 @@
   },
   "imports": {
     "#modules/*": "./src/modules/*",
-    "#lib/*": "./src/lib/*",
     "#infra/*": "./src/infra/*",
-    "#shared/*": "./src/shared/*"
+    "#shared/*": "./src/shared/*",
+    "#dependencies": "./src/dependencies.ts"
   },
   "scripts": {
-    "dev": "bun run build:client && VIGIE_DEV=true bun run --watch src/modules/daemon/main.ts",
+    "dev": "bun run build:client && VIGIE_DEV=true bun run --watch src/daemon.ts",
     "dev:watch-client": "vite build --watch",
     "dev:claude": "bun run src/cli.ts claude",
     "build:pty": "sh scripts/build-pty.sh",
     "build:client": "vite build",
     "build": "bun run build:pty && bun run build:client && bun build --compile --target=bun src/cli.ts --outfile dist/vigie",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsgo --noEmit",
     "lint": "biome lint ./src",
     "lint:fix": "biome lint --write ./src",
     "format": "biome format --write ./src",
@@ -29,33 +29,39 @@
     "fix-imports": "bun ../../scripts/fix-imports.ts",
     "test": "bun test",
     "test:unit": "bun test unit.test",
-    "test:integration": "bun test integration.test"
+    "test:integration": "bun test integration.test",
+    "check-boundaries": "depcruise --validate .dependency-cruiser.cjs src",
+    "check-cycles": "skott --showCircularDependencies --displayMode raw --exitCodeOnCircularDependencies 1 --tsconfig tsconfig.json --no-trackTypeOnlyDependencies --fileExtensions .ts,.tsx --cwd src"
   },
   "dependencies": {
-    "@effect/platform-bun": "4.0.0-beta.24",
+    "@effect/platform-bun": "4.0.0-beta.43",
     "@reduxjs/toolkit": "2.11.2",
-    "@xterm/headless": "5.5.0",
-    "effect": "4.0.0-beta.24",
+    "@xterm/headless": "6.0.0",
+    "effect": "4.0.0-beta.43",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-redux": "9.2.0",
     "tailwind-merge": "3.5.0",
-    "valibot": "1.2.0"
+    "valibot": "1.3.1"
   },
   "devDependencies": {
+    "@effect/tsgo": "0.2.1",
     "@fontsource-variable/dm-sans": "5.2.8",
     "@fontsource/instrument-serif": "5.2.8",
     "@fontsource/jetbrains-mono": "5.2.8",
-    "@tailwindcss/vite": "4.2.1",
-    "@types/bun": "1.3.9",
+    "@tailwindcss/vite": "4.2.2",
+    "@types/bun": "1.3.11",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
+    "@typescript/native-preview": "7.0.0-dev.20260407.1",
     "@vigie/tokens": "workspace:*",
-    "@vitejs/plugin-react": "5.1.4",
+    "@vitejs/plugin-react": "6.0.1",
     "@xterm/addon-fit": "0.11.0",
     "@xterm/xterm": "6.0.0",
-    "tailwindcss": "4.2.1",
-    "typescript": "5.9.3",
-    "vite": "7.3.1"
+    "dependency-cruiser": "17.3.10",
+    "skott": "0.35.10",
+    "tailwindcss": "4.2.2",
+    "typescript": "6.0.2",
+    "vite": "8.0.7"
   }
 }

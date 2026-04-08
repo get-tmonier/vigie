@@ -4,6 +4,10 @@ export class DaemonNotRunningError extends Data.TaggedError('DaemonNotRunningErr
   readonly message: string;
 }> {}
 
+export class IpcConnectionError extends Data.TaggedError('IpcConnectionError')<{
+  readonly message: string;
+}> {}
+
 export class DaemonAlreadyRunningError extends Data.TaggedError('DaemonAlreadyRunningError')<{
   readonly pid: number;
 }> {}
