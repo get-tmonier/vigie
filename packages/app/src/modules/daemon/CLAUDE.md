@@ -13,6 +13,10 @@
 - Terminal chunks or input history
 - Agent adapters or agent logic
 
+## Implements ports from other modules
+
+- `CliSender` (`#modules/agent-session/application/ports/out/cli-sender.port.ts`): Implemented in `daemon/dependencies.ts` via callback injection. The port is defined in `agent-session` (which uses it) but fulfilled by `daemon` (which owns the IPC channel). This is intentional dependency inversion — the composition root wires the adapter without violating module boundaries.
+
 ## Key conventions
 - Session IDs are opaque `string` here — branding is agent-session's concern.
 - Never import from `#modules/agent-session/`. Use ports in `application/ports/in/`.
