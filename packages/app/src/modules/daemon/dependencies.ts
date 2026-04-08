@@ -7,7 +7,6 @@ import { AgentSession } from '#modules/agent-session/dependencies';
 import { IpcServer } from '#modules/daemon/application/ports/out/ipc-server.port';
 import { createRunDaemon } from '#modules/daemon/application/use-cases/run-daemon.use-case';
 import { UnixSocketServerLive } from '#modules/daemon/infrastructure/adapters/out/unix-socket-server.adapter';
-import { DaemonConfigLive } from '#modules/daemon/infrastructure/daemon-config';
 import { createRoutesLayer } from '#modules/daemon/infrastructure/server';
 
 const _HOME = process.env.VIGIE_HOME ?? join(homedir(), '.vigie');
@@ -31,7 +30,7 @@ const CliSenderLive = Layer.effect(CliSender)(
   })
 );
 
-export const DaemonLive = Layer.mergeAll(UnixSocketServerLive, DaemonConfigLive, CliSenderLive);
+export const DaemonLive = Layer.mergeAll(UnixSocketServerLive, CliSenderLive);
 
 export const runDaemon = Effect.gen(function* () {
   const agentSession = yield* AgentSession;

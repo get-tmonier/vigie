@@ -1,8 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, spyOn } from 'bun:test';
-import { Effect } from 'effect';
+import { ConfigProvider, Effect } from 'effect';
 import type { IpcClientShape } from '#modules/daemon/application/ports/in/ipc-client.port';
 import { attachPtyRelay } from '#modules/daemon/infrastructure/adapters/in/pty-relay';
-import { DaemonConfigLive } from '#modules/daemon/infrastructure/daemon-config';
 
 function createMockClient(): IpcClientShape {
   return {
@@ -49,7 +48,13 @@ describe('pty-relay: signal handlers', () => {
     Effect.runPromise(
       attachPtyRelay(createMockClient(), {
         sessionId: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
-      }).pipe(Effect.provide(DaemonConfigLive))
+      }).pipe(
+        Effect.provide(
+          ConfigProvider.layer(
+            ConfigProvider.fromEnv({ env: { VIGIE_HOME: '/tmp/vigie-test', VIGIE_PORT: '19191' } })
+          )
+        )
+      )
     ).catch(() => {});
     // Let the synchronous part of the Effect fiber run (up to first async op)
     await Promise.resolve();
