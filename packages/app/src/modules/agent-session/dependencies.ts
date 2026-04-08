@@ -34,7 +34,7 @@ import { CliSender } from '#shared/kernel/contracts/cli-sender';
 
 type RouteError = HttpServerError.HttpServerError | Socket.SocketError | Cause.UnknownError;
 
-interface AgentSessionServices {
+export interface AgentSessionServices {
   spawnSession: ReturnType<typeof createSpawnSessionUseCase>;
   sessionLifecycle: ReturnType<typeof createSessionLifecycleUseCase>;
   sessionCleanup: ReturnType<typeof createSessionCleanupUseCase>;

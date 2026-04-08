@@ -1,18 +1,16 @@
 import { Effect } from 'effect';
 import * as Schema from 'effect/Schema';
+import type { AgentSessionServices } from '#modules/agent-session/dependencies';
 import type { SessionToDaemon } from '#shared/kernel/contracts/ipc-protocol';
 import { expandPath } from '#shared/lib/path';
-import type { SessionLifecycleShape } from '#shell/application/ports/in/session-lifecycle.port';
-import type { SpawnSessionShape } from '#shell/application/ports/in/spawn-session.port';
-import type { TerminalConnectionShape } from '#shell/application/ports/in/terminal-connection.port';
 import type { IpcConnection } from '#shell/application/ports/out/ipc-server.port';
 
 const encodeJson = Schema.encodeSync(Schema.UnknownFromJsonString);
 
 interface IpcRouterDeps {
-  spawnSession: SpawnSessionShape;
-  sessionLifecycle: SessionLifecycleShape;
-  terminalConnection: TerminalConnectionShape;
+  spawnSession: AgentSessionServices['spawnSession'];
+  sessionLifecycle: AgentSessionServices['sessionLifecycle'];
+  terminalConnection: AgentSessionServices['terminalConnection'];
 }
 
 export function createIpcRouter(

@@ -3,7 +3,7 @@ import { Effect, Layer } from 'effect';
 import { AgentSession } from '#modules/agent-session/dependencies';
 import { CliSender } from '#shared/kernel/contracts/cli-sender';
 import { IpcServer } from '#shell/application/ports/out/ipc-server.port';
-import { createRunDaemon } from '#shell/application/use-cases/run-daemon.use-case';
+import { createRunDaemon } from '#shell/application/run-daemon';
 import { UnixSocketServerLive } from '#shell/infrastructure/adapters/out/unix-socket-server.adapter';
 import type { DaemonConfigShape } from '#shell/infrastructure/daemon-config';
 import { createRoutesLayer } from '#shell/infrastructure/server';
@@ -38,10 +38,7 @@ export const runDaemon = Effect.gen(function* () {
   const agentSession = yield* AgentSession;
   const appRoutes = createRoutesLayer({ appRoutes: agentSession.routes });
   const runner = createRunDaemon({
-    startupOps: agentSession.startupOps,
-    spawnSession: agentSession.spawnSession,
-    sessionLifecycle: agentSession.sessionLifecycle,
-    terminalConnection: agentSession.terminalConnection,
+    agentSession,
     appRoutes,
     cleanup,
   });

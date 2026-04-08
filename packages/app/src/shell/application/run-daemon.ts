@@ -4,11 +4,8 @@ import * as BunHttpServer from '@effect/platform-bun/BunHttpServer';
 import { Duration, Effect, Fiber, Schedule } from 'effect';
 import * as HttpMiddleware from 'effect/unstable/http/HttpMiddleware';
 import * as HttpRouter from 'effect/unstable/http/HttpRouter';
+import type { AgentSessionServices } from '#modules/agent-session/dependencies';
 import { VigiDatabase } from '#shared/db/database';
-import type { SessionLifecycleShape } from '#shell/application/ports/in/session-lifecycle.port';
-import type { SpawnSessionShape } from '#shell/application/ports/in/spawn-session.port';
-import type { StartupOpsShape } from '#shell/application/ports/in/startup-ops.port';
-import type { TerminalConnectionShape } from '#shell/application/ports/in/terminal-connection.port';
 import { IpcServer } from '#shell/application/ports/out/ipc-server.port';
 import { createIpcRouter } from '#shell/infrastructure/adapters/in/ipc-router';
 import type { DaemonConfigShape } from '#shell/infrastructure/daemon-config';
@@ -16,16 +13,14 @@ import { DaemonConfig } from '#shell/infrastructure/daemon-config';
 import type { createRoutesLayer } from '#shell/infrastructure/server';
 
 interface RunDaemonDeps {
-  startupOps: StartupOpsShape;
-  spawnSession: SpawnSessionShape;
-  sessionLifecycle: SessionLifecycleShape;
-  terminalConnection: TerminalConnectionShape;
+  agentSession: AgentSessionServices;
   appRoutes: ReturnType<typeof createRoutesLayer>;
   cleanup: (config: DaemonConfigShape) => void;
 }
 
 export function createRunDaemon(deps: RunDaemonDeps) {
-  const { startupOps, spawnSession, sessionLifecycle, terminalConnection, cleanup } = deps;
+  const { agentSession, cleanup } = deps;
+  const { startupOps, spawnSession, sessionLifecycle, terminalConnection } = agentSession;
 
   return Effect.gen(function* () {
     const config = yield* DaemonConfig;
