@@ -100,7 +100,7 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
       fireAndForget(terminalSubs.publish(sessionId, base64));
     });
 
-    Effect.runFork(
+    fireAndForget(
       Effect.promise(() => entry.handle.wait()).pipe(
         Effect.flatMap((exitCode) =>
           Effect.sync(() => {
