@@ -38,7 +38,10 @@ export const runDaemon = Effect.gen(function* () {
   const agentSession = yield* AgentSession;
   const appRoutes = createRoutesLayer({ appRoutes: agentSession.routes });
   const runner = createRunDaemon({
-    agentSession,
+    startupOps: agentSession.startupOps,
+    spawnSession: agentSession.spawnSession,
+    sessionLifecycle: agentSession.sessionLifecycle,
+    terminalConnection: agentSession.terminalConnection,
     appRoutes,
     cleanup,
   });

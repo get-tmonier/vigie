@@ -1,6 +1,5 @@
 import { Effect } from 'effect';
 import * as Schema from 'effect/Schema';
-import type { AgentSessionServices } from '#modules/agent-session/dependencies';
 import type { SessionToDaemon } from '#shared/kernel/contracts/ipc-protocol';
 import { expandPath } from '#shared/lib/path';
 import type { IpcConnection } from '#shell/application/ports/out/ipc-server.port';
@@ -8,9 +7,51 @@ import type { IpcConnection } from '#shell/application/ports/out/ipc-server.port
 const encodeJson = Schema.encodeSync(Schema.UnknownFromJsonString);
 
 interface IpcRouterDeps {
-  spawnSession: AgentSessionServices['spawnSession'];
-  sessionLifecycle: AgentSessionServices['sessionLifecycle'];
-  terminalConnection: AgentSessionServices['terminalConnection'];
+  spawnSession: {
+    register(props: {
+      sessionId: string;
+      agentType: string;
+      cwd: string;
+      mode?: 'prompt' | 'interactive';
+      gitBranch?: string;
+      gitRemoteUrl?: string;
+      repoName?: string;
+      connId: string;
+    }): void;
+    spawnInteractive(props: {
+      sessionId?: string;
+      agentType: string;
+      cwd: string;
+      cols: number;
+      rows: number;
+      connId?: string;
+      agentSessionId?: string;
+      resume?: boolean;
+      gitBranch?: string;
+      repoName?: string;
+    }): Effect.Effect<{ sessionId: string; pid: number }, Error>;
+    resume(
+      sessionId: string,
+      opts: { cols: number; rows: number; connId?: string; gitBranch?: string; repoName?: string }
+    ): Effect.Effect<{ sessionId: string; pid: number }, Error>;
+  };
+  sessionLifecycle: {
+    markEnded(sessionId: string, exitCode: number): void;
+    markError(sessionId: string, error: string): void;
+    setAgentSessionId(sessionId: string, agentSessionId: string): void;
+    deregister(sessionId: string): void;
+  };
+  terminalConnection: {
+    writeInput(sessionId: string, data: string, source: 'cli' | 'browser'): void;
+    updateCliResize(sessionId: string, connId: string, cols: number, rows: number): void;
+    handleDisconnect(connId: string): void;
+    detach(sessionId: string, connId: string): void;
+    attach(
+      sessionId: string,
+      connId: string,
+      dims: { cols: number; rows: number }
+    ): { chunks: Array<{ data: string }>; pid: number } | null;
+  };
 }
 
 export function createIpcRouter(

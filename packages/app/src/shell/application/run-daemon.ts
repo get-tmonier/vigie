@@ -12,15 +12,16 @@ import type { DaemonConfigShape } from '#shell/infrastructure/daemon-config';
 import { DaemonConfig } from '#shell/infrastructure/daemon-config';
 import type { createRoutesLayer } from '#shell/infrastructure/server';
 
-interface RunDaemonDeps {
-  agentSession: AgentSessionServices;
+type RunDaemonDeps = Pick<
+  AgentSessionServices,
+  'startupOps' | 'spawnSession' | 'sessionLifecycle' | 'terminalConnection'
+> & {
   appRoutes: ReturnType<typeof createRoutesLayer>;
   cleanup: (config: DaemonConfigShape) => void;
-}
+};
 
 export function createRunDaemon(deps: RunDaemonDeps) {
-  const { agentSession, cleanup } = deps;
-  const { startupOps, spawnSession, sessionLifecycle, terminalConnection } = agentSession;
+  const { startupOps, spawnSession, sessionLifecycle, terminalConnection, cleanup } = deps;
 
   return Effect.gen(function* () {
     const config = yield* DaemonConfig;
