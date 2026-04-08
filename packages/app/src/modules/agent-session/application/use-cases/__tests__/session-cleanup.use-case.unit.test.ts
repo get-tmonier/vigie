@@ -1,51 +1,9 @@
 import { describe, expect, it } from 'bun:test';
-import { Effect } from 'effect';
-import type { EventPublisherShape } from '#modules/agent-session/application/ports/out/event-publisher.port';
-import type {
-  ResumableSessionInfo,
-  SessionRepositoryShape,
-} from '#modules/agent-session/application/ports/out/session-repository.port';
 import { createSessionCleanupUseCase } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
-import type { DomainEvent } from '#modules/agent-session/domain/events';
+import { CannotDeleteActiveSessionError } from '#modules/agent-session/domain/errors';
 import { Session } from '#modules/agent-session/domain/session';
 import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
-
-function makeSessionRepo(): SessionRepositoryShape & { store: Map<string, Session> } {
-  const store = new Map<string, Session>();
-  return {
-    store,
-    findById: (id) => store.get(id) ?? null,
-    findAll: () => Array.from(store.values()),
-    findActive: () => Array.from(store.values()).filter((s) => s.isActive),
-    findActiveWithAgentId: (): ResumableSessionInfo[] => [],
-    findRecentlyEnded: (): ResumableSessionInfo[] => [],
-    save: (session) => {
-      store.set(session.id, session);
-    },
-    delete: (id) => {
-      store.delete(id);
-    },
-    deleteAllEnded: () => {
-      for (const [k, v] of store) {
-        if (v.status === 'ended') store.delete(k);
-      }
-    },
-    markOrphanedEnded: () => {},
-    pruneOld: () => {},
-  };
-}
-
-function makeEventPublisher(): EventPublisherShape & { published: DomainEvent[] } {
-  const published: DomainEvent[] = [];
-  return {
-    published,
-    publish: (event) => {
-      published.push(event);
-      return Effect.void;
-    },
-    subscribe: (_listener) => () => {},
-  };
-}
+import { makeEventPublisher, makeSessionRepo } from './test-helpers';
 
 describe('SessionCleanupUseCase.delete', () => {
   it('removes an ended session from the repository', async () => {
@@ -116,7 +74,7 @@ describe('SessionCleanupUseCase.delete', () => {
       sessionRepo,
       eventPublisher: makeEventPublisher(),
     });
-    expect(() => useCase.delete('sess-active')).toThrow();
+    expect(() => useCase.delete('sess-active')).toThrow(CannotDeleteActiveSessionError);
   });
 });
 

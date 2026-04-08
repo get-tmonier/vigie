@@ -1,58 +1,16 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect } from 'effect';
 import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
-import type { EventPublisherShape } from '#modules/agent-session/application/ports/out/event-publisher.port';
 import type { PtySpawnerShape } from '#modules/agent-session/application/ports/out/pty-spawner.port';
-import type {
-  ResumableSessionInfo,
-  SessionRepositoryShape,
-} from '#modules/agent-session/application/ports/out/session-repository.port';
 import { createSpawnSessionUseCase } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
 import {
   CannotResumeSessionError,
   SessionNotFoundError,
 } from '#modules/agent-session/domain/errors';
-import type { DomainEvent } from '#modules/agent-session/domain/events';
 import { Session } from '#modules/agent-session/domain/session';
 import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
 import type { PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
-
-function makeSessionRepo(): SessionRepositoryShape & { store: Map<string, Session> } {
-  const store = new Map<string, Session>();
-  return {
-    store,
-    findById: (id) => store.get(id) ?? null,
-    findAll: () => Array.from(store.values()),
-    findActive: () => Array.from(store.values()).filter((s) => s.isActive),
-    findActiveWithAgentId: (): ResumableSessionInfo[] => [],
-    findRecentlyEnded: (): ResumableSessionInfo[] => [],
-    save: (session) => {
-      store.set(session.id, session);
-    },
-    delete: (id) => {
-      store.delete(id);
-    },
-    deleteAllEnded: () => {
-      for (const [k, v] of store) {
-        if (v.status === 'ended') store.delete(k);
-      }
-    },
-    markOrphanedEnded: () => {},
-    pruneOld: () => {},
-  };
-}
-
-function makeEventPublisher(): EventPublisherShape & { published: DomainEvent[] } {
-  const published: DomainEvent[] = [];
-  return {
-    published,
-    publish: (event) => {
-      published.push(event);
-      return Effect.void;
-    },
-    subscribe: (_listener) => () => {},
-  };
-}
+import { makeEventPublisher, makeSessionRepo } from './test-helpers';
 
 function makeAgentRegistry(canResume = false, detectSessionId = false): AgentRegistryShape {
   return {
@@ -182,6 +140,31 @@ describe('SpawnSessionUseCase.spawnInteractive', () => {
 
     const session = sessionRepo.findById(result.sessionId);
     expect(session?.agentSessionId).toBeDefined();
+  });
+
+  it('does not set agentSessionId when detectSessionId is false', async () => {
+    const sessionRepo = makeSessionRepo();
+    // default makeAgentRegistry has detectSessionId = false
+    const useCase = createSpawnSessionUseCase({
+      sessionRepo,
+      ptySpawner: makePtySpawner(),
+      agentRegistry: makeAgentRegistry(),
+      eventPublisher: makeEventPublisher(),
+      registry: makePtyRegistry(),
+      setupPtyLifecycle: () => {},
+    });
+
+    const result = await Effect.runPromise(
+      useCase.spawnInteractive({
+        agentType: 'claude',
+        cwd: '/tmp',
+        cols: 80,
+        rows: 24,
+      })
+    );
+
+    const session = sessionRepo.findById(result.sessionId);
+    expect(session?.agentSessionId).toBeUndefined();
   });
 
   it('registers pty handle in registry', async () => {

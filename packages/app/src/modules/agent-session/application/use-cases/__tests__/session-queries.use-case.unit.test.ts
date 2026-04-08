@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'bun:test';
 import type {
-  ResumableSessionInfo,
-  SessionRepositoryShape,
-} from '#modules/agent-session/application/ports/out/session-repository.port';
-import type {
   InputEntry,
   TerminalChunk,
   TerminalRepositoryShape,
@@ -11,31 +7,7 @@ import type {
 import { createSessionQueriesUseCase } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import { Session } from '#modules/agent-session/domain/session';
 import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
-
-function makeSessionRepo(): SessionRepositoryShape & { store: Map<string, Session> } {
-  const store = new Map<string, Session>();
-  return {
-    store,
-    findById: (id) => store.get(id) ?? null,
-    findAll: () => Array.from(store.values()),
-    findActive: () => Array.from(store.values()).filter((s) => s.isActive),
-    findActiveWithAgentId: (): ResumableSessionInfo[] => [],
-    findRecentlyEnded: (): ResumableSessionInfo[] => [],
-    save: (session) => {
-      store.set(session.id, session);
-    },
-    delete: (id) => {
-      store.delete(id);
-    },
-    deleteAllEnded: () => {
-      for (const [k, v] of store) {
-        if (v.status === 'ended') store.delete(k);
-      }
-    },
-    markOrphanedEnded: () => {},
-    pruneOld: () => {},
-  };
-}
+import { makeSessionRepo } from './test-helpers';
 
 function makeTerminalRepo(): TerminalRepositoryShape & {
   chunks: Map<string, TerminalChunk[]>;
