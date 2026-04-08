@@ -1,16 +1,16 @@
 import { Layer } from 'effect';
-import { AgentRegistryLayer } from '#modules/agent-session/infrastructure/adapters/out/agents/agent-registry';
-import { BunPtySpawnerLayer } from '#modules/agent-session/infrastructure/adapters/out/bun-pty-spawner';
+import { AgentRegistryLive } from '#modules/agent-session/infrastructure/adapters/out/agents/agent-registry';
+import { BunPtySpawnerLive } from '#modules/agent-session/infrastructure/adapters/out/bun-pty-spawner';
 import {
   AppEventPublisherTag,
-  EventPublisherLayer,
+  EventPublisherLive,
 } from '#modules/agent-session/infrastructure/adapters/out/event-publisher.adapter';
-import { FsResumabilityCheckerLayer } from '#modules/agent-session/infrastructure/adapters/out/fs-resumability-checker';
-import { SqliteSessionRepositoryLayer } from '#modules/agent-session/infrastructure/adapters/out/sqlite-session-repository';
-import { SqliteTerminalRepositoryLayer } from '#modules/agent-session/infrastructure/adapters/out/sqlite-terminal-repository';
+import { FsResumabilityCheckerLive } from '#modules/agent-session/infrastructure/adapters/out/fs-resumability-checker';
+import { SqliteSessionRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-session-repository';
+import { SqliteTerminalRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-terminal-repository';
 import {
   TerminalSubscribers,
-  TerminalSubscribersLayer,
+  TerminalSubscribersLive,
 } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
 
 export { AgentRegistry } from '#modules/agent-session/application/ports/out/agent-adapter.port';
@@ -31,11 +31,11 @@ export { createPtyRegistry } from '#modules/agent-session/infrastructure/pty-reg
 export { AppEventPublisherTag, TerminalSubscribers };
 
 export const AgentSessionLayer = Layer.mergeAll(
-  EventPublisherLayer,
-  BunPtySpawnerLayer,
-  FsResumabilityCheckerLayer,
-  AgentRegistryLayer,
-  TerminalSubscribersLayer,
-  SqliteSessionRepositoryLayer,
-  SqliteTerminalRepositoryLayer
+  EventPublisherLive,
+  BunPtySpawnerLive,
+  FsResumabilityCheckerLive,
+  AgentRegistryLive,
+  TerminalSubscribersLive,
+  SqliteSessionRepositoryLive,
+  SqliteTerminalRepositoryLive
 );
