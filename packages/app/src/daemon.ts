@@ -2,25 +2,26 @@ import * as BunRuntime from '@effect/platform-bun/BunRuntime';
 import { Effect } from 'effect';
 import { AppLive, runDaemon } from '#dependencies';
 import { cleanup } from '#modules/daemon/dependencies';
+import { resolveDefaultDaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
 
 process.on('SIGTERM', () => {
   process.stdout.write('[daemon] Stopped.\n');
-  cleanup();
+  cleanup(resolveDefaultDaemonConfig());
   process.exit(0);
 });
 process.on('SIGINT', () => {
   process.stdout.write('[daemon] Stopped.\n');
-  cleanup();
+  cleanup(resolveDefaultDaemonConfig());
   process.exit(0);
 });
 process.on('uncaughtException', (err) => {
   Effect.runFork(Effect.logError('[daemon] Uncaught exception:', err));
-  cleanup();
+  cleanup(resolveDefaultDaemonConfig());
   process.exit(1);
 });
 process.on('unhandledRejection', (reason) => {
   Effect.runFork(Effect.logError('[daemon] Unhandled rejection:', reason));
-  cleanup();
+  cleanup(resolveDefaultDaemonConfig());
   process.exit(1);
 });
 

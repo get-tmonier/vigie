@@ -11,6 +11,7 @@ import type { StartupOpsShape } from '#modules/daemon/application/ports/in/start
 import type { TerminalConnectionShape } from '#modules/daemon/application/ports/in/terminal-connection.port';
 import { IpcServer } from '#modules/daemon/application/ports/out/ipc-server.port';
 import { createIpcRouter } from '#modules/daemon/infrastructure/adapters/in/ipc-router';
+import type { DaemonConfigShape } from '#modules/daemon/infrastructure/daemon-config';
 import { DaemonConfig } from '#modules/daemon/infrastructure/daemon-config';
 import type { createRoutesLayer } from '#modules/daemon/infrastructure/server';
 
@@ -20,7 +21,7 @@ interface RunDaemonDeps {
   sessionLifecycle: SessionLifecycleShape;
   terminalConnection: TerminalConnectionShape;
   appRoutes: ReturnType<typeof createRoutesLayer>;
-  cleanup: () => void;
+  cleanup: (config: DaemonConfigShape) => void;
 }
 
 export function createRunDaemon(deps: RunDaemonDeps) {
@@ -65,7 +66,7 @@ export function createRunDaemon(deps: RunDaemonDeps) {
         yield* Fiber.interrupt(pruneFiber);
         yield* Fiber.interrupt(resumableFiber);
         db.close();
-        cleanup();
+        cleanup(config);
       })
     );
 
@@ -98,7 +99,7 @@ export function createRunDaemon(deps: RunDaemonDeps) {
           } else {
             yield* Effect.logError('[daemon] HTTP server failed to start:', msg);
           }
-          cleanup();
+          cleanup(config);
           process.exit(1);
         })
       )
