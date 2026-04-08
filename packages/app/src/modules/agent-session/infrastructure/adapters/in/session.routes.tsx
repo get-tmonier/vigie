@@ -54,7 +54,7 @@ const jsonRoute = <E,>(
               HttpServerResponse.jsonUnsafe({ error: err.message }, { status: 404 })
             );
           }
-          if (tag === 'CannotDeleteActiveSessionError' || tag === 'CannotResumeSessionError') {
+          if (tag === 'CannotResumeSessionError') {
             return Effect.succeed(
               HttpServerResponse.jsonUnsafe({ error: err.message }, { status: 409 })
             );
