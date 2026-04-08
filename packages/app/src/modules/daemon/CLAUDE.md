@@ -19,5 +19,5 @@
 
 ## Key conventions
 - Session IDs are opaque `string` here — branding is agent-session's concern.
-- Never import from `#modules/agent-session/`. Use ports in `application/ports/in/`.
+- Never import from other modules. Use ports in `application/ports/in/`.
 - `daemon/dependencies.ts` only exports daemon-specific infrastructure layers.

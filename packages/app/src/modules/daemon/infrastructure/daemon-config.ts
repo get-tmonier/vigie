@@ -35,13 +35,8 @@ export const DaemonConfig = Config.all({
   port: Config.port('VIGIE_PORT').pipe(Config.withDefault(19191)),
 }).pipe(Config.map(({ vigieHome, port }) => createDaemonConfigShape(vigieHome, port)));
 
-let cachedConfig: DaemonConfigShape | undefined;
-
 export function getDefaultDaemonConfig(): DaemonConfigShape {
-  if (!cachedConfig) {
-    const vigieHome = process.env.VIGIE_HOME ?? defaultVigieHome;
-    const port = process.env.VIGIE_PORT !== undefined ? Number(process.env.VIGIE_PORT) : 19191;
-    cachedConfig = createDaemonConfigShape(vigieHome, port);
-  }
-  return cachedConfig;
+  const vigieHome = process.env.VIGIE_HOME ?? defaultVigieHome;
+  const port = process.env.VIGIE_PORT !== undefined ? Number(process.env.VIGIE_PORT) : 19191;
+  return createDaemonConfigShape(vigieHome, port);
 }
