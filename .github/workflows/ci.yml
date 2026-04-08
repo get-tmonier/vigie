@@ -40,7 +40,7 @@ jobs:
         run: bun knip
 
       - name: Biome check scripts
-        run: biome check ./scripts
+        run: bunx biome check ./scripts
 
       - name: Biome check (affected)
         run: bun turbo check --affected
