@@ -1,5 +1,4 @@
-// Browser-facing event union — matches all events published via eventBus
-// and broadcast over /ws/events to UI clients.
+import { ServiceMap } from 'effect';
 
 type DaemonSyncSession = {
   sessionId: string;
@@ -86,3 +85,11 @@ export type BrowserEvent =
   | { type: 'terminal:pty-resized'; sessionId: string; cols: number; rows: number }
   | { type: 'session:deleted'; sessionId: string; timestamp: number }
   | { type: 'sessions:cleared'; timestamp: number };
+
+export interface EventFeedShape {
+  subscribe(listener: (event: BrowserEvent) => void): () => void;
+}
+
+export class EventFeed extends ServiceMap.Service<EventFeed, EventFeedShape>()(
+  '@vigie/EventFeed'
+) {}

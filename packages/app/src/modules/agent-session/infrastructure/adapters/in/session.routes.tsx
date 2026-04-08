@@ -12,6 +12,7 @@ import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse';
 import type * as Socket from 'effect/unstable/socket/Socket';
 import * as v from 'valibot';
 import { renderPage } from '#infra/ssr/render-page';
+import type { EventFeedShape } from '#modules/agent-session/application/ports/out/event-feed.port';
 import type { SessionCleanupShape } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import type { SpawnSessionShape } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
@@ -26,9 +27,7 @@ type SessionRouteDeps = {
   sessionCleanup: SessionCleanupShape;
   sessionQueries: SessionQueriesShape;
   terminalConnection: TerminalConnectionShape;
-  eventPublisher: {
-    subscribeBrowser: (listener: (event: unknown) => void) => () => void;
-  };
+  eventFeed: EventFeedShape;
 };
 
 type RouteError = HttpServerError.HttpServerError | Socket.SocketError | Cause.UnknownError;
@@ -71,7 +70,7 @@ const jsonRoute = <E,>(
   );
 
 export function createSessionRoutes(deps: SessionRouteDeps): HttpRouter.Route<RouteError, never>[] {
-  const { spawnSession, sessionCleanup, sessionQueries, terminalConnection, eventPublisher } = deps;
+  const { spawnSession, sessionCleanup, sessionQueries, terminalConnection, eventFeed } = deps;
 
   return [
     HttpRouter.route(
@@ -302,7 +301,7 @@ export function createSessionRoutes(deps: SessionRouteDeps): HttpRouter.Route<Ro
         yield* write(snapshotMsg);
 
         const services = yield* Effect.services();
-        const unsub = eventPublisher.subscribeBrowser((event) => {
+        const unsub = eventFeed.subscribe((event) => {
           Effect.runForkWith(services)(write(encodeJson(event)));
         });
 

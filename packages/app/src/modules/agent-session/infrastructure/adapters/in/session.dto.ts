@@ -17,7 +17,7 @@ export const AgentSessionSchema = v.object({
 export type AgentSession = v.InferOutput<typeof AgentSessionSchema>;
 
 export const SpawnSessionRequestSchema = v.object({
-  agentType: v.optional(v.string()),
+  agentType: v.optional(v.picklist(['claude', 'opencode', 'generic'])),
   cwd: v.optional(v.string()),
   cols: v.optional(v.number()),
   rows: v.optional(v.number()),

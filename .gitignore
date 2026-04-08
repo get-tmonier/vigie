@@ -38,3 +38,6 @@ pnpm-debug.log*
 
 # serena
 .serena/
+
+# git worktrees
+.worktrees/

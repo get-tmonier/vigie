@@ -5,6 +5,7 @@ import type * as HttpServerError from 'effect/unstable/http/HttpServerError';
 import type * as Socket from 'effect/unstable/socket/Socket';
 import { AgentRegistry } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 import { CliSender } from '#modules/agent-session/application/ports/out/cli-sender.port';
+import { EventFeed } from '#modules/agent-session/application/ports/out/event-feed.port';
 import { EventPublisher } from '#modules/agent-session/application/ports/out/event-publisher.port';
 import { PtySpawner } from '#modules/agent-session/application/ports/out/pty-spawner.port';
 import { ResumabilityChecker } from '#modules/agent-session/application/ports/out/resumability-checker.port';
@@ -20,10 +21,8 @@ import { createSessionRoutes } from '#modules/agent-session/infrastructure/adapt
 import { createTerminalRoutes } from '#modules/agent-session/infrastructure/adapters/in/terminal.routes';
 import { AgentRegistryLive } from '#modules/agent-session/infrastructure/adapters/out/agents/agent-registry';
 import { BunPtySpawnerLive } from '#modules/agent-session/infrastructure/adapters/out/bun-pty-spawner';
-import {
-  AppEventPublisherTag,
-  EventPublisherLive,
-} from '#modules/agent-session/infrastructure/adapters/out/event-publisher.adapter';
+import { EventFeedLive } from '#modules/agent-session/infrastructure/adapters/out/event-feed.adapter';
+import { EventPublisherLive } from '#modules/agent-session/infrastructure/adapters/out/event-publisher.adapter';
 import { FsResumabilityCheckerLive } from '#modules/agent-session/infrastructure/adapters/out/fs-resumability-checker';
 import { SqliteSessionRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-session-repository';
 import { SqliteTerminalRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-terminal-repository';
@@ -56,6 +55,7 @@ export class AgentSession extends ServiceMap.Service<AgentSession, AgentSessionS
 ) {}
 
 const AgentSessionInfraLive = Layer.mergeAll(
+  EventFeedLive,
   EventPublisherLive,
   BunPtySpawnerLive,
   FsResumabilityCheckerLive,
@@ -74,7 +74,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
     const resumabilityChecker = yield* ResumabilityChecker;
     const eventPublisher = yield* EventPublisher;
     const terminalSubs = yield* TerminalSubscribers;
-    const appEventPublisher = yield* AppEventPublisherTag;
+    const eventFeed = yield* EventFeed;
     const cliSender = yield* CliSender;
 
     const registry = createPtyRegistry();
@@ -136,7 +136,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
         sessionCleanup,
         sessionQueries,
         terminalConnection,
-        eventPublisher: appEventPublisher,
+        eventFeed,
       }),
       ...createTerminalRoutes({
         sessionQueries,

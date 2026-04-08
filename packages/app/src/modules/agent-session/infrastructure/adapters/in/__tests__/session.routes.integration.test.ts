@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
 import * as HttpRouter from 'effect/unstable/http/HttpRouter';
+import type { BrowserEvent } from '#modules/agent-session/application/ports/out/event-feed.port';
 import type { SessionCleanupShape } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import type { SpawnSessionShape } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
@@ -60,8 +61,8 @@ const fakeTerminalConnection: TerminalConnectionShape = {
   writeBinaryInput: () => {},
 };
 
-const fakeEventPublisher = {
-  subscribeBrowser: (_listener: (event: unknown) => void) => () => {},
+const fakeEventFeed = {
+  subscribe: (_listener: (event: BrowserEvent) => void) => () => {},
 };
 
 // --- Helper to build test handler ---
@@ -72,7 +73,7 @@ function buildHandler(sessions: Session[] = []) {
     sessionCleanup: fakeSessionCleanup,
     sessionQueries: fakeSessionQueries(sessions),
     terminalConnection: fakeTerminalConnection,
-    eventPublisher: fakeEventPublisher,
+    eventFeed: fakeEventFeed,
   };
   const routes = createSessionRoutes(deps);
   const appLayer = Layer.mergeAll(HttpRouter.layer, HttpRouter.addAll(routes));
