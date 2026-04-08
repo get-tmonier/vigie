@@ -124,7 +124,7 @@ describe('SqliteSessionRepository', () => {
           const all = repo.findAll();
           const ids = all.map((s) => s.id);
           expect(ids).toContain(active.id);
-          expect(ids).toContain('ended-1');
+          expect(ids).toContain(SessionId('ended-1'));
         })
       );
     });
@@ -152,7 +152,7 @@ describe('SqliteSessionRepository', () => {
           const actives = repo.findActive();
           expect(actives.every((s) => s.status === 'active')).toBe(true);
           expect(actives.some((s) => s.id === active.id)).toBe(true);
-          expect(actives.some((s) => s.id === 'ended-find-active')).toBe(false);
+          expect(actives.some((s) => s.id === SessionId('ended-find-active'))).toBe(false);
         })
       );
     });
@@ -212,8 +212,8 @@ describe('SqliteSessionRepository', () => {
           repo.save(oldEnded);
 
           const results = repo.findRecentlyEnded(10_000);
-          expect(results.some((r) => r.id === 'recent-ended-1')).toBe(true);
-          expect(results.some((r) => r.id === 'old-ended-1')).toBe(false);
+          expect(results.some((r) => r.id === SessionId('recent-ended-1'))).toBe(true);
+          expect(results.some((r) => r.id === SessionId('old-ended-1'))).toBe(false);
         })
       );
     });
@@ -236,7 +236,7 @@ describe('SqliteSessionRepository', () => {
           repo.save(resumableEnded);
 
           const results = repo.findRecentlyEnded(10_000);
-          expect(results.some((r) => r.id === 'resumable-ended-1')).toBe(false);
+          expect(results.some((r) => r.id === SessionId('resumable-ended-1'))).toBe(false);
         })
       );
     });
