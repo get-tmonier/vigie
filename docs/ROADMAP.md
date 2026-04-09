@@ -37,7 +37,7 @@
 > Quick scan of everything. Details in sections below.
 
 ### P0 — Ship-blocking
-- [ ] Refactor: [Island architecture — break the mega-island](#r-001)
+- [x] Refactor: [Island architecture — break the mega-island](#r-001)
 - [ ] Refactor: [SQL type safety with Kysely](#r-002)
 - [ ] Feature: [Auto-update (`vigie update`)](#f-001)
 - [ ] Distribution: [Binary build pipeline](#d-001)
