@@ -133,7 +133,7 @@ All cross-folder imports must use ESM subpath aliases (`#alias/...`), never rela
 
 ## Multi-agent extensibility
 
-The **domain layer and ports are agent-agnostic** — `AgentAdapter` port, `AgentRegistry`, and the `Session` domain entity treat `agentType` as a plain string. Adding a new agent (e.g. opencode) requires changes only in the infrastructure layer:
+The **domain layer and ports are agent-agnostic** — `AgentAdapter` port, `AgentCatalog`, and the `Session` domain entity treat `agentType` as a plain string. Adding a new agent (e.g. opencode) requires changes only in the infrastructure layer:
 
 | What to change | Location | Notes |
 |---|---|---|
