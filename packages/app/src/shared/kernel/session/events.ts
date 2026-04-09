@@ -86,12 +86,6 @@ const TerminalResizedEventSchema = v.object({
   rows: v.number(),
 });
 
-export const TerminalChunkSchema = v.object({
-  data: v.string(),
-  timestamp: v.number(),
-  seq: v.number(),
-});
-
 export const SessionEventSchema = v.variant('type', [
   SessionStartedSchema,
   SessionEndedSchema,

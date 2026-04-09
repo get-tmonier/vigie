@@ -1,7 +1,7 @@
 import * as v from 'valibot';
 import { AgentTypeSchema } from '#shared/kernel/session/agent-type';
-import { TerminalChunkSchema } from '#shared/kernel/session/events';
 import { SessionIdSchema } from '#shared/kernel/session/session-id';
+import { TerminalChunkSchema } from '#shared/kernel/session/terminal-chunk';
 
 const DaemonHelloSchema = v.object({
   type: v.literal('daemon:hello'),

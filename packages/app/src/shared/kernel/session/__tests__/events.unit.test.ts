@@ -3,7 +3,6 @@ import * as v from 'valibot';
 import {
   SessionLifecycleEventSchema,
   SessionStartedSchema,
-  TerminalChunkSchema,
   TerminalInputEchoEventSchema,
 } from '../events';
 
@@ -59,16 +58,5 @@ describe('TerminalInputEchoEventSchema', () => {
       timestamp: 1234567890,
     });
     expect(String(result.sessionId)).toBe('abc-123');
-  });
-});
-
-describe('TerminalChunkSchema', () => {
-  it('parses chunk without type field', () => {
-    const result = v.parse(TerminalChunkSchema, {
-      data: 'base64data',
-      timestamp: 1234567890,
-      seq: 1,
-    });
-    expect(result.seq).toBe(1);
   });
 });
