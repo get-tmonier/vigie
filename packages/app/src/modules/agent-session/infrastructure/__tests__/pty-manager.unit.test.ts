@@ -249,8 +249,9 @@ describe('PtyManager.attach/detach', () => {
 
     const result = manager.attach(makeSessionId('sess-1'), 'conn-2', { cols: 100, rows: 30 });
     expect(result).not.toBeNull();
-    expect(result!.pid).toBe(1234);
-    expect(result!.chunks).toHaveLength(1);
+    if (!result) throw new Error('expected result');
+    expect(result.pid).toBe(1234);
+    expect(result.chunks).toHaveLength(1);
   });
 });
 
