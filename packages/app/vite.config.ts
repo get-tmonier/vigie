@@ -11,7 +11,7 @@ export default defineConfig({
     outDir: 'dist/client',
     emptyOutDir: true,
     rollupOptions: {
-      input: { entry: resolve(__dirname, 'src/shared/ssr/client-entry.tsx') },
+      input: { entry: resolve(__dirname, 'src/pages/client-entry.tsx') },
       output: {
         entryFileNames: 'entry.js',
         assetFileNames: 'style[extname]',
