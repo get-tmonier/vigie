@@ -82,6 +82,12 @@ export type TerminalResizedEvent = {
   readonly rows: number;
 };
 
+export type TerminalChunk = {
+  readonly data: string;
+  readonly timestamp: number;
+  readonly seq: number;
+};
+
 export type SessionEvent =
   | SessionLifecycleEvent
   | TerminalOutputEvent

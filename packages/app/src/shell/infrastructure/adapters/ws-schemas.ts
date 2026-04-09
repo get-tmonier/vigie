@@ -1,4 +1,9 @@
 import * as v from 'valibot';
+import type {
+  CommandDoneEvent,
+  CommandErrorEvent,
+  CommandOutputEvent,
+} from '#shared/kernel/shell/events';
 
 // ── Downstream (backend -> daemon) ──
 
@@ -110,7 +115,7 @@ export const CommandOutputSchema = v.object({
   data: v.string(),
   timestamp: v.number(),
 });
-export type CommandOutput = v.InferOutput<typeof CommandOutputSchema>;
+export type CommandOutput = CommandOutputEvent;
 
 export const CommandDoneSchema = v.object({
   type: v.literal('command:done'),
@@ -118,7 +123,7 @@ export const CommandDoneSchema = v.object({
   exitCode: v.number(),
   timestamp: v.number(),
 });
-export type CommandDone = v.InferOutput<typeof CommandDoneSchema>;
+export type CommandDone = CommandDoneEvent;
 
 export const CommandErrorSchema = v.object({
   type: v.literal('command:error'),
@@ -126,7 +131,7 @@ export const CommandErrorSchema = v.object({
   error: v.string(),
   timestamp: v.number(),
 });
-export type CommandError = v.InferOutput<typeof CommandErrorSchema>;
+export type CommandError = CommandErrorEvent;
 
 export const PongSchema = v.object({
   type: v.literal('pong'),
