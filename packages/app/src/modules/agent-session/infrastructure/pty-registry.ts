@@ -1,12 +1,7 @@
-import type { PtyHandle } from '#modules/agent-session/application/ports/out/pty-spawner.port';
+import type { PtyEntry } from '#modules/agent-session/infrastructure/pty-manager.types';
 import type { SessionId } from '#shared/kernel/session/session-id';
 
-export interface PtyEntry {
-  handle: PtyHandle;
-  cliChannels: Map<string, { cols: number; rows: number }>;
-  browserChannels: Map<string, { cols: number; rows: number }>;
-  ptyDimensions: { cols: number; rows: number };
-}
+export type { PtyEntry };
 
 export interface PtyRegistry {
   ptyHandles: Map<SessionId, PtyEntry>;
