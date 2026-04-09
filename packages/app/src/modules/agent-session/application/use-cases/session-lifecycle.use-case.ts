@@ -9,12 +9,12 @@ import type { SessionId } from '#shared/kernel/session/session-id';
 interface SessionLifecycleDeps {
   sessionRepo: SessionStoreShape;
   resumabilityChecker: ResumabilityCheckerShape;
-  agentRegistry: AgentCatalogShape;
+  agentCatalog: AgentCatalogShape;
   eventPublisher: SessionEventBusShape;
 }
 
 export function createSessionLifecycleUseCase(deps: SessionLifecycleDeps) {
-  const { sessionRepo, resumabilityChecker, agentRegistry, eventPublisher } = deps;
+  const { sessionRepo, resumabilityChecker, agentCatalog, eventPublisher } = deps;
 
   function publishEvents(events: SessionLifecycleEvent[]): Effect.Effect<void> {
     return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
@@ -33,7 +33,7 @@ export function createSessionLifecycleUseCase(deps: SessionLifecycleDeps) {
       const session = sessionRepo.findById(sessionId);
       if (!session) return;
 
-      const adapter = agentRegistry.resolve(session.agentType);
+      const adapter = agentCatalog.resolve(session.agentType);
       const resumable =
         adapter.canResume &&
         session.agentSessionId != null &&

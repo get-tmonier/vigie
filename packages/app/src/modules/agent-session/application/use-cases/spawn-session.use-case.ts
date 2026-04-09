@@ -15,7 +15,7 @@ import type { SessionId } from '#shared/kernel/session/session-id';
 
 interface SpawnSessionDeps {
   sessionRepo: SessionStoreShape;
-  agentRegistry: AgentCatalogShape;
+  agentCatalog: AgentCatalogShape;
   eventPublisher: SessionEventBusShape;
   ptyManager: PtyManagerShape;
 }
@@ -23,7 +23,7 @@ interface SpawnSessionDeps {
 export type SpawnSessionShape = ReturnType<typeof createSpawnSessionUseCase>;
 
 export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
-  const { sessionRepo, agentRegistry, eventPublisher, ptyManager } = deps;
+  const { sessionRepo, agentCatalog, eventPublisher, ptyManager } = deps;
 
   function publishEvents(events: SessionLifecycleEvent[]): Effect.Effect<void> {
     return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
@@ -85,7 +85,7 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
         });
         sessionRepo.save(session);
 
-        const adapter = agentRegistry.resolve(props.agentType);
+        const adapter = agentCatalog.resolve(props.agentType);
         const agentSessionId = props.agentSessionId ?? session.id;
 
         if (adapter.detectSessionId) {
@@ -125,7 +125,7 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
         const session = sessionRepo.findById(sessionId);
         if (!session) return yield* new SessionNotFoundError(sessionId);
 
-        const adapter = agentRegistry.resolve(session.agentType);
+        const adapter = agentCatalog.resolve(session.agentType);
         if (!adapter.canResume || !session.canResume) {
           return yield* new CannotResumeSessionError(
             sessionId,

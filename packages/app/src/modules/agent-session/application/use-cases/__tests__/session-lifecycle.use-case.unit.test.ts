@@ -9,7 +9,7 @@ import type { SessionEvent } from '#shared/kernel/session/events';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 import { makeSessionEventBus, makeSessionRepo } from './test-helpers';
 
-function makeAgentRegistry(canResume = false): AgentCatalogShape {
+function makeAgentCatalog(canResume = false): AgentCatalogShape {
   return {
     resolve: (_agentType) => ({
       agentType: 'claude',
@@ -29,7 +29,7 @@ function makeResumabilityChecker(resumable = false): ResumabilityCheckerShape {
 function makeUseCase(overrides?: {
   sessionRepo?: SessionStoreShape & { store: Map<string, Session> };
   eventPublisher?: SessionEventBusShape & { published: SessionEvent[] };
-  agentRegistry?: AgentCatalogShape;
+  agentCatalog?: AgentCatalogShape;
   resumabilityChecker?: ResumabilityCheckerShape;
 }) {
   const sessionRepo = overrides?.sessionRepo ?? makeSessionRepo();
@@ -40,7 +40,7 @@ function makeUseCase(overrides?: {
     useCase: createSessionLifecycleUseCase({
       sessionRepo,
       resumabilityChecker: overrides?.resumabilityChecker ?? makeResumabilityChecker(),
-      agentRegistry: overrides?.agentRegistry ?? makeAgentRegistry(),
+      agentCatalog: overrides?.agentCatalog ?? makeAgentCatalog(),
       eventPublisher,
     }),
   };
@@ -69,7 +69,7 @@ describe('SessionLifecycleUseCase.markEnded', () => {
 
     const { useCase } = makeUseCase({
       sessionRepo,
-      agentRegistry: makeAgentRegistry(true),
+      agentCatalog: makeAgentCatalog(true),
       resumabilityChecker: makeResumabilityChecker(true),
     });
     useCase.markEnded(makeSessionId('sess-1'), 0);

@@ -55,7 +55,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
   Effect.gen(function* () {
     const sessionStore = yield* SessionStore;
     const sessionLog = yield* SessionLog;
-    const agentRegistry = yield* AgentCatalog;
+    const agentCatalog = yield* AgentCatalog;
     const resumabilityChecker = yield* ResumabilityChecker;
     const eventPublisher = yield* SessionEventBus;
     const terminalSubs = yield* TerminalSubscribers;
@@ -64,7 +64,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
     const sessionLifecycle = createSessionLifecycleUseCase({
       sessionRepo: sessionStore,
       resumabilityChecker,
-      agentRegistry,
+      agentCatalog,
       eventPublisher,
     });
 
@@ -102,7 +102,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
 
     const spawnSession = createSpawnSessionUseCase({
       sessionRepo: sessionStore,
-      agentRegistry,
+      agentCatalog,
       eventPublisher,
       ptyManager,
     });
