@@ -4,6 +4,10 @@ import type { AgentProcessShape } from '#modules/agent-session/application/ports
 import { CliChannel } from '#modules/agent-session/application/ports/out/cli-channel.port';
 import { ResumabilityChecker } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import { SessionEventBus } from '#modules/agent-session/application/ports/out/session-event-bus.port';
+import {
+  SessionFeed,
+  type SessionFeedShape,
+} from '#modules/agent-session/application/ports/out/session-feed.port';
 import { SessionLog } from '#modules/agent-session/application/ports/out/session-log.port';
 import { SessionStore } from '#modules/agent-session/application/ports/out/session-store.port';
 import { createCheckResumabilityUseCase } from '#modules/agent-session/application/use-cases/check-resumability.use-case';
@@ -16,11 +20,7 @@ import { createBunPtySpawnFn } from '#modules/agent-session/infrastructure/adapt
 import { FsResumabilityCheckerLive } from '#modules/agent-session/infrastructure/adapters/out/fs-resumability-checker';
 import { SqliteSessionRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-session-repository';
 import { SqliteTerminalRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-terminal-repository';
-import {
-  TerminalSubscribers,
-  TerminalSubscribersLive,
-  type TerminalSubscribersShape,
-} from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
+import { SessionFeedLive } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
 import { createPtyManager } from '#modules/agent-session/infrastructure/pty-manager';
 
 export interface AgentSessionServices {
@@ -30,7 +30,7 @@ export interface AgentSessionServices {
   sessionQueries: ReturnType<typeof createSessionQueriesUseCase>;
   checkResumability: ReturnType<typeof createCheckResumabilityUseCase>;
   ptyManager: AgentProcessShape;
-  terminalSubs: TerminalSubscribersShape;
+  terminalSubs: SessionFeedShape;
   startupOps: {
     cleanupOrphanedSessions: () => void;
     pruneOldSessions: () => void;
@@ -46,7 +46,7 @@ export class AgentSession extends ServiceMap.Service<AgentSession, AgentSessionS
 const AgentSessionInfraLive = Layer.mergeAll(
   FsResumabilityCheckerLive,
   AgentCatalogLive,
-  TerminalSubscribersLive,
+  SessionFeedLive,
   SqliteSessionRepositoryLive,
   SqliteTerminalRepositoryLive
 );
@@ -58,7 +58,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
     const agentCatalog = yield* AgentCatalog;
     const resumabilityChecker = yield* ResumabilityChecker;
     const eventPublisher = yield* SessionEventBus;
-    const terminalSubs = yield* TerminalSubscribers;
+    const terminalSubs = yield* SessionFeed;
     const cliChannel = yield* CliChannel;
 
     const sessionLifecycle = createSessionLifecycleUseCase({

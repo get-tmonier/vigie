@@ -1,12 +1,16 @@
-import { Data, Effect, Layer, ServiceMap } from 'effect';
+import { Data, Effect, Layer } from 'effect';
+import {
+  SessionFeed,
+  type SessionFeedShape,
+} from '#modules/agent-session/application/ports/out/session-feed.port';
 import type { SessionId } from '#shared/kernel/session/session-id';
 
-class TerminalSubscriberError extends Data.TaggedError('TerminalSubscriberError')<{
+class SessionFeedError extends Data.TaggedError('SessionFeedError')<{
   readonly message: string;
   readonly cause?: unknown;
 }> {}
 
-function createTerminalSubscribers(): TerminalSubscribersShape {
+function createSessionFeed(): SessionFeedShape {
   const subscribers = new Map<SessionId, Set<(data: string) => void>>();
 
   return {
@@ -29,8 +33,8 @@ function createTerminalSubscribers(): TerminalSubscribersShape {
           for (const cb of subs) {
             yield* Effect.try({
               try: () => cb(data),
-              catch: (cause) => new TerminalSubscriberError({ message: String(cause), cause }),
-            }).pipe(Effect.catch((err) => Effect.logError(`terminal subscriber error: ${err}`)));
+              catch: (cause) => new SessionFeedError({ message: String(cause), cause }),
+            }).pipe(Effect.catch((err) => Effect.logError(`session feed error: ${err}`)));
           }
         }
       });
@@ -41,17 +45,4 @@ function createTerminalSubscribers(): TerminalSubscribersShape {
   };
 }
 
-export type TerminalSubscribersShape = {
-  subscribe(sessionId: SessionId, callback: (data: string) => void): () => void;
-  publish(sessionId: SessionId, data: string): Effect.Effect<void>;
-  hasSubscribers(sessionId: SessionId): boolean;
-};
-
-export class TerminalSubscribers extends ServiceMap.Service<
-  TerminalSubscribers,
-  TerminalSubscribersShape
->()('@vigie/TerminalSubscribers') {}
-
-export const TerminalSubscribersLive = Layer.sync(TerminalSubscribers)(() =>
-  createTerminalSubscribers()
-);
+export const SessionFeedLive = Layer.sync(SessionFeed)(() => createSessionFeed());
