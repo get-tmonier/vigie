@@ -1,6 +1,7 @@
 import { Database } from 'bun:sqlite';
 import { existsSync } from 'node:fs';
 import { Console, Deferred, Duration, Effect, Exit } from 'effect';
+import { SessionId } from '#shared/kernel/agent-session/session-id';
 import { createKeybindInterceptor } from '#shared/lib/cli-terminal/keybind-interceptor';
 import {
   initStatusBar,
@@ -249,7 +250,7 @@ export function sessionAttachCommand(partialId: string) {
     // NOW send attach — handler is ready to receive replayed history immediately
     yield* client.send({
       type: 'session:attach',
-      sessionId: session.id,
+      sessionId: SessionId(session.id),
       cols,
       rows: rows_,
     });
@@ -329,7 +330,7 @@ export function sessionAttachCommand(partialId: string) {
     const triggerDetach = () => {
       Effect.runForkWith(services)(
         client
-          .send({ type: 'session:detach', sessionId: session.id })
+          .send({ type: 'session:detach', sessionId: SessionId(session.id) })
           .pipe(Effect.catch(() => Effect.void))
       );
       Effect.runForkWith(services)(Deferred.succeed(detachDeferred, undefined));
@@ -361,7 +362,12 @@ export function sessionAttachCommand(partialId: string) {
       // daemon does its own rows-1, so send full newRows
       Effect.runForkWith(services)(
         client
-          .send({ type: 'session:cli-resize', sessionId: session.id, cols: newCols, rows: newRows })
+          .send({
+            type: 'session:cli-resize',
+            sessionId: SessionId(session.id),
+            cols: newCols,
+            rows: newRows,
+          })
           .pipe(Effect.catch(() => Effect.void))
       );
     };

@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'bun:test';
 import * as v from 'valibot';
+import { SessionErrorSchema } from '#shared/kernel/agent-session/events';
+import { SessionId } from '#shared/kernel/agent-session/session-id';
+import { SessionOutputSchema } from '#shared/kernel/shell/events';
 import {
   DaemonToSessionSchema,
   SessionAttachSchema,
@@ -8,8 +11,6 @@ import {
   SessionDetachSchema,
   SessionDoneSchema,
   SessionErrorResponseSchema,
-  SessionErrorSchema,
-  SessionOutputSchema,
   SessionPtyExitedSchema,
   SessionPtyOutputSchema,
   SessionRegisteredSchema,
@@ -19,7 +20,7 @@ import {
   SessionSpawnInteractiveSchema,
   SessionStdinSchema,
   SessionToDaemonSchema,
-} from '#shell/application/contracts/ipc-protocol';
+} from '#shared/kernel/shell/ipc';
 
 describe('SessionToDaemon schemas', () => {
   it('parses session:register', () => {
@@ -73,7 +74,7 @@ describe('SessionToDaemon schemas', () => {
   it('parses session:deregister', () => {
     const msg = { type: 'session:deregister', sessionId: 'abc-123' };
     const result = v.parse(SessionDeregisterSchema, msg);
-    expect(result.sessionId).toBe('abc-123');
+    expect(result.sessionId).toBe(SessionId('abc-123'));
   });
 
   it('parses session:spawn-interactive', () => {
@@ -134,7 +135,7 @@ describe('SessionToDaemon schemas', () => {
   it('parses session:detach', () => {
     const msg = { type: 'session:detach', sessionId: 'abc-123' };
     const result = v.parse(SessionDetachSchema, msg);
-    expect(result.sessionId).toBe('abc-123');
+    expect(result.sessionId).toBe(SessionId('abc-123'));
   });
 
   it('parses session:attach', () => {
@@ -200,7 +201,7 @@ describe('DaemonToSession schemas', () => {
   it('parses session:registered', () => {
     const msg = { type: 'session:registered', sessionId: 'abc-123' };
     const result = v.parse(SessionRegisteredSchema, msg);
-    expect(result.sessionId).toBe('abc-123');
+    expect(result.sessionId).toBe(SessionId('abc-123'));
   });
 
   it('parses session:error-response', () => {
@@ -228,6 +229,7 @@ describe('DaemonToSession schemas', () => {
       type: 'session:spawn-failed',
       sessionId: 'abc-123',
       error: 'command not found',
+      timestamp: 1234,
     };
     const result = v.parse(SessionSpawnFailedSchema, msg);
     expect(result.error).toBe('command not found');

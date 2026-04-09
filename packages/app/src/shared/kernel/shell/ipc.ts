@@ -2,7 +2,10 @@ import * as v from 'valibot';
 import { AgentTypeSchema } from '#shared/kernel/agent-session/agent-type';
 import { SessionErrorSchema } from '#shared/kernel/agent-session/events';
 import { SessionIdSchema } from '#shared/kernel/agent-session/session-id';
+
 import { SessionOutputSchema, SessionSpawnFailedSchema } from '#shared/kernel/shell/events';
+
+export { SessionOutputSchema, SessionSpawnFailedSchema };
 
 // ── Session → Daemon ──
 

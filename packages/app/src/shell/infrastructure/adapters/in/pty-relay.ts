@@ -1,4 +1,5 @@
 import { Console, Deferred, Duration, Effect, Exit } from 'effect';
+import type { SessionId } from '#shared/kernel/agent-session/session-id';
 import { createKeybindInterceptor } from '#shared/lib/cli-terminal/keybind-interceptor';
 import {
   initStatusBar,
@@ -20,7 +21,7 @@ function formatDuration(ms: number): string {
 }
 
 interface PtyRelayOptions {
-  readonly sessionId: string;
+  readonly sessionId: SessionId;
   readonly skipHeader?: boolean;
   readonly startedAt?: number;
   readonly infoLine?: string;

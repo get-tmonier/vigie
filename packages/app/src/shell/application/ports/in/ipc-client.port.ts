@@ -1,5 +1,5 @@
 import type { Effect } from 'effect';
-import type { DaemonToSession, SessionToDaemon } from '#shell/application/contracts/ipc-protocol';
+import type { DaemonToSession, SessionToDaemon } from '#shared/kernel/shell/ipc';
 import type { IpcConnectionError } from '#shell/domain/errors';
 
 export type { IpcConnectionError } from '#shell/domain/errors';

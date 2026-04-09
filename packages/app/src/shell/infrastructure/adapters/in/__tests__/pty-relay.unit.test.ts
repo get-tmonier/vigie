@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, spyOn } from 'bun:test';
 import { ConfigProvider, Effect } from 'effect';
+import { SessionId } from '#shared/kernel/agent-session/session-id';
 import type { IpcClientShape } from '#shell/application/ports/in/ipc-client.port';
 import { attachPtyRelay } from '#shell/infrastructure/adapters/in/pty-relay';
 
@@ -47,7 +48,7 @@ describe('pty-relay: signal handlers', () => {
   async function startRelay(): Promise<void> {
     Effect.runPromise(
       attachPtyRelay(createMockClient(), {
-        sessionId: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+        sessionId: SessionId('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'),
       }).pipe(
         Effect.provide(
           ConfigProvider.layer(

@@ -1,13 +1,12 @@
 import { Effect } from 'effect';
 import * as Schema from 'effect/Schema';
-import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
+import type { SessionToDaemon } from '#shared/kernel/shell/ipc';
 import { expandPath } from '#shared/lib/path';
-import type { SessionToDaemon } from '#shell/application/contracts/ipc-protocol';
 import type { IpcConnection } from '#shell/application/ports/out/ipc-server.port';
 
 const encodeJson = Schema.encodeSync(Schema.UnknownFromJsonString);
 
-import type { SessionId } from '#modules/agent-session/domain/session-id';
+import type { SessionId } from '#shared/kernel/agent-session/session-id';
 
 interface IpcRouterDeps {
   spawnSession: {
@@ -67,7 +66,7 @@ export function createIpcRouter(
       switch (msg.type) {
         case 'session:register': {
           spawnSession.register({
-            sessionId: makeSessionId(msg.sessionId),
+            sessionId: msg.sessionId,
             agentType: msg.agentType,
             cwd: msg.cwd,
             mode: msg.mode as 'prompt' | 'interactive' | undefined,
@@ -82,7 +81,7 @@ export function createIpcRouter(
         case 'session:spawn-interactive': {
           const spawnResult = yield* Effect.result(
             spawnSession.spawnInteractive({
-              sessionId: makeSessionId(msg.sessionId),
+              sessionId: msg.sessionId,
               agentType: msg.agentType,
               cwd: expandPath(msg.cwd),
               cols: msg.cols,
@@ -111,27 +110,22 @@ export function createIpcRouter(
           break;
         }
         case 'session:stdin': {
-          terminalConnection.writeInput(makeSessionId(msg.sessionId), msg.data, 'cli');
+          terminalConnection.writeInput(msg.sessionId, msg.data, 'cli');
           break;
         }
         case 'session:cli-resize': {
-          terminalConnection.updateCliResize(
-            makeSessionId(msg.sessionId),
-            conn.id,
-            msg.cols,
-            msg.rows
-          );
+          terminalConnection.updateCliResize(msg.sessionId, conn.id, msg.cols, msg.rows);
           yield* Effect.logInfo(
             `[daemon] cli-resize sessionId=${msg.sessionId} cols=${msg.cols} rows=${msg.rows}`
           );
           break;
         }
         case 'session:detach': {
-          terminalConnection.detach(makeSessionId(msg.sessionId), conn.id);
+          terminalConnection.detach(msg.sessionId, conn.id);
           break;
         }
         case 'session:attach': {
-          const result = terminalConnection.attach(makeSessionId(msg.sessionId), conn.id, {
+          const result = terminalConnection.attach(msg.sessionId, conn.id, {
             cols: msg.cols,
             rows: msg.rows,
           });
@@ -175,18 +169,18 @@ export function createIpcRouter(
           break;
         }
         case 'session:done': {
-          sessionLifecycle.markEnded(makeSessionId(msg.sessionId), msg.exitCode);
+          sessionLifecycle.markEnded(msg.sessionId, msg.exitCode);
           yield* Effect.logInfo(`[daemon] Session done: ${msg.sessionId} (exit ${msg.exitCode})`);
           break;
         }
         case 'session:error': {
-          sessionLifecycle.markError(makeSessionId(msg.sessionId), msg.error);
+          sessionLifecycle.markError(msg.sessionId, msg.error);
           yield* Effect.logError(`[daemon] Session error: ${msg.sessionId}: ${msg.error}`);
           break;
         }
         case 'session:resume': {
           const resumeResult = yield* Effect.result(
-            spawnSession.resume(makeSessionId(msg.sessionId), {
+            spawnSession.resume(msg.sessionId, {
               cols: msg.cols,
               rows: msg.rows,
               connId: conn.id,
@@ -212,14 +206,14 @@ export function createIpcRouter(
           break;
         }
         case 'session:agent-id': {
-          sessionLifecycle.setAgentSessionId(makeSessionId(msg.sessionId), msg.agentSessionId);
+          sessionLifecycle.setAgentSessionId(msg.sessionId, msg.agentSessionId);
           yield* Effect.logInfo(
             `[daemon] Agent session ID detected for ${msg.sessionId}: ${msg.agentSessionId}`
           );
           break;
         }
         case 'session:deregister': {
-          sessionLifecycle.deregister(makeSessionId(msg.sessionId));
+          sessionLifecycle.deregister(msg.sessionId);
           break;
         }
       }

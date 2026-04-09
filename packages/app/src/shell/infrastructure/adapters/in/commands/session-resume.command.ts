@@ -1,6 +1,7 @@
 import { Database } from 'bun:sqlite';
 import { existsSync } from 'node:fs';
 import { Console, Effect } from 'effect';
+import { SessionId } from '#shared/kernel/agent-session/session-id';
 import { getGitContext } from '#shared/lib/git-context';
 import { DaemonNotRunningError } from '#shell/domain/errors';
 import { createBunProcessManager } from '#shell/infrastructure/adapters/out/bun-process-manager.adapter';
@@ -109,7 +110,7 @@ export function sessionResumeCommand(partialId: string) {
     if (agentSessionId) {
       yield* client.send({
         type: 'session:resume',
-        sessionId: session.id,
+        sessionId: SessionId(session.id),
         agentSessionId,
         cwd: session.cwd,
         cols,
@@ -121,7 +122,7 @@ export function sessionResumeCommand(partialId: string) {
     } else {
       yield* client.send({
         type: 'session:spawn-interactive',
-        sessionId: session.id,
+        sessionId: SessionId(session.id),
         agentType: session.agent_type as 'claude',
         cwd: session.cwd,
         cols,
@@ -139,7 +140,7 @@ export function sessionResumeCommand(partialId: string) {
       : `Previous session was too short-lived — fresh start`;
 
     const result = yield* attachPtyRelay(client, {
-      sessionId: session.id,
+      sessionId: SessionId(session.id),
       startedAt: Date.now(),
       infoLine,
     });

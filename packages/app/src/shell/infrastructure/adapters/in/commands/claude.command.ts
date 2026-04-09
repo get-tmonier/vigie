@@ -1,4 +1,5 @@
 import { Console, Effect, Stream } from 'effect';
+import { SessionId } from '#shared/kernel/agent-session/session-id';
 import { printChunk } from '#shared/lib/cli-terminal/chunk-printer';
 import { printHeader } from '#shared/lib/cli-terminal/header';
 import { printSessionSummary } from '#shared/lib/cli-terminal/status-bar';
@@ -22,7 +23,7 @@ export function claudeCommand(prompt: string) {
     }
 
     const cwd = process.cwd();
-    const sessionId = crypto.randomUUID();
+    const sessionId = SessionId(crypto.randomUUID());
     const gitCtx = yield* getGitContext(cwd);
 
     // Connect to daemon via IPC
