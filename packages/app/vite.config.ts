@@ -20,6 +20,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      '#pages': resolve(__dirname, 'src/pages'),
       '#modules': resolve(__dirname, 'src/modules'),
       '#shared/db': resolve(__dirname, 'src/shared/db'),
       '#shared/ssr': resolve(__dirname, 'src/shared/ssr'),
