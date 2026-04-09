@@ -3,7 +3,7 @@ import type { AgentRegistryShape } from '#modules/agent-session/application/port
 import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
-import type { SessionDomainEvent } from '#modules/agent-session/domain/events';
+import type { SessionLifecycleEvent } from '#modules/agent-session/domain/events';
 import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
 import type { PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
 
@@ -18,7 +18,7 @@ interface SessionLifecycleDeps {
 export function createSessionLifecycleUseCase(deps: SessionLifecycleDeps) {
   const { sessionRepo, resumabilityChecker, agentRegistry, eventPublisher, registry } = deps;
 
-  function publishEvents(events: SessionDomainEvent[]): Effect.Effect<void> {
+  function publishEvents(events: SessionLifecycleEvent[]): Effect.Effect<void> {
     return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
   }
 

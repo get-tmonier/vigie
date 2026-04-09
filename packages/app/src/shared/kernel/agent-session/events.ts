@@ -51,7 +51,7 @@ export type ResumableChanged = {
   readonly timestamp: number;
 };
 
-export type SessionDomainEvent =
+export type SessionLifecycleEvent =
   | SessionStarted
   | SessionEnded
   | SessionError
@@ -82,8 +82,8 @@ export type TerminalResizedEvent = {
   readonly rows: number;
 };
 
-export type AgentSessionEvent =
-  | SessionDomainEvent
+export type SessionEvent =
+  | SessionLifecycleEvent
   | TerminalOutputEvent
   | TerminalInputEchoEvent
   | TerminalResizedEvent;

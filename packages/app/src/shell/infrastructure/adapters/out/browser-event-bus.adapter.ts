@@ -1,6 +1,6 @@
 import { Data, Effect, Layer } from 'effect';
 import { DomainEventBus } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
-import type { AgentSessionEvent } from '#modules/agent-session/domain/events';
+import type { SessionEvent } from '#modules/agent-session/domain/events';
 import {
   type BrowserEvent,
   BrowserEventBus,
@@ -11,7 +11,7 @@ class BrowserEventBusError extends Data.TaggedError('BrowserEventBusError')<{
   readonly cause?: unknown;
 }> {}
 
-function domainEventToBrowserEvent(event: AgentSessionEvent): BrowserEvent | null {
+function domainEventToBrowserEvent(event: SessionEvent): BrowserEvent | null {
   switch (event.type) {
     case 'session:started':
       return {

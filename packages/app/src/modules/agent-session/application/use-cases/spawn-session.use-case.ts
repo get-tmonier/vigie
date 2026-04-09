@@ -8,7 +8,7 @@ import {
   CannotResumeSessionError,
   SessionNotFoundError,
 } from '#modules/agent-session/domain/errors';
-import type { SessionDomainEvent } from '#modules/agent-session/domain/events';
+import type { SessionLifecycleEvent } from '#modules/agent-session/domain/events';
 import { Session } from '#modules/agent-session/domain/session';
 import type { SessionId } from '#modules/agent-session/domain/session-id';
 import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
@@ -29,7 +29,7 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
   const { sessionRepo, ptySpawner, agentRegistry, eventPublisher, registry, setupPtyLifecycle } =
     deps;
 
-  function publishEvents(events: SessionDomainEvent[]): Effect.Effect<void> {
+  function publishEvents(events: SessionLifecycleEvent[]): Effect.Effect<void> {
     return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
   }
 

@@ -2,7 +2,7 @@ import { Effect } from 'effect';
 import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
-import type { SessionDomainEvent } from '#modules/agent-session/domain/events';
+import type { SessionLifecycleEvent } from '#modules/agent-session/domain/events';
 
 interface CheckResumabilityDeps {
   sessionRepo: SessionRepositoryShape;
@@ -13,7 +13,7 @@ interface CheckResumabilityDeps {
 export function createCheckResumabilityUseCase(deps: CheckResumabilityDeps) {
   const { sessionRepo, resumabilityChecker, eventPublisher } = deps;
 
-  function publishEvents(events: SessionDomainEvent[]): Effect.Effect<void> {
+  function publishEvents(events: SessionLifecycleEvent[]): Effect.Effect<void> {
     return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
   }
 

@@ -4,7 +4,7 @@ import type { DomainEventBusShape } from '#modules/agent-session/application/por
 import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
 import type { TerminalRepositoryShape } from '#modules/agent-session/application/ports/out/terminal-repository.port';
-import type { SessionDomainEvent } from '#modules/agent-session/domain/events';
+import type { SessionLifecycleEvent } from '#modules/agent-session/domain/events';
 import type { SessionId } from '#modules/agent-session/domain/session-id';
 import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
 import type { TerminalSubscribersShape } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
@@ -38,7 +38,7 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
 
   const inputLineBuffers = new Map<string, LineBuffer>();
 
-  function publishEvents(events: SessionDomainEvent[]): Effect.Effect<void> {
+  function publishEvents(events: SessionLifecycleEvent[]): Effect.Effect<void> {
     return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
   }
 

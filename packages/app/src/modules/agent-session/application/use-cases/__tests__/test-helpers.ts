@@ -4,7 +4,7 @@ import type {
   ResumableSessionInfo,
   SessionRepositoryShape,
 } from '#modules/agent-session/application/ports/out/session-repository.port';
-import type { AgentSessionEvent } from '#modules/agent-session/domain/events';
+import type { SessionEvent } from '#modules/agent-session/domain/events';
 import type { Session } from '#modules/agent-session/domain/session';
 
 export function makeSessionRepo(
@@ -49,8 +49,8 @@ export function makeSessionRepo(
   };
 }
 
-export function makeDomainEventBus(): DomainEventBusShape & { published: AgentSessionEvent[] } {
-  const published: AgentSessionEvent[] = [];
+export function makeDomainEventBus(): DomainEventBusShape & { published: SessionEvent[] } {
+  const published: SessionEvent[] = [];
   return {
     published,
     publish: (event) => {

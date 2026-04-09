@@ -4,7 +4,7 @@ import type { DomainEventBusShape } from '#modules/agent-session/application/por
 import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
 import { createSessionLifecycleUseCase } from '#modules/agent-session/application/use-cases/session-lifecycle.use-case';
-import type { AgentSessionEvent } from '#modules/agent-session/domain/events';
+import type { SessionEvent } from '#modules/agent-session/domain/events';
 import { Session } from '#modules/agent-session/domain/session';
 import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
 import type { PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
@@ -37,7 +37,7 @@ function makePtyRegistry(): PtyRegistry {
 
 function makeUseCase(overrides?: {
   sessionRepo?: SessionRepositoryShape & { store: Map<string, Session> };
-  eventPublisher?: DomainEventBusShape & { published: AgentSessionEvent[] };
+  eventPublisher?: DomainEventBusShape & { published: SessionEvent[] };
   agentRegistry?: AgentRegistryShape;
   resumabilityChecker?: ResumabilityCheckerShape;
   registry?: PtyRegistry;

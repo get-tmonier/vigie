@@ -1,7 +1,7 @@
-import type { AgentSessionEvent } from '#shared/kernel/agent-session/events';
+import type { SessionEvent } from '#shared/kernel/agent-session/events';
 import type { SessionId } from '#shared/kernel/agent-session/session-id';
 
-export type { AgentSessionEvent };
+export type { SessionEvent };
 
 export type DaemonSyncSession = {
   sessionId: string;
@@ -20,7 +20,7 @@ export type DaemonSyncSession = {
 };
 
 export type BrowserEvent =
-  | AgentSessionEvent
+  | SessionEvent
   | { type: 'daemon:hello'; hostname: string; pid: number; version: string }
   | {
       type: 'command:output';

@@ -1,6 +1,6 @@
 import { Data, Effect, Layer } from 'effect';
 import { DomainEventBus } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
-import type { AgentSessionEvent } from '#modules/agent-session/domain/events';
+import type { SessionEvent } from '#modules/agent-session/domain/events';
 
 class DomainEventBusError extends Data.TaggedError('DomainEventBusError')<{
   readonly message: string;
@@ -8,9 +8,9 @@ class DomainEventBusError extends Data.TaggedError('DomainEventBusError')<{
 }> {}
 
 export const DomainEventBusLive = Layer.sync(DomainEventBus)(() => {
-  const listeners = new Set<(event: AgentSessionEvent) => void>();
+  const listeners = new Set<(event: SessionEvent) => void>();
   return {
-    publish(event: AgentSessionEvent): Effect.Effect<void> {
+    publish(event: SessionEvent): Effect.Effect<void> {
       return Effect.gen(function* () {
         for (const listener of listeners) {
           yield* Effect.try({
@@ -20,7 +20,7 @@ export const DomainEventBusLive = Layer.sync(DomainEventBus)(() => {
         }
       });
     },
-    subscribe(listener: (event: AgentSessionEvent) => void): () => void {
+    subscribe(listener: (event: SessionEvent) => void): () => void {
       listeners.add(listener);
       return () => {
         listeners.delete(listener);
