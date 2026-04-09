@@ -2,13 +2,13 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { Effect, Layer } from 'effect';
 import { AgentSession, AgentSessionLive } from '#modules/agent-session/dependencies';
+import { createDashboardRoutes } from '#modules/agent-session/infrastructure/adapters/in/dashboard.routes';
 import { createSessionApiRoutes } from '#modules/agent-session/infrastructure/adapters/in/session.api-routes';
 import { createTerminalRoutes } from '#modules/agent-session/infrastructure/adapters/in/terminal.routes';
 import { makeDatabaseLayer } from '#shared/db/database';
 import { BrowserEventBus } from '#shell/application/ports/out/browser-event-bus.port';
 import { createRunDaemon } from '#shell/application/run-daemon';
 import { BrowserEventBusLive, cleanup, DaemonLive } from '#shell/dependencies';
-import { createDashboardRoutes } from '#shell/infrastructure/adapters/in/dashboard.routes';
 import { createEventsRoutes } from '#shell/infrastructure/adapters/in/events.routes';
 import { createRoutesLayer } from '#shell/infrastructure/server';
 
