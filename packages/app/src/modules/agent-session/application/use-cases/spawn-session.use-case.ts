@@ -1,7 +1,6 @@
 import { Effect } from 'effect';
 import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
-import type { PtySpawnerShape } from '#modules/agent-session/application/ports/out/pty-spawner.port';
 import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
 import type { AgentRunnerError } from '#modules/agent-session/domain/errors';
 import {
@@ -9,25 +8,22 @@ import {
   SessionNotFoundError,
 } from '#modules/agent-session/domain/errors';
 import { Session } from '#modules/agent-session/domain/session';
-import type { PtyEntry, PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
+import type { PtyManagerShape } from '#modules/agent-session/infrastructure/pty-manager.types';
 import type { AgentType } from '#shared/kernel/session/agent-type';
 import type { SessionLifecycleEvent } from '#shared/kernel/session/events';
 import type { SessionId } from '#shared/kernel/session/session-id';
 
 interface SpawnSessionDeps {
   sessionRepo: SessionRepositoryShape;
-  ptySpawner: PtySpawnerShape;
   agentRegistry: AgentRegistryShape;
   eventPublisher: DomainEventBusShape;
-  registry: PtyRegistry;
-  setupPtyLifecycle: (sessionId: SessionId, entry: PtyEntry) => void;
+  ptyManager: PtyManagerShape;
 }
 
 export type SpawnSessionShape = ReturnType<typeof createSpawnSessionUseCase>;
 
 export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
-  const { sessionRepo, ptySpawner, agentRegistry, eventPublisher, registry, setupPtyLifecycle } =
-    deps;
+  const { sessionRepo, agentRegistry, eventPublisher, ptyManager } = deps;
 
   function publishEvents(events: SessionLifecycleEvent[]): Effect.Effect<void> {
     return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
@@ -62,8 +58,7 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
         repoName: props.repoName,
       });
       sessionRepo.save(session);
-      registry.sessionConnections.set(props.sessionId, props.connId);
-      registry.connSessions.set(props.connId, props.sessionId);
+      ptyManager.trackConnection(props.sessionId, props.connId);
       fireAndForget(publishEvents(session.pullEvents()));
     },
 
@@ -102,25 +97,20 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
           agentSessionId,
           resume: props.resume,
         });
-        const handle = yield* ptySpawner.spawn(command, args, props.cwd, props.cols, props.rows);
 
-        const entry: PtyEntry = {
-          handle,
-          cliChannels: new Map(),
-          browserChannels: new Map(),
-          ptyDimensions: { cols: props.cols, rows: props.rows },
-        };
-        registry.ptyHandles.set(session.id, entry);
-
-        if (props.connId) {
-          registry.connSessions.set(props.connId, session.id);
-          entry.cliChannels.set(props.connId, { cols: props.cols, rows: props.rows });
-        }
+        const { pid } = yield* ptyManager.spawn({
+          sessionId: session.id,
+          command,
+          args,
+          cwd: props.cwd,
+          cols: props.cols,
+          rows: props.rows,
+          connId: props.connId,
+        });
 
         yield* Effect.forkChild(publishEvents(session.pullEvents()));
-        setupPtyLifecycle(session.id, entry);
 
-        return { sessionId: session.id, pid: handle.pid };
+        return { sessionId: session.id, pid };
       });
     },
 
@@ -150,25 +140,20 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
           agentSessionId: session.agentSessionId,
           resume: true,
         });
-        const handle = yield* ptySpawner.spawn(command, args, session.cwd, opts.cols, opts.rows);
 
-        const entry: PtyEntry = {
-          handle,
-          cliChannels: new Map(),
-          browserChannels: new Map(),
-          ptyDimensions: { cols: opts.cols, rows: opts.rows },
-        };
-        registry.ptyHandles.set(sessionId, entry);
-
-        if (opts.connId) {
-          registry.connSessions.set(opts.connId, sessionId);
-          entry.cliChannels.set(opts.connId, { cols: opts.cols, rows: opts.rows });
-        }
+        const { pid } = yield* ptyManager.spawn({
+          sessionId,
+          command,
+          args,
+          cwd: session.cwd,
+          cols: opts.cols,
+          rows: opts.rows,
+          connId: opts.connId,
+        });
 
         yield* Effect.forkChild(publishEvents(session.pullEvents()));
-        setupPtyLifecycle(sessionId, entry);
 
-        return { sessionId, pid: handle.pid };
+        return { sessionId, pid };
       });
     },
   };

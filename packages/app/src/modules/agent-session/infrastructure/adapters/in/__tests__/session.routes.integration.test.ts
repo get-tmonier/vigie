@@ -4,8 +4,8 @@ import * as HttpRouter from 'effect/unstable/http/HttpRouter';
 import type { SessionCleanupShape } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import type { SpawnSessionShape } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
-import type { TerminalConnectionShape } from '#modules/agent-session/application/use-cases/terminal-connection.use-case';
 import { Session } from '#modules/agent-session/domain/session';
+import type { PtyManagerShape } from '#modules/agent-session/infrastructure/pty-manager.types';
 import { SessionId } from '#shared/kernel/session/session-id';
 import { createSessionApiRoutes } from '../session.api-routes';
 
@@ -43,8 +43,8 @@ const fakeSessionCleanup: SessionCleanupShape = {
   deleteAllEnded: () => {},
 };
 
-const fakeTerminalConnection: TerminalConnectionShape = {
-  setupPtyLifecycle: () => {},
+const fakePtyManager: PtyManagerShape = {
+  spawn: () => Effect.succeed({ pid: 0 }),
   kill: () => {},
   killAll: () => {},
   getActivePid: () => null,
@@ -52,12 +52,14 @@ const fakeTerminalConnection: TerminalConnectionShape = {
   detach: () => {},
   updateCliResize: () => {},
   handleDisconnect: () => {},
-  writeInput: () => {},
-  applyResizePriority: () => null,
   addBrowserChannel: () => null,
   updateBrowserChannel: () => {},
   removeBrowserChannel: () => {},
+  writeInput: () => {},
   writeBinaryInput: () => {},
+  trackConnection: () => {},
+  getConnId: () => undefined,
+  clearConnection: () => {},
 };
 
 // --- Helper to build test handler ---
@@ -67,7 +69,7 @@ function buildHandler(sessions: Session[] = []) {
     spawnSession: fakeSpawnSession,
     sessionCleanup: fakeSessionCleanup,
     sessionQueries: fakeSessionQueries(sessions),
-    terminalConnection: fakeTerminalConnection,
+    ptyManager: fakePtyManager,
   };
   const routes = createSessionApiRoutes(deps);
   const appLayer = Layer.mergeAll(HttpRouter.layer, HttpRouter.addAll(routes));

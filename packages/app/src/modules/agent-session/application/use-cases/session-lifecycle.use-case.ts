@@ -3,7 +3,6 @@ import type { AgentRegistryShape } from '#modules/agent-session/application/port
 import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
-import type { PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
 import type { SessionLifecycleEvent } from '#shared/kernel/session/events';
 import type { SessionId } from '#shared/kernel/session/session-id';
 
@@ -12,11 +11,10 @@ interface SessionLifecycleDeps {
   resumabilityChecker: ResumabilityCheckerShape;
   agentRegistry: AgentRegistryShape;
   eventPublisher: DomainEventBusShape;
-  registry: PtyRegistry;
 }
 
 export function createSessionLifecycleUseCase(deps: SessionLifecycleDeps) {
-  const { sessionRepo, resumabilityChecker, agentRegistry, eventPublisher, registry } = deps;
+  const { sessionRepo, resumabilityChecker, agentRegistry, eventPublisher } = deps;
 
   function publishEvents(events: SessionLifecycleEvent[]): Effect.Effect<void> {
     return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
@@ -64,17 +62,11 @@ export function createSessionLifecycleUseCase(deps: SessionLifecycleDeps) {
 
     deregister(sessionId: SessionId): void {
       const session = sessionRepo.findById(sessionId);
-      if (session) {
+      if (session?.isActive) {
         session.markEnded(0, false);
         sessionRepo.save(session);
         fireAndForget(publishEvents(session.pullEvents()));
       }
-
-      const connId = registry.sessionConnections.get(sessionId);
-      if (connId) {
-        registry.connSessions.delete(connId);
-      }
-      registry.sessionConnections.delete(sessionId);
     },
   };
 }

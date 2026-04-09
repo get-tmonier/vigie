@@ -15,14 +15,14 @@ import type { createRoutesLayer } from '#shell/infrastructure/server';
 
 type RunDaemonDeps = Pick<
   AgentSessionServices,
-  'startupOps' | 'spawnSession' | 'sessionLifecycle' | 'terminalConnection'
+  'startupOps' | 'spawnSession' | 'sessionLifecycle' | 'ptyManager'
 > & {
   appRoutes: ReturnType<typeof createRoutesLayer>;
   cleanup: (config: DaemonConfigShape) => void;
 };
 
 export function createRunDaemon(deps: RunDaemonDeps) {
-  const { startupOps, spawnSession, sessionLifecycle, terminalConnection, cleanup } = deps;
+  const { startupOps, spawnSession, sessionLifecycle, ptyManager, cleanup } = deps;
 
   return Effect.gen(function* () {
     const config = yield* DaemonConfig;
@@ -108,9 +108,9 @@ export function createRunDaemon(deps: RunDaemonDeps) {
     if (existsSync(config.socketPath)) unlinkSync(config.socketPath);
     if (existsSync(config.stdinSocketPath)) unlinkSync(config.stdinSocketPath);
 
-    const router = createIpcRouter({ spawnSession, sessionLifecycle, terminalConnection });
+    const router = createIpcRouter({ spawnSession, sessionLifecycle, ptyManager });
     yield* ipcServer.start(config.socketPath, router, (connId) =>
-      Effect.sync(() => terminalConnection.handleDisconnect(connId))
+      Effect.sync(() => ptyManager.handleDisconnect(connId))
     );
 
     yield* Effect.logInfo(`[daemon] IPC server listening on ${config.socketPath}`);
@@ -131,7 +131,7 @@ export function createRunDaemon(deps: RunDaemonDeps) {
               continue;
             }
             if (parsed.sessionId && parsed.data) {
-              terminalConnection.writeInput(makeSessionId(parsed.sessionId), parsed.data, 'cli');
+              ptyManager.writeInput(makeSessionId(parsed.sessionId), parsed.data, 'cli');
             }
           }
         },

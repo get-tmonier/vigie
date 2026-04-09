@@ -30,7 +30,7 @@ export const runDaemon = Effect.gen(function* () {
     spawnSession: agentSession.spawnSession,
     sessionCleanup: agentSession.sessionCleanup,
     sessionQueries: agentSession.sessionQueries,
-    terminalConnection: agentSession.terminalConnection,
+    ptyManager: agentSession.ptyManager,
   });
 
   const dashboardRoutes = createDashboardRoutes({
@@ -44,7 +44,7 @@ export const runDaemon = Effect.gen(function* () {
 
   const terminalRoutes = createTerminalRoutes({
     sessionQueries: agentSession.sessionQueries,
-    terminalConnection: agentSession.terminalConnection,
+    ptyManager: agentSession.ptyManager,
     terminalSubs: agentSession.terminalSubs,
   });
 
@@ -56,7 +56,7 @@ export const runDaemon = Effect.gen(function* () {
     startupOps: agentSession.startupOps,
     spawnSession: agentSession.spawnSession,
     sessionLifecycle: agentSession.sessionLifecycle,
-    terminalConnection: agentSession.terminalConnection,
+    ptyManager: agentSession.ptyManager,
     appRoutes,
     cleanup,
   });

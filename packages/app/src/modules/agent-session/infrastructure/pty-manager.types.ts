@@ -22,7 +22,7 @@ export interface PtyEntry {
 
 // --- Injected spawn function ---
 
-type PtySpawnFn = (
+export type PtySpawnFn = (
   command: string,
   args: string[],
   cwd: string,
@@ -32,16 +32,17 @@ type PtySpawnFn = (
 
 // --- Callbacks for domain notifications ---
 
-interface PtyManagerCallbacks {
+export interface PtyManagerCallbacks {
   onOutput(sessionId: SessionId, base64: string, ts: number): void;
   onProcessExited(sessionId: SessionId, exitCode: number): void;
   onResized(sessionId: SessionId, cols: number, rows: number): void;
+  onInputEcho(sessionId: SessionId, text: string, source: 'cli' | 'browser', ts: number): void;
   sendToCliClient(connId: string, msg: string): void;
 }
 
 // --- Public shape ---
 
-interface PtyManagerShape {
+export interface PtyManagerShape {
   // Spawn & lifecycle
   spawn(opts: {
     sessionId: SessionId;

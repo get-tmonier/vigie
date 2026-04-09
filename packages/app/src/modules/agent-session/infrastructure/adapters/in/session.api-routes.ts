@@ -9,9 +9,9 @@ import * as v from 'valibot';
 import type { SessionCleanupShape } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import type { SpawnSessionShape } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
-import type { TerminalConnectionShape } from '#modules/agent-session/application/use-cases/terminal-connection.use-case';
 import { SpawnSessionRequestSchema } from '#modules/agent-session/infrastructure/adapters/in/session.dto';
 import { sessionToDTO } from '#modules/agent-session/infrastructure/adapters/in/session.mapper';
+import type { PtyManagerShape } from '#modules/agent-session/infrastructure/pty-manager.types';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 import { expandPath } from '#shared/lib/path';
 
@@ -19,7 +19,7 @@ type SessionApiRouteDeps = {
   spawnSession: SpawnSessionShape;
   sessionCleanup: SessionCleanupShape;
   sessionQueries: SessionQueriesShape;
-  terminalConnection: TerminalConnectionShape;
+  ptyManager: PtyManagerShape;
 };
 
 type RouteError = HttpServerError.HttpServerError | Socket.SocketError | Cause.UnknownError;
@@ -64,7 +64,7 @@ const jsonRoute = <E>(
 export function createSessionApiRoutes(
   deps: SessionApiRouteDeps
 ): HttpRouter.Route<RouteError, never>[] {
-  const { spawnSession, sessionCleanup, sessionQueries, terminalConnection } = deps;
+  const { spawnSession, sessionCleanup, sessionQueries, ptyManager } = deps;
 
   return [
     HttpRouter.route(
@@ -112,14 +112,14 @@ export function createSessionApiRoutes(
           return HttpServerResponse.jsonUnsafe({ error: 'Missing session ID' }, { status: 400 });
         }
         const sessionId = makeSessionId(rawSessionId);
-        const pid = terminalConnection.getActivePid(sessionId);
+        const pid = ptyManager.getActivePid(sessionId);
         if (pid === null) {
           return HttpServerResponse.jsonUnsafe(
             { error: 'Session not found or not active' },
             { status: 404 }
           );
         }
-        terminalConnection.kill(sessionId);
+        ptyManager.kill(sessionId);
         return HttpServerResponse.jsonUnsafe({ ok: true });
       })
     ),
@@ -195,7 +195,7 @@ export function createSessionApiRoutes(
       'POST',
       '/api/sessions/kill-all',
       Effect.sync(() => {
-        terminalConnection.killAll();
+        ptyManager.killAll();
         return HttpServerResponse.jsonUnsafe({ killedCount: -1 });
       })
     ),

@@ -6,13 +6,13 @@ import * as HttpServerRequest from 'effect/unstable/http/HttpServerRequest';
 import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse';
 import type * as Socket from 'effect/unstable/socket/Socket';
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
-import type { TerminalConnectionShape } from '#modules/agent-session/application/use-cases/terminal-connection.use-case';
 import type { TerminalSubscribersShape } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
+import type { PtyManagerShape } from '#modules/agent-session/infrastructure/pty-manager.types';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 
 type TerminalRouteDeps = {
   sessionQueries: SessionQueriesShape;
-  terminalConnection: TerminalConnectionShape;
+  ptyManager: PtyManagerShape;
   terminalSubs: TerminalSubscribersShape;
 };
 
@@ -21,7 +21,7 @@ type RouteError = HttpServerError.HttpServerError | Socket.SocketError | Cause.U
 export function createTerminalRoutes(
   deps: TerminalRouteDeps
 ): HttpRouter.Route<RouteError, never>[] {
-  const { sessionQueries, terminalConnection, terminalSubs } = deps;
+  const { sessionQueries, ptyManager, terminalSubs } = deps;
 
   return [
     HttpRouter.route(
@@ -79,7 +79,7 @@ export function createTerminalRoutes(
           yield* write(payload);
         }
 
-        terminalConnection.addBrowserChannel(sessionId, browserConnId, { cols: 120, rows: 30 });
+        ptyManager.addBrowserChannel(sessionId, browserConnId, { cols: 120, rows: 30 });
 
         const services = yield* Effect.services();
         const unsub = terminalSubs.subscribe(sessionId, (data: string) => {
@@ -100,19 +100,19 @@ export function createTerminalRoutes(
                 typeof parsed.cols === 'number' &&
                 typeof parsed.rows === 'number'
               ) {
-                terminalConnection.updateBrowserChannel(sessionId, browserConnId, {
+                ptyManager.updateBrowserChannel(sessionId, browserConnId, {
                   cols: parsed.cols,
                   rows: parsed.rows,
                 });
               }
             } catch {}
           } else if (message.length > 0) {
-            terminalConnection.writeBinaryInput(sessionId, message);
+            ptyManager.writeBinaryInput(sessionId, message);
           }
         });
 
         unsub();
-        terminalConnection.removeBrowserChannel(sessionId, browserConnId);
+        ptyManager.removeBrowserChannel(sessionId, browserConnId);
 
         return HttpServerResponse.empty();
       })

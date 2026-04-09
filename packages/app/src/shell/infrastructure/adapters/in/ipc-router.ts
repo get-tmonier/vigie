@@ -44,7 +44,7 @@ interface IpcRouterDeps {
     setAgentSessionId(sessionId: SessionId, agentSessionId: string): void;
     deregister(sessionId: SessionId): void;
   };
-  terminalConnection: {
+  ptyManager: {
     writeInput(sessionId: SessionId, data: string, source: 'cli' | 'browser'): void;
     updateCliResize(sessionId: SessionId, connId: string, cols: number, rows: number): void;
     handleDisconnect(connId: string): void;
@@ -54,13 +54,14 @@ interface IpcRouterDeps {
       connId: string,
       dims: { cols: number; rows: number }
     ): { chunks: Array<{ data: string }>; pid: number } | null;
+    clearConnection(connId: string): void;
   };
 }
 
 export function createIpcRouter(
   deps: IpcRouterDeps
 ): (conn: IpcConnection, msg: SessionToDaemon) => Effect.Effect<void> {
-  const { spawnSession, sessionLifecycle, terminalConnection } = deps;
+  const { spawnSession, sessionLifecycle, ptyManager } = deps;
 
   return (conn, msg) =>
     Effect.gen(function* () {
@@ -111,22 +112,22 @@ export function createIpcRouter(
           break;
         }
         case 'session:stdin': {
-          terminalConnection.writeInput(msg.sessionId, msg.data, 'cli');
+          ptyManager.writeInput(msg.sessionId, msg.data, 'cli');
           break;
         }
         case 'session:cli-resize': {
-          terminalConnection.updateCliResize(msg.sessionId, conn.id, msg.cols, msg.rows);
+          ptyManager.updateCliResize(msg.sessionId, conn.id, msg.cols, msg.rows);
           yield* Effect.logInfo(
             `[daemon] cli-resize sessionId=${msg.sessionId} cols=${msg.cols} rows=${msg.rows}`
           );
           break;
         }
         case 'session:detach': {
-          terminalConnection.detach(msg.sessionId, conn.id);
+          ptyManager.detach(msg.sessionId, conn.id);
           break;
         }
         case 'session:attach': {
-          const result = terminalConnection.attach(msg.sessionId, conn.id, {
+          const result = ptyManager.attach(msg.sessionId, conn.id, {
             cols: msg.cols,
             rows: msg.rows,
           });
@@ -215,6 +216,7 @@ export function createIpcRouter(
         }
         case 'session:deregister': {
           sessionLifecycle.deregister(msg.sessionId);
+          ptyManager.clearConnection(conn.id);
           break;
         }
       }

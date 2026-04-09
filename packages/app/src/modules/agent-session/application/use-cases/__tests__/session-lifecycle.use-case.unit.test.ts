@@ -5,7 +5,6 @@ import type { ResumabilityCheckerShape } from '#modules/agent-session/applicatio
 import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
 import { createSessionLifecycleUseCase } from '#modules/agent-session/application/use-cases/session-lifecycle.use-case';
 import { Session } from '#modules/agent-session/domain/session';
-import type { PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
 import type { SessionEvent } from '#shared/kernel/session/events';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 import { makeDomainEventBus, makeSessionRepo } from './test-helpers';
@@ -27,20 +26,11 @@ function makeResumabilityChecker(resumable = false): ResumabilityCheckerShape {
   };
 }
 
-function makePtyRegistry(): PtyRegistry {
-  return {
-    ptyHandles: new Map(),
-    sessionConnections: new Map(),
-    connSessions: new Map(),
-  };
-}
-
 function makeUseCase(overrides?: {
   sessionRepo?: SessionRepositoryShape & { store: Map<string, Session> };
   eventPublisher?: DomainEventBusShape & { published: SessionEvent[] };
   agentRegistry?: AgentRegistryShape;
   resumabilityChecker?: ResumabilityCheckerShape;
-  registry?: PtyRegistry;
 }) {
   const sessionRepo = overrides?.sessionRepo ?? makeSessionRepo();
   const eventPublisher = overrides?.eventPublisher ?? makeDomainEventBus();
@@ -52,7 +42,6 @@ function makeUseCase(overrides?: {
       resumabilityChecker: overrides?.resumabilityChecker ?? makeResumabilityChecker(),
       agentRegistry: overrides?.agentRegistry ?? makeAgentRegistry(),
       eventPublisher,
-      registry: overrides?.registry ?? makePtyRegistry(),
     }),
   };
 }
@@ -141,44 +130,30 @@ describe('SessionLifecycleUseCase.setAgentSessionId', () => {
 describe('SessionLifecycleUseCase.deregister', () => {
   it('marks session ended with exit code 0', async () => {
     const sessionRepo = makeSessionRepo();
-    const registry = makePtyRegistry();
     const session = Session.create({ id: 'sess-1', agentType: 'claude', cwd: '/tmp' });
     session.pullEvents();
     sessionRepo.save(session);
-    registry.sessionConnections.set(makeSessionId('sess-1'), 'conn-1');
-    registry.connSessions.set('conn-1', makeSessionId('sess-1'));
 
-    const { useCase } = makeUseCase({ sessionRepo, registry });
+    const { useCase } = makeUseCase({ sessionRepo });
     useCase.deregister(makeSessionId('sess-1'));
 
     await new Promise((r) => setTimeout(r, 10));
     expect(sessionRepo.findById(makeSessionId('sess-1'))?.status).toBe('ended');
   });
 
-  it('cleans up registry connections', () => {
-    const sessionRepo = makeSessionRepo();
-    const registry = makePtyRegistry();
-    const session = Session.create({ id: 'sess-1', agentType: 'claude', cwd: '/tmp' });
-    session.pullEvents();
-    sessionRepo.save(session);
-    registry.sessionConnections.set(makeSessionId('sess-1'), 'conn-1');
-    registry.connSessions.set('conn-1', makeSessionId('sess-1'));
-
-    const { useCase } = makeUseCase({ sessionRepo, registry });
-    useCase.deregister(makeSessionId('sess-1'));
-
-    expect(registry.sessionConnections.has(makeSessionId('sess-1'))).toBe(false);
-    expect(registry.connSessions.has('conn-1')).toBe(false);
+  it('is a no-op when session does not exist', () => {
+    const { useCase } = makeUseCase();
+    expect(() => useCase.deregister(makeSessionId('nonexistent'))).not.toThrow();
   });
 
-  it('cleans registry even if session not found', () => {
-    const registry = makePtyRegistry();
-    registry.sessionConnections.set(makeSessionId('sess-orphan'), 'conn-orphan');
-    registry.connSessions.set('conn-orphan', makeSessionId('sess-orphan'));
+  it('is a no-op when session is already ended', () => {
+    const sessionRepo = makeSessionRepo();
+    const session = Session.create({ id: 'sess-1', agentType: 'claude', cwd: '/tmp' });
+    session.markEnded(0, false);
+    session.pullEvents();
+    sessionRepo.save(session);
 
-    const { useCase } = makeUseCase({ registry });
-    useCase.deregister(makeSessionId('sess-orphan'));
-
-    expect(registry.sessionConnections.has(makeSessionId('sess-orphan'))).toBe(false);
+    const { useCase } = makeUseCase({ sessionRepo });
+    expect(() => useCase.deregister(makeSessionId('sess-1'))).not.toThrow();
   });
 });
