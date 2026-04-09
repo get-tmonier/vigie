@@ -1,10 +1,10 @@
 import { ServiceMap } from 'effect';
-import type { BrowserEvent } from '#shared/contracts/browser-events';
+import type { VigieEvent } from '#shared/contracts/vigie-events';
 
-export type { BrowserEvent } from '#shared/contracts/browser-events';
+export type { VigieEvent } from '#shared/contracts/vigie-events';
 
 export interface BrowserEventBusShape {
-  subscribe(listener: (event: BrowserEvent) => void): () => void;
+  subscribe(listener: (event: VigieEvent) => void): () => void;
 }
 
 export class BrowserEventBus extends ServiceMap.Service<BrowserEventBus, BrowserEventBusShape>()(

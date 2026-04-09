@@ -4,4 +4,4 @@ import type { ShellEvent } from '#shared/kernel/shell/events';
 export type { SessionEvent } from '#shared/kernel/agent-session/events';
 export type { ShellEvent } from '#shared/kernel/shell/events';
 
-export type BrowserEvent = SessionEvent | ShellEvent;
+export type VigieEvent = SessionEvent | ShellEvent;
