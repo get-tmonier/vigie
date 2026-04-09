@@ -1,12 +1,12 @@
 import { Effect } from 'effect';
-import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
+import type { SessionEventBusShape } from '#modules/agent-session/application/ports/out/session-event-bus.port';
 import type { SessionStoreShape } from '#modules/agent-session/application/ports/out/session-store.port';
 import type { SessionLifecycleEvent } from '#shared/kernel/session/events';
 import type { SessionId } from '#shared/kernel/session/session-id';
 
 interface SessionCleanupDeps {
   sessionRepo: SessionStoreShape;
-  eventPublisher: DomainEventBusShape;
+  eventPublisher: SessionEventBusShape;
 }
 
 export type SessionCleanupShape = ReturnType<typeof createSessionCleanupUseCase>;

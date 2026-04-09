@@ -1,13 +1,13 @@
 import { Effect } from 'effect';
-import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
+import type { SessionEventBusShape } from '#modules/agent-session/application/ports/out/session-event-bus.port';
 import type { SessionStoreShape } from '#modules/agent-session/application/ports/out/session-store.port';
 import type { SessionLifecycleEvent } from '#shared/kernel/session/events';
 
 interface CheckResumabilityDeps {
   sessionRepo: SessionStoreShape;
   resumabilityChecker: ResumabilityCheckerShape;
-  eventPublisher: DomainEventBusShape;
+  eventPublisher: SessionEventBusShape;
 }
 
 export function createCheckResumabilityUseCase(deps: CheckResumabilityDeps) {

@@ -1,7 +1,7 @@
 import { Effect, Layer, ServiceMap } from 'effect';
 import { AgentRegistry } from '#modules/agent-session/application/ports/out/agent-adapter.port';
-import { DomainEventBus } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import { ResumabilityChecker } from '#modules/agent-session/application/ports/out/resumability-checker.port';
+import { SessionEventBus } from '#modules/agent-session/application/ports/out/session-event-bus.port';
 import { SessionLog } from '#modules/agent-session/application/ports/out/session-log.port';
 import { SessionSink } from '#modules/agent-session/application/ports/out/session-sink.port';
 import { SessionStore } from '#modules/agent-session/application/ports/out/session-store.port';
@@ -57,7 +57,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
     const sessionLog = yield* SessionLog;
     const agentRegistry = yield* AgentRegistry;
     const resumabilityChecker = yield* ResumabilityChecker;
-    const eventPublisher = yield* DomainEventBus;
+    const eventPublisher = yield* SessionEventBus;
     const terminalSubs = yield* TerminalSubscribers;
     const sessionSink = yield* SessionSink;
 
