@@ -50,7 +50,7 @@ export function makeSessionRepo(
   };
 }
 
-export function makeDomainEventBus(): SessionEventBusShape & { published: SessionEvent[] } {
+export function makeSessionEventBus(): SessionEventBusShape & { published: SessionEvent[] } {
   const published: SessionEvent[] = [];
   return {
     published,

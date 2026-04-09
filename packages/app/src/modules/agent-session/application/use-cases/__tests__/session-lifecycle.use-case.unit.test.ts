@@ -7,7 +7,7 @@ import { createSessionLifecycleUseCase } from '#modules/agent-session/applicatio
 import { Session } from '#modules/agent-session/domain/session';
 import type { SessionEvent } from '#shared/kernel/session/events';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
-import { makeDomainEventBus, makeSessionRepo } from './test-helpers';
+import { makeSessionEventBus, makeSessionRepo } from './test-helpers';
 
 function makeAgentRegistry(canResume = false): AgentRegistryShape {
   return {
@@ -33,7 +33,7 @@ function makeUseCase(overrides?: {
   resumabilityChecker?: ResumabilityCheckerShape;
 }) {
   const sessionRepo = overrides?.sessionRepo ?? makeSessionRepo();
-  const eventPublisher = overrides?.eventPublisher ?? makeDomainEventBus();
+  const eventPublisher = overrides?.eventPublisher ?? makeSessionEventBus();
   return {
     sessionRepo,
     eventPublisher,

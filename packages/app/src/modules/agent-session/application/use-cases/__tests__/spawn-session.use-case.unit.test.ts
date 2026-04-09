@@ -9,7 +9,7 @@ import {
 import { Session } from '#modules/agent-session/domain/session';
 import type { PtyManagerShape } from '#modules/agent-session/infrastructure/pty-manager.types';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
-import { makeDomainEventBus, makeSessionRepo } from './test-helpers';
+import { makeSessionEventBus, makeSessionRepo } from './test-helpers';
 
 function makeAgentRegistry(canResume = false, detectSessionId = false): AgentRegistryShape {
   return {
@@ -69,7 +69,7 @@ describe('SpawnSessionUseCase.register', () => {
     const useCase = createSpawnSessionUseCase({
       sessionRepo,
       agentRegistry: makeAgentRegistry(),
-      eventPublisher: makeDomainEventBus(),
+      eventPublisher: makeSessionEventBus(),
       ptyManager: makePtyManager(),
     });
 
@@ -88,7 +88,7 @@ describe('SpawnSessionUseCase.register', () => {
     const useCase = createSpawnSessionUseCase({
       sessionRepo: makeSessionRepo(),
       agentRegistry: makeAgentRegistry(),
-      eventPublisher: makeDomainEventBus(),
+      eventPublisher: makeSessionEventBus(),
       ptyManager,
     });
 
@@ -108,7 +108,7 @@ describe('SpawnSessionUseCase.spawnInteractive', () => {
     const useCase = createSpawnSessionUseCase({
       sessionRepo: makeSessionRepo(),
       agentRegistry: makeAgentRegistry(),
-      eventPublisher: makeDomainEventBus(),
+      eventPublisher: makeSessionEventBus(),
       ptyManager: makePtyManager(),
     });
 
@@ -130,7 +130,7 @@ describe('SpawnSessionUseCase.spawnInteractive', () => {
     const useCase = createSpawnSessionUseCase({
       sessionRepo,
       agentRegistry: makeAgentRegistry(false, true),
-      eventPublisher: makeDomainEventBus(),
+      eventPublisher: makeSessionEventBus(),
       ptyManager: makePtyManager(),
     });
 
@@ -153,7 +153,7 @@ describe('SpawnSessionUseCase.spawnInteractive', () => {
     const useCase = createSpawnSessionUseCase({
       sessionRepo,
       agentRegistry: makeAgentRegistry(),
-      eventPublisher: makeDomainEventBus(),
+      eventPublisher: makeSessionEventBus(),
       ptyManager: makePtyManager(),
     });
 
@@ -175,7 +175,7 @@ describe('SpawnSessionUseCase.spawnInteractive', () => {
     const useCase = createSpawnSessionUseCase({
       sessionRepo: makeSessionRepo(),
       agentRegistry: makeAgentRegistry(),
-      eventPublisher: makeDomainEventBus(),
+      eventPublisher: makeSessionEventBus(),
       ptyManager,
     });
 
@@ -198,7 +198,7 @@ describe('SpawnSessionUseCase.resume', () => {
     const useCase = createSpawnSessionUseCase({
       sessionRepo: makeSessionRepo(),
       agentRegistry: makeAgentRegistry(true),
-      eventPublisher: makeDomainEventBus(),
+      eventPublisher: makeSessionEventBus(),
       ptyManager: makePtyManager(),
     });
 
@@ -222,7 +222,7 @@ describe('SpawnSessionUseCase.resume', () => {
     const useCase = createSpawnSessionUseCase({
       sessionRepo,
       agentRegistry: makeAgentRegistry(true),
-      eventPublisher: makeDomainEventBus(),
+      eventPublisher: makeSessionEventBus(),
       ptyManager: makePtyManager(),
     });
 
@@ -247,7 +247,7 @@ describe('SpawnSessionUseCase.resume', () => {
     const useCase = createSpawnSessionUseCase({
       sessionRepo,
       agentRegistry: makeAgentRegistry(true),
-      eventPublisher: makeDomainEventBus(),
+      eventPublisher: makeSessionEventBus(),
       ptyManager: makePtyManager(),
     });
 

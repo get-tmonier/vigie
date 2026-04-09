@@ -4,7 +4,7 @@ import { Effect, Layer } from 'effect';
 import { AgentSession, AgentSessionLive } from '#modules/agent-session/dependencies';
 import { createSessionApiRoutes } from '#modules/agent-session/infrastructure/adapters/in/session.api-routes';
 import { createTerminalRoutes } from '#modules/agent-session/infrastructure/adapters/in/terminal.routes';
-import { SessionEventBusLive } from '#modules/agent-session/infrastructure/adapters/out/domain-event-bus.adapter';
+import { SessionEventBusLive } from '#modules/agent-session/infrastructure/adapters/out/session-event-bus.adapter';
 import { createDashboardRoutes } from '#pages/dashboard.page';
 import { makeDatabaseLayer } from '#shared/db/database';
 import { BrowserEventBus } from '#shell/application/ports/out/browser-event-bus.port';
