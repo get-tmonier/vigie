@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import type { AgentSession } from '#modules/agent-session/infrastructure/adapters/in/session.dto';
+import type { BrowserEvent } from '#shared/contracts/browser-events';
 import { cn } from '#shared/lib/cn';
 import { DashboardLayout } from '#shared/ui/DashboardLayout';
 import { Header } from '#shared/ui/Header';
@@ -11,20 +12,7 @@ import { SpawnSessionFormIsland } from './SpawnSessionForm.island';
 import { sessionsSlice } from './sessions.slice';
 import { type AppDispatch, homedir, type RootState, store } from './store';
 
-type WsEvent =
-  | { type: 'snapshot'; sessions: AgentSession[] }
-  | { type: 'session:started'; sessionId: string; timestamp: number }
-  | {
-      type: 'session:ended';
-      sessionId: string;
-      exitCode?: number;
-      resumable: boolean;
-      timestamp: number;
-    }
-  | { type: 'session:deleted'; sessionId: string; timestamp: number }
-  | { type: 'sessions:cleared'; timestamp: number }
-  | { type: 'session:resumable-changed'; sessionId: string; resumable: boolean; timestamp: number }
-  | { type: string };
+type WsMessage = { type: 'snapshot'; sessions: AgentSession[] } | BrowserEvent;
 
 function useSessionEvents(dispatch: AppDispatch) {
   const mountedRef = useRef(true);
@@ -41,9 +29,9 @@ function useSessionEvents(dispatch: AppDispatch) {
       ws.addEventListener('message', (e) => {
         if (!mountedRef.current || typeof e.data !== 'string') return;
         try {
-          const event = JSON.parse(e.data) as WsEvent;
+          const event = JSON.parse(e.data) as WsMessage;
           if (event.type === 'snapshot') {
-            const e = event as Extract<WsEvent, { type: 'snapshot' }>;
+            const e = event as Extract<WsMessage, { type: 'snapshot' }>;
             dispatch(sessionsSlice.actions.snapshotReceived(e.sessions));
           } else if (event.type === 'session:started') {
             fetch('/api/sessions')
@@ -53,7 +41,7 @@ function useSessionEvents(dispatch: AppDispatch) {
               )
               .catch(() => {});
           } else if (event.type === 'session:ended') {
-            const e = event as Extract<WsEvent, { type: 'session:ended' }>;
+            const e = event as Extract<WsMessage, { type: 'session:ended' }>;
             dispatch(
               sessionsSlice.actions.sessionEnded({
                 sessionId: e.sessionId,
@@ -62,12 +50,12 @@ function useSessionEvents(dispatch: AppDispatch) {
               })
             );
           } else if (event.type === 'session:deleted') {
-            const e = event as Extract<WsEvent, { type: 'session:deleted' }>;
+            const e = event as Extract<WsMessage, { type: 'session:deleted' }>;
             dispatch(sessionsSlice.actions.sessionRemoved(e.sessionId));
           } else if (event.type === 'sessions:cleared') {
             dispatch(sessionsSlice.actions.endedSessionsCleared());
           } else if (event.type === 'session:resumable-changed') {
-            const e = event as Extract<WsEvent, { type: 'session:resumable-changed' }>;
+            const e = event as Extract<WsMessage, { type: 'session:resumable-changed' }>;
             dispatch(
               sessionsSlice.actions.sessionResumableChanged({
                 sessionId: e.sessionId,

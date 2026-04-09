@@ -16,8 +16,7 @@
       "#modules/*": ["./src/modules/*"],
       "#shell/*": ["./src/shell/*"],
       "#shared/*": ["./src/shared/*"],
-      "#pages/*": ["./src/pages/*"],
-      "#dependencies": ["./src/dependencies.ts"]
+"#dependencies": ["./src/dependencies.ts"]
     },
     "plugins": [
       {

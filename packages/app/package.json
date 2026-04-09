@@ -9,8 +9,7 @@
     "#modules/*": "./src/modules/*",
     "#shell/*": "./src/shell/*",
     "#shared/*": "./src/shared/*",
-    "#pages/*": "./src/pages/*",
-    "#dependencies": "./src/dependencies.ts"
+"#dependencies": "./src/dependencies.ts"
   },
   "scripts": {
     "dev": "bun run build:client && VIGIE_DEV=true bun run --watch src/daemon.ts",
