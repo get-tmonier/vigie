@@ -7,7 +7,7 @@ import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse';
 import type * as Socket from 'effect/unstable/socket/Socket';
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import type { TerminalConnectionShape } from '#modules/agent-session/application/use-cases/terminal-connection.use-case';
-import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
 import type { TerminalSubscribersShape } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
 
 type TerminalRouteDeps = {

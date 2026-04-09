@@ -10,7 +10,7 @@ import type { SessionCleanupShape } from '#modules/agent-session/application/use
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import type { SpawnSessionShape } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
 import type { TerminalConnectionShape } from '#modules/agent-session/application/use-cases/terminal-connection.use-case';
-import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
 import { SpawnSessionRequestSchema } from '#modules/agent-session/infrastructure/adapters/in/session.dto';
 import { sessionToDTO } from '#modules/agent-session/infrastructure/adapters/in/session.mapper';
 import { expandPath } from '#shared/lib/path';

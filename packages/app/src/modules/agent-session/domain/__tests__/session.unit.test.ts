@@ -4,7 +4,7 @@ import {
   InvalidStatusTransitionError,
 } from '#modules/agent-session/domain/errors';
 import { Session } from '#modules/agent-session/domain/session';
-import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
 
 function makeActiveSession(overrides?: { agentType?: string; cwd?: string }) {
   return Session.create({

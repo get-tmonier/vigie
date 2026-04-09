@@ -2,9 +2,9 @@ import {
   CannotDeleteActiveSessionError,
   InvalidStatusTransitionError,
 } from '#modules/agent-session/domain/errors';
-import type { SessionLifecycleEvent } from '#modules/agent-session/domain/events';
-import type { SessionId } from '#modules/agent-session/domain/session-id';
-import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
+import type { SessionLifecycleEvent } from '#shared/kernel/agent-session/events';
+import type { SessionId } from '#shared/kernel/agent-session/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
 import type { SessionStatus } from '#modules/agent-session/domain/session-status';
 import { canTransition } from '#modules/agent-session/domain/session-status';
 import type { AgentType as KernelAgentType } from '#shared/kernel/agent-session/agent-type';

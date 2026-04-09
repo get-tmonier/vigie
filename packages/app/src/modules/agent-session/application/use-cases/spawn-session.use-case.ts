@@ -8,9 +8,9 @@ import {
   CannotResumeSessionError,
   SessionNotFoundError,
 } from '#modules/agent-session/domain/errors';
-import type { SessionLifecycleEvent } from '#modules/agent-session/domain/events';
+import type { SessionLifecycleEvent } from '#shared/kernel/agent-session/events';
 import { Session } from '#modules/agent-session/domain/session';
-import type { SessionId } from '#modules/agent-session/domain/session-id';
+import type { SessionId } from '#shared/kernel/agent-session/session-id';
 import type { PtyEntry, PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
 
 interface SpawnSessionDeps {

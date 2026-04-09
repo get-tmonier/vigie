@@ -1,8 +1,8 @@
 import { Effect } from 'effect';
 import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
-import type { SessionLifecycleEvent } from '#modules/agent-session/domain/events';
-import type { SessionId } from '#modules/agent-session/domain/session-id';
+import type { SessionLifecycleEvent } from '#shared/kernel/agent-session/events';
+import type { SessionId } from '#shared/kernel/agent-session/session-id';
 
 interface SessionCleanupDeps {
   sessionRepo: SessionRepositoryShape;

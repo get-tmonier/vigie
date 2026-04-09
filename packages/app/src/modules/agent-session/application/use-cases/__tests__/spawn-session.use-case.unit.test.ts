@@ -8,7 +8,7 @@ import {
   SessionNotFoundError,
 } from '#modules/agent-session/domain/errors';
 import { Session } from '#modules/agent-session/domain/session';
-import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
 import type { PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
 import { makeDomainEventBus, makeSessionRepo } from './test-helpers';
 

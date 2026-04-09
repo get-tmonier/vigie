@@ -6,7 +6,7 @@ import {
   TerminalRepository,
   type TerminalRepositoryShape,
 } from '#modules/agent-session/application/ports/out/terminal-repository.port';
-import type { SessionId } from '#modules/agent-session/domain/session-id';
+import type { SessionId } from '#shared/kernel/agent-session/session-id';
 import { VigiDatabase } from '#shared/db/database';
 
 function createSqliteTerminalRepository(db: Database): TerminalRepositoryShape {

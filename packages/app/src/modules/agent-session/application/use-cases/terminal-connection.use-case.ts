@@ -4,8 +4,8 @@ import type { DomainEventBusShape } from '#modules/agent-session/application/por
 import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
 import type { TerminalRepositoryShape } from '#modules/agent-session/application/ports/out/terminal-repository.port';
-import type { SessionLifecycleEvent } from '#modules/agent-session/domain/events';
-import type { SessionId } from '#modules/agent-session/domain/session-id';
+import type { SessionLifecycleEvent } from '#shared/kernel/agent-session/events';
+import type { SessionId } from '#shared/kernel/agent-session/session-id';
 import type { TerminalSubscribersShape } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
 import type { PtyEntry, PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
 import { type LineBuffer, stripAnsiAndBuffer } from '#shared/lib/input-line-buffer';

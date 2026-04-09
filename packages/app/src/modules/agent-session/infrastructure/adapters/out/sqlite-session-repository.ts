@@ -6,8 +6,8 @@ import {
   type SessionRepositoryShape,
 } from '#modules/agent-session/application/ports/out/session-repository.port';
 import { Session } from '#modules/agent-session/domain/session';
-import type { SessionId } from '#modules/agent-session/domain/session-id';
-import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
+import type { SessionId } from '#shared/kernel/agent-session/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
 import type { SessionStatus } from '#modules/agent-session/domain/session-status';
 import { VigiDatabase } from '#shared/db/database';
 

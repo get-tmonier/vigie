@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
 import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import { DomainEventBus } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
-import type { SessionEvent } from '#modules/agent-session/domain/events';
+import type { SessionEvent } from '#shared/kernel/agent-session/events';
 import type { VigieEvent } from '#shell/application/ports/out/browser-event-bus.port';
 import { BrowserEventBus } from '#shell/application/ports/out/browser-event-bus.port';
 import { BrowserEventBusLive } from '../browser-event-bus.adapter';
@@ -40,7 +40,7 @@ function makeFakeDomainEventBus(): {
 const makeSessionStartedEvent = (): SessionEvent => ({
   type: 'session:started',
   sessionId: 'session-1' as ReturnType<
-    typeof import('#modules/agent-session/domain/session-id').SessionId
+    typeof import('#shared/kernel/agent-session/session-id').SessionId
   >,
   agentType: 'claude',
   mode: 'interactive',
@@ -51,7 +51,7 @@ const makeSessionStartedEvent = (): SessionEvent => ({
 const makeTerminalOutputEvent = (): SessionEvent => ({
   type: 'terminal:output',
   sessionId: 'session-1' as ReturnType<
-    typeof import('#modules/agent-session/domain/session-id').SessionId
+    typeof import('#shared/kernel/agent-session/session-id').SessionId
   >,
   data: 'some output',
   timestamp: 1000,

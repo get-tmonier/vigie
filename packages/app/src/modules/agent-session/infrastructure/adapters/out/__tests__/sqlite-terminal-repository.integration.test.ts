@@ -2,7 +2,7 @@ import { Database } from 'bun:sqlite';
 import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
 import { TerminalRepository } from '#modules/agent-session/application/ports/out/terminal-repository.port';
-import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
 import { SqliteTerminalRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-terminal-repository';
 import { VigiDatabase } from '#shared/db/database';
 

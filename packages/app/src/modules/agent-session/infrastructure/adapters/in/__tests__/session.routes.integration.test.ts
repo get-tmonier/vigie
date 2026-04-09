@@ -6,7 +6,7 @@ import type { SessionQueriesShape } from '#modules/agent-session/application/use
 import type { SpawnSessionShape } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
 import type { TerminalConnectionShape } from '#modules/agent-session/application/use-cases/terminal-connection.use-case';
 import { Session } from '#modules/agent-session/domain/session';
-import { SessionId } from '#modules/agent-session/domain/session-id';
+import { SessionId } from '#shared/kernel/agent-session/session-id';
 import { createSessionApiRoutes } from '../session.api-routes';
 
 // --- Fake domain objects ---
