@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import * as v from 'valibot';
-import { SessionErrorSchema } from '#shared/kernel/agent-session/events';
-import { SessionId } from '#shared/kernel/agent-session/session-id';
+import { SessionErrorSchema } from '#shared/kernel/session/events';
+import { SessionId } from '#shared/kernel/session/session-id';
 import { SessionOutputSchema, SessionSpawnFailedSchema } from '#shared/kernel/shell/events';
 import {
   DaemonToSessionSchema,

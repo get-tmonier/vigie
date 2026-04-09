@@ -6,7 +6,7 @@ import type {
 } from '#modules/agent-session/application/ports/out/terminal-repository.port';
 import { createSessionQueriesUseCase } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import { Session } from '#modules/agent-session/domain/session';
-import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 import { makeSessionRepo } from './test-helpers';
 
 function makeTerminalRepo(): TerminalRepositoryShape & {

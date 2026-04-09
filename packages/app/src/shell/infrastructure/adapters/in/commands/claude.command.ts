@@ -1,5 +1,5 @@
 import { Console, Effect, Stream } from 'effect';
-import { SessionId } from '#shared/kernel/agent-session/session-id';
+import { SessionId } from '#shared/kernel/session/session-id';
 import { printChunk } from '#shared/lib/cli-terminal/chunk-printer';
 import { printHeader } from '#shared/lib/cli-terminal/header';
 import { printSessionSummary } from '#shared/lib/cli-terminal/status-bar';

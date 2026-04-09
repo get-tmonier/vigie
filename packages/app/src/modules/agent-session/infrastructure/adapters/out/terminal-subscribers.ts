@@ -1,5 +1,5 @@
 import { Data, Effect, Layer, ServiceMap } from 'effect';
-import type { SessionId } from '#shared/kernel/agent-session/session-id';
+import type { SessionId } from '#shared/kernel/session/session-id';
 
 class TerminalSubscriberError extends Data.TaggedError('TerminalSubscriberError')<{
   readonly message: string;

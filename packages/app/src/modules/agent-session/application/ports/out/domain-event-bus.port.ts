@@ -1,6 +1,6 @@
 import type { Effect } from 'effect';
 import { ServiceMap } from 'effect';
-import type { SessionEvent } from '#shared/kernel/agent-session/events';
+import type { SessionEvent } from '#shared/kernel/session/events';
 
 export interface DomainEventBusShape {
   publish(event: SessionEvent): Effect.Effect<void>;

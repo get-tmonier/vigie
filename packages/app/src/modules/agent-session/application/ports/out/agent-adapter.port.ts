@@ -1,5 +1,5 @@
 import { ServiceMap } from 'effect';
-import type { AgentType } from '#shared/kernel/agent-session/agent-type';
+import type { AgentType } from '#shared/kernel/session/agent-type';
 
 export interface AgentAdapter {
   readonly agentType: AgentType;

@@ -6,8 +6,8 @@ import type { SessionRepositoryShape } from '#modules/agent-session/application/
 import { createSessionLifecycleUseCase } from '#modules/agent-session/application/use-cases/session-lifecycle.use-case';
 import { Session } from '#modules/agent-session/domain/session';
 import type { PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
-import type { SessionEvent } from '#shared/kernel/agent-session/events';
-import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
+import type { SessionEvent } from '#shared/kernel/session/events';
+import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 import { makeDomainEventBus, makeSessionRepo } from './test-helpers';
 
 function makeAgentRegistry(canResume = false): AgentRegistryShape {

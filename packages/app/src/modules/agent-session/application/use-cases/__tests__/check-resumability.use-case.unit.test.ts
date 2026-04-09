@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test';
 import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import { createCheckResumabilityUseCase } from '#modules/agent-session/application/use-cases/check-resumability.use-case';
 import { Session } from '#modules/agent-session/domain/session';
-import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 import { makeDomainEventBus, makeSessionRepo } from './test-helpers';
 
 function makeResumabilityChecker(resumable = false): ResumabilityCheckerShape {

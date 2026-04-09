@@ -4,7 +4,7 @@ import {
   AgentRegistry,
   type AgentRegistryShape,
 } from '#modules/agent-session/application/ports/out/agent-adapter.port';
-import type { AgentType } from '#shared/kernel/agent-session/agent-type';
+import type { AgentType } from '#shared/kernel/session/agent-type';
 import { claudeAdapter } from './claude.adapter';
 
 function createAgentRegistry(): AgentRegistryShape {

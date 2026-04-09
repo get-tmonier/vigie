@@ -1,7 +1,7 @@
 import { Database } from 'bun:sqlite';
 import { existsSync } from 'node:fs';
 import { Console, Deferred, Duration, Effect, Exit } from 'effect';
-import { SessionId } from '#shared/kernel/agent-session/session-id';
+import { SessionId } from '#shared/kernel/session/session-id';
 import { createKeybindInterceptor } from '#shared/lib/cli-terminal/keybind-interceptor';
 import {
   initStatusBar,

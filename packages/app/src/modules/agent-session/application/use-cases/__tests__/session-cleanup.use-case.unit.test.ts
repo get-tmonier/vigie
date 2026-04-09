@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test';
 import { createSessionCleanupUseCase } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
 import { CannotDeleteActiveSessionError } from '#modules/agent-session/domain/errors';
 import { Session } from '#modules/agent-session/domain/session';
-import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 import { makeDomainEventBus, makeSessionRepo } from './test-helpers';
 
 describe('SessionCleanupUseCase.delete', () => {

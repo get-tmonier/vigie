@@ -6,7 +6,7 @@ import * as HttpMiddleware from 'effect/unstable/http/HttpMiddleware';
 import * as HttpRouter from 'effect/unstable/http/HttpRouter';
 import type { AgentSessionServices } from '#modules/agent-session/dependencies';
 import { VigiDatabase } from '#shared/db/database';
-import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 import { IpcServer } from '#shell/application/ports/out/ipc-server.port';
 import { createIpcRouter } from '#shell/infrastructure/adapters/in/ipc-router';
 import type { DaemonConfigShape } from '#shell/infrastructure/daemon-config';

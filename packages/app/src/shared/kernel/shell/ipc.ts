@@ -1,7 +1,7 @@
 import * as v from 'valibot';
-import { AgentTypeSchema } from '#shared/kernel/agent-session/agent-type';
-import { SessionErrorSchema } from '#shared/kernel/agent-session/events';
-import { SessionIdSchema } from '#shared/kernel/agent-session/session-id';
+import { AgentTypeSchema } from '#shared/kernel/session/agent-type';
+import { SessionErrorSchema } from '#shared/kernel/session/events';
+import { SessionIdSchema } from '#shared/kernel/session/session-id';
 
 import { SessionOutputSchema, SessionSpawnFailedSchema } from '#shared/kernel/shell/events';
 

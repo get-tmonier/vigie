@@ -12,7 +12,7 @@ import type { SpawnSessionShape } from '#modules/agent-session/application/use-c
 import type { TerminalConnectionShape } from '#modules/agent-session/application/use-cases/terminal-connection.use-case';
 import { SpawnSessionRequestSchema } from '#modules/agent-session/infrastructure/adapters/in/session.dto';
 import { sessionToDTO } from '#modules/agent-session/infrastructure/adapters/in/session.mapper';
-import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 import { expandPath } from '#shared/lib/path';
 
 type SessionApiRouteDeps = {

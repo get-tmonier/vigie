@@ -1,5 +1,5 @@
 import { Console, Deferred, Duration, Effect, Exit } from 'effect';
-import type { SessionId } from '#shared/kernel/agent-session/session-id';
+import type { SessionId } from '#shared/kernel/session/session-id';
 import { createKeybindInterceptor } from '#shared/lib/cli-terminal/keybind-interceptor';
 import {
   initStatusBar,

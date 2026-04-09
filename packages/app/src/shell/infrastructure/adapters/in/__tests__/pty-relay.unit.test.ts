@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, spyOn } from 'bun:test';
 import { ConfigProvider, Effect } from 'effect';
-import { SessionId } from '#shared/kernel/agent-session/session-id';
+import { SessionId } from '#shared/kernel/session/session-id';
 import type { IpcClientShape } from '#shell/application/ports/in/ipc-client.port';
 import { attachPtyRelay } from '#shell/infrastructure/adapters/in/pty-relay';
 

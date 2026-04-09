@@ -7,7 +7,7 @@ import {
   type TerminalRepositoryShape,
 } from '#modules/agent-session/application/ports/out/terminal-repository.port';
 import { VigiDatabase } from '#shared/db/database';
-import type { SessionId } from '#shared/kernel/agent-session/session-id';
+import type { SessionId } from '#shared/kernel/session/session-id';
 
 function createSqliteTerminalRepository(db: Database): TerminalRepositoryShape {
   const getMaxSeqStmt = db.prepare(

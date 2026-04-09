@@ -1,6 +1,6 @@
 import { Data, Effect, Layer } from 'effect';
 import { DomainEventBus } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
-import type { SessionEvent } from '#shared/kernel/agent-session/events';
+import type { SessionEvent } from '#shared/kernel/session/events';
 
 class DomainEventBusError extends Data.TaggedError('DomainEventBusError')<{
   readonly message: string;

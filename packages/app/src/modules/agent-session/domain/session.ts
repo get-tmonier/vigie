@@ -4,10 +4,10 @@ import {
 } from '#modules/agent-session/domain/errors';
 import type { SessionStatus } from '#modules/agent-session/domain/session-status';
 import { canTransition } from '#modules/agent-session/domain/session-status';
-import type { AgentType } from '#shared/kernel/agent-session/agent-type';
-import type { SessionLifecycleEvent } from '#shared/kernel/agent-session/events';
-import type { SessionId } from '#shared/kernel/agent-session/session-id';
-import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
+import type { AgentType } from '#shared/kernel/session/agent-type';
+import type { SessionLifecycleEvent } from '#shared/kernel/session/events';
+import type { SessionId } from '#shared/kernel/session/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 
 interface CreateSessionProps {
   readonly id?: string;

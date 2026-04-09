@@ -6,8 +6,8 @@ import type { SessionRepositoryShape } from '#modules/agent-session/application/
 import type { TerminalRepositoryShape } from '#modules/agent-session/application/ports/out/terminal-repository.port';
 import type { TerminalSubscribersShape } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
 import type { PtyEntry, PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
-import type { SessionLifecycleEvent } from '#shared/kernel/agent-session/events';
-import type { SessionId } from '#shared/kernel/agent-session/session-id';
+import type { SessionLifecycleEvent } from '#shared/kernel/session/events';
+import type { SessionId } from '#shared/kernel/session/session-id';
 import { type LineBuffer, stripAnsiAndBuffer } from '#shared/lib/input-line-buffer';
 
 interface TerminalConnectionDeps {

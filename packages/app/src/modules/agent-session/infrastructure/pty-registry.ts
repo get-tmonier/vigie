@@ -1,5 +1,5 @@
 import type { PtyHandle } from '#modules/agent-session/application/ports/out/pty-spawner.port';
-import type { SessionId } from '#shared/kernel/agent-session/session-id';
+import type { SessionId } from '#shared/kernel/session/session-id';
 
 export interface PtyEntry {
   handle: PtyHandle;

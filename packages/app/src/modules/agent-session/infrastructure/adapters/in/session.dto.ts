@@ -1,5 +1,5 @@
 import * as v from 'valibot';
-import { AgentTypeSchema } from '#shared/kernel/agent-session/agent-type';
+import { AgentTypeSchema } from '#shared/kernel/session/agent-type';
 
 export const AgentSessionSchema = v.object({
   id: v.string(),

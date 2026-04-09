@@ -1,5 +1,5 @@
 import { ServiceMap } from 'effect';
-import type { SessionId } from '#shared/kernel/agent-session/session-id';
+import type { SessionId } from '#shared/kernel/session/session-id';
 
 export interface TerminalChunk {
   readonly data: string;

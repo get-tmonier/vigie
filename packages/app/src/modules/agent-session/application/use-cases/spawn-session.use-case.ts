@@ -10,9 +10,9 @@ import {
 } from '#modules/agent-session/domain/errors';
 import { Session } from '#modules/agent-session/domain/session';
 import type { PtyEntry, PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
-import type { AgentType } from '#shared/kernel/agent-session/agent-type';
-import type { SessionLifecycleEvent } from '#shared/kernel/agent-session/events';
-import type { SessionId } from '#shared/kernel/agent-session/session-id';
+import type { AgentType } from '#shared/kernel/session/agent-type';
+import type { SessionLifecycleEvent } from '#shared/kernel/session/events';
+import type { SessionId } from '#shared/kernel/session/session-id';
 
 interface SpawnSessionDeps {
   sessionRepo: SessionRepositoryShape;

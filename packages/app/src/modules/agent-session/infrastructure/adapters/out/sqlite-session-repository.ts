@@ -9,9 +9,9 @@ import {
 import { Session } from '#modules/agent-session/domain/session';
 import type { SessionStatus } from '#modules/agent-session/domain/session-status';
 import { VigiDatabase } from '#shared/db/database';
-import { AgentTypeSchema } from '#shared/kernel/agent-session/agent-type';
-import type { SessionId } from '#shared/kernel/agent-session/session-id';
-import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
+import { AgentTypeSchema } from '#shared/kernel/session/agent-type';
+import type { SessionId } from '#shared/kernel/session/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 
 interface SessionRow {
   id: string;

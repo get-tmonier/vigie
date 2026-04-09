@@ -6,8 +6,8 @@ import type { IpcConnection } from '#shell/application/ports/out/ipc-server.port
 
 const encodeJson = Schema.encodeSync(Schema.UnknownFromJsonString);
 
-import type { AgentType } from '#shared/kernel/agent-session/agent-type';
-import type { SessionId } from '#shared/kernel/agent-session/session-id';
+import type { AgentType } from '#shared/kernel/session/agent-type';
+import type { SessionId } from '#shared/kernel/session/session-id';
 
 interface IpcRouterDeps {
   spawnSession: {

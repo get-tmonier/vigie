@@ -1,7 +1,7 @@
 import { Database } from 'bun:sqlite';
 import { existsSync } from 'node:fs';
 import { Console, Effect } from 'effect';
-import { SessionId } from '#shared/kernel/agent-session/session-id';
+import { SessionId } from '#shared/kernel/session/session-id';
 import { getGitContext } from '#shared/lib/git-context';
 import { DaemonNotRunningError } from '#shell/domain/errors';
 import { createBunProcessManager } from '#shell/infrastructure/adapters/out/bun-process-manager.adapter';
