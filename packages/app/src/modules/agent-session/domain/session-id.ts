@@ -1,4 +1,1 @@
-import { Brand } from 'effect';
-
-export type SessionId = string & Brand.Brand<'SessionId'>;
-export const SessionId = Brand.nominal<SessionId>();
+export { SessionId } from '#shared/kernel/agent-session/session-id';

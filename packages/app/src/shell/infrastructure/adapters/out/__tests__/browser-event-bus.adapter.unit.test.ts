@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
 import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import { DomainEventBus } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
-import type { DomainEvent } from '#modules/agent-session/domain/events';
+import type { AgentSessionEvent } from '#modules/agent-session/domain/events';
 import type { BrowserEvent } from '#shell/application/ports/out/browser-event-bus.port';
 import { BrowserEventBus } from '#shell/application/ports/out/browser-event-bus.port';
 import { BrowserEventBusLive } from '../browser-event-bus.adapter';
@@ -11,9 +11,9 @@ import { BrowserEventBusLive } from '../browser-event-bus.adapter';
 
 function makeFakeDomainEventBus(): {
   layer: Layer.Layer<DomainEventBus>;
-  emit: (event: DomainEvent) => void;
+  emit: (event: AgentSessionEvent) => void;
 } {
-  let capturedListener: ((event: DomainEvent) => void) | null = null;
+  let capturedListener: ((event: AgentSessionEvent) => void) | null = null;
 
   const shape: DomainEventBusShape = {
     publish: (_event) => Effect.void,
@@ -37,7 +37,7 @@ function makeFakeDomainEventBus(): {
 
 // --- Test helpers ---
 
-const makeSessionStartedEvent = (): DomainEvent => ({
+const makeSessionStartedEvent = (): AgentSessionEvent => ({
   type: 'session:started',
   sessionId: 'session-1' as ReturnType<
     typeof import('#modules/agent-session/domain/session-id').SessionId
@@ -48,7 +48,7 @@ const makeSessionStartedEvent = (): DomainEvent => ({
   timestamp: 1000,
 });
 
-const makeTerminalOutputEvent = (): DomainEvent => ({
+const makeTerminalOutputEvent = (): AgentSessionEvent => ({
   type: 'terminal:output',
   sessionId: 'session-1',
   data: 'some output',
@@ -58,7 +58,7 @@ const makeTerminalOutputEvent = (): DomainEvent => ({
 // --- Tests ---
 
 describe('BrowserEventBusLive', () => {
-  it('listener receives a BrowserEvent when a matching DomainEvent is published', async () => {
+  it('listener receives a BrowserEvent when a matching AgentSessionEvent is published', async () => {
     const { layer: fakePublisherLayer, emit } = makeFakeDomainEventBus();
     const testLayer = BrowserEventBusLive.pipe(Layer.provide(fakePublisherLayer));
 
