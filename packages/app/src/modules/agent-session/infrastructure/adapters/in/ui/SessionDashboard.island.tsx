@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import type { AgentSession } from '#modules/agent-session/infrastructure/adapters/in/session.dto';
-import type { VigieEvent } from '#shared/contracts/vigie-events';
+import type { SessionEvent } from '#shared/kernel/session/events';
 import { cn } from '#shared/lib/cn';
 import { DashboardLayout } from '#shared/ui/DashboardLayout';
 import { Header } from '#shared/ui/Header';
@@ -12,7 +12,7 @@ import { SpawnSessionFormIsland } from './SpawnSessionForm.island';
 import { sessionsSlice } from './sessions.slice';
 import { type AppDispatch, homedir, type RootState, store } from './store';
 
-type WsMessage = { type: 'snapshot'; sessions: AgentSession[] } | VigieEvent;
+type WsMessage = { type: 'snapshot'; sessions: AgentSession[] } | SessionEvent;
 
 function useSessionEvents(dispatch: AppDispatch) {
   const mountedRef = useRef(true);
