@@ -2,9 +2,9 @@ import { Effect, Layer, ServiceMap } from 'effect';
 import { AgentRegistry } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 import { DomainEventBus } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import { ResumabilityChecker } from '#modules/agent-session/application/ports/out/resumability-checker.port';
+import { SessionLog } from '#modules/agent-session/application/ports/out/session-log.port';
 import { SessionSink } from '#modules/agent-session/application/ports/out/session-sink.port';
 import { SessionStore } from '#modules/agent-session/application/ports/out/session-store.port';
-import { TerminalRepository } from '#modules/agent-session/application/ports/out/terminal-repository.port';
 import { createCheckResumabilityUseCase } from '#modules/agent-session/application/use-cases/check-resumability.use-case';
 import { createSessionCleanupUseCase } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
 import { createSessionLifecycleUseCase } from '#modules/agent-session/application/use-cases/session-lifecycle.use-case';
@@ -55,7 +55,7 @@ const AgentSessionInfraLive = Layer.mergeAll(
 export const AgentSessionLive = Layer.effect(AgentSession)(
   Effect.gen(function* () {
     const sessionStore = yield* SessionStore;
-    const terminalRepo = yield* TerminalRepository;
+    const sessionLog = yield* SessionLog;
     const agentRegistry = yield* AgentRegistry;
     const resumabilityChecker = yield* ResumabilityChecker;
     const eventPublisher = yield* DomainEventBus;
@@ -98,7 +98,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
           sessionSink.send(connId, msg);
         },
       },
-      terminalRepo,
+      terminalRepo: sessionLog,
     });
 
     const spawnSession = createSpawnSessionUseCase({
@@ -121,7 +121,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
 
     const sessionQueries = createSessionQueriesUseCase({
       sessionRepo: sessionStore,
-      terminalRepo,
+      terminalRepo: sessionLog,
     });
 
     const startupOps = {

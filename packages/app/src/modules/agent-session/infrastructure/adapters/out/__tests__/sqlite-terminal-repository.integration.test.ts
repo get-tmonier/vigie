@@ -1,7 +1,7 @@
 import { Database } from 'bun:sqlite';
 import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
-import { TerminalRepository } from '#modules/agent-session/application/ports/out/terminal-repository.port';
+import { SessionLog } from '#modules/agent-session/application/ports/out/session-log.port';
 import { SqliteTerminalRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-terminal-repository';
 import { VigiDatabase } from '#shared/db/database';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
@@ -49,7 +49,7 @@ function makeTestDb(): Database {
 const TestDatabaseLayer = Layer.sync(VigiDatabase)(() => makeTestDb());
 const TestRepoLayer = SqliteTerminalRepositoryLive.pipe(Layer.provide(TestDatabaseLayer));
 
-async function runWithRepo<A>(effect: Effect.Effect<A, never, TerminalRepository>): Promise<A> {
+async function runWithRepo<A>(effect: Effect.Effect<A, never, SessionLog>): Promise<A> {
   return Effect.runPromise(Effect.provide(effect, TestRepoLayer));
 }
 
@@ -61,7 +61,7 @@ describe('SqliteTerminalRepository', () => {
     it('appends a chunk and retrieves it', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* TerminalRepository;
+          const repo = yield* SessionLog;
           const now = Date.now();
 
           repo.appendChunk(SESSION_ID, 'hello world', now);
@@ -78,7 +78,7 @@ describe('SqliteTerminalRepository', () => {
     it('assigns sequential seq numbers across multiple appends', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* TerminalRepository;
+          const repo = yield* SessionLog;
           const now = Date.now();
 
           repo.appendChunk(SESSION_ID, 'chunk-a', now);
@@ -96,7 +96,7 @@ describe('SqliteTerminalRepository', () => {
     it('returns chunks in ascending order', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* TerminalRepository;
+          const repo = yield* SessionLog;
           const now = Date.now();
 
           repo.appendChunk(SESSION_ID, 'first', now);
@@ -112,7 +112,7 @@ describe('SqliteTerminalRepository', () => {
     it('respects the limit parameter', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* TerminalRepository;
+          const repo = yield* SessionLog;
           const now = Date.now();
 
           repo.appendChunk(SESSION_ID, 'a', now);
@@ -128,7 +128,7 @@ describe('SqliteTerminalRepository', () => {
     it('returns empty array for unknown session', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* TerminalRepository;
+          const repo = yield* SessionLog;
           const chunks = repo.getChunks(UNKNOWN_ID);
           expect(chunks).toEqual([]);
         })
@@ -140,7 +140,7 @@ describe('SqliteTerminalRepository', () => {
     it('returns all chunks in ascending seq order', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* TerminalRepository;
+          const repo = yield* SessionLog;
           const now = Date.now();
 
           repo.appendChunk(SESSION_ID, 'x', now);
@@ -159,7 +159,7 @@ describe('SqliteTerminalRepository', () => {
     it('returns empty array when no chunks exist', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* TerminalRepository;
+          const repo = yield* SessionLog;
           const all = repo.getAllChunks(UNKNOWN_ID);
           expect(all).toEqual([]);
         })
@@ -171,7 +171,7 @@ describe('SqliteTerminalRepository', () => {
     it('appends an input entry and retrieves it', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* TerminalRepository;
+          const repo = yield* SessionLog;
           const now = Date.now();
 
           repo.appendInput(SESSION_ID, 'ls -la', 'cli', now);
@@ -188,7 +188,7 @@ describe('SqliteTerminalRepository', () => {
     it('returns entries in ascending timestamp order', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* TerminalRepository;
+          const repo = yield* SessionLog;
           const now = Date.now();
 
           repo.appendInput(SESSION_ID, 'first-cmd', 'cli', now);
@@ -206,7 +206,7 @@ describe('SqliteTerminalRepository', () => {
     it('respects the limit parameter', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* TerminalRepository;
+          const repo = yield* SessionLog;
           const now = Date.now();
 
           repo.appendInput(SESSION_ID, 'cmd1', 'cli', now);
@@ -222,7 +222,7 @@ describe('SqliteTerminalRepository', () => {
     it('returns empty array for unknown session', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* TerminalRepository;
+          const repo = yield* SessionLog;
           const history = repo.getInputHistory(UNKNOWN_ID);
           expect(history).toEqual([]);
         })

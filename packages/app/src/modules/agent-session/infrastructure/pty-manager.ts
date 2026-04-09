@@ -1,5 +1,5 @@
 import { Effect } from 'effect';
-import type { TerminalRepositoryShape } from '#modules/agent-session/application/ports/out/terminal-repository.port';
+import type { SessionLogShape } from '#modules/agent-session/application/ports/out/session-log.port';
 import type { AgentRunnerError } from '#modules/agent-session/domain/errors';
 import type {
   PtyEntry,
@@ -13,7 +13,7 @@ import { type LineBuffer, stripAnsiAndBuffer } from '#shared/lib/input-line-buff
 interface PtyManagerDeps {
   spawner: PtySpawnFn;
   callbacks: PtyManagerCallbacks;
-  terminalRepo: TerminalRepositoryShape;
+  terminalRepo: SessionLogShape;
 }
 
 export function createPtyManager(deps: PtyManagerDeps): PtyManagerShape {

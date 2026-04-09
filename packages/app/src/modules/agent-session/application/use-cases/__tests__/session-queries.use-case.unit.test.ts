@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'bun:test';
 import type {
   InputEntry,
+  SessionLogShape,
   TerminalChunk,
-  TerminalRepositoryShape,
-} from '#modules/agent-session/application/ports/out/terminal-repository.port';
+} from '#modules/agent-session/application/ports/out/session-log.port';
 import { createSessionQueriesUseCase } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import { Session } from '#modules/agent-session/domain/session';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 import { makeSessionRepo } from './test-helpers';
 
-function makeTerminalRepo(): TerminalRepositoryShape & {
+function makeTerminalRepo(): SessionLogShape & {
   chunks: Map<string, TerminalChunk[]>;
   inputs: Map<string, InputEntry[]>;
 } {

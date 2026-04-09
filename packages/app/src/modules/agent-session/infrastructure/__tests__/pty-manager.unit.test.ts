@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect } from 'effect';
-import type { TerminalRepositoryShape } from '#modules/agent-session/application/ports/out/terminal-repository.port';
+import type { SessionLogShape } from '#modules/agent-session/application/ports/out/session-log.port';
 import { createPtyManager } from '#modules/agent-session/infrastructure/pty-manager';
 import type {
   PtyHandle,
@@ -67,7 +67,7 @@ function makeFakeCallbacks(overrides?: Partial<PtyManagerCallbacks>): PtyManager
   };
 }
 
-function makeFakeTerminalRepo(): TerminalRepositoryShape {
+function makeFakeTerminalRepo(): SessionLogShape {
   let seq = 0;
   const chunks: Array<{ data: string; timestamp: number; seq: number }> = [];
   return {
@@ -84,7 +84,7 @@ function makeFakeTerminalRepo(): TerminalRepositoryShape {
 function makeManager(overrides?: {
   spawner?: PtySpawnFn;
   callbacks?: PtyManagerCallbacks;
-  terminalRepo?: TerminalRepositoryShape;
+  terminalRepo?: SessionLogShape;
 }) {
   const callbacks = overrides?.callbacks ?? makeFakeCallbacks();
   return {

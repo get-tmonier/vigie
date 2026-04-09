@@ -2,14 +2,14 @@ import type { Database } from 'bun:sqlite';
 import { Effect, Layer } from 'effect';
 import {
   type InputEntry,
+  SessionLog,
+  type SessionLogShape,
   type TerminalChunk,
-  TerminalRepository,
-  type TerminalRepositoryShape,
-} from '#modules/agent-session/application/ports/out/terminal-repository.port';
+} from '#modules/agent-session/application/ports/out/session-log.port';
 import { VigiDatabase } from '#shared/db/database';
 import type { SessionId } from '#shared/kernel/session/session-id';
 
-function createSqliteTerminalRepository(db: Database): TerminalRepositoryShape {
+function createSqliteTerminalRepository(db: Database): SessionLogShape {
   const getMaxSeqStmt = db.prepare(
     'SELECT COALESCE(MAX(seq), 0) as max_seq FROM terminal_chunks WHERE session_id = $session_id'
   );
@@ -70,7 +70,7 @@ function createSqliteTerminalRepository(db: Database): TerminalRepositoryShape {
   };
 }
 
-export const SqliteTerminalRepositoryLive = Layer.effect(TerminalRepository)(
+export const SqliteTerminalRepositoryLive = Layer.effect(SessionLog)(
   Effect.gen(function* () {
     const db = yield* VigiDatabase;
     return createSqliteTerminalRepository(db);
