@@ -1,19 +1,19 @@
 import { Layer } from 'effect';
 import {
-  type AgentAdapter,
   AgentCatalog,
   type AgentCatalogShape,
-} from '#modules/agent-session/application/ports/out/agent-adapter.port';
+  type AgentSpec,
+} from '#modules/agent-session/application/ports/out/agent-catalog.port';
 import type { AgentType } from '#shared/kernel/session/agent-type';
 import { claudeAdapter } from './claude.adapter';
 
 function createAgentCatalog(): AgentCatalogShape {
-  const registry: Record<AgentType, AgentAdapter> = {
+  const registry: Record<AgentType, AgentSpec> = {
     claude: claudeAdapter,
   };
 
   return {
-    resolve(agentType: AgentType): AgentAdapter {
+    resolve(agentType: AgentType): AgentSpec {
       return registry[agentType];
     },
   };

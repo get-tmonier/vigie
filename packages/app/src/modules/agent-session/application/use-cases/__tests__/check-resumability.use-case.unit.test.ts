@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import type { AgentCatalogShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import type { AgentCatalogShape } from '#modules/agent-session/application/ports/out/agent-catalog.port';
 import { createCheckResumabilityUseCase } from '#modules/agent-session/application/use-cases/check-resumability.use-case';
 import { Session } from '#modules/agent-session/domain/session';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';

@@ -1,5 +1,5 @@
 import { Effect } from 'effect';
-import type { AgentCatalogShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import type { AgentCatalogShape } from '#modules/agent-session/application/ports/out/agent-catalog.port';
 import type { AgentProcessShape } from '#modules/agent-session/application/ports/out/agent-process.port';
 import type { SessionEventBusShape } from '#modules/agent-session/application/ports/out/session-event-bus.port';
 import type { SessionStoreShape } from '#modules/agent-session/application/ports/out/session-store.port';

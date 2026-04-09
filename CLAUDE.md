@@ -30,10 +30,10 @@ The freelance portfolio (`tmonier.com`) is a separate repo: `get-tmonier/landing
 **Single process, fully local:**
 - **CLI daemon** (`@vigie/app`): single Bun process that runs everything
   - **Embedded Effect HTTP server** on `localhost:19191` — serves REST API + WebSocket + React SSR
-  - **AgentProcess** — spawns and manages agent sessions via PTY (Claude, aider, codex, generic); `SessionFeed` streams live output to browser viewers; `SessionLog` persists terminal output to SQLite
+  - **AgentProcess** — spawns and manages agent sessions via PTY (Claude, aider, codex, generic); `SessionOutput` streams live output to browser viewers; `SessionLog` persists terminal output to SQLite
   - **SQLite database** at `~/.vigie/data.db` — sessions, terminal chunks, input history
   - **Unix socket IPC** at `~/.vigie/daemon.sock` — CLI-to-daemon communication
-  - Agent-agnostic design: `AgentAdapter` port + `AgentCatalog` defines how to spawn any CLI agent
+  - Agent-agnostic design: `AgentSpec` port + `AgentCatalog` defines how to spawn any CLI agent
 - **Frontend:** React SSR rendered by the daemon, with Vite-bundled client islands for interactivity
 - **No auth required** — everything runs on localhost
 - **No external database** — SQLite only
@@ -133,12 +133,12 @@ All cross-folder imports must use ESM subpath aliases (`#alias/...`), never rela
 
 ## Multi-agent extensibility
 
-The **domain layer and ports are agent-agnostic** — `AgentAdapter` port, `AgentCatalog`, and the `Session` domain entity treat `agentType` as a plain string. Adding a new agent (e.g. opencode) requires changes only in the infrastructure layer:
+The **domain layer and ports are agent-agnostic** — `AgentSpec` port, `AgentCatalog`, and the `Session` domain entity treat `agentType` as a plain string. Adding a new agent (e.g. opencode) requires changes only in the infrastructure layer:
 
 | What to change | Location | Notes |
 |---|---|---|
 | CLI command | `src/modules/agent-session/infrastructure/adapters/in/commands/` | `vigie claude` is Claude-specific — add `vigie opencode` or generalize to `vigie run --agent <name>` |
 | Prompt-mode runner | `src/modules/agent-session/infrastructure/adapters/out/agents/claude-runner.adapter.ts` | The only `AgentRunnerShape` impl — new agents need their own runner |
-| Session resume | `src/modules/agent-session/infrastructure/adapters/in/commands/session-resume.command.ts` | Rejects non-Claude + hardcodes `~/.claude/` paths — use `AgentAdapter.canResume` + `AgentAdapter.isResumable` instead |
+| Session resume | `src/modules/agent-session/infrastructure/adapters/in/commands/session-resume.command.ts` | Rejects non-Claude + hardcodes `~/.claude/` paths — use `AgentSpec.canResume` + `AgentSpec.isResumable` instead |
 | IPC schema | `src/shell/infrastructure/adapters/ipc-schemas.ts` | `agentType` is a closed `picklist` — extend or change to `v.string()` |
 | Agent adapter | `src/modules/agent-session/infrastructure/adapters/out/agents/` | One file per agent (e.g. `opencode.adapter.ts`), registered in `agent-catalog.ts` |

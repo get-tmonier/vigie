@@ -1,13 +1,13 @@
 import { Effect, Layer, ServiceMap } from 'effect';
-import { AgentCatalog } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import { AgentCatalog } from '#modules/agent-session/application/ports/out/agent-catalog.port';
 import type { AgentProcessShape } from '#modules/agent-session/application/ports/out/agent-process.port';
 import { CliChannel } from '#modules/agent-session/application/ports/out/cli-channel.port';
 import { SessionEventBus } from '#modules/agent-session/application/ports/out/session-event-bus.port';
-import {
-  SessionFeed,
-  type SessionFeedShape,
-} from '#modules/agent-session/application/ports/out/session-feed.port';
 import { SessionLog } from '#modules/agent-session/application/ports/out/session-log.port';
+import {
+  SessionOutput,
+  type SessionOutputShape,
+} from '#modules/agent-session/application/ports/out/session-output.port';
 import { SessionStore } from '#modules/agent-session/application/ports/out/session-store.port';
 import { createCheckResumabilityUseCase } from '#modules/agent-session/application/use-cases/check-resumability.use-case';
 import { createSessionCleanupUseCase } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
@@ -18,7 +18,7 @@ import { AgentCatalogLive } from '#modules/agent-session/infrastructure/adapters
 import { createBunPtySpawnFn } from '#modules/agent-session/infrastructure/adapters/out/bun-pty-spawner';
 import { SqliteSessionRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-session-repository';
 import { SqliteTerminalRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-terminal-repository';
-import { SessionFeedLive } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
+import { SessionOutputLive } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
 import { createPtyManager } from '#modules/agent-session/infrastructure/pty-manager';
 
 export interface AgentSessionServices {
@@ -28,7 +28,7 @@ export interface AgentSessionServices {
   sessionQueries: ReturnType<typeof createSessionQueriesUseCase>;
   checkResumability: ReturnType<typeof createCheckResumabilityUseCase>;
   ptyManager: AgentProcessShape;
-  terminalSubs: SessionFeedShape;
+  terminalSubs: SessionOutputShape;
   startupOps: {
     cleanupOrphanedSessions: () => void;
     pruneOldSessions: () => void;
@@ -43,7 +43,7 @@ export class AgentSession extends ServiceMap.Service<AgentSession, AgentSessionS
 
 const AgentSessionInfraLive = Layer.mergeAll(
   AgentCatalogLive,
-  SessionFeedLive,
+  SessionOutputLive,
   SqliteSessionRepositoryLive,
   SqliteTerminalRepositoryLive
 );
@@ -54,7 +54,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
     const sessionLog = yield* SessionLog;
     const agentCatalog = yield* AgentCatalog;
     const eventPublisher = yield* SessionEventBus;
-    const terminalSubs = yield* SessionFeed;
+    const terminalSubs = yield* SessionOutput;
     const cliChannel = yield* CliChannel;
 
     const sessionLifecycle = createSessionLifecycleUseCase({

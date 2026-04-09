@@ -1,9 +1,9 @@
 import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import type { AgentAdapter } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import type { AgentSpec } from '#modules/agent-session/application/ports/out/agent-catalog.port';
 
-export const claudeAdapter: AgentAdapter = {
+export const claudeAdapter: AgentSpec = {
   agentType: 'claude',
   canResume: true,
   detectSessionId: true,

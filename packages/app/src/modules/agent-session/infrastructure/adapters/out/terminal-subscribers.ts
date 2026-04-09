@@ -1,16 +1,16 @@
 import { Data, Effect, Layer } from 'effect';
 import {
-  SessionFeed,
-  type SessionFeedShape,
-} from '#modules/agent-session/application/ports/out/session-feed.port';
+  SessionOutput,
+  type SessionOutputShape,
+} from '#modules/agent-session/application/ports/out/session-output.port';
 import type { SessionId } from '#shared/kernel/session/session-id';
 
-class SessionFeedError extends Data.TaggedError('SessionFeedError')<{
+class SessionOutputError extends Data.TaggedError('SessionOutputError')<{
   readonly message: string;
   readonly cause?: unknown;
 }> {}
 
-function createSessionFeed(): SessionFeedShape {
+function createSessionOutput(): SessionOutputShape {
   const subscribers = new Map<SessionId, Set<(data: string) => void>>();
 
   return {
@@ -33,8 +33,8 @@ function createSessionFeed(): SessionFeedShape {
           for (const cb of subs) {
             yield* Effect.try({
               try: () => cb(data),
-              catch: (cause) => new SessionFeedError({ message: String(cause), cause }),
-            }).pipe(Effect.catch((err) => Effect.logError(`session feed error: ${err}`)));
+              catch: (cause) => new SessionOutputError({ message: String(cause), cause }),
+            }).pipe(Effect.catch((err) => Effect.logError(`session output error: ${err}`)));
           }
         }
       });
@@ -45,4 +45,4 @@ function createSessionFeed(): SessionFeedShape {
   };
 }
 
-export const SessionFeedLive = Layer.sync(SessionFeed)(() => createSessionFeed());
+export const SessionOutputLive = Layer.sync(SessionOutput)(() => createSessionOutput());

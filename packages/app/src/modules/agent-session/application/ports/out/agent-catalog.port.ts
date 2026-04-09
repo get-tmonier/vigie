@@ -1,7 +1,7 @@
 import { ServiceMap } from 'effect';
 import type { AgentType } from '#shared/kernel/session/agent-type';
 
-export interface AgentAdapter {
+export interface AgentSpec {
   readonly agentType: AgentType;
   readonly canResume: boolean;
   readonly detectSessionId: boolean;
@@ -13,7 +13,7 @@ export interface AgentAdapter {
 }
 
 export interface AgentCatalogShape {
-  resolve(agentType: AgentType): AgentAdapter;
+  resolve(agentType: AgentType): AgentSpec;
 }
 
 export class AgentCatalog extends ServiceMap.Service<AgentCatalog, AgentCatalogShape>()(
