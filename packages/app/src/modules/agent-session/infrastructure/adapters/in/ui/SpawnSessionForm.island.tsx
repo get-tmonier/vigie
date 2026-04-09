@@ -1,12 +1,15 @@
+import { useStore } from '@nanostores/react';
 import { useEffect, useRef, useState } from 'react';
 import { cn } from '#shared/lib/cn';
+import { $homedir, $selectedId, $sessions } from './store';
 
-interface SpawnSessionFormProps {
-  defaultCwd?: string;
-  onSpawned?: (sessionId: string) => void;
-}
+export function SpawnSessionFormIsland() {
+  const sessions = useStore($sessions);
+  const selectedId = useStore($selectedId);
+  const homedir = useStore($homedir);
+  const selectedSession = sessions.find((s) => s.id === selectedId);
+  const defaultCwd = selectedSession?.cwd ?? homedir;
 
-export function SpawnSessionFormIsland({ defaultCwd = '/', onSpawned }: SpawnSessionFormProps) {
   const [agentType, setAgentType] = useState('claude');
   const [value, setValue] = useState(defaultCwd);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -153,7 +156,8 @@ export function SpawnSessionFormIsland({ defaultCwd = '/', onSpawned }: SpawnSes
       const data = (await res.json()) as { sessionId?: string };
       if (data.sessionId) {
         setValue(defaultCwd);
-        onSpawned?.(data.sessionId);
+        $selectedId.set(data.sessionId);
+        history.pushState(null, '', `/?session=${data.sessionId}`);
       }
     } catch {
       /* WS will update */

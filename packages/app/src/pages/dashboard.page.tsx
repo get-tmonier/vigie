@@ -8,6 +8,8 @@ import type { SessionQueriesShape } from '#modules/agent-session/application/use
 import type { AgentSession } from '#modules/agent-session/infrastructure/adapters/in/session.dto';
 import { sessionToDTO } from '#modules/agent-session/infrastructure/adapters/in/session.mapper';
 import { renderPage } from '#shared/ssr/render-page';
+import { DashboardLayout } from '#shared/ui/DashboardLayout';
+import { Header } from '#shared/ui/Header';
 
 type RouteError = HttpServerError.HttpServerError | Socket.SocketError | Cause.UnknownError;
 
@@ -20,7 +22,16 @@ function DashboardPage({ sessions, homedir }: { sessions: AgentSession[]; homedi
         data-homedir={homedir}
         className="hidden"
       />
-      <div id="dashboard-app" className="h-full" />
+      <DashboardLayout
+        sidebar={
+          <>
+            <Header />
+            <div id="session-list-app" className="flex-1 flex flex-col min-h-0" />
+            <div id="spawn-form-app" />
+          </>
+        }
+        main={<div id="session-detail-app" className="flex-1 flex flex-col min-h-0" />}
+      />
     </div>
   );
 }
