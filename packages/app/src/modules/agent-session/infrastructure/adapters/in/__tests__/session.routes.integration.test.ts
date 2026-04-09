@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
 import * as HttpRouter from 'effect/unstable/http/HttpRouter';
+import type { AgentProcessShape } from '#modules/agent-session/application/ports/out/agent-process.port';
 import type { SessionCleanupShape } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import type { SpawnSessionShape } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
 import { Session } from '#modules/agent-session/domain/session';
-import type { PtyManagerShape } from '#modules/agent-session/infrastructure/pty-manager.types';
 import { SessionId } from '#shared/kernel/session/session-id';
 import { createSessionApiRoutes } from '../session.api-routes';
 
@@ -43,7 +43,7 @@ const fakeSessionCleanup: SessionCleanupShape = {
   deleteAllEnded: () => {},
 };
 
-const fakePtyManager: PtyManagerShape = {
+const fakePtyManager: AgentProcessShape = {
   spawn: () => Effect.succeed({ pid: 0 }),
   kill: () => {},
   killAll: () => {},

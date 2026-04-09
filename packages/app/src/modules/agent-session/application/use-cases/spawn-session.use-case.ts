@@ -1,5 +1,6 @@
 import { Effect } from 'effect';
 import type { AgentCatalogShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import type { AgentProcessShape } from '#modules/agent-session/application/ports/out/agent-process.port';
 import type { SessionEventBusShape } from '#modules/agent-session/application/ports/out/session-event-bus.port';
 import type { SessionStoreShape } from '#modules/agent-session/application/ports/out/session-store.port';
 import type { AgentRunnerError } from '#modules/agent-session/domain/errors';
@@ -8,7 +9,6 @@ import {
   SessionNotFoundError,
 } from '#modules/agent-session/domain/errors';
 import { Session } from '#modules/agent-session/domain/session';
-import type { PtyManagerShape } from '#modules/agent-session/infrastructure/pty-manager.types';
 import type { AgentType } from '#shared/kernel/session/agent-type';
 import type { SessionLifecycleEvent } from '#shared/kernel/session/events';
 import type { SessionId } from '#shared/kernel/session/session-id';
@@ -17,7 +17,7 @@ interface SpawnSessionDeps {
   sessionRepo: SessionStoreShape;
   agentCatalog: AgentCatalogShape;
   eventPublisher: SessionEventBusShape;
-  ptyManager: PtyManagerShape;
+  ptyManager: AgentProcessShape;
 }
 
 export type SpawnSessionShape = ReturnType<typeof createSpawnSessionUseCase>;

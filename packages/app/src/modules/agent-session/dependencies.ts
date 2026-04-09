@@ -1,5 +1,6 @@
 import { Effect, Layer, ServiceMap } from 'effect';
 import { AgentCatalog } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import type { AgentProcessShape } from '#modules/agent-session/application/ports/out/agent-process.port';
 import { CliChannel } from '#modules/agent-session/application/ports/out/cli-channel.port';
 import { ResumabilityChecker } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import { SessionEventBus } from '#modules/agent-session/application/ports/out/session-event-bus.port';
@@ -21,7 +22,6 @@ import {
   type TerminalSubscribersShape,
 } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
 import { createPtyManager } from '#modules/agent-session/infrastructure/pty-manager';
-import type { PtyManagerShape } from '#modules/agent-session/infrastructure/pty-manager.types';
 
 export interface AgentSessionServices {
   spawnSession: ReturnType<typeof createSpawnSessionUseCase>;
@@ -29,7 +29,7 @@ export interface AgentSessionServices {
   sessionCleanup: ReturnType<typeof createSessionCleanupUseCase>;
   sessionQueries: ReturnType<typeof createSessionQueriesUseCase>;
   checkResumability: ReturnType<typeof createCheckResumabilityUseCase>;
-  ptyManager: PtyManagerShape;
+  ptyManager: AgentProcessShape;
   terminalSubs: TerminalSubscribersShape;
   startupOps: {
     cleanupOrphanedSessions: () => void;

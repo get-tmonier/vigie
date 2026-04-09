@@ -6,12 +6,12 @@ import * as HttpServerRequest from 'effect/unstable/http/HttpServerRequest';
 import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse';
 import type * as Socket from 'effect/unstable/socket/Socket';
 import * as v from 'valibot';
+import type { AgentProcessShape } from '#modules/agent-session/application/ports/out/agent-process.port';
 import type { SessionCleanupShape } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import type { SpawnSessionShape } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
 import { SpawnSessionRequestSchema } from '#modules/agent-session/infrastructure/adapters/in/session.dto';
 import { sessionToDTO } from '#modules/agent-session/infrastructure/adapters/in/session.mapper';
-import type { PtyManagerShape } from '#modules/agent-session/infrastructure/pty-manager.types';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 import { expandPath } from '#shared/lib/path';
 
@@ -19,7 +19,7 @@ type SessionApiRouteDeps = {
   spawnSession: SpawnSessionShape;
   sessionCleanup: SessionCleanupShape;
   sessionQueries: SessionQueriesShape;
-  ptyManager: PtyManagerShape;
+  ptyManager: AgentProcessShape;
 };
 
 type RouteError = HttpServerError.HttpServerError | Socket.SocketError | Cause.UnknownError;

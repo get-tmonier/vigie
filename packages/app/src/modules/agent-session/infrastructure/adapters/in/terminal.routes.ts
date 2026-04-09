@@ -5,14 +5,14 @@ import type * as HttpServerError from 'effect/unstable/http/HttpServerError';
 import * as HttpServerRequest from 'effect/unstable/http/HttpServerRequest';
 import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse';
 import type * as Socket from 'effect/unstable/socket/Socket';
+import type { AgentProcessShape } from '#modules/agent-session/application/ports/out/agent-process.port';
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import type { TerminalSubscribersShape } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
-import type { PtyManagerShape } from '#modules/agent-session/infrastructure/pty-manager.types';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 
 type TerminalRouteDeps = {
   sessionQueries: SessionQueriesShape;
-  ptyManager: PtyManagerShape;
+  ptyManager: AgentProcessShape;
   terminalSubs: TerminalSubscribersShape;
 };
 

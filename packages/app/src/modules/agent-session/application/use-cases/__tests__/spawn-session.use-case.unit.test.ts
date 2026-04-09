@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect } from 'effect';
 import type { AgentCatalogShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import type { AgentProcessShape } from '#modules/agent-session/application/ports/out/agent-process.port';
 import { createSpawnSessionUseCase } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
 import {
   CannotResumeSessionError,
   SessionNotFoundError,
 } from '#modules/agent-session/domain/errors';
 import { Session } from '#modules/agent-session/domain/session';
-import type { PtyManagerShape } from '#modules/agent-session/infrastructure/pty-manager.types';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 import { makeSessionEventBus, makeSessionRepo } from './test-helpers';
 
@@ -25,7 +25,7 @@ function makeAgentCatalog(canResume = false, detectSessionId = false): AgentCata
   };
 }
 
-function makePtyManager(): PtyManagerShape & {
+function makePtyManager(): AgentProcessShape & {
   spawnCalls: Array<{ sessionId: string; command: string }>;
   trackedConnections: Map<string, string>;
 } {
