@@ -7,6 +7,7 @@ import type { SessionId } from '#modules/agent-session/domain/session-id';
 import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
 import type { SessionStatus } from '#modules/agent-session/domain/session-status';
 import { canTransition } from '#modules/agent-session/domain/session-status';
+import type { AgentType as KernelAgentType } from '#shared/kernel/agent-session/agent-type';
 
 type AgentType = string;
 
@@ -101,7 +102,7 @@ export class Session {
     session._events.push({
       type: 'session:started',
       sessionId: session.id,
-      agentType: session.agentType,
+      agentType: session.agentType as KernelAgentType,
       mode: (props.mode ?? 'prompt') as 'prompt' | 'interactive',
       cwd: session.cwd,
       gitBranch: session.gitBranch,
@@ -203,7 +204,7 @@ export class Session {
     this._events.push({
       type: 'session:started',
       sessionId: this.id,
-      agentType: this.agentType,
+      agentType: this.agentType as KernelAgentType,
       mode: this.mode as 'prompt' | 'interactive',
       cwd: this.cwd,
       gitBranch: this.gitBranch,

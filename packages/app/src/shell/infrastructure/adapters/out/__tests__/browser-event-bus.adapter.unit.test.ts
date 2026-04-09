@@ -50,7 +50,9 @@ const makeSessionStartedEvent = (): SessionEvent => ({
 
 const makeTerminalOutputEvent = (): SessionEvent => ({
   type: 'terminal:output',
-  sessionId: 'session-1',
+  sessionId: 'session-1' as ReturnType<
+    typeof import('#modules/agent-session/domain/session-id').SessionId
+  >,
   data: 'some output',
   timestamp: 1000,
 });
