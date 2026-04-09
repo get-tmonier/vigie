@@ -2,6 +2,7 @@ import { Database } from 'bun:sqlite';
 import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
 import { TerminalRepository } from '#modules/agent-session/application/ports/out/terminal-repository.port';
+import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
 import { SqliteTerminalRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-terminal-repository';
 import { VigiDatabase } from '#shared/db/database';
 
@@ -52,7 +53,8 @@ async function runWithRepo<A>(effect: Effect.Effect<A, never, TerminalRepository
   return Effect.runPromise(Effect.provide(effect, TestRepoLayer));
 }
 
-const SESSION_ID = 'session-1';
+const SESSION_ID = makeSessionId('session-1');
+const UNKNOWN_ID = makeSessionId('nonexistent-session');
 
 describe('SqliteTerminalRepository', () => {
   describe('appendChunk + getChunks', () => {
@@ -127,7 +129,7 @@ describe('SqliteTerminalRepository', () => {
       await runWithRepo(
         Effect.gen(function* () {
           const repo = yield* TerminalRepository;
-          const chunks = repo.getChunks('nonexistent-session');
+          const chunks = repo.getChunks(UNKNOWN_ID);
           expect(chunks).toEqual([]);
         })
       );
@@ -158,7 +160,7 @@ describe('SqliteTerminalRepository', () => {
       await runWithRepo(
         Effect.gen(function* () {
           const repo = yield* TerminalRepository;
-          const all = repo.getAllChunks('nonexistent-session');
+          const all = repo.getAllChunks(UNKNOWN_ID);
           expect(all).toEqual([]);
         })
       );
@@ -221,7 +223,7 @@ describe('SqliteTerminalRepository', () => {
       await runWithRepo(
         Effect.gen(function* () {
           const repo = yield* TerminalRepository;
-          const history = repo.getInputHistory('nonexistent-session');
+          const history = repo.getInputHistory(UNKNOWN_ID);
           expect(history).toEqual([]);
         })
       );

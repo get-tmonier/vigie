@@ -4,7 +4,7 @@ import type { DomainEventBusShape } from '#modules/agent-session/application/por
 import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
 import type { SessionLifecycleEvent } from '#modules/agent-session/domain/events';
-import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
+import type { SessionId } from '#modules/agent-session/domain/session-id';
 import type { PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
 
 interface SessionLifecycleDeps {
@@ -31,9 +31,8 @@ export function createSessionLifecycleUseCase(deps: SessionLifecycleDeps) {
   }
 
   return {
-    markEnded(sessionId: string, exitCode: number): void {
-      const id = makeSessionId(sessionId);
-      const session = sessionRepo.findById(id);
+    markEnded(sessionId: SessionId, exitCode: number): void {
+      const session = sessionRepo.findById(sessionId);
       if (!session) return;
 
       const adapter = agentRegistry.resolve(session.agentType);
@@ -47,27 +46,24 @@ export function createSessionLifecycleUseCase(deps: SessionLifecycleDeps) {
       fireAndForget(publishEvents(session.pullEvents()));
     },
 
-    markError(sessionId: string, error: string): void {
-      const id = makeSessionId(sessionId);
-      const session = sessionRepo.findById(id);
+    markError(sessionId: SessionId, error: string): void {
+      const session = sessionRepo.findById(sessionId);
       if (!session) return;
       session.markError(error);
       sessionRepo.save(session);
       fireAndForget(publishEvents(session.pullEvents()));
     },
 
-    setAgentSessionId(sessionId: string, agentSessionId: string): void {
-      const id = makeSessionId(sessionId);
-      const session = sessionRepo.findById(id);
+    setAgentSessionId(sessionId: SessionId, agentSessionId: string): void {
+      const session = sessionRepo.findById(sessionId);
       if (!session) return;
       session.setAgentSessionId(agentSessionId);
       sessionRepo.save(session);
       fireAndForget(publishEvents(session.pullEvents()));
     },
 
-    deregister(sessionId: string): void {
-      const id = makeSessionId(sessionId);
-      const session = sessionRepo.findById(id);
+    deregister(sessionId: SessionId): void {
+      const session = sessionRepo.findById(sessionId);
       if (session) {
         session.markEnded(0, false);
         sessionRepo.save(session);

@@ -5,6 +5,7 @@ import { Duration, Effect, Fiber, Schedule } from 'effect';
 import * as HttpMiddleware from 'effect/unstable/http/HttpMiddleware';
 import * as HttpRouter from 'effect/unstable/http/HttpRouter';
 import type { AgentSessionServices } from '#modules/agent-session/dependencies';
+import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
 import { VigiDatabase } from '#shared/db/database';
 import { IpcServer } from '#shell/application/ports/out/ipc-server.port';
 import { createIpcRouter } from '#shell/infrastructure/adapters/in/ipc-router';
@@ -130,7 +131,7 @@ export function createRunDaemon(deps: RunDaemonDeps) {
               continue;
             }
             if (parsed.sessionId && parsed.data) {
-              terminalConnection.writeInput(parsed.sessionId, parsed.data, 'cli');
+              terminalConnection.writeInput(makeSessionId(parsed.sessionId), parsed.data, 'cli');
             }
           }
         },

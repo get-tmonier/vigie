@@ -6,6 +6,7 @@ import type {
 } from '#modules/agent-session/application/ports/out/session-repository.port';
 import type { SessionEvent } from '#modules/agent-session/domain/events';
 import type { Session } from '#modules/agent-session/domain/session';
+import type { SessionId } from '#modules/agent-session/domain/session-id';
 
 export function makeSessionRepo(
   sessions: Session[] = [],
@@ -14,11 +15,11 @@ export function makeSessionRepo(
     recentlyEnded?: ResumableSessionInfo[];
   }
 ): SessionRepositoryShape & {
-  store: Map<string, Session>;
+  store: Map<SessionId, Session>;
   activeWithAgentId: ResumableSessionInfo[];
   recentlyEnded: ResumableSessionInfo[];
 } {
-  const store = new Map<string, Session>();
+  const store = new Map<SessionId, Session>();
   for (const s of sessions) store.set(s.id, s);
 
   const activeWithAgentId: ResumableSessionInfo[] = opts?.activeWithAgentId ?? [];

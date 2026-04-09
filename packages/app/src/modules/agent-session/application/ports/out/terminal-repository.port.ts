@@ -1,4 +1,5 @@
 import { ServiceMap } from 'effect';
+import type { SessionId } from '#modules/agent-session/domain/session-id';
 
 export interface TerminalChunk {
   readonly data: string;
@@ -13,11 +14,11 @@ export interface InputEntry {
 }
 
 export interface TerminalRepositoryShape {
-  appendChunk(sessionId: string, data: string, timestamp: number): void;
-  getChunks(sessionId: string, limit?: number): TerminalChunk[];
-  getAllChunks(sessionId: string): TerminalChunk[];
-  appendInput(sessionId: string, text: string, source: string, timestamp: number): void;
-  getInputHistory(sessionId: string, limit?: number): InputEntry[];
+  appendChunk(sessionId: SessionId, data: string, timestamp: number): void;
+  getChunks(sessionId: SessionId, limit?: number): TerminalChunk[];
+  getAllChunks(sessionId: SessionId): TerminalChunk[];
+  appendInput(sessionId: SessionId, text: string, source: string, timestamp: number): void;
+  getInputHistory(sessionId: SessionId, limit?: number): InputEntry[];
 }
 
 export class TerminalRepository extends ServiceMap.Service<

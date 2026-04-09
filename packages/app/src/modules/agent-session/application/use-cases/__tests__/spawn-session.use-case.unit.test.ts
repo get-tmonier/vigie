@@ -61,7 +61,7 @@ describe('SpawnSessionUseCase.register', () => {
     });
 
     useCase.register({
-      sessionId: 'sess-1',
+      sessionId: makeSessionId('sess-1'),
       agentType: 'claude',
       cwd: '/tmp',
       connId: 'conn-1',
@@ -82,14 +82,14 @@ describe('SpawnSessionUseCase.register', () => {
     });
 
     useCase.register({
-      sessionId: 'sess-1',
+      sessionId: makeSessionId('sess-1'),
       agentType: 'claude',
       cwd: '/tmp',
       connId: 'conn-1',
     });
 
-    expect(registry.sessionConnections.get('sess-1')).toBe('conn-1');
-    expect(registry.connSessions.get('conn-1')).toBe('sess-1');
+    expect(registry.sessionConnections.get(makeSessionId('sess-1'))).toBe('conn-1');
+    expect(registry.connSessions.get('conn-1')).toBe(makeSessionId('sess-1'));
   });
 });
 
@@ -130,7 +130,7 @@ describe('SpawnSessionUseCase.spawnInteractive', () => {
 
     const result = await Effect.runPromise(
       useCase.spawnInteractive({
-        sessionId: 'sess-detect',
+        sessionId: makeSessionId('sess-detect'),
         agentType: 'claude',
         cwd: '/tmp',
         cols: 80,
@@ -204,7 +204,7 @@ describe('SpawnSessionUseCase.resume', () => {
 
     let caught: unknown = null;
     await Effect.runPromise(
-      Effect.catch(useCase.resume('nonexistent', { cols: 80, rows: 24 }), (err) => {
+      Effect.catch(useCase.resume(makeSessionId('nonexistent'), { cols: 80, rows: 24 }), (err) => {
         caught = err;
         return Effect.void;
       })
@@ -231,7 +231,7 @@ describe('SpawnSessionUseCase.resume', () => {
 
     let caught: unknown = null;
     await Effect.runPromise(
-      Effect.catch(useCase.resume('sess-1', { cols: 80, rows: 24 }), (err) => {
+      Effect.catch(useCase.resume(makeSessionId('sess-1'), { cols: 80, rows: 24 }), (err) => {
         caught = err;
         return Effect.void;
       })
@@ -256,7 +256,9 @@ describe('SpawnSessionUseCase.resume', () => {
       setupPtyLifecycle: () => {},
     });
 
-    const result = await Effect.runPromise(useCase.resume('sess-resume', { cols: 80, rows: 24 }));
+    const result = await Effect.runPromise(
+      useCase.resume(makeSessionId('sess-resume'), { cols: 80, rows: 24 })
+    );
 
     expect(result.pid).toBe(1234);
     expect(sessionRepo.findById(makeSessionId('sess-resume'))?.status).toBe('active');

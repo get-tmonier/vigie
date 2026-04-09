@@ -2,7 +2,7 @@ import { Effect } from 'effect';
 import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
 import type { SessionLifecycleEvent } from '#modules/agent-session/domain/events';
-import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
+import type { SessionId } from '#modules/agent-session/domain/session-id';
 
 interface SessionCleanupDeps {
   sessionRepo: SessionRepositoryShape;
@@ -27,12 +27,11 @@ export function createSessionCleanupUseCase(deps: SessionCleanupDeps) {
   }
 
   return {
-    delete(sessionId: string): void {
-      const id = makeSessionId(sessionId);
-      const session = sessionRepo.findById(id);
+    delete(sessionId: SessionId): void {
+      const session = sessionRepo.findById(sessionId);
       if (!session) return;
       session.delete();
-      sessionRepo.delete(id);
+      sessionRepo.delete(sessionId);
       fireAndForget(publishEvents(session.pullEvents()));
     },
 

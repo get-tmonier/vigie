@@ -6,6 +6,7 @@ import {
   TerminalRepository,
   type TerminalRepositoryShape,
 } from '#modules/agent-session/application/ports/out/terminal-repository.port';
+import type { SessionId } from '#modules/agent-session/domain/session-id';
 import { VigiDatabase } from '#shared/db/database';
 
 function createSqliteTerminalRepository(db: Database): TerminalRepositoryShape {
@@ -29,7 +30,7 @@ function createSqliteTerminalRepository(db: Database): TerminalRepositoryShape {
   );
 
   return {
-    appendChunk(sessionId: string, data: string, timestamp: number): void {
+    appendChunk(sessionId: SessionId, data: string, timestamp: number): void {
       const row = getMaxSeqStmt.get({ $session_id: sessionId }) as { max_seq: number };
       appendChunkStmt.run({
         $session_id: sessionId,
@@ -39,7 +40,7 @@ function createSqliteTerminalRepository(db: Database): TerminalRepositoryShape {
       });
     },
 
-    getChunks(sessionId: string, limit: number = 500): TerminalChunk[] {
+    getChunks(sessionId: SessionId, limit: number = 500): TerminalChunk[] {
       const rows = getChunksStmt.all({
         $session_id: sessionId,
         $limit: limit,
@@ -47,11 +48,11 @@ function createSqliteTerminalRepository(db: Database): TerminalRepositoryShape {
       return rows.reverse();
     },
 
-    getAllChunks(sessionId: string): TerminalChunk[] {
+    getAllChunks(sessionId: SessionId): TerminalChunk[] {
       return getAllChunksStmt.all({ $session_id: sessionId }) as TerminalChunk[];
     },
 
-    appendInput(sessionId: string, text: string, source: string, timestamp: number): void {
+    appendInput(sessionId: SessionId, text: string, source: string, timestamp: number): void {
       appendInputStmt.run({
         $session_id: sessionId,
         $text: text,
@@ -60,7 +61,7 @@ function createSqliteTerminalRepository(db: Database): TerminalRepositoryShape {
       });
     },
 
-    getInputHistory(sessionId: string, limit: number = 200): InputEntry[] {
+    getInputHistory(sessionId: SessionId, limit: number = 200): InputEntry[] {
       return getInputHistoryStmt.all({
         $session_id: sessionId,
         $limit: limit,

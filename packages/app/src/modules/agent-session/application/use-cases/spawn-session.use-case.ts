@@ -11,7 +11,6 @@ import {
 import type { SessionLifecycleEvent } from '#modules/agent-session/domain/events';
 import { Session } from '#modules/agent-session/domain/session';
 import type { SessionId } from '#modules/agent-session/domain/session-id';
-import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
 import type { PtyEntry, PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
 
 interface SpawnSessionDeps {
@@ -43,7 +42,7 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
 
   return {
     register(props: {
-      sessionId: string;
+      sessionId: SessionId;
       agentType: string;
       cwd: string;
       mode?: 'prompt' | 'interactive';
@@ -68,7 +67,7 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
     },
 
     spawnInteractive(props: {
-      sessionId?: string;
+      sessionId?: SessionId;
       agentType: string;
       cwd: string;
       cols: number;
@@ -125,15 +124,14 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
     },
 
     resume(
-      sessionId: string,
+      sessionId: SessionId,
       opts: { cols: number; rows: number; connId?: string; gitBranch?: string; repoName?: string }
     ): Effect.Effect<
       { sessionId: SessionId; pid: number },
       SessionNotFoundError | CannotResumeSessionError | AgentRunnerError
     > {
       return Effect.gen(function* () {
-        const id = makeSessionId(sessionId);
-        const session = sessionRepo.findById(id);
+        const session = sessionRepo.findById(sessionId);
         if (!session) return yield* new SessionNotFoundError(sessionId);
 
         const adapter = agentRegistry.resolve(session.agentType);
@@ -159,17 +157,17 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
           browserChannels: new Map(),
           ptyDimensions: { cols: opts.cols, rows: opts.rows },
         };
-        registry.ptyHandles.set(id, entry);
+        registry.ptyHandles.set(sessionId, entry);
 
         if (opts.connId) {
-          registry.connSessions.set(opts.connId, id);
+          registry.connSessions.set(opts.connId, sessionId);
           entry.cliChannels.set(opts.connId, { cols: opts.cols, rows: opts.rows });
         }
 
         yield* Effect.forkChild(publishEvents(session.pullEvents()));
-        setupPtyLifecycle(id, entry);
+        setupPtyLifecycle(sessionId, entry);
 
-        return { sessionId: id, pid: handle.pid };
+        return { sessionId, pid: handle.pid };
       });
     },
   };

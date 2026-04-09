@@ -65,7 +65,7 @@ describe('SessionLifecycleUseCase.markEnded', () => {
     sessionRepo.save(session);
 
     const { useCase } = makeUseCase({ sessionRepo });
-    useCase.markEnded('sess-1', 0);
+    useCase.markEnded(makeSessionId('sess-1'), 0);
 
     await new Promise((r) => setTimeout(r, 10));
     expect(sessionRepo.findById(makeSessionId('sess-1'))?.status).toBe('ended');
@@ -83,7 +83,7 @@ describe('SessionLifecycleUseCase.markEnded', () => {
       agentRegistry: makeAgentRegistry(true),
       resumabilityChecker: makeResumabilityChecker(true),
     });
-    useCase.markEnded('sess-1', 0);
+    useCase.markEnded(makeSessionId('sess-1'), 0);
 
     await new Promise((r) => setTimeout(r, 10));
     const saved = sessionRepo.findById(makeSessionId('sess-1'));
@@ -92,7 +92,7 @@ describe('SessionLifecycleUseCase.markEnded', () => {
 
   it('is a no-op when session does not exist', () => {
     const { useCase } = makeUseCase();
-    expect(() => useCase.markEnded('nonexistent', 0)).not.toThrow();
+    expect(() => useCase.markEnded(makeSessionId('nonexistent'), 0)).not.toThrow();
   });
 });
 
@@ -104,7 +104,7 @@ describe('SessionLifecycleUseCase.markError', () => {
     sessionRepo.save(session);
 
     const { useCase } = makeUseCase({ sessionRepo });
-    useCase.markError('sess-1', 'crash');
+    useCase.markError(makeSessionId('sess-1'), 'crash');
 
     await new Promise((r) => setTimeout(r, 10));
     expect(sessionRepo.findById(makeSessionId('sess-1'))?.status).toBe('error');
@@ -112,7 +112,7 @@ describe('SessionLifecycleUseCase.markError', () => {
 
   it('is a no-op when session does not exist', () => {
     const { useCase } = makeUseCase();
-    expect(() => useCase.markError('nonexistent', 'crash')).not.toThrow();
+    expect(() => useCase.markError(makeSessionId('nonexistent'), 'crash')).not.toThrow();
   });
 });
 
@@ -124,7 +124,7 @@ describe('SessionLifecycleUseCase.setAgentSessionId', () => {
     sessionRepo.save(session);
 
     const { useCase } = makeUseCase({ sessionRepo });
-    useCase.setAgentSessionId('sess-1', 'agent-xyz');
+    useCase.setAgentSessionId(makeSessionId('sess-1'), 'agent-xyz');
 
     await new Promise((r) => setTimeout(r, 10));
     expect(sessionRepo.findById(makeSessionId('sess-1'))?.agentSessionId).toBe('agent-xyz');
@@ -132,7 +132,9 @@ describe('SessionLifecycleUseCase.setAgentSessionId', () => {
 
   it('is a no-op when session does not exist', () => {
     const { useCase } = makeUseCase();
-    expect(() => useCase.setAgentSessionId('nonexistent', 'agent-xyz')).not.toThrow();
+    expect(() =>
+      useCase.setAgentSessionId(makeSessionId('nonexistent'), 'agent-xyz')
+    ).not.toThrow();
   });
 });
 
@@ -143,11 +145,11 @@ describe('SessionLifecycleUseCase.deregister', () => {
     const session = Session.create({ id: 'sess-1', agentType: 'claude', cwd: '/tmp' });
     session.pullEvents();
     sessionRepo.save(session);
-    registry.sessionConnections.set('sess-1', 'conn-1');
-    registry.connSessions.set('conn-1', 'sess-1');
+    registry.sessionConnections.set(makeSessionId('sess-1'), 'conn-1');
+    registry.connSessions.set('conn-1', makeSessionId('sess-1'));
 
     const { useCase } = makeUseCase({ sessionRepo, registry });
-    useCase.deregister('sess-1');
+    useCase.deregister(makeSessionId('sess-1'));
 
     await new Promise((r) => setTimeout(r, 10));
     expect(sessionRepo.findById(makeSessionId('sess-1'))?.status).toBe('ended');
@@ -159,24 +161,24 @@ describe('SessionLifecycleUseCase.deregister', () => {
     const session = Session.create({ id: 'sess-1', agentType: 'claude', cwd: '/tmp' });
     session.pullEvents();
     sessionRepo.save(session);
-    registry.sessionConnections.set('sess-1', 'conn-1');
-    registry.connSessions.set('conn-1', 'sess-1');
+    registry.sessionConnections.set(makeSessionId('sess-1'), 'conn-1');
+    registry.connSessions.set('conn-1', makeSessionId('sess-1'));
 
     const { useCase } = makeUseCase({ sessionRepo, registry });
-    useCase.deregister('sess-1');
+    useCase.deregister(makeSessionId('sess-1'));
 
-    expect(registry.sessionConnections.has('sess-1')).toBe(false);
+    expect(registry.sessionConnections.has(makeSessionId('sess-1'))).toBe(false);
     expect(registry.connSessions.has('conn-1')).toBe(false);
   });
 
   it('cleans registry even if session not found', () => {
     const registry = makePtyRegistry();
-    registry.sessionConnections.set('sess-orphan', 'conn-orphan');
-    registry.connSessions.set('conn-orphan', 'sess-orphan');
+    registry.sessionConnections.set(makeSessionId('sess-orphan'), 'conn-orphan');
+    registry.connSessions.set('conn-orphan', makeSessionId('sess-orphan'));
 
     const { useCase } = makeUseCase({ registry });
-    useCase.deregister('sess-orphan');
+    useCase.deregister(makeSessionId('sess-orphan'));
 
-    expect(registry.sessionConnections.has('sess-orphan')).toBe(false);
+    expect(registry.sessionConnections.has(makeSessionId('sess-orphan'))).toBe(false);
   });
 });

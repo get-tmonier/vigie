@@ -67,7 +67,7 @@ describe('SessionQueriesUseCase.findById', () => {
       sessionRepo: makeSessionRepo(),
       terminalRepo: makeTerminalRepo(),
     });
-    expect(useCase.findById('nonexistent')).toBeNull();
+    expect(useCase.findById(makeSessionId('nonexistent'))).toBeNull();
   });
 
   it('returns the session when it exists', () => {
@@ -76,7 +76,7 @@ describe('SessionQueriesUseCase.findById', () => {
     sessionRepo.save(session);
 
     const useCase = createSessionQueriesUseCase({ sessionRepo, terminalRepo: makeTerminalRepo() });
-    const found = useCase.findById('sess-1');
+    const found = useCase.findById(makeSessionId('sess-1'));
     expect(found).not.toBeNull();
     expect(found?.id).toBe(makeSessionId('sess-1'));
   });
@@ -88,19 +88,19 @@ describe('SessionQueriesUseCase.getAllChunks', () => {
       sessionRepo: makeSessionRepo(),
       terminalRepo: makeTerminalRepo(),
     });
-    expect(useCase.getAllChunks('sess-1')).toEqual([]);
+    expect(useCase.getAllChunks(makeSessionId('sess-1'))).toEqual([]);
   });
 
   it('returns all chunks for a session', () => {
     const terminalRepo = makeTerminalRepo();
-    terminalRepo.appendChunk('sess-1', 'hello', Date.now());
-    terminalRepo.appendChunk('sess-1', ' world', Date.now());
+    terminalRepo.appendChunk(makeSessionId('sess-1'), 'hello', Date.now());
+    terminalRepo.appendChunk(makeSessionId('sess-1'), ' world', Date.now());
 
     const useCase = createSessionQueriesUseCase({
       sessionRepo: makeSessionRepo(),
       terminalRepo,
     });
-    const chunks = useCase.getAllChunks('sess-1');
+    const chunks = useCase.getAllChunks(makeSessionId('sess-1'));
     expect(chunks).toHaveLength(2);
     expect(chunks[0].data).toBe('hello');
     expect(chunks[1].data).toBe(' world');
@@ -113,19 +113,19 @@ describe('SessionQueriesUseCase.getInputHistory', () => {
       sessionRepo: makeSessionRepo(),
       terminalRepo: makeTerminalRepo(),
     });
-    expect(useCase.getInputHistory('sess-1')).toEqual([]);
+    expect(useCase.getInputHistory(makeSessionId('sess-1'))).toEqual([]);
   });
 
   it('returns input history for a session', () => {
     const terminalRepo = makeTerminalRepo();
-    terminalRepo.appendInput('sess-1', 'ls -la', 'cli', Date.now());
-    terminalRepo.appendInput('sess-1', 'pwd', 'browser', Date.now());
+    terminalRepo.appendInput(makeSessionId('sess-1'), 'ls -la', 'cli', Date.now());
+    terminalRepo.appendInput(makeSessionId('sess-1'), 'pwd', 'browser', Date.now());
 
     const useCase = createSessionQueriesUseCase({
       sessionRepo: makeSessionRepo(),
       terminalRepo,
     });
-    const history = useCase.getInputHistory('sess-1');
+    const history = useCase.getInputHistory(makeSessionId('sess-1'));
     expect(history).toHaveLength(2);
     expect(history[0].text).toBe('ls -la');
     expect(history[1].source).toBe('browser');
@@ -133,15 +133,15 @@ describe('SessionQueriesUseCase.getInputHistory', () => {
 
   it('respects limit parameter', () => {
     const terminalRepo = makeTerminalRepo();
-    terminalRepo.appendInput('sess-1', 'cmd1', 'cli', Date.now());
-    terminalRepo.appendInput('sess-1', 'cmd2', 'cli', Date.now());
-    terminalRepo.appendInput('sess-1', 'cmd3', 'cli', Date.now());
+    terminalRepo.appendInput(makeSessionId('sess-1'), 'cmd1', 'cli', Date.now());
+    terminalRepo.appendInput(makeSessionId('sess-1'), 'cmd2', 'cli', Date.now());
+    terminalRepo.appendInput(makeSessionId('sess-1'), 'cmd3', 'cli', Date.now());
 
     const useCase = createSessionQueriesUseCase({
       sessionRepo: makeSessionRepo(),
       terminalRepo,
     });
-    const history = useCase.getInputHistory('sess-1', 2);
+    const history = useCase.getInputHistory(makeSessionId('sess-1'), 2);
     expect(history).toHaveLength(2);
   });
 });

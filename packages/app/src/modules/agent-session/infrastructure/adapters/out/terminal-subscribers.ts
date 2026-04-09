@@ -1,4 +1,5 @@
 import { Data, Effect, Layer, ServiceMap } from 'effect';
+import type { SessionId } from '#modules/agent-session/domain/session-id';
 
 class TerminalSubscriberError extends Data.TaggedError('TerminalSubscriberError')<{
   readonly message: string;
@@ -6,10 +7,10 @@ class TerminalSubscriberError extends Data.TaggedError('TerminalSubscriberError'
 }> {}
 
 function createTerminalSubscribers(): TerminalSubscribersShape {
-  const subscribers = new Map<string, Set<(data: string) => void>>();
+  const subscribers = new Map<SessionId, Set<(data: string) => void>>();
 
   return {
-    subscribe(sessionId: string, callback: (data: string) => void): () => void {
+    subscribe(sessionId: SessionId, callback: (data: string) => void): () => void {
       if (!subscribers.has(sessionId)) {
         subscribers.set(sessionId, new Set());
       }
@@ -21,7 +22,7 @@ function createTerminalSubscribers(): TerminalSubscribersShape {
         }
       };
     },
-    publish(sessionId: string, data: string): Effect.Effect<void> {
+    publish(sessionId: SessionId, data: string): Effect.Effect<void> {
       return Effect.gen(function* () {
         const subs = subscribers.get(sessionId);
         if (subs) {
@@ -34,16 +35,16 @@ function createTerminalSubscribers(): TerminalSubscribersShape {
         }
       });
     },
-    hasSubscribers(sessionId: string): boolean {
+    hasSubscribers(sessionId: SessionId): boolean {
       return (subscribers.get(sessionId)?.size ?? 0) > 0;
     },
   };
 }
 
 export type TerminalSubscribersShape = {
-  subscribe(sessionId: string, callback: (data: string) => void): () => void;
-  publish(sessionId: string, data: string): Effect.Effect<void>;
-  hasSubscribers(sessionId: string): boolean;
+  subscribe(sessionId: SessionId, callback: (data: string) => void): () => void;
+  publish(sessionId: SessionId, data: string): Effect.Effect<void>;
+  hasSubscribers(sessionId: SessionId): boolean;
 };
 
 export class TerminalSubscribers extends ServiceMap.Service<

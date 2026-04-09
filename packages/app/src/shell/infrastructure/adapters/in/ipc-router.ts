@@ -1,15 +1,18 @@
 import { Effect } from 'effect';
 import * as Schema from 'effect/Schema';
+import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
 import { expandPath } from '#shared/lib/path';
 import type { SessionToDaemon } from '#shell/application/contracts/ipc-protocol';
 import type { IpcConnection } from '#shell/application/ports/out/ipc-server.port';
 
 const encodeJson = Schema.encodeSync(Schema.UnknownFromJsonString);
 
+import type { SessionId } from '#modules/agent-session/domain/session-id';
+
 interface IpcRouterDeps {
   spawnSession: {
     register(props: {
-      sessionId: string;
+      sessionId: SessionId;
       agentType: string;
       cwd: string;
       mode?: 'prompt' | 'interactive';
@@ -19,7 +22,7 @@ interface IpcRouterDeps {
       connId: string;
     }): void;
     spawnInteractive(props: {
-      sessionId?: string;
+      sessionId?: SessionId;
       agentType: string;
       cwd: string;
       cols: number;
@@ -31,23 +34,23 @@ interface IpcRouterDeps {
       repoName?: string;
     }): Effect.Effect<{ sessionId: string; pid: number }, Error>;
     resume(
-      sessionId: string,
+      sessionId: SessionId,
       opts: { cols: number; rows: number; connId?: string; gitBranch?: string; repoName?: string }
     ): Effect.Effect<{ sessionId: string; pid: number }, Error>;
   };
   sessionLifecycle: {
-    markEnded(sessionId: string, exitCode: number): void;
-    markError(sessionId: string, error: string): void;
-    setAgentSessionId(sessionId: string, agentSessionId: string): void;
-    deregister(sessionId: string): void;
+    markEnded(sessionId: SessionId, exitCode: number): void;
+    markError(sessionId: SessionId, error: string): void;
+    setAgentSessionId(sessionId: SessionId, agentSessionId: string): void;
+    deregister(sessionId: SessionId): void;
   };
   terminalConnection: {
-    writeInput(sessionId: string, data: string, source: 'cli' | 'browser'): void;
-    updateCliResize(sessionId: string, connId: string, cols: number, rows: number): void;
+    writeInput(sessionId: SessionId, data: string, source: 'cli' | 'browser'): void;
+    updateCliResize(sessionId: SessionId, connId: string, cols: number, rows: number): void;
     handleDisconnect(connId: string): void;
-    detach(sessionId: string, connId: string): void;
+    detach(sessionId: SessionId, connId: string): void;
     attach(
-      sessionId: string,
+      sessionId: SessionId,
       connId: string,
       dims: { cols: number; rows: number }
     ): { chunks: Array<{ data: string }>; pid: number } | null;
@@ -64,7 +67,7 @@ export function createIpcRouter(
       switch (msg.type) {
         case 'session:register': {
           spawnSession.register({
-            sessionId: msg.sessionId,
+            sessionId: makeSessionId(msg.sessionId),
             agentType: msg.agentType,
             cwd: msg.cwd,
             mode: msg.mode as 'prompt' | 'interactive' | undefined,
@@ -79,7 +82,7 @@ export function createIpcRouter(
         case 'session:spawn-interactive': {
           const spawnResult = yield* Effect.result(
             spawnSession.spawnInteractive({
-              sessionId: msg.sessionId,
+              sessionId: makeSessionId(msg.sessionId),
               agentType: msg.agentType,
               cwd: expandPath(msg.cwd),
               cols: msg.cols,
@@ -108,22 +111,27 @@ export function createIpcRouter(
           break;
         }
         case 'session:stdin': {
-          terminalConnection.writeInput(msg.sessionId, msg.data, 'cli');
+          terminalConnection.writeInput(makeSessionId(msg.sessionId), msg.data, 'cli');
           break;
         }
         case 'session:cli-resize': {
-          terminalConnection.updateCliResize(msg.sessionId, conn.id, msg.cols, msg.rows);
+          terminalConnection.updateCliResize(
+            makeSessionId(msg.sessionId),
+            conn.id,
+            msg.cols,
+            msg.rows
+          );
           yield* Effect.logInfo(
             `[daemon] cli-resize sessionId=${msg.sessionId} cols=${msg.cols} rows=${msg.rows}`
           );
           break;
         }
         case 'session:detach': {
-          terminalConnection.detach(msg.sessionId, conn.id);
+          terminalConnection.detach(makeSessionId(msg.sessionId), conn.id);
           break;
         }
         case 'session:attach': {
-          const result = terminalConnection.attach(msg.sessionId, conn.id, {
+          const result = terminalConnection.attach(makeSessionId(msg.sessionId), conn.id, {
             cols: msg.cols,
             rows: msg.rows,
           });
@@ -167,18 +175,18 @@ export function createIpcRouter(
           break;
         }
         case 'session:done': {
-          sessionLifecycle.markEnded(msg.sessionId, msg.exitCode);
+          sessionLifecycle.markEnded(makeSessionId(msg.sessionId), msg.exitCode);
           yield* Effect.logInfo(`[daemon] Session done: ${msg.sessionId} (exit ${msg.exitCode})`);
           break;
         }
         case 'session:error': {
-          sessionLifecycle.markError(msg.sessionId, msg.error);
+          sessionLifecycle.markError(makeSessionId(msg.sessionId), msg.error);
           yield* Effect.logError(`[daemon] Session error: ${msg.sessionId}: ${msg.error}`);
           break;
         }
         case 'session:resume': {
           const resumeResult = yield* Effect.result(
-            spawnSession.resume(msg.sessionId, {
+            spawnSession.resume(makeSessionId(msg.sessionId), {
               cols: msg.cols,
               rows: msg.rows,
               connId: conn.id,
@@ -204,14 +212,14 @@ export function createIpcRouter(
           break;
         }
         case 'session:agent-id': {
-          sessionLifecycle.setAgentSessionId(msg.sessionId, msg.agentSessionId);
+          sessionLifecycle.setAgentSessionId(makeSessionId(msg.sessionId), msg.agentSessionId);
           yield* Effect.logInfo(
             `[daemon] Agent session ID detected for ${msg.sessionId}: ${msg.agentSessionId}`
           );
           break;
         }
         case 'session:deregister': {
-          sessionLifecycle.deregister(msg.sessionId);
+          sessionLifecycle.deregister(makeSessionId(msg.sessionId));
           break;
         }
       }

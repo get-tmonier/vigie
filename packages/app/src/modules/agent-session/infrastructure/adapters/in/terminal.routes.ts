@@ -7,6 +7,7 @@ import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse';
 import type * as Socket from 'effect/unstable/socket/Socket';
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import type { TerminalConnectionShape } from '#modules/agent-session/application/use-cases/terminal-connection.use-case';
+import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
 import type { TerminalSubscribersShape } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
 
 type TerminalRouteDeps = {
@@ -27,10 +28,11 @@ export function createTerminalRoutes(
       'GET',
       '/api/sessions/:id/chunks',
       Effect.gen(function* () {
-        const { id: sessionId } = yield* HttpRouter.params;
-        if (!sessionId) {
+        const { id: rawSessionId } = yield* HttpRouter.params;
+        if (!rawSessionId) {
           return HttpServerResponse.jsonUnsafe({ error: 'Missing session ID' }, { status: 400 });
         }
+        const sessionId = makeSessionId(rawSessionId);
         const chunks = sessionQueries.getAllChunks(sessionId);
         return HttpServerResponse.jsonUnsafe({ chunks });
       })
@@ -40,10 +42,11 @@ export function createTerminalRoutes(
       'GET',
       '/api/sessions/:id/input-history',
       Effect.gen(function* () {
-        const { id: sessionId } = yield* HttpRouter.params;
-        if (!sessionId) {
+        const { id: rawSessionId } = yield* HttpRouter.params;
+        if (!rawSessionId) {
           return HttpServerResponse.jsonUnsafe({ error: 'Missing session ID' }, { status: 400 });
         }
+        const sessionId = makeSessionId(rawSessionId);
         const request = yield* HttpServerRequest.HttpServerRequest;
         const url = new URL(request.url, 'http://localhost');
         const limitParam = url.searchParams.get('limit');
@@ -57,10 +60,11 @@ export function createTerminalRoutes(
       'GET',
       '/ws/terminal/:sessionId',
       Effect.gen(function* () {
-        const { sessionId } = yield* HttpRouter.params;
-        if (!sessionId) {
+        const { sessionId: rawSessionId } = yield* HttpRouter.params;
+        if (!rawSessionId) {
           return HttpServerResponse.jsonUnsafe({ error: 'Missing session ID' }, { status: 400 });
         }
+        const sessionId = makeSessionId(rawSessionId);
 
         const request = yield* HttpServerRequest.HttpServerRequest;
         const socket = yield* request.upgrade;

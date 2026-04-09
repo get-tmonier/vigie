@@ -1,7 +1,7 @@
 import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
 import type { TerminalRepositoryShape } from '#modules/agent-session/application/ports/out/terminal-repository.port';
 import type { Session } from '#modules/agent-session/domain/session';
-import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
+import type { SessionId } from '#modules/agent-session/domain/session-id';
 
 interface SessionQueriesDeps {
   sessionRepo: SessionRepositoryShape;
@@ -18,16 +18,16 @@ export function createSessionQueriesUseCase(deps: SessionQueriesDeps) {
       return sessionRepo.findAll();
     },
 
-    findById(sessionId: string): Session | null {
-      return sessionRepo.findById(makeSessionId(sessionId));
+    findById(sessionId: SessionId): Session | null {
+      return sessionRepo.findById(sessionId);
     },
 
-    getAllChunks(sessionId: string): Array<{ data: string }> {
+    getAllChunks(sessionId: SessionId): Array<{ data: string }> {
       return terminalRepo.getAllChunks(sessionId);
     },
 
     getInputHistory(
-      sessionId: string,
+      sessionId: SessionId,
       limit?: number
     ): Array<{ text: string; source: string; timestamp: number }> {
       return terminalRepo.getInputHistory(sessionId, limit);

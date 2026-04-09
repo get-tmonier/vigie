@@ -10,6 +10,7 @@ import type { SessionCleanupShape } from '#modules/agent-session/application/use
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import type { SpawnSessionShape } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
 import type { TerminalConnectionShape } from '#modules/agent-session/application/use-cases/terminal-connection.use-case';
+import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
 import { SpawnSessionRequestSchema } from '#modules/agent-session/infrastructure/adapters/in/session.dto';
 import { sessionToDTO } from '#modules/agent-session/infrastructure/adapters/in/session.mapper';
 import { expandPath } from '#shared/lib/path';
@@ -106,10 +107,11 @@ export function createSessionApiRoutes(
       'POST',
       '/api/sessions/:id/kill',
       Effect.gen(function* () {
-        const { id: sessionId } = yield* HttpRouter.params;
-        if (!sessionId) {
+        const { id: rawSessionId } = yield* HttpRouter.params;
+        if (!rawSessionId) {
           return HttpServerResponse.jsonUnsafe({ error: 'Missing session ID' }, { status: 400 });
         }
+        const sessionId = makeSessionId(rawSessionId);
         const pid = terminalConnection.getActivePid(sessionId);
         if (pid === null) {
           return HttpServerResponse.jsonUnsafe(
@@ -126,10 +128,11 @@ export function createSessionApiRoutes(
       'POST',
       '/api/sessions/:id/resume',
       Effect.gen(function* () {
-        const { id: sessionId } = yield* HttpRouter.params;
-        if (!sessionId) {
+        const { id: rawSessionId } = yield* HttpRouter.params;
+        if (!rawSessionId) {
           return HttpServerResponse.jsonUnsafe({ error: 'Missing session ID' }, { status: 400 });
         }
+        const sessionId = makeSessionId(rawSessionId);
         const session = sessionQueries.findById(sessionId);
         if (!session) {
           return HttpServerResponse.jsonUnsafe({ error: 'Session not found' }, { status: 404 });
@@ -159,10 +162,11 @@ export function createSessionApiRoutes(
       'DELETE',
       '/api/sessions/:id',
       Effect.gen(function* () {
-        const { id: sessionId } = yield* HttpRouter.params;
-        if (!sessionId) {
+        const { id: rawSessionId } = yield* HttpRouter.params;
+        if (!rawSessionId) {
           return HttpServerResponse.jsonUnsafe({ error: 'Missing session ID' }, { status: 400 });
         }
+        const sessionId = makeSessionId(rawSessionId);
         const session = sessionQueries.findById(sessionId);
         if (!session) {
           return HttpServerResponse.jsonUnsafe({ error: 'Session not found' }, { status: 404 });

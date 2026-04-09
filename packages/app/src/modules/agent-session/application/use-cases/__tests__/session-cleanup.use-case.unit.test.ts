@@ -17,7 +17,7 @@ describe('SessionCleanupUseCase.delete', () => {
       sessionRepo,
       eventPublisher: makeDomainEventBus(),
     });
-    useCase.delete('sess-1');
+    useCase.delete(makeSessionId('sess-1'));
 
     await new Promise((r) => setTimeout(r, 10));
     expect(sessionRepo.findById(makeSessionId('sess-1'))).toBeNull();
@@ -34,7 +34,7 @@ describe('SessionCleanupUseCase.delete', () => {
       sessionRepo,
       eventPublisher: makeDomainEventBus(),
     });
-    useCase.delete('sess-1');
+    useCase.delete(makeSessionId('sess-1'));
 
     await new Promise((r) => setTimeout(r, 10));
     expect(sessionRepo.findById(makeSessionId('sess-1'))).toBeNull();
@@ -49,7 +49,7 @@ describe('SessionCleanupUseCase.delete', () => {
     sessionRepo.save(session);
 
     const useCase = createSessionCleanupUseCase({ sessionRepo, eventPublisher });
-    useCase.delete('sess-1');
+    useCase.delete(makeSessionId('sess-1'));
 
     await new Promise((r) => setTimeout(r, 10));
     expect(eventPublisher.published.some((e) => e.type === 'session:deleted')).toBe(true);
@@ -61,7 +61,7 @@ describe('SessionCleanupUseCase.delete', () => {
       sessionRepo,
       eventPublisher: makeDomainEventBus(),
     });
-    expect(() => useCase.delete('nonexistent')).not.toThrow();
+    expect(() => useCase.delete(makeSessionId('nonexistent'))).not.toThrow();
   });
 
   it('throws when trying to delete an active session', () => {
@@ -74,7 +74,9 @@ describe('SessionCleanupUseCase.delete', () => {
       sessionRepo,
       eventPublisher: makeDomainEventBus(),
     });
-    expect(() => useCase.delete('sess-active')).toThrow(CannotDeleteActiveSessionError);
+    expect(() => useCase.delete(makeSessionId('sess-active'))).toThrow(
+      CannotDeleteActiveSessionError
+    );
   });
 });
 

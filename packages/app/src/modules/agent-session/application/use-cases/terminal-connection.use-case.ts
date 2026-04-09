@@ -6,7 +6,6 @@ import type { SessionRepositoryShape } from '#modules/agent-session/application/
 import type { TerminalRepositoryShape } from '#modules/agent-session/application/ports/out/terminal-repository.port';
 import type { SessionLifecycleEvent } from '#modules/agent-session/domain/events';
 import type { SessionId } from '#modules/agent-session/domain/session-id';
-import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
 import type { TerminalSubscribersShape } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
 import type { PtyEntry, PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
 import { type LineBuffer, stripAnsiAndBuffer } from '#shared/lib/input-line-buffer';
@@ -50,7 +49,7 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
     );
   }
 
-  function applyResizePriority(sessionId: string): { cols: number; rows: number } | null {
+  function applyResizePriority(sessionId: SessionId): { cols: number; rows: number } | null {
     const entry = registry.ptyHandles.get(sessionId);
     if (!entry) return null;
 
@@ -134,7 +133,7 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
   return {
     setupPtyLifecycle,
 
-    kill(sessionId: string): void {
+    kill(sessionId: SessionId): void {
       const entry = registry.ptyHandles.get(sessionId);
       if (entry) entry.handle.kill();
     },
@@ -145,22 +144,21 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
       }
     },
 
-    getActivePid(sessionId: string): number | null {
+    getActivePid(sessionId: SessionId): number | null {
       return registry.ptyHandles.get(sessionId)?.handle.pid ?? null;
     },
 
     attach(
-      sessionId: string,
+      sessionId: SessionId,
       connId: string,
       dims: { cols: number; rows: number }
     ): { chunks: Array<{ data: string }>; pid: number } | null {
-      const id = makeSessionId(sessionId);
-      const entry = registry.ptyHandles.get(id);
+      const entry = registry.ptyHandles.get(sessionId);
       if (!entry) return null;
 
       const cliRows = dims.rows - 1;
       entry.cliChannels.set(connId, { cols: dims.cols, rows: dims.rows });
-      registry.connSessions.set(connId, id);
+      registry.connSessions.set(connId, sessionId);
 
       entry.handle.resize(dims.cols, cliRows);
       entry.ptyDimensions = { cols: dims.cols, rows: cliRows };
@@ -178,16 +176,15 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
       return { chunks, pid: entry.handle.pid };
     },
 
-    detach(sessionId: string, connId: string): void {
-      const id = makeSessionId(sessionId);
-      const entry = registry.ptyHandles.get(id);
+    detach(sessionId: SessionId, connId: string): void {
+      const entry = registry.ptyHandles.get(sessionId);
       if (!entry) return;
       entry.cliChannels.delete(connId);
       registry.connSessions.delete(connId);
-      applyResizePriority(id);
+      applyResizePriority(sessionId);
     },
 
-    updateCliResize(sessionId: string, connId: string, cols: number, rows: number): void {
+    updateCliResize(sessionId: SessionId, connId: string, cols: number, rows: number): void {
       const entry = registry.ptyHandles.get(sessionId);
       if (entry?.cliChannels.has(connId)) {
         entry.cliChannels.set(connId, { cols, rows });
@@ -205,8 +202,7 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
         registry.connSessions.delete(connId);
         applyResizePriority(sessionId);
       } else {
-        const id = makeSessionId(sessionId);
-        const session = sessionRepo.findById(id);
+        const session = sessionRepo.findById(sessionId);
         const alreadyEnded = session && (session.status === 'ended' || session.status === 'error');
 
         if (!alreadyEnded && session) {
@@ -220,7 +216,7 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
       }
     },
 
-    writeInput(sessionId: string, data: string, source: 'cli' | 'browser'): void {
+    writeInput(sessionId: SessionId, data: string, source: 'cli' | 'browser'): void {
       const entry = registry.ptyHandles.get(sessionId);
       if (!entry) return;
 
@@ -241,12 +237,12 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
       });
     },
 
-    applyResizePriority(sessionId: string): { cols: number; rows: number } | null {
+    applyResizePriority(sessionId: SessionId): { cols: number; rows: number } | null {
       return applyResizePriority(sessionId);
     },
 
     addBrowserChannel(
-      sessionId: string,
+      sessionId: SessionId,
       connId: string,
       dims: { cols: number; rows: number }
     ): number | null {
@@ -258,7 +254,7 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
     },
 
     updateBrowserChannel(
-      sessionId: string,
+      sessionId: SessionId,
       connId: string,
       dims: { cols: number; rows: number }
     ): void {
@@ -268,14 +264,14 @@ export function createTerminalConnectionUseCase(deps: TerminalConnectionDeps) {
       applyResizePriority(sessionId);
     },
 
-    removeBrowserChannel(sessionId: string, connId: string): void {
+    removeBrowserChannel(sessionId: SessionId, connId: string): void {
       const entry = registry.ptyHandles.get(sessionId);
       if (!entry) return;
       entry.browserChannels.delete(connId);
       applyResizePriority(sessionId);
     },
 
-    writeBinaryInput(sessionId: string, data: Uint8Array): void {
+    writeBinaryInput(sessionId: SessionId, data: Uint8Array): void {
       const entry = registry.ptyHandles.get(sessionId);
       if (entry) {
         entry.handle.write(data);

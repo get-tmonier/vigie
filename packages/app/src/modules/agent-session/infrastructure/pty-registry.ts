@@ -1,4 +1,5 @@
 import type { PtyHandle } from '#modules/agent-session/application/ports/out/pty-spawner.port';
+import type { SessionId } from '#modules/agent-session/domain/session-id';
 
 export interface PtyEntry {
   handle: PtyHandle;
@@ -8,9 +9,9 @@ export interface PtyEntry {
 }
 
 export interface PtyRegistry {
-  ptyHandles: Map<string, PtyEntry>;
-  sessionConnections: Map<string, string>; // sessionId → connId
-  connSessions: Map<string, string>; // connId → sessionId
+  ptyHandles: Map<SessionId, PtyEntry>;
+  sessionConnections: Map<SessionId, string>; // sessionId → connId
+  connSessions: Map<string, SessionId>; // connId → sessionId
 }
 
 export function createPtyRegistry(): PtyRegistry {
