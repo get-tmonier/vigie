@@ -1,5 +1,5 @@
 import { Effect } from 'effect';
-import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import type { AgentCatalogShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 import type { SessionEventBusShape } from '#modules/agent-session/application/ports/out/session-event-bus.port';
 import type { SessionStoreShape } from '#modules/agent-session/application/ports/out/session-store.port';
 import type { AgentRunnerError } from '#modules/agent-session/domain/errors';
@@ -15,7 +15,7 @@ import type { SessionId } from '#shared/kernel/session/session-id';
 
 interface SpawnSessionDeps {
   sessionRepo: SessionStoreShape;
-  agentRegistry: AgentRegistryShape;
+  agentRegistry: AgentCatalogShape;
   eventPublisher: SessionEventBusShape;
   ptyManager: PtyManagerShape;
 }

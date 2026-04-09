@@ -1,5 +1,5 @@
 import { Effect } from 'effect';
-import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import type { AgentCatalogShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import type { SessionEventBusShape } from '#modules/agent-session/application/ports/out/session-event-bus.port';
 import type { SessionStoreShape } from '#modules/agent-session/application/ports/out/session-store.port';
@@ -9,7 +9,7 @@ import type { SessionId } from '#shared/kernel/session/session-id';
 interface SessionLifecycleDeps {
   sessionRepo: SessionStoreShape;
   resumabilityChecker: ResumabilityCheckerShape;
-  agentRegistry: AgentRegistryShape;
+  agentRegistry: AgentCatalogShape;
   eventPublisher: SessionEventBusShape;
 }
 

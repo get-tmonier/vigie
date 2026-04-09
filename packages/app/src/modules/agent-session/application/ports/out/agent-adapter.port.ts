@@ -11,10 +11,10 @@ export interface AgentAdapter {
   };
 }
 
-export interface AgentRegistryShape {
+export interface AgentCatalogShape {
   resolve(agentType: AgentType): AgentAdapter;
 }
 
-export class AgentRegistry extends ServiceMap.Service<AgentRegistry, AgentRegistryShape>()(
-  '@vigie/AgentRegistry'
+export class AgentCatalog extends ServiceMap.Service<AgentCatalog, AgentCatalogShape>()(
+  '@vigie/AgentCatalog'
 ) {}

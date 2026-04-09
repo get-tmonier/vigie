@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect } from 'effect';
-import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import type { AgentCatalogShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 import { createSpawnSessionUseCase } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
 import {
   CannotResumeSessionError,
@@ -11,7 +11,7 @@ import type { PtyManagerShape } from '#modules/agent-session/infrastructure/pty-
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 import { makeSessionEventBus, makeSessionRepo } from './test-helpers';
 
-function makeAgentRegistry(canResume = false, detectSessionId = false): AgentRegistryShape {
+function makeAgentRegistry(canResume = false, detectSessionId = false): AgentCatalogShape {
   return {
     resolve: (_agentType) => ({
       agentType: 'claude',

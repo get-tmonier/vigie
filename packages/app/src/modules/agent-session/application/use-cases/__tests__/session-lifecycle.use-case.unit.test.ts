@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import type { AgentCatalogShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import type { SessionEventBusShape } from '#modules/agent-session/application/ports/out/session-event-bus.port';
 import type { SessionStoreShape } from '#modules/agent-session/application/ports/out/session-store.port';
@@ -9,7 +9,7 @@ import type { SessionEvent } from '#shared/kernel/session/events';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 import { makeSessionEventBus, makeSessionRepo } from './test-helpers';
 
-function makeAgentRegistry(canResume = false): AgentRegistryShape {
+function makeAgentRegistry(canResume = false): AgentCatalogShape {
   return {
     resolve: (_agentType) => ({
       agentType: 'claude',
@@ -29,7 +29,7 @@ function makeResumabilityChecker(resumable = false): ResumabilityCheckerShape {
 function makeUseCase(overrides?: {
   sessionRepo?: SessionStoreShape & { store: Map<string, Session> };
   eventPublisher?: SessionEventBusShape & { published: SessionEvent[] };
-  agentRegistry?: AgentRegistryShape;
+  agentRegistry?: AgentCatalogShape;
   resumabilityChecker?: ResumabilityCheckerShape;
 }) {
   const sessionRepo = overrides?.sessionRepo ?? makeSessionRepo();

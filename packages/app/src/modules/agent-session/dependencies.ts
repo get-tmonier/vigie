@@ -1,5 +1,5 @@
 import { Effect, Layer, ServiceMap } from 'effect';
-import { AgentRegistry } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import { AgentCatalog } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 import { ResumabilityChecker } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import { SessionEventBus } from '#modules/agent-session/application/ports/out/session-event-bus.port';
 import { SessionLog } from '#modules/agent-session/application/ports/out/session-log.port';
@@ -10,7 +10,7 @@ import { createSessionCleanupUseCase } from '#modules/agent-session/application/
 import { createSessionLifecycleUseCase } from '#modules/agent-session/application/use-cases/session-lifecycle.use-case';
 import { createSessionQueriesUseCase } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import { createSpawnSessionUseCase } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
-import { AgentRegistryLive } from '#modules/agent-session/infrastructure/adapters/out/agents/agent-registry';
+import { AgentCatalogLive } from '#modules/agent-session/infrastructure/adapters/out/agents/agent-registry';
 import { createBunPtySpawnFn } from '#modules/agent-session/infrastructure/adapters/out/bun-pty-spawner';
 import { FsResumabilityCheckerLive } from '#modules/agent-session/infrastructure/adapters/out/fs-resumability-checker';
 import { SqliteSessionRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-session-repository';
@@ -45,7 +45,7 @@ export class AgentSession extends ServiceMap.Service<AgentSession, AgentSessionS
 
 const AgentSessionInfraLive = Layer.mergeAll(
   FsResumabilityCheckerLive,
-  AgentRegistryLive,
+  AgentCatalogLive,
   TerminalSubscribersLive,
   SqliteSessionRepositoryLive,
   SqliteTerminalRepositoryLive
@@ -55,7 +55,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
   Effect.gen(function* () {
     const sessionStore = yield* SessionStore;
     const sessionLog = yield* SessionLog;
-    const agentRegistry = yield* AgentRegistry;
+    const agentRegistry = yield* AgentCatalog;
     const resumabilityChecker = yield* ResumabilityChecker;
     const eventPublisher = yield* SessionEventBus;
     const terminalSubs = yield* TerminalSubscribers;

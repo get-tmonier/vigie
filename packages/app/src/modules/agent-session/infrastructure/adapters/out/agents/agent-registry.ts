@@ -1,13 +1,13 @@
 import { Layer } from 'effect';
 import {
   type AgentAdapter,
-  AgentRegistry,
-  type AgentRegistryShape,
+  AgentCatalog,
+  type AgentCatalogShape,
 } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 import type { AgentType } from '#shared/kernel/session/agent-type';
 import { claudeAdapter } from './claude.adapter';
 
-function createAgentRegistry(): AgentRegistryShape {
+function createAgentCatalog(): AgentCatalogShape {
   const registry: Record<AgentType, AgentAdapter> = {
     claude: claudeAdapter,
   };
@@ -19,4 +19,4 @@ function createAgentRegistry(): AgentRegistryShape {
   };
 }
 
-export const AgentRegistryLive = Layer.sync(AgentRegistry)(() => createAgentRegistry());
+export const AgentCatalogLive = Layer.sync(AgentCatalog)(() => createAgentCatalog());
