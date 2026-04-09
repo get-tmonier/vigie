@@ -12,7 +12,7 @@ A single Bun process that runs everything locally:
 - **Unix socket IPC** at `~/.vigie/daemon.sock` — CLI-to-daemon communication
 
 ```
-Browser (SPA) <-> HTTP+WS (localhost:19191) <-> PTY manager <-> spawn(claude, aider, ...)
+Browser (SSR + client islands) <-> HTTP+WS (localhost:19191) <-> PTY manager <-> spawn(claude, aider, ...)
 ```
 
 No remote servers. No cloud dependency. No auth required.
