@@ -18,8 +18,6 @@ export const BrowserEventBusLive = Layer.effect(BrowserEventBus)(
     const services = yield* Effect.services();
 
     eventPublisher.subscribe((event) => {
-      // terminal:output is streamed directly via /ws/terminal/:sessionId — all other session events go to the browser
-      if (event.type === 'terminal:output') return;
       for (const listener of listeners) {
         Effect.runForkWith(services)(
           Effect.try({

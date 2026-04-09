@@ -3,7 +3,7 @@ import * as v from 'valibot';
 import {
   SessionLifecycleEventSchema,
   SessionStartedSchema,
-  TerminalInputEchoEventSchema,
+  TerminalInputEchoSchema,
 } from '../events';
 
 describe('SessionStartedSchema', () => {
@@ -48,9 +48,9 @@ describe('SessionLifecycleEventSchema', () => {
   });
 });
 
-describe('TerminalInputEchoEventSchema', () => {
+describe('TerminalInputEchoSchema', () => {
   it('parses and brands sessionId', () => {
-    const result = v.parse(TerminalInputEchoEventSchema, {
+    const result = v.parse(TerminalInputEchoSchema, {
       type: 'terminal:input-echo',
       sessionId: 'abc-123',
       text: 'hello',

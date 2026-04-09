@@ -48,15 +48,6 @@ const makeSessionStartedEvent = (): SessionEvent => ({
   timestamp: 1000,
 });
 
-const makeTerminalOutputEvent = (): SessionEvent => ({
-  type: 'terminal:output',
-  sessionId: 'session-1' as ReturnType<
-    typeof import('#shared/kernel/session/session-id').SessionId
-  >,
-  data: 'some output',
-  timestamp: 1000,
-});
-
 // --- Tests ---
 
 describe('BrowserEventBusLive', () => {
@@ -80,26 +71,6 @@ describe('BrowserEventBusLive', () => {
 
     expect(received).toHaveLength(1);
     expect(received[0]).toMatchObject({ type: 'session:started', sessionId: 'session-1' });
-  });
-
-  it('listener does NOT receive an event for an unmapped domain event (terminal:output → null)', async () => {
-    const { layer: fakePublisherLayer, emit } = makeFakeDomainEventBus();
-    const testLayer = BrowserEventBusLive.pipe(Layer.provide(fakePublisherLayer));
-
-    const received: VigieEvent[] = [];
-
-    await Effect.runPromise(
-      Effect.gen(function* () {
-        const browserEventBus = yield* BrowserEventBus;
-        browserEventBus.subscribe((event) => {
-          received.push(event);
-        });
-        emit(makeTerminalOutputEvent());
-        yield* Effect.sleep(0);
-      }).pipe(Effect.provide(testLayer))
-    );
-
-    expect(received).toHaveLength(0);
   });
 
   it('unsubscribe stops future deliveries', async () => {

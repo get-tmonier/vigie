@@ -64,14 +64,7 @@ export const SessionLifecycleEventSchema = v.variant('type', [
 ]);
 export type SessionLifecycleEvent = v.InferOutput<typeof SessionLifecycleEventSchema>;
 
-const TerminalOutputEventSchema = v.object({
-  type: v.literal('terminal:output'),
-  sessionId: SessionIdSchema,
-  data: v.string(),
-  timestamp: v.number(),
-});
-
-export const TerminalInputEchoEventSchema = v.object({
+export const TerminalInputEchoSchema = v.object({
   type: v.literal('terminal:input-echo'),
   sessionId: SessionIdSchema,
   text: v.string(),
@@ -79,7 +72,7 @@ export const TerminalInputEchoEventSchema = v.object({
   timestamp: v.number(),
 });
 
-const TerminalResizedEventSchema = v.object({
+const TerminalResizedSchema = v.object({
   type: v.literal('terminal:pty-resized'),
   sessionId: SessionIdSchema,
   cols: v.number(),
@@ -94,8 +87,7 @@ export const SessionEventSchema = v.variant('type', [
   SessionsClearedSchema,
   AgentSessionIdDetectedSchema,
   ResumableChangedSchema,
-  TerminalOutputEventSchema,
-  TerminalInputEchoEventSchema,
-  TerminalResizedEventSchema,
+  TerminalInputEchoSchema,
+  TerminalResizedSchema,
 ]);
 export type SessionEvent = v.InferOutput<typeof SessionEventSchema>;
