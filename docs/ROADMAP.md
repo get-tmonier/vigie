@@ -74,13 +74,14 @@
 ## Refactoring
 
 <a id="r-001"></a>
-### `[ ]` P0 — Island architecture: break the mega-island
+### `[x]` P0 — Island architecture: break the mega-island
 
 | | |
 |---|---|
-| Status | Not started |
+| Status | Done (2026-04-09) |
 | Depends on | — |
 | Blocks | — |
+| PR | [#33](https://github.com/tmonier/vigie/pull/33) |
 
 **Problem:** `SessionDashboard.island.tsx` wraps the entire page. Every component (header, sidebar, session list, form, terminal) hydrates as one React blob. The "island" suffix is cosmetic — this is full SPA hydration. SSR renders HTML that the client immediately throws away and re-renders.
 
@@ -624,4 +625,5 @@
 
 | Date | Change |
 |------|--------|
+| 2026-04-09 | ✅ R-001 (Island architecture) completed — 3 focused islands, nanostores, Redux removed |
 | 2026-04-09 | Initial roadmap from full codebase audit (31 items) |
