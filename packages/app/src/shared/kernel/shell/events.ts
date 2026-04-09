@@ -1,93 +1,124 @@
-import type { TerminalChunk } from '#shared/kernel/agent-session/events';
-import type { SessionId } from '#shared/kernel/agent-session/session-id';
+import * as v from 'valibot';
+import { TerminalChunkSchema } from '#shared/kernel/agent-session/events';
+import { SessionIdSchema } from '#shared/kernel/agent-session/session-id';
 
-export type DaemonHelloEvent = {
-  readonly type: 'daemon:hello';
-  readonly hostname: string;
-  readonly pid: number;
-  readonly version: string;
-};
+export const DaemonHelloSchema = v.object({
+  type: v.literal('daemon:hello'),
+  hostname: v.string(),
+  pid: v.number(),
+  version: v.string(),
+});
+export type DaemonHelloEvent = v.InferOutput<typeof DaemonHelloSchema>;
 
-export type CommandOutputEvent = {
-  readonly type: 'command:output';
-  readonly id: string;
-  readonly stream: 'stdout' | 'stderr';
-  readonly data: string;
-  readonly timestamp: number;
-};
+export const CommandOutputSchema = v.object({
+  type: v.literal('command:output'),
+  id: v.string(),
+  stream: v.picklist(['stdout', 'stderr']),
+  data: v.string(),
+  timestamp: v.number(),
+});
+export type CommandOutputEvent = v.InferOutput<typeof CommandOutputSchema>;
 
-export type CommandDoneEvent = {
-  readonly type: 'command:done';
-  readonly id: string;
-  readonly exitCode: number;
-  readonly timestamp: number;
-};
+export const CommandDoneSchema = v.object({
+  type: v.literal('command:done'),
+  id: v.string(),
+  exitCode: v.number(),
+  timestamp: v.number(),
+});
+export type CommandDoneEvent = v.InferOutput<typeof CommandDoneSchema>;
 
-export type CommandErrorEvent = {
-  readonly type: 'command:error';
-  readonly id: string;
-  readonly error: string;
-  readonly timestamp: number;
-};
+export const CommandErrorSchema = v.object({
+  type: v.literal('command:error'),
+  id: v.string(),
+  error: v.string(),
+  timestamp: v.number(),
+});
+export type CommandErrorEvent = v.InferOutput<typeof CommandErrorSchema>;
 
-export type PongEvent = {
-  readonly type: 'pong';
-};
+export const PongSchema = v.object({
+  type: v.literal('pong'),
+});
+export type PongEvent = v.InferOutput<typeof PongSchema>;
 
-export type FsListDirResponseEvent = {
-  readonly type: 'fs:list-dir-response';
-  readonly requestId: string;
-  readonly entries: Array<{ readonly name: string; readonly isDirectory: boolean }>;
-  readonly error?: string;
-};
+export const FsListDirResponseSchema = v.object({
+  type: v.literal('fs:list-dir-response'),
+  requestId: v.string(),
+  entries: v.array(
+    v.object({
+      name: v.string(),
+      isDirectory: v.boolean(),
+    })
+  ),
+  error: v.optional(v.string()),
+});
+export type FsListDirResponseEvent = v.InferOutput<typeof FsListDirResponseSchema>;
 
-export type DaemonSyncSession = {
-  readonly sessionId: string;
-  readonly agentType: string;
-  readonly mode: 'prompt' | 'interactive';
-  readonly cwd: string;
-  readonly gitBranch?: string;
-  readonly repoName?: string;
-  readonly startedAt: number;
-  readonly status: 'active' | 'ended' | 'error';
-  readonly exitCode?: number;
-  readonly agentSessionId?: string;
-  readonly resumable: boolean;
-  readonly terminalChunks: TerminalChunk[];
-  readonly inputHistory?: Array<{
-    readonly text: string;
-    readonly source: 'cli' | 'browser';
-    readonly timestamp: number;
-  }>;
-};
+export const DaemonSyncSessionSchema = v.object({
+  sessionId: v.string(),
+  agentType: v.string(),
+  mode: v.optional(v.picklist(['prompt', 'interactive']), 'prompt'),
+  cwd: v.string(),
+  gitBranch: v.optional(v.string()),
+  repoName: v.optional(v.string()),
+  startedAt: v.number(),
+  status: v.picklist(['active', 'ended', 'error']),
+  exitCode: v.optional(v.number()),
+  agentSessionId: v.optional(v.string()),
+  resumable: v.boolean(),
+  terminalChunks: v.array(TerminalChunkSchema),
+  inputHistory: v.optional(
+    v.array(
+      v.object({
+        text: v.string(),
+        source: v.picklist(['cli', 'browser']),
+        timestamp: v.number(),
+      })
+    )
+  ),
+});
+export type DaemonSyncSession = v.InferOutput<typeof DaemonSyncSessionSchema>;
 
-export type DaemonSyncEvent = {
-  readonly type: 'daemon:sync';
-  readonly sessions: DaemonSyncSession[];
-};
+export const DaemonSyncSchema = v.object({
+  type: v.literal('daemon:sync'),
+  sessions: v.array(DaemonSyncSessionSchema),
+});
+export type DaemonSyncEvent = v.InferOutput<typeof DaemonSyncSchema>;
 
-export type SessionOutputEvent = {
-  readonly type: 'session:output';
-  readonly sessionId: SessionId;
-  readonly data: string;
-  readonly chunkType: 'text' | 'thinking' | 'tool_use' | 'tool_result' | 'status' | 'error';
-  readonly timestamp: number;
-};
+export const SessionOutputSchema = v.object({
+  type: v.literal('session:output'),
+  sessionId: SessionIdSchema,
+  data: v.string(),
+  chunkType: v.picklist(['text', 'thinking', 'tool_use', 'tool_result', 'status', 'error']),
+  timestamp: v.number(),
+});
+export type SessionOutputEvent = v.InferOutput<typeof SessionOutputSchema>;
 
-export type SessionSpawnFailedEvent = {
-  readonly type: 'session:spawn-failed';
-  readonly sessionId: SessionId;
-  readonly error: string;
-  readonly timestamp: number;
-};
+export const SessionSpawnFailedSchema = v.object({
+  type: v.literal('session:spawn-failed'),
+  sessionId: SessionIdSchema,
+  error: v.string(),
+  timestamp: v.number(),
+});
+export type SessionSpawnFailedEvent = v.InferOutput<typeof SessionSpawnFailedSchema>;
 
-export type ShellEvent =
-  | DaemonHelloEvent
-  | CommandOutputEvent
-  | CommandDoneEvent
-  | CommandErrorEvent
-  | PongEvent
-  | FsListDirResponseEvent
-  | DaemonSyncEvent
-  | SessionOutputEvent
-  | SessionSpawnFailedEvent;
+export const ShellEventSchema = v.variant('type', [
+  DaemonHelloSchema,
+  CommandOutputSchema,
+  CommandDoneSchema,
+  CommandErrorSchema,
+  PongSchema,
+  FsListDirResponseSchema,
+  DaemonSyncSchema,
+  SessionOutputSchema,
+  SessionSpawnFailedSchema,
+]);
+export type ShellEvent = v.InferOutput<typeof ShellEventSchema>;
+
+// Migrated from ws-schemas.ts — browser→daemon command
+export const CommandRequestSchema = v.object({
+  type: v.literal('command:request'),
+  id: v.string(),
+  command: v.string(),
+  cwd: v.optional(v.string()),
+});
+export type CommandRequest = v.InferOutput<typeof CommandRequestSchema>;
