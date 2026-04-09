@@ -1,6 +1,6 @@
 import { unlinkSync } from 'node:fs';
 import { Effect, Layer } from 'effect';
-import { SessionSink } from '#modules/agent-session/application/ports/out/session-sink.port';
+import { CliChannel } from '#modules/agent-session/application/ports/out/cli-channel.port';
 import { IpcServer } from '#shell/application/ports/out/ipc-server.port';
 import { UnixSocketServerLive } from '#shell/infrastructure/adapters/out/unix-socket-server.adapter';
 import type { DaemonConfigShape } from '#shell/infrastructure/daemon-config';
@@ -18,7 +18,7 @@ export function cleanup(config: DaemonConfigShape): void {
   }
 }
 
-const SessionSinkLive = Layer.effect(SessionSink)(
+const CliChannelLive = Layer.effect(CliChannel)(
   Effect.gen(function* () {
     const ipcServer = yield* IpcServer;
     return {
@@ -31,7 +31,7 @@ const SessionSinkLive = Layer.effect(SessionSink)(
 
 export const DaemonLive = Layer.merge(
   UnixSocketServerLive,
-  SessionSinkLive.pipe(Layer.provide(UnixSocketServerLive))
+  CliChannelLive.pipe(Layer.provide(UnixSocketServerLive))
 );
 
 export { BrowserEventBusLive } from '#shell/infrastructure/adapters/out/browser-event-bus.adapter';

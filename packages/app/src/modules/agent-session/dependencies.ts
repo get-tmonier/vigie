@@ -1,9 +1,9 @@
 import { Effect, Layer, ServiceMap } from 'effect';
 import { AgentCatalog } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import { CliChannel } from '#modules/agent-session/application/ports/out/cli-channel.port';
 import { ResumabilityChecker } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import { SessionEventBus } from '#modules/agent-session/application/ports/out/session-event-bus.port';
 import { SessionLog } from '#modules/agent-session/application/ports/out/session-log.port';
-import { SessionSink } from '#modules/agent-session/application/ports/out/session-sink.port';
 import { SessionStore } from '#modules/agent-session/application/ports/out/session-store.port';
 import { createCheckResumabilityUseCase } from '#modules/agent-session/application/use-cases/check-resumability.use-case';
 import { createSessionCleanupUseCase } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
@@ -59,7 +59,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
     const resumabilityChecker = yield* ResumabilityChecker;
     const eventPublisher = yield* SessionEventBus;
     const terminalSubs = yield* TerminalSubscribers;
-    const sessionSink = yield* SessionSink;
+    const cliChannel = yield* CliChannel;
 
     const sessionLifecycle = createSessionLifecycleUseCase({
       sessionRepo: sessionStore,
@@ -94,7 +94,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
           );
         },
         sendToCliClient(connId, msg) {
-          sessionSink.send(connId, msg);
+          cliChannel.send(connId, msg);
         },
       },
       terminalRepo: sessionLog,
