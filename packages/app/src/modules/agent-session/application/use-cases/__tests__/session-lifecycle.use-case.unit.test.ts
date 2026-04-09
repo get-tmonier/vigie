@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test';
 import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
-import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
+import type { SessionStoreShape } from '#modules/agent-session/application/ports/out/session-store.port';
 import { createSessionLifecycleUseCase } from '#modules/agent-session/application/use-cases/session-lifecycle.use-case';
 import { Session } from '#modules/agent-session/domain/session';
 import type { SessionEvent } from '#shared/kernel/session/events';
@@ -27,7 +27,7 @@ function makeResumabilityChecker(resumable = false): ResumabilityCheckerShape {
 }
 
 function makeUseCase(overrides?: {
-  sessionRepo?: SessionRepositoryShape & { store: Map<string, Session> };
+  sessionRepo?: SessionStoreShape & { store: Map<string, Session> };
   eventPublisher?: DomainEventBusShape & { published: SessionEvent[] };
   agentRegistry?: AgentRegistryShape;
   resumabilityChecker?: ResumabilityCheckerShape;

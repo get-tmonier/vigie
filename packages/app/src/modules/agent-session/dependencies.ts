@@ -2,8 +2,8 @@ import { Effect, Layer, ServiceMap } from 'effect';
 import { AgentRegistry } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 import { DomainEventBus } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
 import { ResumabilityChecker } from '#modules/agent-session/application/ports/out/resumability-checker.port';
-import { SessionRepository } from '#modules/agent-session/application/ports/out/session-repository.port';
 import { SessionSink } from '#modules/agent-session/application/ports/out/session-sink.port';
+import { SessionStore } from '#modules/agent-session/application/ports/out/session-store.port';
 import { TerminalRepository } from '#modules/agent-session/application/ports/out/terminal-repository.port';
 import { createCheckResumabilityUseCase } from '#modules/agent-session/application/use-cases/check-resumability.use-case';
 import { createSessionCleanupUseCase } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
@@ -54,7 +54,7 @@ const AgentSessionInfraLive = Layer.mergeAll(
 
 export const AgentSessionLive = Layer.effect(AgentSession)(
   Effect.gen(function* () {
-    const sessionRepo = yield* SessionRepository;
+    const sessionStore = yield* SessionStore;
     const terminalRepo = yield* TerminalRepository;
     const agentRegistry = yield* AgentRegistry;
     const resumabilityChecker = yield* ResumabilityChecker;
@@ -63,7 +63,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
     const sessionSink = yield* SessionSink;
 
     const sessionLifecycle = createSessionLifecycleUseCase({
-      sessionRepo,
+      sessionRepo: sessionStore,
       resumabilityChecker,
       agentRegistry,
       eventPublisher,
@@ -102,31 +102,31 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
     });
 
     const spawnSession = createSpawnSessionUseCase({
-      sessionRepo,
+      sessionRepo: sessionStore,
       agentRegistry,
       eventPublisher,
       ptyManager,
     });
 
     const sessionCleanup = createSessionCleanupUseCase({
-      sessionRepo,
+      sessionRepo: sessionStore,
       eventPublisher,
     });
 
     const checkResumability = createCheckResumabilityUseCase({
-      sessionRepo,
+      sessionRepo: sessionStore,
       resumabilityChecker,
       eventPublisher,
     });
 
     const sessionQueries = createSessionQueriesUseCase({
-      sessionRepo,
+      sessionRepo: sessionStore,
       terminalRepo,
     });
 
     const startupOps = {
-      cleanupOrphanedSessions: () => sessionRepo.markOrphanedEnded(),
-      pruneOldSessions: () => sessionRepo.pruneOld(),
+      cleanupOrphanedSessions: () => sessionStore.markOrphanedEnded(),
+      pruneOldSessions: () => sessionStore.pruneOld(),
       checkResumableForAll: () => checkResumability.checkResumableForAll(),
       checkResumableForActive: () => checkResumability.checkResumableForActive(),
     };

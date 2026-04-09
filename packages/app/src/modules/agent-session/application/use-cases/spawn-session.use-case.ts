@@ -1,7 +1,7 @@
 import { Effect } from 'effect';
 import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
-import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
+import type { SessionStoreShape } from '#modules/agent-session/application/ports/out/session-store.port';
 import type { AgentRunnerError } from '#modules/agent-session/domain/errors';
 import {
   CannotResumeSessionError,
@@ -14,7 +14,7 @@ import type { SessionLifecycleEvent } from '#shared/kernel/session/events';
 import type { SessionId } from '#shared/kernel/session/session-id';
 
 interface SpawnSessionDeps {
-  sessionRepo: SessionRepositoryShape;
+  sessionRepo: SessionStoreShape;
   agentRegistry: AgentRegistryShape;
   eventPublisher: DomainEventBusShape;
   ptyManager: PtyManagerShape;

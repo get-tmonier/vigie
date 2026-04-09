@@ -9,7 +9,7 @@ export interface ResumableSessionInfo {
   readonly resumable: boolean;
 }
 
-export interface SessionRepositoryShape {
+export interface SessionStoreShape {
   findById(id: SessionId): Session | null;
   findAll(): Session[];
   findActive(): Session[];
@@ -22,7 +22,6 @@ export interface SessionRepositoryShape {
   pruneOld(maxAgeMs?: number): void;
 }
 
-export class SessionRepository extends ServiceMap.Service<
-  SessionRepository,
-  SessionRepositoryShape
->()('@vigie/SessionRepository') {}
+export class SessionStore extends ServiceMap.Service<SessionStore, SessionStoreShape>()(
+  '@vigie/SessionStore'
+) {}

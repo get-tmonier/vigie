@@ -3,9 +3,9 @@ import { Effect, Layer } from 'effect';
 import * as v from 'valibot';
 import {
   type ResumableSessionInfo,
-  SessionRepository,
-  type SessionRepositoryShape,
-} from '#modules/agent-session/application/ports/out/session-repository.port';
+  SessionStore,
+  type SessionStoreShape,
+} from '#modules/agent-session/application/ports/out/session-store.port';
 import { Session } from '#modules/agent-session/domain/session';
 import type { SessionStatus } from '#modules/agent-session/domain/session-status';
 import { VigiDatabase } from '#shared/db/database';
@@ -47,7 +47,7 @@ function rowToSession(row: SessionRow): Session {
   });
 }
 
-function createSqliteSessionRepository(db: Database): SessionRepositoryShape {
+function createSqliteSessionRepository(db: Database): SessionStoreShape {
   const upsertStmt = db.prepare(`
     INSERT INTO sessions (id, agent_type, mode, cwd, git_branch, git_remote_url, repo_name, started_at, ended_at, status, exit_code, agent_session_id, resumable)
     VALUES ($id, $agent_type, $mode, $cwd, $git_branch, $git_remote_url, $repo_name, $started_at, $ended_at, $status, $exit_code, $agent_session_id, $resumable)
@@ -172,7 +172,7 @@ function createSqliteSessionRepository(db: Database): SessionRepositoryShape {
   };
 }
 
-export const SqliteSessionRepositoryLive = Layer.effect(SessionRepository)(
+export const SqliteSessionRepositoryLive = Layer.effect(SessionStore)(
   Effect.gen(function* () {
     const db = yield* VigiDatabase;
     return createSqliteSessionRepository(db);

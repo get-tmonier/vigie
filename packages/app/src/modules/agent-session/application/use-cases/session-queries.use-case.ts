@@ -1,10 +1,10 @@
-import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
+import type { SessionStoreShape } from '#modules/agent-session/application/ports/out/session-store.port';
 import type { TerminalRepositoryShape } from '#modules/agent-session/application/ports/out/terminal-repository.port';
 import type { Session } from '#modules/agent-session/domain/session';
 import type { SessionId } from '#shared/kernel/session/session-id';
 
 interface SessionQueriesDeps {
-  sessionRepo: SessionRepositoryShape;
+  sessionRepo: SessionStoreShape;
   terminalRepo: TerminalRepositoryShape;
 }
 
