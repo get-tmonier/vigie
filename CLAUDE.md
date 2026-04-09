@@ -25,12 +25,12 @@ The freelance portfolio (`tmonier.com`) is a separate repo: `get-tmonier/landing
 
 ## Architecture
 
-**Overall:** `Browser (SSR, localhost:19191) ↔ Effect HTTP+WS (embedded in daemon) ↔ PTY manager ↔ spawn(claude, aider, ...)`
+**Overall:** `Browser (SSR, localhost:19191) ↔ Effect HTTP+WS (embedded in daemon) ↔ AgentProcess (PTY) ↔ spawn(claude, aider, ...)`
 
 **Single process, fully local:**
 - **CLI daemon** (`@vigie/app`): single Bun process that runs everything
   - **Embedded Effect HTTP server** on `localhost:19191` — serves REST API + WebSocket + React SSR
-  - **PTY manager** — spawns and manages agent sessions (Claude, aider, codex, generic)
+  - **AgentProcess** — spawns and manages agent sessions via PTY (Claude, aider, codex, generic); `SessionFeed` streams live output to browser viewers; `SessionLog` persists terminal output to SQLite
   - **SQLite database** at `~/.vigie/data.db` — sessions, terminal chunks, input history
   - **Unix socket IPC** at `~/.vigie/daemon.sock` — CLI-to-daemon communication
   - Agent-agnostic design: `AgentAdapter` port + `AgentRegistry` defines how to spawn any CLI agent
