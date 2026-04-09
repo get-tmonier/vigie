@@ -5,14 +5,15 @@ import type * as HttpServerError from 'effect/unstable/http/HttpServerError';
 import * as HttpServerRequest from 'effect/unstable/http/HttpServerRequest';
 import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse';
 import type * as Socket from 'effect/unstable/socket/Socket';
+import type { AgentProcessShape } from '#modules/agent-session/application/ports/out/agent-process.port';
+import type { SessionOutputShape } from '#modules/agent-session/application/ports/out/session-output.port';
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
-import type { TerminalConnectionShape } from '#modules/agent-session/application/use-cases/terminal-connection.use-case';
-import type { TerminalSubscribersShape } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
+import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 
 type TerminalRouteDeps = {
   sessionQueries: SessionQueriesShape;
-  terminalConnection: TerminalConnectionShape;
-  terminalSubs: TerminalSubscribersShape;
+  ptyManager: AgentProcessShape;
+  terminalSubs: SessionOutputShape;
 };
 
 type RouteError = HttpServerError.HttpServerError | Socket.SocketError | Cause.UnknownError;
@@ -20,17 +21,18 @@ type RouteError = HttpServerError.HttpServerError | Socket.SocketError | Cause.U
 export function createTerminalRoutes(
   deps: TerminalRouteDeps
 ): HttpRouter.Route<RouteError, never>[] {
-  const { sessionQueries, terminalConnection, terminalSubs } = deps;
+  const { sessionQueries, ptyManager, terminalSubs } = deps;
 
   return [
     HttpRouter.route(
       'GET',
       '/api/sessions/:id/chunks',
       Effect.gen(function* () {
-        const { id: sessionId } = yield* HttpRouter.params;
-        if (!sessionId) {
+        const { id: rawSessionId } = yield* HttpRouter.params;
+        if (!rawSessionId) {
           return HttpServerResponse.jsonUnsafe({ error: 'Missing session ID' }, { status: 400 });
         }
+        const sessionId = makeSessionId(rawSessionId);
         const chunks = sessionQueries.getAllChunks(sessionId);
         return HttpServerResponse.jsonUnsafe({ chunks });
       })
@@ -40,10 +42,11 @@ export function createTerminalRoutes(
       'GET',
       '/api/sessions/:id/input-history',
       Effect.gen(function* () {
-        const { id: sessionId } = yield* HttpRouter.params;
-        if (!sessionId) {
+        const { id: rawSessionId } = yield* HttpRouter.params;
+        if (!rawSessionId) {
           return HttpServerResponse.jsonUnsafe({ error: 'Missing session ID' }, { status: 400 });
         }
+        const sessionId = makeSessionId(rawSessionId);
         const request = yield* HttpServerRequest.HttpServerRequest;
         const url = new URL(request.url, 'http://localhost');
         const limitParam = url.searchParams.get('limit');
@@ -57,10 +60,11 @@ export function createTerminalRoutes(
       'GET',
       '/ws/terminal/:sessionId',
       Effect.gen(function* () {
-        const { sessionId } = yield* HttpRouter.params;
-        if (!sessionId) {
+        const { sessionId: rawSessionId } = yield* HttpRouter.params;
+        if (!rawSessionId) {
           return HttpServerResponse.jsonUnsafe({ error: 'Missing session ID' }, { status: 400 });
         }
+        const sessionId = makeSessionId(rawSessionId);
 
         const request = yield* HttpServerRequest.HttpServerRequest;
         const socket = yield* request.upgrade;
@@ -75,7 +79,7 @@ export function createTerminalRoutes(
           yield* write(payload);
         }
 
-        terminalConnection.addBrowserChannel(sessionId, browserConnId, { cols: 120, rows: 30 });
+        ptyManager.addBrowserChannel(sessionId, browserConnId, { cols: 120, rows: 30 });
 
         const services = yield* Effect.services();
         const unsub = terminalSubs.subscribe(sessionId, (data: string) => {
@@ -96,19 +100,19 @@ export function createTerminalRoutes(
                 typeof parsed.cols === 'number' &&
                 typeof parsed.rows === 'number'
               ) {
-                terminalConnection.updateBrowserChannel(sessionId, browserConnId, {
+                ptyManager.updateBrowserChannel(sessionId, browserConnId, {
                   cols: parsed.cols,
                   rows: parsed.rows,
                 });
               }
             } catch {}
           } else if (message.length > 0) {
-            terminalConnection.writeBinaryInput(sessionId, message);
+            ptyManager.writeBinaryInput(sessionId, message);
           }
         });
 
         unsub();
-        terminalConnection.removeBrowserChannel(sessionId, browserConnId);
+        ptyManager.removeBrowserChannel(sessionId, browserConnId);
 
         return HttpServerResponse.empty();
       })

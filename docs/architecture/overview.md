@@ -10,15 +10,16 @@ graph TB
     end
 
     subgraph daemon["Daemon (single Bun process)"]
-        subgraph daemon_mod["daemon module"]
+        subgraph shell["shell (application host)"]
             IPC["Unix Socket IPC<br/>~/.vigie/daemon.sock"]
             HTTP["HTTP + WebSocket<br/>localhost:19191"]
         end
         subgraph session_mod["agent-session module"]
-            UC["Use Cases<br/>spawn · terminal · lifecycle · queries"]
-            PTY["Bun PTY Spawner"]
-            DB[("SQLite<br/>~/.vigie/data.db")]
-            Events["Event Publisher"]
+            UC["Use Cases<br/>spawn · lifecycle · queries · cleanup · resumability"]
+            AgentProcess["AgentProcess<br/>(PTY manager)"]
+            SessionLog[("SessionLog<br/>SQLite ~/.vigie/data.db")]
+            SessionFeed["SessionFeed<br/>(live output broadcaster)"]
+            SessionEventBus["SessionEventBus<br/>(lifecycle events)"]
         end
     end
 
@@ -31,13 +32,15 @@ graph TB
     Browser -->|"HTTP / WebSocket"| HTTP
     IPC --> UC
     HTTP --> UC
-    UC --> PTY
-    UC <--> DB
-    PTY -->|spawn| Claude
-    PTY -->|spawn| Other
-    PTY -->|output chunks| Events
-    Events -->|broadcast| HTTP
-    Events -->|broadcast| IPC
+    UC --> AgentProcess
+    UC <--> SessionLog
+    AgentProcess -->|spawn| Claude
+    AgentProcess -->|spawn| Other
+    AgentProcess -->|"output chunks (persist)"| SessionLog
+    AgentProcess -->|"output chunks (live)"| SessionFeed
+    SessionFeed -->|"stream"| HTTP
+    AgentProcess -->|"pty output → CLI"| IPC
+    SessionEventBus -->|"lifecycle events"| HTTP
 ```
 
 ## Communication protocols

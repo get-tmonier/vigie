@@ -1,0 +1,18 @@
+// IPC client used by CLI commands to talk to the running daemon over a Unix socket.
+// Sends typed SessionToDaemon messages and waits for typed DaemonToSession responses.
+import type { Effect } from 'effect';
+import type { IpcConnectionError } from '#shell/domain/errors';
+import type { DaemonToSession, SessionToDaemon } from '#shell/protocols/ipc';
+
+export type { IpcConnectionError } from '#shell/domain/errors';
+
+export interface IpcClientShape {
+  readonly connect: (socketPath: string) => Effect.Effect<void, IpcConnectionError>;
+  readonly send: (msg: SessionToDaemon) => Effect.Effect<void, IpcConnectionError>;
+  readonly waitForMessage: <T extends DaemonToSession['type']>(
+    type: T
+  ) => Effect.Effect<Extract<DaemonToSession, { type: T }>, IpcConnectionError>;
+  readonly onMessage: (handler: (msg: DaemonToSession) => void) => void;
+  readonly onClose: (handler: () => void) => void;
+  readonly close: () => Effect.Effect<void>;
+}

@@ -14,9 +14,10 @@
     "types": ["bun-types", "react", "react-dom"],
     "paths": {
       "#modules/*": ["./src/modules/*"],
-      "#infra/*": ["./src/infra/*"],
+      "#shell/*": ["./src/shell/*"],
       "#shared/*": ["./src/shared/*"],
-      "#dependencies": ["./src/dependencies.ts"]
+      "#pages/*": ["./src/pages/*"],
+"#dependencies": ["./src/dependencies.ts"]
     },
     "plugins": [
       {

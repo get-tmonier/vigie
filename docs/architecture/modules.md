@@ -1,6 +1,6 @@
 # Module architecture
 
-vigie follows hexagonal architecture (ports & adapters) with two bounded modules.
+vigie follows hexagonal architecture (ports & adapters) with one bounded domain module (`agent-session`) and an application shell (`shell`).
 
 ## Module map
 
@@ -13,26 +13,22 @@ graph LR
             end
             subgraph as_app["Application"]
                 AS_UC["Use Cases<br/>spawn-session<br/>terminal-connection<br/>session-lifecycle<br/>session-queries<br/>session-cleanup<br/>check-resumability"]
-                AS_PORT_OUT["Out ports<br/>SessionRepository<br/>TerminalRepository<br/>PtySpawner<br/>AgentAdapter / AgentRegistry<br/>EventPublisher<br/>ResumabilityChecker<br/>CliSender"]
+                AS_PORT_OUT["Out ports<br/>SessionStore<br/>SessionLog<br/>AgentProcess<br/>SessionFeed<br/>SessionEventBus<br/>AgentAdapter / AgentCatalog<br/>CliChannel"]
             end
             subgraph as_infra["Infrastructure"]
                 AS_IN["Adapters in<br/>HTTP routes (sessions, terminal WS)<br/>React SSR (dashboard, islands)"]
-                AS_OUT["Adapters out<br/>SQLite repos<br/>Bun PTY spawner<br/>In-memory event publisher<br/>FS resumability checker<br/>Claude agent adapter"]
+                AS_OUT["Adapters out<br/>SQLite repos (session + log)<br/>Bun PTY (AgentProcess impl)<br/>In-memory event bus<br/>In-memory session feed<br/>Claude agent adapter"]
             end
         end
 
-        subgraph daemon_mod["daemon module"]
-            subgraph d_domain["Domain"]
-                D_E["DaemonInfo<br/>Errors"]
+        subgraph shell_mod["shell (application host)"]
+            subgraph s_app["Application"]
+                S_UC["run-daemon<br/>(startup loop)"]
+                S_PORT_OUT["Out ports<br/>IpcServer<br/>ProcessManager"]
             end
-            subgraph d_app["Application"]
-                D_UC["Use Cases<br/>run-daemon (main loop)"]
-                D_PORT_IN["In ports<br/>spawn-session · session-lifecycle<br/>terminal-connection · startup-ops<br/>ipc-client"]
-                D_PORT_OUT["Out ports<br/>IpcServer<br/>ProcessManager"]
-            end
-            subgraph d_infra["Infrastructure"]
-                D_IN["Adapters in<br/>IPC router<br/>CLI commands<br/>Unix socket client<br/>PTY relay"]
-                D_OUT["Adapters out<br/>Unix socket server<br/>Bun process manager<br/>Claude runner adapter"]
+            subgraph s_infra["Infrastructure"]
+                S_IN["Adapters in<br/>IPC router<br/>CLI commands<br/>Unix socket client<br/>PTY relay"]
+                S_OUT["Adapters out<br/>Unix socket server<br/>Bun process manager<br/>Claude runner adapter"]
             end
         end
 
@@ -45,18 +41,18 @@ graph LR
     AS_PORT_OUT --> AS_OUT
     AS_IN --> AS_UC
     AS_UC --> AS_PORT_OUT
-    D_PORT_IN -.->|"delegates to"| AS_UC
-    D_IN --> D_UC
-    D_UC --> D_PORT_OUT
-    D_PORT_OUT --> D_OUT
+    S_IN -->|"delegates to"| AS_UC
+    S_IN --> S_UC
+    S_UC --> S_PORT_OUT
+    S_PORT_OUT --> S_OUT
     AS_OUT --> DB
-    D_OUT --> KERNEL
+    S_OUT --> KERNEL
     AS_OUT --> KERNEL
 ```
 
 ## agent-session module
 
-**Bounded context:** session lifecycle, PTY I/O, terminal streaming.
+**Bounded context:** session lifecycle, agent process management, session output streaming.
 
 ### Domain
 
@@ -72,7 +68,6 @@ graph LR
 | Use case | Responsibility |
 |---|---|
 | `spawn-session` | Create session record, spawn PTY, wire output → storage + events |
-| `terminal-connection` | Route stdin/resize between CLI/browser channels and PTY |
 | `session-lifecycle` | Transition session status (active, ended, error) |
 | `session-queries` | Fetch sessions, terminal chunks, input history |
 | `session-cleanup` | Delete session + associated data |
@@ -80,15 +75,15 @@ graph LR
 
 ### Application — out ports
 
-| Port | Implemented by |
-|---|---|
-| `SessionRepository` | `SqliteSessionRepository` |
-| `TerminalRepository` | `SqliteTerminalRepository` |
-| `PtySpawner` | `BunPtySpawner` |
-| `AgentAdapter` + `AgentRegistry` | `ClaudeAdapter` + `AgentRegistry` |
-| `EventPublisher` | In-memory pub/sub |
-| `ResumabilityChecker` | `FsResumabilityChecker` |
-| `CliSender` | `CliSenderLive` (writes back to IPC socket) |
+| Port | Shape | Implemented by |
+|---|---|---|
+| `session-store.port.ts` | `SessionStoreShape` | `SqliteSessionRepository` |
+| `session-log.port.ts` | `SessionLogShape` | `SqliteTerminalRepository` |
+| `agent-process.port.ts` | `AgentProcessShape` | `createPtyManager` (Bun PTY) |
+| `session-feed.port.ts` | `SessionFeedShape` | In-memory pub/sub (`terminal-subscribers.ts`) |
+| `session-event-bus.port.ts` | `SessionEventBusShape` | In-memory pub/sub (`session-event-bus.adapter.ts`) |
+| `agent-adapter.port.ts` | `AgentAdapter` / `AgentCatalogShape` | `claudeAdapter` + `createAgentCatalog` |
+| `cli-channel.port.ts` | `CliChannelShape` | `CliChannelLive` (writes back to IPC socket) |
 
 ### Infrastructure — adapters in
 
@@ -101,21 +96,17 @@ graph LR
 
 ---
 
-## daemon module
+## shell
 
-**Bounded context:** daemon lifecycle, IPC server, CLI command dispatch.
+**Role:** Application host — not a domain module. No bounded context, no domain model.
 
-### Application — use cases
-
-| Use case | Responsibility |
-|---|---|
-| `run-daemon` | Startup sequence, HTTP+WS server, IPC server, periodic maintenance |
+Owns process lifecycle, HTTP/IPC server wiring, and CLI commands. Delegates all business logic to `agent-session`.
 
 ### Startup sequence (`run-daemon`)
 
 ```mermaid
 sequenceDiagram
-    participant D as Daemon
+    participant D as shell
     participant DB as SQLite
     participant HTTP as HTTP Server
     participant IPC as IPC Server
@@ -147,16 +138,15 @@ sequenceDiagram
 graph BT
     DB["DatabaseLive"]
     AS["AgentSessionLive"]
-    D["DaemonLive"]
+    SH["DaemonLive (shell)"]
     APP["AppLive"]
 
     DB --> AS
-    DB --> D
+    SH --> APP
     AS --> APP
-    D --> APP
 ```
 
-`AppLive` is the root composition provided to the daemon entry point.
+`AppLive` is the root composition in `src/dependencies.ts` — the single wiring point for `agent-session` + shell infrastructure.
 
 ## See also
 

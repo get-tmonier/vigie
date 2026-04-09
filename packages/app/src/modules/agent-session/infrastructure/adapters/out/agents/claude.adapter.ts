@@ -1,6 +1,9 @@
-import type { AgentAdapter } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import { existsSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
+import type { AgentSpec } from '#modules/agent-session/application/ports/out/agent-catalog.port';
 
-export const claudeAdapter: AgentAdapter = {
+export const claudeAdapter: AgentSpec = {
   agentType: 'claude',
   canResume: true,
   detectSessionId: true,
@@ -14,5 +17,10 @@ export const claudeAdapter: AgentAdapter = {
       }
     }
     return { command: 'claude', args };
+  },
+  isResumable(agentSessionId: string, cwd: string): boolean {
+    const projectDir = cwd.replace(/\//g, '-');
+    const claudeDir = join(homedir(), '.claude', 'projects', projectDir);
+    return existsSync(join(claudeDir, `${agentSessionId}.jsonl`));
   },
 };

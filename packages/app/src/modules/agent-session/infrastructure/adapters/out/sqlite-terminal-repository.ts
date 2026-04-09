@@ -1,14 +1,15 @@
 import type { Database } from 'bun:sqlite';
 import { Effect, Layer } from 'effect';
-import { VigiDatabase } from '#infra/database';
 import {
   type InputEntry,
+  SessionLog,
+  type SessionLogShape,
   type TerminalChunk,
-  TerminalRepository,
-  type TerminalRepositoryShape,
-} from '#modules/agent-session/application/ports/out/terminal-repository.port';
+} from '#modules/agent-session/application/ports/out/session-log.port';
+import { VigiDatabase } from '#shared/db/database';
+import type { SessionId } from '#shared/kernel/session/session-id';
 
-function createSqliteTerminalRepository(db: Database): TerminalRepositoryShape {
+function createSqliteTerminalRepository(db: Database): SessionLogShape {
   const getMaxSeqStmt = db.prepare(
     'SELECT COALESCE(MAX(seq), 0) as max_seq FROM terminal_chunks WHERE session_id = $session_id'
   );
@@ -29,7 +30,7 @@ function createSqliteTerminalRepository(db: Database): TerminalRepositoryShape {
   );
 
   return {
-    appendChunk(sessionId: string, data: string, timestamp: number): void {
+    appendChunk(sessionId: SessionId, data: string, timestamp: number): void {
       const row = getMaxSeqStmt.get({ $session_id: sessionId }) as { max_seq: number };
       appendChunkStmt.run({
         $session_id: sessionId,
@@ -39,7 +40,7 @@ function createSqliteTerminalRepository(db: Database): TerminalRepositoryShape {
       });
     },
 
-    getChunks(sessionId: string, limit: number = 500): TerminalChunk[] {
+    getChunks(sessionId: SessionId, limit: number = 500): TerminalChunk[] {
       const rows = getChunksStmt.all({
         $session_id: sessionId,
         $limit: limit,
@@ -47,11 +48,11 @@ function createSqliteTerminalRepository(db: Database): TerminalRepositoryShape {
       return rows.reverse();
     },
 
-    getAllChunks(sessionId: string): TerminalChunk[] {
+    getAllChunks(sessionId: SessionId): TerminalChunk[] {
       return getAllChunksStmt.all({ $session_id: sessionId }) as TerminalChunk[];
     },
 
-    appendInput(sessionId: string, text: string, source: string, timestamp: number): void {
+    appendInput(sessionId: SessionId, text: string, source: string, timestamp: number): void {
       appendInputStmt.run({
         $session_id: sessionId,
         $text: text,
@@ -60,7 +61,7 @@ function createSqliteTerminalRepository(db: Database): TerminalRepositoryShape {
       });
     },
 
-    getInputHistory(sessionId: string, limit: number = 200): InputEntry[] {
+    getInputHistory(sessionId: SessionId, limit: number = 200): InputEntry[] {
       return getInputHistoryStmt.all({
         $session_id: sessionId,
         $limit: limit,
@@ -69,7 +70,7 @@ function createSqliteTerminalRepository(db: Database): TerminalRepositoryShape {
   };
 }
 
-export const SqliteTerminalRepositoryLive = Layer.effect(TerminalRepository)(
+export const SqliteTerminalRepositoryLive = Layer.effect(SessionLog)(
   Effect.gen(function* () {
     const db = yield* VigiDatabase;
     return createSqliteTerminalRepository(db);

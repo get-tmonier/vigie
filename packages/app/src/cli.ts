@@ -1,8 +1,8 @@
 import { BunRuntime, BunServices } from '@effect/platform-bun';
 import { Console, Effect } from 'effect';
 import { Command, Flag } from 'effect/unstable/cli';
-import { claudeCommand } from '#modules/daemon/infrastructure/adapters/in/commands/claude.command';
-import { claudeInteractiveCommand } from '#modules/daemon/infrastructure/adapters/in/commands/claude-interactive.command';
+import { claudeCommand } from '#shell/infrastructure/adapters/in/commands/claude.command';
+import { claudeInteractiveCommand } from '#shell/infrastructure/adapters/in/commands/claude-interactive.command';
 import {
   daemonAttachCommand,
   daemonLogsCommand,
@@ -10,11 +10,11 @@ import {
   daemonStartCommand,
   daemonStatusCommand,
   daemonStopCommand,
-} from '#modules/daemon/infrastructure/adapters/in/commands/daemon.command';
-import { openCommand } from '#modules/daemon/infrastructure/adapters/in/commands/open.command';
-import { sessionAttachCommand } from '#modules/daemon/infrastructure/adapters/in/commands/session-attach.command';
-import { sessionListCommand } from '#modules/daemon/infrastructure/adapters/in/commands/session-list.command';
-import { sessionResumeCommand } from '#modules/daemon/infrastructure/adapters/in/commands/session-resume.command';
+} from '#shell/infrastructure/adapters/in/commands/daemon.command';
+import { openCommand } from '#shell/infrastructure/adapters/in/commands/open.command';
+import { sessionAttachCommand } from '#shell/infrastructure/adapters/in/commands/session-attach.command';
+import { sessionListCommand } from '#shell/infrastructure/adapters/in/commands/session-list.command';
+import { sessionResumeCommand } from '#shell/infrastructure/adapters/in/commands/session-resume.command';
 
 // ── Daemon subcommands ��─
 

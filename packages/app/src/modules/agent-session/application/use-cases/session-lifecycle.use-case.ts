@@ -1,24 +1,20 @@
 import { Effect } from 'effect';
-import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
-import type { EventPublisherShape } from '#modules/agent-session/application/ports/out/event-publisher.port';
-import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
-import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
-import type { SessionDomainEvent } from '#modules/agent-session/domain/events';
-import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
-import type { PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
+import type { AgentCatalogShape } from '#modules/agent-session/application/ports/out/agent-catalog.port';
+import type { SessionEventBusShape } from '#modules/agent-session/application/ports/out/session-event-bus.port';
+import type { SessionStoreShape } from '#modules/agent-session/application/ports/out/session-store.port';
+import type { SessionLifecycleEvent } from '#shared/kernel/session/events';
+import type { SessionId } from '#shared/kernel/session/session-id';
 
 interface SessionLifecycleDeps {
-  sessionRepo: SessionRepositoryShape;
-  resumabilityChecker: ResumabilityCheckerShape;
-  agentRegistry: AgentRegistryShape;
-  eventPublisher: EventPublisherShape;
-  registry: PtyRegistry;
+  sessionRepo: SessionStoreShape;
+  agentCatalog: AgentCatalogShape;
+  eventPublisher: SessionEventBusShape;
 }
 
 export function createSessionLifecycleUseCase(deps: SessionLifecycleDeps) {
-  const { sessionRepo, resumabilityChecker, agentRegistry, eventPublisher, registry } = deps;
+  const { sessionRepo, agentCatalog, eventPublisher } = deps;
 
-  function publishEvents(events: SessionDomainEvent[]): Effect.Effect<void> {
+  function publishEvents(events: SessionLifecycleEvent[]): Effect.Effect<void> {
     return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
   }
 
@@ -31,54 +27,44 @@ export function createSessionLifecycleUseCase(deps: SessionLifecycleDeps) {
   }
 
   return {
-    markEnded(sessionId: string, exitCode: number): void {
-      const id = makeSessionId(sessionId);
-      const session = sessionRepo.findById(id);
+    markEnded(sessionId: SessionId, exitCode: number): void {
+      const session = sessionRepo.findById(sessionId);
       if (!session) return;
 
-      const adapter = agentRegistry.resolve(session.agentType);
+      const adapter = agentCatalog.resolve(session.agentType);
       const resumable =
         adapter.canResume &&
         session.agentSessionId != null &&
-        resumabilityChecker.isResumable(session.agentSessionId, session.cwd);
+        adapter.isResumable(session.agentSessionId, session.cwd);
 
       session.markEnded(exitCode, resumable);
       sessionRepo.save(session);
       fireAndForget(publishEvents(session.pullEvents()));
     },
 
-    markError(sessionId: string, error: string): void {
-      const id = makeSessionId(sessionId);
-      const session = sessionRepo.findById(id);
+    markError(sessionId: SessionId, error: string): void {
+      const session = sessionRepo.findById(sessionId);
       if (!session) return;
       session.markError(error);
       sessionRepo.save(session);
       fireAndForget(publishEvents(session.pullEvents()));
     },
 
-    setAgentSessionId(sessionId: string, agentSessionId: string): void {
-      const id = makeSessionId(sessionId);
-      const session = sessionRepo.findById(id);
+    setAgentSessionId(sessionId: SessionId, agentSessionId: string): void {
+      const session = sessionRepo.findById(sessionId);
       if (!session) return;
       session.setAgentSessionId(agentSessionId);
       sessionRepo.save(session);
       fireAndForget(publishEvents(session.pullEvents()));
     },
 
-    deregister(sessionId: string): void {
-      const id = makeSessionId(sessionId);
-      const session = sessionRepo.findById(id);
-      if (session) {
+    deregister(sessionId: SessionId): void {
+      const session = sessionRepo.findById(sessionId);
+      if (session?.isActive) {
         session.markEnded(0, false);
         sessionRepo.save(session);
         fireAndForget(publishEvents(session.pullEvents()));
       }
-
-      const connId = registry.sessionConnections.get(sessionId);
-      if (connId) {
-        registry.connSessions.delete(connId);
-      }
-      registry.sessionConnections.delete(sessionId);
     },
   };
 }

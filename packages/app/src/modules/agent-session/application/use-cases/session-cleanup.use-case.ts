@@ -1,12 +1,12 @@
 import { Effect } from 'effect';
-import type { EventPublisherShape } from '#modules/agent-session/application/ports/out/event-publisher.port';
-import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
-import type { SessionDomainEvent } from '#modules/agent-session/domain/events';
-import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
+import type { SessionEventBusShape } from '#modules/agent-session/application/ports/out/session-event-bus.port';
+import type { SessionStoreShape } from '#modules/agent-session/application/ports/out/session-store.port';
+import type { SessionLifecycleEvent } from '#shared/kernel/session/events';
+import type { SessionId } from '#shared/kernel/session/session-id';
 
 interface SessionCleanupDeps {
-  sessionRepo: SessionRepositoryShape;
-  eventPublisher: EventPublisherShape;
+  sessionRepo: SessionStoreShape;
+  eventPublisher: SessionEventBusShape;
 }
 
 export type SessionCleanupShape = ReturnType<typeof createSessionCleanupUseCase>;
@@ -14,7 +14,7 @@ export type SessionCleanupShape = ReturnType<typeof createSessionCleanupUseCase>
 export function createSessionCleanupUseCase(deps: SessionCleanupDeps) {
   const { sessionRepo, eventPublisher } = deps;
 
-  function publishEvents(events: SessionDomainEvent[]): Effect.Effect<void> {
+  function publishEvents(events: SessionLifecycleEvent[]): Effect.Effect<void> {
     return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
   }
 
@@ -27,12 +27,11 @@ export function createSessionCleanupUseCase(deps: SessionCleanupDeps) {
   }
 
   return {
-    delete(sessionId: string): void {
-      const id = makeSessionId(sessionId);
-      const session = sessionRepo.findById(id);
+    delete(sessionId: SessionId): void {
+      const session = sessionRepo.findById(sessionId);
       if (!session) return;
       session.delete();
-      sessionRepo.delete(id);
+      sessionRepo.delete(sessionId);
       fireAndForget(publishEvents(session.pullEvents()));
     },
 

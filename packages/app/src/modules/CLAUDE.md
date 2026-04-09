@@ -1,9 +1,8 @@
 # Module Boundary Rules
 
-- No cross-module imports. `modules/X` must not import from `modules/Y`.
-- Only `modules/*/dependencies.ts` may wire across module boundaries.
-- Only UI islands (`modules/*/infrastructure/adapters/in/ui/`) may compose across modules.
-- Shared kernel (`#shared/kernel/`) is for cross-cutting wire protocols owned by no single bounded context.
-  - If something moves to shared/kernel to escape an import error, that is a boundary smell — fix the module design instead.
-- Each module owns its `CLAUDE.md`, `dependencies.ts`, and domain layer.
-- `src/dependencies.ts` (root) is the only file allowed to import from multiple modules simultaneously.
+- `modules/agent-session` is the only domain module.
+- `modules/agent-session` must not import from `src/shell/`.
+- `modules/agent-session/dependencies.ts` wires only agent-session's own infrastructure.
+- Cross-module composition (agent-session + shell) happens exclusively in `src/dependencies.ts`.
+- Shared kernel (`#shared/kernel/`) contains domain types shared across modules: session identity, domain events, value objects.
+- Protocol schemas (IPC, browser) live in `#shell/protocols/` — they are shell-internal infrastructure contracts.

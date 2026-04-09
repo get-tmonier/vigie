@@ -1,11 +1,12 @@
 import { Effect } from 'effect';
-import type { EventPublisherShape } from '#modules/agent-session/application/ports/out/event-publisher.port';
+import type { SessionEventBusShape } from '#modules/agent-session/application/ports/out/session-event-bus.port';
 import type {
   ResumableSessionInfo,
-  SessionRepositoryShape,
-} from '#modules/agent-session/application/ports/out/session-repository.port';
-import type { DomainEvent } from '#modules/agent-session/domain/events';
+  SessionStoreShape,
+} from '#modules/agent-session/application/ports/out/session-store.port';
 import type { Session } from '#modules/agent-session/domain/session';
+import type { SessionEvent } from '#shared/kernel/session/events';
+import type { SessionId } from '#shared/kernel/session/session-id';
 
 export function makeSessionRepo(
   sessions: Session[] = [],
@@ -13,12 +14,12 @@ export function makeSessionRepo(
     activeWithAgentId?: ResumableSessionInfo[];
     recentlyEnded?: ResumableSessionInfo[];
   }
-): SessionRepositoryShape & {
-  store: Map<string, Session>;
+): SessionStoreShape & {
+  store: Map<SessionId, Session>;
   activeWithAgentId: ResumableSessionInfo[];
   recentlyEnded: ResumableSessionInfo[];
 } {
-  const store = new Map<string, Session>();
+  const store = new Map<SessionId, Session>();
   for (const s of sessions) store.set(s.id, s);
 
   const activeWithAgentId: ResumableSessionInfo[] = opts?.activeWithAgentId ?? [];
@@ -49,8 +50,8 @@ export function makeSessionRepo(
   };
 }
 
-export function makeEventPublisher(): EventPublisherShape & { published: DomainEvent[] } {
-  const published: DomainEvent[] = [];
+export function makeSessionEventBus(): SessionEventBusShape & { published: SessionEvent[] } {
+  const published: SessionEvent[] = [];
   return {
     published,
     publish: (event) => {

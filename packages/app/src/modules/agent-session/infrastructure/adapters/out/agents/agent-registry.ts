@@ -1,50 +1,22 @@
 import { Layer } from 'effect';
 import {
-  type AgentAdapter,
-  AgentRegistry,
-  type AgentRegistryShape,
-} from '#modules/agent-session/application/ports/out/agent-adapter.port';
+  AgentCatalog,
+  type AgentCatalogShape,
+  type AgentSpec,
+} from '#modules/agent-session/application/ports/out/agent-catalog.port';
+import type { AgentType } from '#shared/kernel/session/agent-type';
 import { claudeAdapter } from './claude.adapter';
 
-function genericAdapter(agentType: string): AgentAdapter {
-  return {
-    agentType,
-    canResume: false,
-    detectSessionId: false,
-    buildSpawnArgs() {
-      return { command: agentType, args: [agentType] };
-    },
-  };
-}
-
-function createAgentRegistry(): AgentRegistryShape {
-  const registry: Record<string, AgentAdapter> = {
+function createAgentCatalog(): AgentCatalogShape {
+  const registry: Record<AgentType, AgentSpec> = {
     claude: claudeAdapter,
-    aider: {
-      agentType: 'aider',
-      canResume: false,
-      detectSessionId: false,
-      buildSpawnArgs: () => ({ command: 'aider', args: ['aider'] }),
-    },
-    codex: {
-      agentType: 'codex',
-      canResume: false,
-      detectSessionId: false,
-      buildSpawnArgs: () => ({ command: 'codex', args: ['codex'] }),
-    },
-    opencode: {
-      agentType: 'opencode',
-      canResume: false,
-      detectSessionId: false,
-      buildSpawnArgs: () => ({ command: 'opencode', args: ['opencode'] }),
-    },
   };
 
   return {
-    resolve(agentType: string): AgentAdapter {
-      return registry[agentType] ?? genericAdapter(agentType);
+    resolve(agentType: AgentType): AgentSpec {
+      return registry[agentType];
     },
   };
 }
 
-export const AgentRegistryLive = Layer.sync(AgentRegistry)(() => createAgentRegistry());
+export const AgentCatalogLive = Layer.sync(AgentCatalog)(() => createAgentCatalog());

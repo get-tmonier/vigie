@@ -2,13 +2,12 @@ import {
   CannotDeleteActiveSessionError,
   InvalidStatusTransitionError,
 } from '#modules/agent-session/domain/errors';
-import type { SessionDomainEvent } from '#modules/agent-session/domain/events';
-import type { SessionId } from '#modules/agent-session/domain/session-id';
-import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
 import type { SessionStatus } from '#modules/agent-session/domain/session-status';
 import { canTransition } from '#modules/agent-session/domain/session-status';
-
-type AgentType = string;
+import type { AgentType } from '#shared/kernel/session/agent-type';
+import type { SessionLifecycleEvent } from '#shared/kernel/session/events';
+import type { SessionId } from '#shared/kernel/session/session-id';
+import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 
 interface CreateSessionProps {
   readonly id?: string;
@@ -51,7 +50,7 @@ export class Session {
   private _resumable: boolean;
   private _exitCode?: number;
   private _endedAt?: number;
-  private readonly _events: SessionDomainEvent[] = [];
+  private readonly _events: SessionLifecycleEvent[] = [];
 
   private constructor(props: {
     id: SessionId;
@@ -247,7 +246,7 @@ export class Session {
     });
   }
 
-  pullEvents(): SessionDomainEvent[] {
+  pullEvents(): SessionLifecycleEvent[] {
     const events = [...this._events];
     this._events.length = 0;
     return events;

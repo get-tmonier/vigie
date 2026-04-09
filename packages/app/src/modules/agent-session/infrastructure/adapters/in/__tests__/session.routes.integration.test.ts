@@ -1,14 +1,13 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
 import * as HttpRouter from 'effect/unstable/http/HttpRouter';
-import type { BrowserEvent } from '#modules/agent-session/application/ports/out/event-feed.port';
+import type { AgentProcessShape } from '#modules/agent-session/application/ports/out/agent-process.port';
 import type { SessionCleanupShape } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import type { SpawnSessionShape } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
-import type { TerminalConnectionShape } from '#modules/agent-session/application/use-cases/terminal-connection.use-case';
 import { Session } from '#modules/agent-session/domain/session';
-import { SessionId } from '#modules/agent-session/domain/session-id';
-import { createSessionRoutes } from '../session.routes';
+import { SessionId } from '#shared/kernel/session/session-id';
+import { createSessionApiRoutes } from '../session.api-routes';
 
 // --- Fake domain objects ---
 
@@ -44,8 +43,8 @@ const fakeSessionCleanup: SessionCleanupShape = {
   deleteAllEnded: () => {},
 };
 
-const fakeTerminalConnection: TerminalConnectionShape = {
-  setupPtyLifecycle: () => {},
+const fakePtyManager: AgentProcessShape = {
+  spawn: () => Effect.succeed({ pid: 0 }),
   kill: () => {},
   killAll: () => {},
   getActivePid: () => null,
@@ -53,16 +52,14 @@ const fakeTerminalConnection: TerminalConnectionShape = {
   detach: () => {},
   updateCliResize: () => {},
   handleDisconnect: () => {},
-  writeInput: () => {},
-  applyResizePriority: () => null,
   addBrowserChannel: () => null,
   updateBrowserChannel: () => {},
   removeBrowserChannel: () => {},
+  writeInput: () => {},
   writeBinaryInput: () => {},
-};
-
-const fakeEventFeed = {
-  subscribe: (_listener: (event: BrowserEvent) => void) => () => {},
+  trackConnection: () => {},
+  getConnId: () => undefined,
+  clearConnection: () => {},
 };
 
 // --- Helper to build test handler ---
@@ -72,10 +69,9 @@ function buildHandler(sessions: Session[] = []) {
     spawnSession: fakeSpawnSession,
     sessionCleanup: fakeSessionCleanup,
     sessionQueries: fakeSessionQueries(sessions),
-    terminalConnection: fakeTerminalConnection,
-    eventFeed: fakeEventFeed,
+    ptyManager: fakePtyManager,
   };
-  const routes = createSessionRoutes(deps);
+  const routes = createSessionApiRoutes(deps);
   const appLayer = Layer.mergeAll(HttpRouter.layer, HttpRouter.addAll(routes));
   return HttpRouter.toWebHandler(appLayer, { disableLogger: true });
 }

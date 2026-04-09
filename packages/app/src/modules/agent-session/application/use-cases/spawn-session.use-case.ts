@@ -1,35 +1,31 @@
 import { Effect } from 'effect';
-import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
-import type { EventPublisherShape } from '#modules/agent-session/application/ports/out/event-publisher.port';
-import type { PtySpawnerShape } from '#modules/agent-session/application/ports/out/pty-spawner.port';
-import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
+import type { AgentCatalogShape } from '#modules/agent-session/application/ports/out/agent-catalog.port';
+import type { AgentProcessShape } from '#modules/agent-session/application/ports/out/agent-process.port';
+import type { SessionEventBusShape } from '#modules/agent-session/application/ports/out/session-event-bus.port';
+import type { SessionStoreShape } from '#modules/agent-session/application/ports/out/session-store.port';
 import type { AgentRunnerError } from '#modules/agent-session/domain/errors';
 import {
   CannotResumeSessionError,
   SessionNotFoundError,
 } from '#modules/agent-session/domain/errors';
-import type { SessionDomainEvent } from '#modules/agent-session/domain/events';
 import { Session } from '#modules/agent-session/domain/session';
-import type { SessionId } from '#modules/agent-session/domain/session-id';
-import { SessionId as makeSessionId } from '#modules/agent-session/domain/session-id';
-import type { PtyEntry, PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
+import type { AgentType } from '#shared/kernel/session/agent-type';
+import type { SessionLifecycleEvent } from '#shared/kernel/session/events';
+import type { SessionId } from '#shared/kernel/session/session-id';
 
 interface SpawnSessionDeps {
-  sessionRepo: SessionRepositoryShape;
-  ptySpawner: PtySpawnerShape;
-  agentRegistry: AgentRegistryShape;
-  eventPublisher: EventPublisherShape;
-  registry: PtyRegistry;
-  setupPtyLifecycle: (sessionId: SessionId, entry: PtyEntry) => void;
+  sessionRepo: SessionStoreShape;
+  agentCatalog: AgentCatalogShape;
+  eventPublisher: SessionEventBusShape;
+  ptyManager: AgentProcessShape;
 }
 
 export type SpawnSessionShape = ReturnType<typeof createSpawnSessionUseCase>;
 
 export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
-  const { sessionRepo, ptySpawner, agentRegistry, eventPublisher, registry, setupPtyLifecycle } =
-    deps;
+  const { sessionRepo, agentCatalog, eventPublisher, ptyManager } = deps;
 
-  function publishEvents(events: SessionDomainEvent[]): Effect.Effect<void> {
+  function publishEvents(events: SessionLifecycleEvent[]): Effect.Effect<void> {
     return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
   }
 
@@ -43,8 +39,8 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
 
   return {
     register(props: {
-      sessionId: string;
-      agentType: string;
+      sessionId: SessionId;
+      agentType: AgentType;
       cwd: string;
       mode?: 'prompt' | 'interactive';
       gitBranch?: string;
@@ -62,14 +58,13 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
         repoName: props.repoName,
       });
       sessionRepo.save(session);
-      registry.sessionConnections.set(props.sessionId, props.connId);
-      registry.connSessions.set(props.connId, props.sessionId);
+      ptyManager.trackConnection(props.sessionId, props.connId);
       fireAndForget(publishEvents(session.pullEvents()));
     },
 
     spawnInteractive(props: {
-      sessionId?: string;
-      agentType: string;
+      sessionId?: SessionId;
+      agentType: AgentType;
       cwd: string;
       cols: number;
       rows: number;
@@ -90,7 +85,7 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
         });
         sessionRepo.save(session);
 
-        const adapter = agentRegistry.resolve(props.agentType);
+        const adapter = agentCatalog.resolve(props.agentType);
         const agentSessionId = props.agentSessionId ?? session.id;
 
         if (adapter.detectSessionId) {
@@ -102,41 +97,35 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
           agentSessionId,
           resume: props.resume,
         });
-        const handle = yield* ptySpawner.spawn(command, args, props.cwd, props.cols, props.rows);
 
-        const entry: PtyEntry = {
-          handle,
-          cliChannels: new Map(),
-          browserChannels: new Map(),
-          ptyDimensions: { cols: props.cols, rows: props.rows },
-        };
-        registry.ptyHandles.set(session.id, entry);
+        const { pid } = yield* ptyManager.spawn({
+          sessionId: session.id,
+          command,
+          args,
+          cwd: props.cwd,
+          cols: props.cols,
+          rows: props.rows,
+          connId: props.connId,
+        });
 
-        if (props.connId) {
-          registry.connSessions.set(props.connId, session.id);
-          entry.cliChannels.set(props.connId, { cols: props.cols, rows: props.rows });
-        }
+        fireAndForget(publishEvents(session.pullEvents()));
 
-        yield* Effect.forkChild(publishEvents(session.pullEvents()));
-        setupPtyLifecycle(session.id, entry);
-
-        return { sessionId: session.id, pid: handle.pid };
+        return { sessionId: session.id, pid };
       });
     },
 
     resume(
-      sessionId: string,
+      sessionId: SessionId,
       opts: { cols: number; rows: number; connId?: string; gitBranch?: string; repoName?: string }
     ): Effect.Effect<
       { sessionId: SessionId; pid: number },
       SessionNotFoundError | CannotResumeSessionError | AgentRunnerError
     > {
       return Effect.gen(function* () {
-        const id = makeSessionId(sessionId);
-        const session = sessionRepo.findById(id);
+        const session = sessionRepo.findById(sessionId);
         if (!session) return yield* new SessionNotFoundError(sessionId);
 
-        const adapter = agentRegistry.resolve(session.agentType);
+        const adapter = agentCatalog.resolve(session.agentType);
         if (!adapter.canResume || !session.canResume) {
           return yield* new CannotResumeSessionError(
             sessionId,
@@ -151,25 +140,20 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
           agentSessionId: session.agentSessionId,
           resume: true,
         });
-        const handle = yield* ptySpawner.spawn(command, args, session.cwd, opts.cols, opts.rows);
 
-        const entry: PtyEntry = {
-          handle,
-          cliChannels: new Map(),
-          browserChannels: new Map(),
-          ptyDimensions: { cols: opts.cols, rows: opts.rows },
-        };
-        registry.ptyHandles.set(id, entry);
+        const { pid } = yield* ptyManager.spawn({
+          sessionId,
+          command,
+          args,
+          cwd: session.cwd,
+          cols: opts.cols,
+          rows: opts.rows,
+          connId: opts.connId,
+        });
 
-        if (opts.connId) {
-          registry.connSessions.set(opts.connId, id);
-          entry.cliChannels.set(opts.connId, { cols: opts.cols, rows: opts.rows });
-        }
+        fireAndForget(publishEvents(session.pullEvents()));
 
-        yield* Effect.forkChild(publishEvents(session.pullEvents()));
-        setupPtyLifecycle(id, entry);
-
-        return { sessionId: id, pid: handle.pid };
+        return { sessionId, pid };
       });
     },
   };

@@ -2,20 +2,14 @@
 module.exports = {
   forbidden: [
     {
-      name: 'no-cross-module-imports',
-      comment:
-        'Modules must not import from each other. Only dependencies.ts files may cross module boundaries.',
+      name: 'no-domain-imports-shell',
+      comment: 'agent-session domain module must not import from the application shell.',
       severity: 'error',
       from: {
-        path: '^src/modules/([^/]+)/',
-        pathNot: [
-          '^src/modules/[^/]+/dependencies\\.ts$',
-          '^src/modules/[^/]+/infrastructure/adapters/in/ui/.*',
-        ],
+        path: '^src/modules/',
       },
       to: {
-        path: '^src/modules/([^/]+)/',
-        pathNot: '^src/modules/$1/',
+        path: '^src/shell/',
       },
     },
     {

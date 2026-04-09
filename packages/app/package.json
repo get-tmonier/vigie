@@ -7,9 +7,10 @@
   },
   "imports": {
     "#modules/*": "./src/modules/*",
-    "#infra/*": "./src/infra/*",
+    "#shell/*": "./src/shell/*",
     "#shared/*": "./src/shared/*",
-    "#dependencies": "./src/dependencies.ts"
+    "#pages/*": "./src/pages/*",
+"#dependencies": "./src/dependencies.ts"
   },
   "scripts": {
     "dev": "bun run build:client && VIGIE_DEV=true bun run --watch src/daemon.ts",
@@ -23,7 +24,7 @@
     "lint:fix": "biome lint --write ./src",
     "format": "biome format --write ./src",
     "format:fix": "biome format --write ./src",
-    "check": "biome check ./src",
+    "check": "biome check ./src ./scripts",
     "check:fix": "biome check --write ./src",
     "check-imports": "bun ../../scripts/check-imports.ts",
     "fix-imports": "bun ../../scripts/fix-imports.ts",

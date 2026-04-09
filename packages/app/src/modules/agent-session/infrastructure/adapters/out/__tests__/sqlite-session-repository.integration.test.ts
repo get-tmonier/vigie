@@ -1,11 +1,11 @@
 import { Database } from 'bun:sqlite';
 import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
-import { VigiDatabase } from '#infra/database';
-import { SessionRepository } from '#modules/agent-session/application/ports/out/session-repository.port';
+import { SessionStore } from '#modules/agent-session/application/ports/out/session-store.port';
 import { Session } from '#modules/agent-session/domain/session';
-import { SessionId } from '#modules/agent-session/domain/session-id';
 import { SqliteSessionRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-session-repository';
+import { VigiDatabase } from '#shared/db/database';
+import { SessionId } from '#shared/kernel/session/session-id';
 
 function makeTestDb(): Database {
   const db = new Database(':memory:');
@@ -46,7 +46,7 @@ function makeTestDb(): Database {
 const TestDatabaseLayer = Layer.sync(VigiDatabase)(() => makeTestDb());
 const TestRepoLayer = SqliteSessionRepositoryLive.pipe(Layer.provide(TestDatabaseLayer));
 
-async function runWithRepo<A>(effect: Effect.Effect<A, never, SessionRepository>): Promise<A> {
+async function runWithRepo<A>(effect: Effect.Effect<A, never, SessionStore>): Promise<A> {
   return Effect.runPromise(Effect.provide(effect, TestRepoLayer));
 }
 
@@ -55,7 +55,7 @@ describe('SqliteSessionRepository', () => {
     it('saves a session and retrieves it by id', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* SessionRepository;
+          const repo = yield* SessionStore;
           const session = Session.create({
             agentType: 'claude',
             cwd: '/tmp/test',
@@ -78,7 +78,7 @@ describe('SqliteSessionRepository', () => {
     it('returns null for unknown id', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* SessionRepository;
+          const repo = yield* SessionStore;
           const found = repo.findById(SessionId('nonexistent'));
           expect(found).toBeNull();
         })
@@ -88,7 +88,7 @@ describe('SqliteSessionRepository', () => {
     it('updates an existing session on re-save', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* SessionRepository;
+          const repo = yield* SessionStore;
           const session = Session.create({ agentType: 'claude', cwd: '/tmp/test' });
           repo.save(session);
 
@@ -106,7 +106,7 @@ describe('SqliteSessionRepository', () => {
     it('returns all sessions with active, ended, or error status', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* SessionRepository;
+          const repo = yield* SessionStore;
           const active = Session.create({ agentType: 'claude', cwd: '/tmp/a' });
           const ended = Session.reconstitute({
             id: 'ended-1',
@@ -134,7 +134,7 @@ describe('SqliteSessionRepository', () => {
     it('returns only active sessions', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* SessionRepository;
+          const repo = yield* SessionStore;
           const active = Session.create({ agentType: 'claude', cwd: '/tmp/active' });
           const ended = Session.reconstitute({
             id: 'ended-find-active',
@@ -162,7 +162,7 @@ describe('SqliteSessionRepository', () => {
     it('returns active sessions that have an agentSessionId', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* SessionRepository;
+          const repo = yield* SessionStore;
           const withAgent = Session.create({ agentType: 'claude', cwd: '/tmp/with-agent' });
           withAgent.setAgentSessionId('claude-sess-xyz');
           repo.save(withAgent);
@@ -184,7 +184,7 @@ describe('SqliteSessionRepository', () => {
     it('returns recently ended sessions with agentSessionId and resumable=false', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* SessionRepository;
+          const repo = yield* SessionStore;
           const recentEnded = Session.reconstitute({
             id: 'recent-ended-1',
             agentType: 'claude',
@@ -221,7 +221,7 @@ describe('SqliteSessionRepository', () => {
     it('excludes resumable sessions', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* SessionRepository;
+          const repo = yield* SessionStore;
           const resumableEnded = Session.reconstitute({
             id: 'resumable-ended-1',
             agentType: 'claude',
@@ -246,7 +246,7 @@ describe('SqliteSessionRepository', () => {
     it('removes session and its associated data', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* SessionRepository;
+          const repo = yield* SessionStore;
           const ended = Session.reconstitute({
             id: 'to-delete-1',
             agentType: 'claude',
@@ -272,7 +272,7 @@ describe('SqliteSessionRepository', () => {
     it('transitions all active sessions to ended status', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* SessionRepository;
+          const repo = yield* SessionStore;
           const s1 = Session.create({ agentType: 'claude', cwd: '/tmp/orphan1' });
           const s2 = Session.create({ agentType: 'claude', cwd: '/tmp/orphan2' });
           repo.save(s1);
@@ -294,7 +294,7 @@ describe('SqliteSessionRepository', () => {
     it('deletes ended sessions older than maxAgeMs', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* SessionRepository;
+          const repo = yield* SessionStore;
           const old = Session.reconstitute({
             id: 'prune-old-1',
             agentType: 'claude',
@@ -329,7 +329,7 @@ describe('SqliteSessionRepository', () => {
     it('preserves active sessions regardless of age', async () => {
       await runWithRepo(
         Effect.gen(function* () {
-          const repo = yield* SessionRepository;
+          const repo = yield* SessionStore;
           const active = Session.reconstitute({
             id: 'prune-active-1',
             agentType: 'claude',
