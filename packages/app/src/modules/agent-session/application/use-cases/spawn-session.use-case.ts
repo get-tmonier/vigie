@@ -10,6 +10,7 @@ import {
 } from '#modules/agent-session/domain/errors';
 import { Session } from '#modules/agent-session/domain/session';
 import type { PtyEntry, PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
+import type { AgentType } from '#shared/kernel/agent-session/agent-type';
 import type { SessionLifecycleEvent } from '#shared/kernel/agent-session/events';
 import type { SessionId } from '#shared/kernel/agent-session/session-id';
 
@@ -43,7 +44,7 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
   return {
     register(props: {
       sessionId: SessionId;
-      agentType: string;
+      agentType: AgentType;
       cwd: string;
       mode?: 'prompt' | 'interactive';
       gitBranch?: string;
@@ -68,7 +69,7 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
 
     spawnInteractive(props: {
       sessionId?: SessionId;
-      agentType: string;
+      agentType: AgentType;
       cwd: string;
       cols: number;
       rows: number;

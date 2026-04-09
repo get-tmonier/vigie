@@ -1,4 +1,5 @@
 import * as v from 'valibot';
+import { AgentTypeSchema } from '#shared/kernel/agent-session/agent-type';
 import { TerminalChunkSchema } from '#shared/kernel/agent-session/events';
 import { SessionIdSchema } from '#shared/kernel/agent-session/session-id';
 
@@ -52,7 +53,7 @@ const FsListDirResponseSchema = v.object({
 
 const DaemonSyncSessionSchema = v.object({
   sessionId: v.string(),
-  agentType: v.string(),
+  agentType: AgentTypeSchema,
   mode: v.optional(v.picklist(['prompt', 'interactive']), 'prompt'),
   cwd: v.string(),
   gitBranch: v.optional(v.string()),

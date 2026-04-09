@@ -1,5 +1,6 @@
 import type { Database } from 'bun:sqlite';
 import { Effect, Layer } from 'effect';
+import * as v from 'valibot';
 import {
   type ResumableSessionInfo,
   SessionRepository,
@@ -8,6 +9,7 @@ import {
 import { Session } from '#modules/agent-session/domain/session';
 import type { SessionStatus } from '#modules/agent-session/domain/session-status';
 import { VigiDatabase } from '#shared/db/database';
+import { AgentTypeSchema } from '#shared/kernel/agent-session/agent-type';
 import type { SessionId } from '#shared/kernel/agent-session/session-id';
 import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
 
@@ -30,7 +32,7 @@ interface SessionRow {
 function rowToSession(row: SessionRow): Session {
   return Session.reconstitute({
     id: row.id,
-    agentType: row.agent_type,
+    agentType: v.parse(AgentTypeSchema, row.agent_type),
     cwd: row.cwd,
     gitBranch: row.git_branch ?? undefined,
     gitRemoteUrl: row.git_remote_url ?? undefined,

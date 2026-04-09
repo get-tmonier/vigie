@@ -1,8 +1,9 @@
 import * as v from 'valibot';
+import { AgentTypeSchema } from '#shared/kernel/agent-session/agent-type';
 
 export const AgentSessionSchema = v.object({
   id: v.string(),
-  agentType: v.string(),
+  agentType: AgentTypeSchema,
   mode: v.string(),
   cwd: v.string(),
   gitBranch: v.optional(v.string()),
@@ -17,7 +18,7 @@ export const AgentSessionSchema = v.object({
 export type AgentSession = v.InferOutput<typeof AgentSessionSchema>;
 
 export const SpawnSessionRequestSchema = v.object({
-  agentType: v.optional(v.picklist(['claude', 'opencode', 'generic'])),
+  agentType: v.optional(AgentTypeSchema),
   cwd: v.optional(v.string()),
   cols: v.optional(v.number()),
   rows: v.optional(v.number()),

@@ -1,7 +1,8 @@
 import { ServiceMap } from 'effect';
+import type { AgentType } from '#shared/kernel/agent-session/agent-type';
 
 export interface AgentAdapter {
-  readonly agentType: string;
+  readonly agentType: AgentType;
   readonly canResume: boolean;
   readonly detectSessionId: boolean;
   buildSpawnArgs(opts?: { agentSessionId?: string; resume?: boolean }): {
@@ -11,7 +12,7 @@ export interface AgentAdapter {
 }
 
 export interface AgentRegistryShape {
-  resolve(agentType: string): AgentAdapter;
+  resolve(agentType: AgentType): AgentAdapter;
 }
 
 export class AgentRegistry extends ServiceMap.Service<AgentRegistry, AgentRegistryShape>()(

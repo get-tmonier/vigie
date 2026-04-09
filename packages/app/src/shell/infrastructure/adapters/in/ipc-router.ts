@@ -6,13 +6,14 @@ import type { IpcConnection } from '#shell/application/ports/out/ipc-server.port
 
 const encodeJson = Schema.encodeSync(Schema.UnknownFromJsonString);
 
+import type { AgentType } from '#shared/kernel/agent-session/agent-type';
 import type { SessionId } from '#shared/kernel/agent-session/session-id';
 
 interface IpcRouterDeps {
   spawnSession: {
     register(props: {
       sessionId: SessionId;
-      agentType: string;
+      agentType: AgentType;
       cwd: string;
       mode?: 'prompt' | 'interactive';
       gitBranch?: string;
@@ -22,7 +23,7 @@ interface IpcRouterDeps {
     }): void;
     spawnInteractive(props: {
       sessionId?: SessionId;
-      agentType: string;
+      agentType: AgentType;
       cwd: string;
       cols: number;
       rows: number;
