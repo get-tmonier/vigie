@@ -45,7 +45,6 @@ export class AgentSession extends ServiceMap.Service<AgentSession, AgentSessionS
 ) {}
 
 const AgentSessionInfraLive = Layer.mergeAll(
-  DomainEventBusLive,
   FsResumabilityCheckerLive,
   AgentRegistryLive,
   TerminalSubscribersLive,

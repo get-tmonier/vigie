@@ -29,6 +29,9 @@ const SessionSinkLive = Layer.effect(SessionSink)(
   })
 );
 
-export const DaemonLive = Layer.mergeAll(UnixSocketServerLive, SessionSinkLive);
+export const DaemonLive = Layer.merge(
+  UnixSocketServerLive,
+  SessionSinkLive.pipe(Layer.provide(UnixSocketServerLive))
+);
 
 export { BrowserEventBusLive } from '#shell/infrastructure/adapters/out/browser-event-bus.adapter';

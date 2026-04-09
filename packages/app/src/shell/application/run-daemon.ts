@@ -1,5 +1,4 @@
 import { existsSync, mkdirSync, unlinkSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
 import * as BunHttpServer from '@effect/platform-bun/BunHttpServer';
 import { Duration, Effect, Fiber, Schedule } from 'effect';
 import * as HttpMiddleware from 'effect/unstable/http/HttpMiddleware';
@@ -68,15 +67,6 @@ export function createRunDaemon(deps: RunDaemonDeps) {
     );
 
     // ── 2. HTTP + WebSocket server ─────────────────────────────────────
-    const clientDistCandidates = [
-      join(dirname(process.execPath), 'client'),
-      resolve(import.meta.dir, '..', '..', '..', '..', '..', 'dist', 'client'),
-    ];
-    const clientDistPath = clientDistCandidates.find((p) => existsSync(p));
-    if (clientDistPath) {
-      yield* Effect.logInfo(`[daemon] Serving client islands from ${clientDistPath}`);
-    }
-
     const port = config.port;
 
     yield* Effect.gen(function* () {

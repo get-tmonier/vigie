@@ -108,7 +108,7 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
           connId: props.connId,
         });
 
-        yield* Effect.forkChild(publishEvents(session.pullEvents()));
+        fireAndForget(publishEvents(session.pullEvents()));
 
         return { sessionId: session.id, pid };
       });
@@ -151,7 +151,7 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
           connId: opts.connId,
         });
 
-        yield* Effect.forkChild(publishEvents(session.pullEvents()));
+        fireAndForget(publishEvents(session.pullEvents()));
 
         return { sessionId, pid };
       });
