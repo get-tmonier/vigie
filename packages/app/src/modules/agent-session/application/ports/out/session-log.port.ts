@@ -13,7 +13,7 @@ export interface InputEntry {
   readonly timestamp: number;
 }
 
-export interface TerminalRepositoryShape {
+export interface SessionLogShape {
   appendChunk(sessionId: SessionId, data: string, timestamp: number): void;
   getChunks(sessionId: SessionId, limit?: number): TerminalChunk[];
   getAllChunks(sessionId: SessionId): TerminalChunk[];
@@ -21,7 +21,6 @@ export interface TerminalRepositoryShape {
   getInputHistory(sessionId: SessionId, limit?: number): InputEntry[];
 }
 
-export class TerminalRepository extends ServiceMap.Service<
-  TerminalRepository,
-  TerminalRepositoryShape
->()('@vigie/TerminalRepository') {}
+export class SessionLog extends ServiceMap.Service<SessionLog, SessionLogShape>()(
+  '@vigie/SessionLog'
+) {}

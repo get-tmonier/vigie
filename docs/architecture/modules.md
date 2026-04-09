@@ -13,11 +13,11 @@ graph LR
             end
             subgraph as_app["Application"]
                 AS_UC["Use Cases<br/>spawn-session<br/>terminal-connection<br/>session-lifecycle<br/>session-queries<br/>session-cleanup<br/>check-resumability"]
-                AS_PORT_OUT["Out ports<br/>SessionRepository<br/>TerminalRepository<br/>PtySpawner<br/>AgentAdapter / AgentRegistry<br/>EventPublisher<br/>ResumabilityChecker<br/>CliSender"]
+                AS_PORT_OUT["Out ports<br/>SessionStore<br/>SessionLog<br/>AgentProcess<br/>SessionFeed<br/>SessionEventBus<br/>AgentAdapter / AgentCatalog<br/>CliChannel"]
             end
             subgraph as_infra["Infrastructure"]
                 AS_IN["Adapters in<br/>HTTP routes (sessions, terminal WS)<br/>React SSR (dashboard, islands)"]
-                AS_OUT["Adapters out<br/>SQLite repos<br/>Bun PTY spawner<br/>In-memory event publisher<br/>FS resumability checker<br/>Claude agent adapter"]
+                AS_OUT["Adapters out<br/>SQLite repos (session + log)<br/>Bun PTY (AgentProcess impl)<br/>In-memory event bus<br/>In-memory session feed<br/>Claude agent adapter"]
             end
         end
 
@@ -52,7 +52,7 @@ graph LR
 
 ## agent-session module
 
-**Bounded context:** session lifecycle, PTY I/O, terminal streaming.
+**Bounded context:** session lifecycle, agent process management, session output streaming.
 
 ### Domain
 
@@ -68,7 +68,6 @@ graph LR
 | Use case | Responsibility |
 |---|---|
 | `spawn-session` | Create session record, spawn PTY, wire output → storage + events |
-| `terminal-connection` | Route stdin/resize between CLI/browser channels and PTY |
 | `session-lifecycle` | Transition session status (active, ended, error) |
 | `session-queries` | Fetch sessions, terminal chunks, input history |
 | `session-cleanup` | Delete session + associated data |
@@ -76,15 +75,15 @@ graph LR
 
 ### Application — out ports
 
-| Port | Implemented by |
-|---|---|
-| `SessionRepository` | `SqliteSessionRepository` |
-| `TerminalRepository` | `SqliteTerminalRepository` |
-| `PtySpawner` | `BunPtySpawner` |
-| `AgentAdapter` + `AgentRegistry` | `ClaudeAdapter` + `AgentRegistry` |
-| `EventPublisher` | In-memory pub/sub |
-| `ResumabilityChecker` | `FsResumabilityChecker` |
-| `CliSender` | `CliSenderLive` (writes back to IPC socket) |
+| Port | Shape | Implemented by |
+|---|---|---|
+| `session-store.port.ts` | `SessionStoreShape` | `SqliteSessionRepository` |
+| `session-log.port.ts` | `SessionLogShape` | `SqliteTerminalRepository` |
+| `agent-process.port.ts` | `AgentProcessShape` | `createPtyManager` (Bun PTY) |
+| `session-feed.port.ts` | `SessionFeedShape` | In-memory pub/sub (`terminal-subscribers.ts`) |
+| `session-event-bus.port.ts` | `SessionEventBusShape` | In-memory pub/sub (`session-event-bus.adapter.ts`) |
+| `agent-adapter.port.ts` | `AgentAdapter` / `AgentCatalogShape` | `claudeAdapter` + `createAgentCatalog` |
+| `cli-channel.port.ts` | `CliChannelShape` | `CliChannelLive` (writes back to IPC socket) |
 
 ### Infrastructure — adapters in
 

@@ -1,13 +1,19 @@
 import { describe, expect, it } from 'bun:test';
-import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
+import type { AgentCatalogShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 import { createCheckResumabilityUseCase } from '#modules/agent-session/application/use-cases/check-resumability.use-case';
 import { Session } from '#modules/agent-session/domain/session';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
-import { makeDomainEventBus, makeSessionRepo } from './test-helpers';
+import { makeSessionEventBus, makeSessionRepo } from './test-helpers';
 
-function makeResumabilityChecker(resumable = false): ResumabilityCheckerShape {
+function makeAgentCatalog(resumable = false): AgentCatalogShape {
   return {
-    isResumable: () => resumable,
+    resolve: (_agentType) => ({
+      agentType: 'claude',
+      canResume: true,
+      detectSessionId: false,
+      buildSpawnArgs: () => ({ command: 'claude', args: [] }),
+      isResumable: () => resumable,
+    }),
   };
 }
 
@@ -18,11 +24,11 @@ describe('CheckResumabilityUseCase.checkResumableForAll', () => {
     session.pullEvents();
 
     const sessionRepo = makeSessionRepo([session]);
-    const eventPublisher = makeDomainEventBus();
+    const eventPublisher = makeSessionEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(true),
+      agentCatalog: makeAgentCatalog(true),
       eventPublisher,
     });
 
@@ -41,11 +47,11 @@ describe('CheckResumabilityUseCase.checkResumableForAll', () => {
     session.pullEvents();
 
     const sessionRepo = makeSessionRepo([session]);
-    const eventPublisher = makeDomainEventBus();
+    const eventPublisher = makeSessionEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(false),
+      agentCatalog: makeAgentCatalog(false),
       eventPublisher,
     });
 
@@ -63,11 +69,11 @@ describe('CheckResumabilityUseCase.checkResumableForAll', () => {
     session.pullEvents(); // no agentSessionId set
 
     const sessionRepo = makeSessionRepo([session]);
-    const eventPublisher = makeDomainEventBus();
+    const eventPublisher = makeSessionEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(true),
+      agentCatalog: makeAgentCatalog(true),
       eventPublisher,
     });
 
@@ -84,11 +90,11 @@ describe('CheckResumabilityUseCase.checkResumableForAll', () => {
     session.pullEvents();
 
     const sessionRepo = makeSessionRepo([session]);
-    const eventPublisher = makeDomainEventBus();
+    const eventPublisher = makeSessionEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(true),
+      agentCatalog: makeAgentCatalog(true),
       eventPublisher,
     });
 
@@ -113,13 +119,14 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
       agentSessionId: 'agent-abc',
       cwd: '/tmp',
       resumable: false,
+      agentType: 'claude',
     });
 
-    const eventPublisher = makeDomainEventBus();
+    const eventPublisher = makeSessionEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(true),
+      agentCatalog: makeAgentCatalog(true),
       eventPublisher,
     });
 
@@ -142,13 +149,14 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
       agentSessionId: 'agent-abc',
       cwd: '/tmp',
       resumable: false, // matches checker result of false
+      agentType: 'claude',
     });
 
-    const eventPublisher = makeDomainEventBus();
+    const eventPublisher = makeSessionEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(false),
+      agentCatalog: makeAgentCatalog(false),
       eventPublisher,
     });
 
@@ -173,13 +181,14 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
       agentSessionId: 'agent-ended',
       cwd: '/tmp',
       resumable: false,
+      agentType: 'claude',
     });
 
-    const eventPublisher = makeDomainEventBus();
+    const eventPublisher = makeSessionEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(true),
+      agentCatalog: makeAgentCatalog(true),
       eventPublisher,
     });
 
@@ -203,13 +212,14 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
       agentSessionId: 'agent-ended',
       cwd: '/tmp',
       resumable: false,
+      agentType: 'claude',
     });
 
-    const eventPublisher = makeDomainEventBus();
+    const eventPublisher = makeSessionEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(false),
+      agentCatalog: makeAgentCatalog(false),
       eventPublisher,
     });
 
@@ -238,8 +248,8 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(false),
-      eventPublisher: makeDomainEventBus(),
+      agentCatalog: makeAgentCatalog(false),
+      eventPublisher: makeSessionEventBus(),
     });
 
     useCase.checkResumableForActive();
@@ -261,13 +271,14 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
       agentSessionId: 'agent-ended',
       cwd: '/tmp',
       resumable: true,
+      agentType: 'claude',
     });
 
-    const eventPublisher = makeDomainEventBus();
+    const eventPublisher = makeSessionEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(true),
+      agentCatalog: makeAgentCatalog(true),
       eventPublisher,
     });
 

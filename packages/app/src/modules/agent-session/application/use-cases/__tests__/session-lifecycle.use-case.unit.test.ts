@@ -1,46 +1,38 @@
 import { describe, expect, it } from 'bun:test';
-import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
-import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
-import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
-import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
+import type { AgentCatalogShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import type { SessionEventBusShape } from '#modules/agent-session/application/ports/out/session-event-bus.port';
+import type { SessionStoreShape } from '#modules/agent-session/application/ports/out/session-store.port';
 import { createSessionLifecycleUseCase } from '#modules/agent-session/application/use-cases/session-lifecycle.use-case';
 import { Session } from '#modules/agent-session/domain/session';
 import type { SessionEvent } from '#shared/kernel/session/events';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
-import { makeDomainEventBus, makeSessionRepo } from './test-helpers';
+import { makeSessionEventBus, makeSessionRepo } from './test-helpers';
 
-function makeAgentRegistry(canResume = false): AgentRegistryShape {
+function makeAgentCatalog(canResume = false, resumable = false): AgentCatalogShape {
   return {
     resolve: (_agentType) => ({
       agentType: 'claude',
       canResume,
       detectSessionId: false,
       buildSpawnArgs: () => ({ command: 'claude', args: [] }),
+      isResumable: () => resumable,
     }),
   };
 }
 
-function makeResumabilityChecker(resumable = false): ResumabilityCheckerShape {
-  return {
-    isResumable: () => resumable,
-  };
-}
-
 function makeUseCase(overrides?: {
-  sessionRepo?: SessionRepositoryShape & { store: Map<string, Session> };
-  eventPublisher?: DomainEventBusShape & { published: SessionEvent[] };
-  agentRegistry?: AgentRegistryShape;
-  resumabilityChecker?: ResumabilityCheckerShape;
+  sessionRepo?: SessionStoreShape & { store: Map<string, Session> };
+  eventPublisher?: SessionEventBusShape & { published: SessionEvent[] };
+  agentCatalog?: AgentCatalogShape;
 }) {
   const sessionRepo = overrides?.sessionRepo ?? makeSessionRepo();
-  const eventPublisher = overrides?.eventPublisher ?? makeDomainEventBus();
+  const eventPublisher = overrides?.eventPublisher ?? makeSessionEventBus();
   return {
     sessionRepo,
     eventPublisher,
     useCase: createSessionLifecycleUseCase({
       sessionRepo,
-      resumabilityChecker: overrides?.resumabilityChecker ?? makeResumabilityChecker(),
-      agentRegistry: overrides?.agentRegistry ?? makeAgentRegistry(),
+      agentCatalog: overrides?.agentCatalog ?? makeAgentCatalog(),
       eventPublisher,
     }),
   };
@@ -69,8 +61,7 @@ describe('SessionLifecycleUseCase.markEnded', () => {
 
     const { useCase } = makeUseCase({
       sessionRepo,
-      agentRegistry: makeAgentRegistry(true),
-      resumabilityChecker: makeResumabilityChecker(true),
+      agentCatalog: makeAgentCatalog(true, true),
     });
     useCase.markEnded(makeSessionId('sess-1'), 0);
 

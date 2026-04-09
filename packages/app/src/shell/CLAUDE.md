@@ -12,8 +12,8 @@ Not a domain module. No bounded context, no domain model.
 - Process manager (spawn/kill daemon process)
 
 ## Does not own
-- Session state or PTY handles
-- Terminal chunks or input history
+- Session state or agent process handles
+- Session output log or input history
 - Agent adapters or agent logic
 
 ## Key conventions

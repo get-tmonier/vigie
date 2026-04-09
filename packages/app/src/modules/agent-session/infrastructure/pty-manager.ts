@@ -1,10 +1,10 @@
 import { Effect } from 'effect';
-import type { TerminalRepositoryShape } from '#modules/agent-session/application/ports/out/terminal-repository.port';
+import type { AgentProcessShape } from '#modules/agent-session/application/ports/out/agent-process.port';
+import type { SessionLogShape } from '#modules/agent-session/application/ports/out/session-log.port';
 import type { AgentRunnerError } from '#modules/agent-session/domain/errors';
 import type {
   PtyEntry,
   PtyManagerCallbacks,
-  PtyManagerShape,
   PtySpawnFn,
 } from '#modules/agent-session/infrastructure/pty-manager.types';
 import type { SessionId } from '#shared/kernel/session/session-id';
@@ -13,10 +13,10 @@ import { type LineBuffer, stripAnsiAndBuffer } from '#shared/lib/input-line-buff
 interface PtyManagerDeps {
   spawner: PtySpawnFn;
   callbacks: PtyManagerCallbacks;
-  terminalRepo: TerminalRepositoryShape;
+  terminalRepo: SessionLogShape;
 }
 
-export function createPtyManager(deps: PtyManagerDeps): PtyManagerShape {
+export function createPtyManager(deps: PtyManagerDeps): AgentProcessShape {
   const { spawner, callbacks, terminalRepo } = deps;
 
   // Internal state (replaces PtyRegistry)

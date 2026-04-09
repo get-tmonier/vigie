@@ -1,5 +1,5 @@
 import { Data, Effect, Layer } from 'effect';
-import { DomainEventBus } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
+import { SessionEventBus } from '#modules/agent-session/application/ports/out/session-event-bus.port';
 import type { SessionEvent } from '#shared/kernel/session/events';
 import { BrowserEventBus } from '#shell/application/ports/out/browser-event-bus.port';
 
@@ -10,7 +10,7 @@ class BrowserEventBusError extends Data.TaggedError('BrowserEventBusError')<{
 
 export const BrowserEventBusLive = Layer.effect(BrowserEventBus)(
   Effect.gen(function* () {
-    const eventPublisher = yield* DomainEventBus;
+    const eventPublisher = yield* SessionEventBus;
     const listeners = new Set<(event: SessionEvent) => void>();
     // Capture service context so fire-and-forget listener dispatch via Effect.runForkWith has access to all services
     const services = yield* Effect.services();

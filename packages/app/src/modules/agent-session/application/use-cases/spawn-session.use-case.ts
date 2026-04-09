@@ -1,29 +1,29 @@
 import { Effect } from 'effect';
-import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
-import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
-import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
+import type { AgentCatalogShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import type { AgentProcessShape } from '#modules/agent-session/application/ports/out/agent-process.port';
+import type { SessionEventBusShape } from '#modules/agent-session/application/ports/out/session-event-bus.port';
+import type { SessionStoreShape } from '#modules/agent-session/application/ports/out/session-store.port';
 import type { AgentRunnerError } from '#modules/agent-session/domain/errors';
 import {
   CannotResumeSessionError,
   SessionNotFoundError,
 } from '#modules/agent-session/domain/errors';
 import { Session } from '#modules/agent-session/domain/session';
-import type { PtyManagerShape } from '#modules/agent-session/infrastructure/pty-manager.types';
 import type { AgentType } from '#shared/kernel/session/agent-type';
 import type { SessionLifecycleEvent } from '#shared/kernel/session/events';
 import type { SessionId } from '#shared/kernel/session/session-id';
 
 interface SpawnSessionDeps {
-  sessionRepo: SessionRepositoryShape;
-  agentRegistry: AgentRegistryShape;
-  eventPublisher: DomainEventBusShape;
-  ptyManager: PtyManagerShape;
+  sessionRepo: SessionStoreShape;
+  agentCatalog: AgentCatalogShape;
+  eventPublisher: SessionEventBusShape;
+  ptyManager: AgentProcessShape;
 }
 
 export type SpawnSessionShape = ReturnType<typeof createSpawnSessionUseCase>;
 
 export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
-  const { sessionRepo, agentRegistry, eventPublisher, ptyManager } = deps;
+  const { sessionRepo, agentCatalog, eventPublisher, ptyManager } = deps;
 
   function publishEvents(events: SessionLifecycleEvent[]): Effect.Effect<void> {
     return Effect.forEach(events, (event) => eventPublisher.publish(event), { discard: true });
@@ -85,7 +85,7 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
         });
         sessionRepo.save(session);
 
-        const adapter = agentRegistry.resolve(props.agentType);
+        const adapter = agentCatalog.resolve(props.agentType);
         const agentSessionId = props.agentSessionId ?? session.id;
 
         if (adapter.detectSessionId) {
@@ -125,7 +125,7 @@ export function createSpawnSessionUseCase(deps: SpawnSessionDeps) {
         const session = sessionRepo.findById(sessionId);
         if (!session) return yield* new SessionNotFoundError(sessionId);
 
-        const adapter = agentRegistry.resolve(session.agentType);
+        const adapter = agentCatalog.resolve(session.agentType);
         if (!adapter.canResume || !session.canResume) {
           return yield* new CannotResumeSessionError(
             sessionId,

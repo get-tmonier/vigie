@@ -1,17 +1,17 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect } from 'effect';
-import type { AgentRegistryShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import type { AgentCatalogShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
+import type { AgentProcessShape } from '#modules/agent-session/application/ports/out/agent-process.port';
 import { createSpawnSessionUseCase } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
 import {
   CannotResumeSessionError,
   SessionNotFoundError,
 } from '#modules/agent-session/domain/errors';
 import { Session } from '#modules/agent-session/domain/session';
-import type { PtyManagerShape } from '#modules/agent-session/infrastructure/pty-manager.types';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
-import { makeDomainEventBus, makeSessionRepo } from './test-helpers';
+import { makeSessionEventBus, makeSessionRepo } from './test-helpers';
 
-function makeAgentRegistry(canResume = false, detectSessionId = false): AgentRegistryShape {
+function makeAgentCatalog(canResume = false, detectSessionId = false): AgentCatalogShape {
   return {
     resolve: (_agentType) => ({
       agentType: 'claude',
@@ -21,11 +21,12 @@ function makeAgentRegistry(canResume = false, detectSessionId = false): AgentReg
         command: 'claude',
         args: opts?.resume ? ['--resume', opts.agentSessionId ?? ''] : [],
       }),
+      isResumable: () => false,
     }),
   };
 }
 
-function makePtyManager(): PtyManagerShape & {
+function makePtyManager(): AgentProcessShape & {
   spawnCalls: Array<{ sessionId: string; command: string }>;
   trackedConnections: Map<string, string>;
 } {
@@ -68,8 +69,8 @@ describe('SpawnSessionUseCase.register', () => {
     const sessionRepo = makeSessionRepo();
     const useCase = createSpawnSessionUseCase({
       sessionRepo,
-      agentRegistry: makeAgentRegistry(),
-      eventPublisher: makeDomainEventBus(),
+      agentCatalog: makeAgentCatalog(),
+      eventPublisher: makeSessionEventBus(),
       ptyManager: makePtyManager(),
     });
 
@@ -87,8 +88,8 @@ describe('SpawnSessionUseCase.register', () => {
     const ptyManager = makePtyManager();
     const useCase = createSpawnSessionUseCase({
       sessionRepo: makeSessionRepo(),
-      agentRegistry: makeAgentRegistry(),
-      eventPublisher: makeDomainEventBus(),
+      agentCatalog: makeAgentCatalog(),
+      eventPublisher: makeSessionEventBus(),
       ptyManager,
     });
 
@@ -107,8 +108,8 @@ describe('SpawnSessionUseCase.spawnInteractive', () => {
   it('returns sessionId and pid on success', async () => {
     const useCase = createSpawnSessionUseCase({
       sessionRepo: makeSessionRepo(),
-      agentRegistry: makeAgentRegistry(),
-      eventPublisher: makeDomainEventBus(),
+      agentCatalog: makeAgentCatalog(),
+      eventPublisher: makeSessionEventBus(),
       ptyManager: makePtyManager(),
     });
 
@@ -129,8 +130,8 @@ describe('SpawnSessionUseCase.spawnInteractive', () => {
     const sessionRepo = makeSessionRepo();
     const useCase = createSpawnSessionUseCase({
       sessionRepo,
-      agentRegistry: makeAgentRegistry(false, true),
-      eventPublisher: makeDomainEventBus(),
+      agentCatalog: makeAgentCatalog(false, true),
+      eventPublisher: makeSessionEventBus(),
       ptyManager: makePtyManager(),
     });
 
@@ -152,8 +153,8 @@ describe('SpawnSessionUseCase.spawnInteractive', () => {
     const sessionRepo = makeSessionRepo();
     const useCase = createSpawnSessionUseCase({
       sessionRepo,
-      agentRegistry: makeAgentRegistry(),
-      eventPublisher: makeDomainEventBus(),
+      agentCatalog: makeAgentCatalog(),
+      eventPublisher: makeSessionEventBus(),
       ptyManager: makePtyManager(),
     });
 
@@ -174,8 +175,8 @@ describe('SpawnSessionUseCase.spawnInteractive', () => {
     const ptyManager = makePtyManager();
     const useCase = createSpawnSessionUseCase({
       sessionRepo: makeSessionRepo(),
-      agentRegistry: makeAgentRegistry(),
-      eventPublisher: makeDomainEventBus(),
+      agentCatalog: makeAgentCatalog(),
+      eventPublisher: makeSessionEventBus(),
       ptyManager,
     });
 
@@ -197,8 +198,8 @@ describe('SpawnSessionUseCase.resume', () => {
   it('fails with SessionNotFoundError when session does not exist', async () => {
     const useCase = createSpawnSessionUseCase({
       sessionRepo: makeSessionRepo(),
-      agentRegistry: makeAgentRegistry(true),
-      eventPublisher: makeDomainEventBus(),
+      agentCatalog: makeAgentCatalog(true),
+      eventPublisher: makeSessionEventBus(),
       ptyManager: makePtyManager(),
     });
 
@@ -221,8 +222,8 @@ describe('SpawnSessionUseCase.resume', () => {
 
     const useCase = createSpawnSessionUseCase({
       sessionRepo,
-      agentRegistry: makeAgentRegistry(true),
-      eventPublisher: makeDomainEventBus(),
+      agentCatalog: makeAgentCatalog(true),
+      eventPublisher: makeSessionEventBus(),
       ptyManager: makePtyManager(),
     });
 
@@ -246,8 +247,8 @@ describe('SpawnSessionUseCase.resume', () => {
 
     const useCase = createSpawnSessionUseCase({
       sessionRepo,
-      agentRegistry: makeAgentRegistry(true),
-      eventPublisher: makeDomainEventBus(),
+      agentCatalog: makeAgentCatalog(true),
+      eventPublisher: makeSessionEventBus(),
       ptyManager: makePtyManager(),
     });
 

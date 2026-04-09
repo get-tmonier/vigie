@@ -1,9 +1,9 @@
 import { Effect } from 'effect';
-import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
+import type { SessionEventBusShape } from '#modules/agent-session/application/ports/out/session-event-bus.port';
 import type {
   ResumableSessionInfo,
-  SessionRepositoryShape,
-} from '#modules/agent-session/application/ports/out/session-repository.port';
+  SessionStoreShape,
+} from '#modules/agent-session/application/ports/out/session-store.port';
 import type { Session } from '#modules/agent-session/domain/session';
 import type { SessionEvent } from '#shared/kernel/session/events';
 import type { SessionId } from '#shared/kernel/session/session-id';
@@ -14,7 +14,7 @@ export function makeSessionRepo(
     activeWithAgentId?: ResumableSessionInfo[];
     recentlyEnded?: ResumableSessionInfo[];
   }
-): SessionRepositoryShape & {
+): SessionStoreShape & {
   store: Map<SessionId, Session>;
   activeWithAgentId: ResumableSessionInfo[];
   recentlyEnded: ResumableSessionInfo[];
@@ -50,7 +50,7 @@ export function makeSessionRepo(
   };
 }
 
-export function makeDomainEventBus(): DomainEventBusShape & { published: SessionEvent[] } {
+export function makeSessionEventBus(): SessionEventBusShape & { published: SessionEvent[] } {
   const published: SessionEvent[] = [];
   return {
     published,

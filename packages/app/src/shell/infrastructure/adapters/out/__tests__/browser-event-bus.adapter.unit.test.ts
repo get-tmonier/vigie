@@ -1,20 +1,20 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
-import type { DomainEventBusShape } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
-import { DomainEventBus } from '#modules/agent-session/application/ports/out/domain-event-bus.port';
+import type { SessionEventBusShape } from '#modules/agent-session/application/ports/out/session-event-bus.port';
+import { SessionEventBus } from '#modules/agent-session/application/ports/out/session-event-bus.port';
 import type { SessionEvent } from '#shared/kernel/session/events';
 import { BrowserEventBus } from '#shell/application/ports/out/browser-event-bus.port';
 import { BrowserEventBusLive } from '../browser-event-bus.adapter';
 
-// --- Fake DomainEventBus ---
+// --- Fake SessionEventBus ---
 
 function makeFakeDomainEventBus(): {
-  layer: Layer.Layer<DomainEventBus>;
+  layer: Layer.Layer<SessionEventBus>;
   emit: (event: SessionEvent) => void;
 } {
   let capturedListener: ((event: SessionEvent) => void) | null = null;
 
-  const shape: DomainEventBusShape = {
+  const shape: SessionEventBusShape = {
     publish: (_event) => Effect.void,
     subscribe: (listener) => {
       capturedListener = listener;
@@ -24,7 +24,7 @@ function makeFakeDomainEventBus(): {
     },
   };
 
-  const layer = Layer.succeed(DomainEventBus, shape);
+  const layer = Layer.succeed(SessionEventBus, shape);
 
   return {
     layer,

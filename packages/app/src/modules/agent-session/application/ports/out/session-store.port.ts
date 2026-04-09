@@ -1,5 +1,6 @@
 import { ServiceMap } from 'effect';
 import type { Session } from '#modules/agent-session/domain/session';
+import type { AgentType } from '#shared/kernel/session/agent-type';
 import type { SessionId } from '#shared/kernel/session/session-id';
 
 export interface ResumableSessionInfo {
@@ -7,9 +8,10 @@ export interface ResumableSessionInfo {
   readonly agentSessionId: string;
   readonly cwd: string;
   readonly resumable: boolean;
+  readonly agentType: AgentType;
 }
 
-export interface SessionRepositoryShape {
+export interface SessionStoreShape {
   findById(id: SessionId): Session | null;
   findAll(): Session[];
   findActive(): Session[];
@@ -22,7 +24,6 @@ export interface SessionRepositoryShape {
   pruneOld(maxAgeMs?: number): void;
 }
 
-export class SessionRepository extends ServiceMap.Service<
-  SessionRepository,
-  SessionRepositoryShape
->()('@vigie/SessionRepository') {}
+export class SessionStore extends ServiceMap.Service<SessionStore, SessionStoreShape>()(
+  '@vigie/SessionStore'
+) {}
