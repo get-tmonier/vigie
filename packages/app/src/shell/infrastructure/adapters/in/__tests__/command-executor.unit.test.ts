@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'bun:test';
 import { Effect } from 'effect';
 import type {
-  CommandDone,
-  CommandError,
-  CommandOutput,
+  CommandDoneEvent,
+  CommandErrorEvent,
+  CommandOutputEvent,
   CommandRequest,
-} from '#shell/infrastructure/adapters/ws-schemas';
+} from '#shared/kernel/shell/events';
 import { executeCommand } from '../command-executor';
 
-type UpstreamMessage = CommandOutput | CommandDone | CommandError;
+type UpstreamMessage = CommandOutputEvent | CommandDoneEvent | CommandErrorEvent;
 
 describe('executeCommand', () => {
   it('executes echo and streams stdout', async () => {
@@ -25,11 +25,11 @@ describe('executeCommand', () => {
     const done = messages.find((m) => m.type === 'command:done');
 
     expect(outputs.length).toBeGreaterThanOrEqual(1);
-    const combined = outputs.map((o) => (o as CommandOutput).data).join('');
+    const combined = outputs.map((o) => (o as CommandOutputEvent).data).join('');
     expect(combined.trim()).toBe('hello');
 
     expect(done).toBeDefined();
-    expect((done as CommandDone).exitCode).toBe(0);
+    expect((done as CommandDoneEvent).exitCode).toBe(0);
   });
 
   it('captures stderr', async () => {
@@ -43,7 +43,7 @@ describe('executeCommand', () => {
     await Effect.runPromise(executeCommand(request, (msg) => messages.push(msg)));
 
     const stderrOutputs = messages.filter(
-      (m) => m.type === 'command:output' && (m as CommandOutput).stream === 'stderr'
+      (m) => m.type === 'command:output' && (m as CommandOutputEvent).stream === 'stderr'
     );
     expect(stderrOutputs.length).toBeGreaterThanOrEqual(1);
   });
@@ -58,7 +58,7 @@ describe('executeCommand', () => {
 
     await Effect.runPromise(executeCommand(request, (msg) => messages.push(msg)));
 
-    const done = messages.find((m) => m.type === 'command:done') as CommandDone;
+    const done = messages.find((m) => m.type === 'command:done') as CommandDoneEvent;
     expect(done).toBeDefined();
     expect(done.exitCode).toBe(42);
   });

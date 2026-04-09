@@ -1,17 +1,17 @@
 import { Data, Effect } from 'effect';
 import type {
-  CommandDone,
-  CommandError,
-  CommandOutput,
+  CommandDoneEvent,
+  CommandErrorEvent,
+  CommandOutputEvent,
   CommandRequest,
-} from '#shell/infrastructure/adapters/ws-schemas';
+} from '#shared/kernel/shell/events';
 
 class CommandExecutorError extends Data.TaggedError('CommandExecutorError')<{
   readonly message: string;
   readonly cause?: unknown;
 }> {}
 
-type UpstreamMessage = CommandOutput | CommandDone | CommandError;
+type UpstreamMessage = CommandOutputEvent | CommandDoneEvent | CommandErrorEvent;
 
 export function executeCommand(request: CommandRequest, send: (msg: UpstreamMessage) => void) {
   return Effect.tryPromise({
