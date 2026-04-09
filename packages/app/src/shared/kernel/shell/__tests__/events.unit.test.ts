@@ -1,17 +1,9 @@
 import { describe, expect, it } from 'bun:test';
 import * as v from 'valibot';
 import {
-  CommandDoneSchema,
-  CommandErrorSchema,
   CommandOutputSchema,
   CommandRequestSchema,
-  DaemonHelloSchema,
-  DaemonSyncSchema,
-  DaemonSyncSessionSchema,
-  FsListDirResponseSchema,
-  PongSchema,
   SessionOutputSchema,
-  SessionSpawnFailedSchema,
   ShellEventSchema,
 } from '../events';
 

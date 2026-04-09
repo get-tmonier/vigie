@@ -2,13 +2,12 @@ import * as v from 'valibot';
 import { TerminalChunkSchema } from '#shared/kernel/agent-session/events';
 import { SessionIdSchema } from '#shared/kernel/agent-session/session-id';
 
-export const DaemonHelloSchema = v.object({
+const DaemonHelloSchema = v.object({
   type: v.literal('daemon:hello'),
   hostname: v.string(),
   pid: v.number(),
   version: v.string(),
 });
-export type DaemonHelloEvent = v.InferOutput<typeof DaemonHelloSchema>;
 
 export const CommandOutputSchema = v.object({
   type: v.literal('command:output'),
@@ -35,12 +34,11 @@ export const CommandErrorSchema = v.object({
 });
 export type CommandErrorEvent = v.InferOutput<typeof CommandErrorSchema>;
 
-export const PongSchema = v.object({
+const PongSchema = v.object({
   type: v.literal('pong'),
 });
-export type PongEvent = v.InferOutput<typeof PongSchema>;
 
-export const FsListDirResponseSchema = v.object({
+const FsListDirResponseSchema = v.object({
   type: v.literal('fs:list-dir-response'),
   requestId: v.string(),
   entries: v.array(
@@ -51,9 +49,8 @@ export const FsListDirResponseSchema = v.object({
   ),
   error: v.optional(v.string()),
 });
-export type FsListDirResponseEvent = v.InferOutput<typeof FsListDirResponseSchema>;
 
-export const DaemonSyncSessionSchema = v.object({
+const DaemonSyncSessionSchema = v.object({
   sessionId: v.string(),
   agentType: v.string(),
   mode: v.optional(v.picklist(['prompt', 'interactive']), 'prompt'),
@@ -76,13 +73,11 @@ export const DaemonSyncSessionSchema = v.object({
     )
   ),
 });
-export type DaemonSyncSession = v.InferOutput<typeof DaemonSyncSessionSchema>;
 
-export const DaemonSyncSchema = v.object({
+const DaemonSyncSchema = v.object({
   type: v.literal('daemon:sync'),
   sessions: v.array(DaemonSyncSessionSchema),
 });
-export type DaemonSyncEvent = v.InferOutput<typeof DaemonSyncSchema>;
 
 export const SessionOutputSchema = v.object({
   type: v.literal('session:output'),
@@ -91,7 +86,6 @@ export const SessionOutputSchema = v.object({
   chunkType: v.picklist(['text', 'thinking', 'tool_use', 'tool_result', 'status', 'error']),
   timestamp: v.number(),
 });
-export type SessionOutputEvent = v.InferOutput<typeof SessionOutputSchema>;
 
 export const SessionSpawnFailedSchema = v.object({
   type: v.literal('session:spawn-failed'),
@@ -99,7 +93,6 @@ export const SessionSpawnFailedSchema = v.object({
   error: v.string(),
   timestamp: v.number(),
 });
-export type SessionSpawnFailedEvent = v.InferOutput<typeof SessionSpawnFailedSchema>;
 
 export const ShellEventSchema = v.variant('type', [
   DaemonHelloSchema,
@@ -112,7 +105,6 @@ export const ShellEventSchema = v.variant('type', [
   SessionOutputSchema,
   SessionSpawnFailedSchema,
 ]);
-export type ShellEvent = v.InferOutput<typeof ShellEventSchema>;
 
 // Migrated from ws-schemas.ts — browser→daemon command
 export const CommandRequestSchema = v.object({

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'bun:test';
 import * as v from 'valibot';
 import { SessionErrorSchema } from '#shared/kernel/agent-session/events';
 import { SessionId } from '#shared/kernel/agent-session/session-id';
-import { SessionOutputSchema } from '#shared/kernel/shell/events';
+import { SessionOutputSchema, SessionSpawnFailedSchema } from '#shared/kernel/shell/events';
 import {
   DaemonToSessionSchema,
   SessionAttachSchema,
@@ -16,7 +16,6 @@ import {
   SessionRegisteredSchema,
   SessionRegisterSchema,
   SessionSpawnedSchema,
-  SessionSpawnFailedSchema,
   SessionSpawnInteractiveSchema,
   SessionStdinSchema,
   SessionToDaemonSchema,

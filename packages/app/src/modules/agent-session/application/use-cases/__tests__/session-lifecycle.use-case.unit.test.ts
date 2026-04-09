@@ -4,10 +4,10 @@ import type { DomainEventBusShape } from '#modules/agent-session/application/por
 import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
 import type { SessionRepositoryShape } from '#modules/agent-session/application/ports/out/session-repository.port';
 import { createSessionLifecycleUseCase } from '#modules/agent-session/application/use-cases/session-lifecycle.use-case';
-import type { SessionEvent } from '#shared/kernel/agent-session/events';
 import { Session } from '#modules/agent-session/domain/session';
-import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
 import type { PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
+import type { SessionEvent } from '#shared/kernel/agent-session/events';
+import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
 import { makeDomainEventBus, makeSessionRepo } from './test-helpers';
 
 function makeAgentRegistry(canResume = false): AgentRegistryShape {

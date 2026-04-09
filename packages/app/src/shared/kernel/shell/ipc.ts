@@ -5,8 +5,6 @@ import { SessionIdSchema } from '#shared/kernel/agent-session/session-id';
 
 import { SessionOutputSchema, SessionSpawnFailedSchema } from '#shared/kernel/shell/events';
 
-export { SessionOutputSchema, SessionSpawnFailedSchema };
-
 // ── Session → Daemon ──
 
 export const SessionRegisterSchema = v.object({
@@ -26,7 +24,7 @@ const SessionAgentIdSchema = v.object({
   agentSessionId: v.string(),
 });
 
-export const SessionTerminalOutputSchema = v.object({
+const SessionTerminalOutputSchema = v.object({
   type: v.literal('session:terminal-output'),
   sessionId: SessionIdSchema,
   data: v.string(),
@@ -124,13 +122,13 @@ export const SessionErrorResponseSchema = v.object({
   error: v.string(),
 });
 
-export const SessionTerminalInputSchema = v.object({
+const SessionTerminalInputSchema = v.object({
   type: v.literal('session:terminal-input'),
   sessionId: SessionIdSchema,
   data: v.string(),
 });
 
-export const SessionTerminalResizeSchema = v.object({
+const SessionTerminalResizeSchema = v.object({
   type: v.literal('session:terminal-resize'),
   sessionId: SessionIdSchema,
   cols: v.number(),

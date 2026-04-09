@@ -8,8 +8,8 @@ import {
   SessionNotFoundError,
 } from '#modules/agent-session/domain/errors';
 import { Session } from '#modules/agent-session/domain/session';
-import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
 import type { PtyRegistry } from '#modules/agent-session/infrastructure/pty-registry';
+import { SessionId as makeSessionId } from '#shared/kernel/agent-session/session-id';
 import { makeDomainEventBus, makeSessionRepo } from './test-helpers';
 
 function makeAgentRegistry(canResume = false, detectSessionId = false): AgentRegistryShape {

@@ -3,9 +3,9 @@ import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
 import { SessionRepository } from '#modules/agent-session/application/ports/out/session-repository.port';
 import { Session } from '#modules/agent-session/domain/session';
-import { SessionId } from '#shared/kernel/agent-session/session-id';
 import { SqliteSessionRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-session-repository';
 import { VigiDatabase } from '#shared/db/database';
+import { SessionId } from '#shared/kernel/agent-session/session-id';
 
 function makeTestDb(): Database {
   const db = new Database(':memory:');
