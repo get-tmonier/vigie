@@ -32,9 +32,10 @@ Use SQLite (`~/.vigie/data.db`) as the sole persistent store. The Bun daemon hol
 - No clustering: impossible to run daemon replicas
 
 **Data persisted:**
-- `sessions`: id, agent type, start time, end time, status, input history
-- `terminal_chunks`: session id, timestamp, output, metadata
-- `(future)` agent state or task history if needed
+- `sessions`: id, agent_type, mode, cwd, git_branch, git_remote_url, repo_name, started_at, ended_at, status, exit_code, agent_session_id, resumable
+- `terminal_chunks`: session_id, data (base64), timestamp, seq (sequence number)
+- `input_history`: session_id, text, source (cli/browser), timestamp
+- `event_queue`: serialized domain events (currently unused for replay; reserved for future audit trail)
 
 **Data not persisted:**
 - In-memory event bus (by ADR 002)

@@ -18,7 +18,7 @@ graph TB
             UC["Use Cases<br/>spawn · lifecycle · queries · cleanup · resumability"]
             AgentProcess["AgentProcess<br/>(PTY manager)"]
             SessionLog[("SessionLog<br/>SQLite ~/.vigie/data.db")]
-            SessionFeed["SessionFeed<br/>(live output broadcaster)"]
+            SessionOutput["SessionOutput<br/>(live output broadcaster)"]
             SessionEventBus["SessionEventBus<br/>(lifecycle events)"]
         end
     end
@@ -37,8 +37,8 @@ graph TB
     AgentProcess -->|spawn| Claude
     AgentProcess -->|spawn| Other
     AgentProcess -->|"output chunks (persist)"| SessionLog
-    AgentProcess -->|"output chunks (live)"| SessionFeed
-    SessionFeed -->|"stream"| HTTP
+    AgentProcess -->|"output chunks (live)"| SessionOutput
+    SessionOutput -->|"stream"| HTTP
     AgentProcess -->|"pty output → CLI"| IPC
     SessionEventBus -->|"lifecycle events"| HTTP
 ```
@@ -54,9 +54,9 @@ graph TB
 
 ## IPC message types
 
-CLI → Daemon: `session:register` · `session:spawn-interactive` · `session:stdin` · `session:cli-resize` · `session:attach` · `session:detach`
+CLI → Daemon: `session:register` · `session:spawn-interactive` · `session:stdin` · `session:cli-resize` · `session:attach` · `session:detach` · `session:resume` · `session:done` · `session:deregister` · `session:agent-id` · `session:output` · `session:terminal-output`
 
-Daemon → CLI: `session:registered` · `session:spawned` · `session:pty-output` · `session:pty-exited` · `session:pty-resized`
+Daemon → CLI: `session:registered` · `session:spawned` · `session:spawn-failed` · `session:pty-output` · `session:pty-exited` · `session:pty-resized` · `session:replay-complete` · `session:terminal-input` · `session:terminal-resize` · `session:error-response`
 
 ## Storage
 

@@ -13,11 +13,11 @@ graph LR
             end
             subgraph as_app["Application"]
                 AS_UC["Use Cases<br/>spawn-session<br/>terminal-connection<br/>session-lifecycle<br/>session-queries<br/>session-cleanup<br/>check-resumability"]
-                AS_PORT_OUT["Out ports<br/>SessionStore<br/>SessionLog<br/>AgentProcess<br/>SessionFeed<br/>SessionEventBus<br/>AgentAdapter / AgentCatalog<br/>CliChannel"]
+                AS_PORT_OUT["Out ports<br/>SessionStore<br/>SessionLog<br/>AgentProcess<br/>SessionOutput<br/>SessionEventBus<br/>AgentSpec / AgentCatalog<br/>CliChannel"]
             end
             subgraph as_infra["Infrastructure"]
                 AS_IN["Adapters in<br/>HTTP routes (sessions, terminal WS)<br/>React SSR (dashboard, islands)"]
-                AS_OUT["Adapters out<br/>SQLite repos (session + log)<br/>Bun PTY (AgentProcess impl)<br/>In-memory event bus<br/>In-memory session feed<br/>Claude agent adapter"]
+                AS_OUT["Adapters out<br/>SQLite repos (session + log)<br/>Bun PTY (AgentProcess impl)<br/>In-memory event bus<br/>In-memory session output<br/>Claude AgentSpec adapter"]
             end
         end
 
@@ -80,16 +80,16 @@ graph LR
 | `session-store.port.ts` | `SessionStoreShape` | `SqliteSessionRepository` |
 | `session-log.port.ts` | `SessionLogShape` | `SqliteTerminalRepository` |
 | `agent-process.port.ts` | `AgentProcessShape` | `createPtyManager` (Bun PTY) |
-| `session-feed.port.ts` | `SessionFeedShape` | In-memory pub/sub (`terminal-subscribers.ts`) |
+| `session-output.port.ts` | `SessionOutputShape` | In-memory pub/sub (`terminal-subscribers.ts`) |
 | `session-event-bus.port.ts` | `SessionEventBusShape` | In-memory pub/sub (`session-event-bus.adapter.ts`) |
-| `agent-adapter.port.ts` | `AgentAdapter` / `AgentCatalogShape` | `claudeAdapter` + `createAgentCatalog` |
+| `agent-catalog.port.ts` | `AgentSpec` / `AgentCatalogShape` | `claudeAdapter` + `createAgentCatalog` |
 | `cli-channel.port.ts` | `CliChannelShape` | `CliChannelLive` (writes back to IPC socket) |
 
 ### Infrastructure — adapters in
 
 | Adapter | Exposes |
 |---|---|
-| `session.routes.tsx` | `POST /sessions/create` · `/kill` · `/resume` · `GET /api/sessions` |
+| `session.api-routes.ts` | `POST /api/sessions` · `/kill` · `/resume` · `GET /api/sessions` · `DELETE /api/sessions/:id` |
 | `terminal.routes.ts` | `GET /api/sessions/:id/chunks` · `WS /ws/terminal/:sessionId` |
 | `dashboard.view.tsx` | React SSR — `GET /` |
 | `SpawnSessionForm.island.tsx` | Client-side Vite island |
