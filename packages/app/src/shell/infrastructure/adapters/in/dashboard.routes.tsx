@@ -5,9 +5,9 @@ import * as HttpRouter from 'effect/unstable/http/HttpRouter';
 import type * as HttpServerError from 'effect/unstable/http/HttpServerError';
 import type * as Socket from 'effect/unstable/socket/Socket';
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
+import { DashboardPage } from '#modules/agent-session/infrastructure/adapters/in/dashboard.view';
+import { sessionToDTO } from '#modules/agent-session/infrastructure/adapters/in/session.mapper';
 import { renderPage } from '#shared/ssr/render-page';
-import { DashboardPage } from './dashboard.view';
-import { sessionToDTO } from './session.mapper';
 
 type RouteError = HttpServerError.HttpServerError | Socket.SocketError | Cause.UnknownError;
 
