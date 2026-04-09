@@ -5,7 +5,7 @@ import type {
   CommandErrorEvent,
   CommandOutputEvent,
   CommandRequest,
-} from '#shared/kernel/shell/events';
+} from '#shell/protocols/browser';
 import { executeCommand } from '../command-executor';
 
 type UpstreamMessage = CommandOutputEvent | CommandDoneEvent | CommandErrorEvent;

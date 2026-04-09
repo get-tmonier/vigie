@@ -4,7 +4,7 @@ import type {
   CommandErrorEvent,
   CommandOutputEvent,
   CommandRequest,
-} from '#shared/kernel/shell/events';
+} from '#shell/protocols/browser';
 
 class CommandExecutorError extends Data.TaggedError('CommandExecutorError')<{
   readonly message: string;

@@ -3,11 +3,26 @@ import { AgentTypeSchema } from '#shared/kernel/session/agent-type';
 import { SessionErrorSchema } from '#shared/kernel/session/events';
 import { SessionIdSchema } from '#shared/kernel/session/session-id';
 
-import { SessionOutputSchema, SessionSpawnFailedSchema } from '#shared/kernel/shell/events';
+// ── Cross-protocol schemas (used by both IPC and browser protocol) ──
+
+export const SessionOutputSchema = v.object({
+  type: v.literal('session:output'),
+  sessionId: SessionIdSchema,
+  data: v.string(),
+  chunkType: v.picklist(['text', 'thinking', 'tool_use', 'tool_result', 'status', 'error']),
+  timestamp: v.number(),
+});
+
+export const SessionSpawnFailedSchema = v.object({
+  type: v.literal('session:spawn-failed'),
+  sessionId: SessionIdSchema,
+  error: v.string(),
+  timestamp: v.number(),
+});
 
 // ── Session → Daemon ──
 
-export const SessionRegisterSchema = v.object({
+const SessionRegisterSchema = v.object({
   type: v.literal('session:register'),
   sessionId: SessionIdSchema,
   agentType: AgentTypeSchema,
@@ -31,7 +46,7 @@ const SessionTerminalOutputSchema = v.object({
   timestamp: v.number(),
 });
 
-export const SessionSpawnInteractiveSchema = v.object({
+const SessionSpawnInteractiveSchema = v.object({
   type: v.literal('session:spawn-interactive'),
   sessionId: SessionIdSchema,
   agentType: AgentTypeSchema,
@@ -43,25 +58,25 @@ export const SessionSpawnInteractiveSchema = v.object({
   repoName: v.optional(v.string()),
 });
 
-export const SessionStdinSchema = v.object({
+const SessionStdinSchema = v.object({
   type: v.literal('session:stdin'),
   sessionId: SessionIdSchema,
   data: v.string(),
 });
 
-export const SessionCliResizeSchema = v.object({
+const SessionCliResizeSchema = v.object({
   type: v.literal('session:cli-resize'),
   sessionId: SessionIdSchema,
   cols: v.number(),
   rows: v.number(),
 });
 
-export const SessionDetachSchema = v.object({
+const SessionDetachSchema = v.object({
   type: v.literal('session:detach'),
   sessionId: SessionIdSchema,
 });
 
-export const SessionAttachSchema = v.object({
+const SessionAttachSchema = v.object({
   type: v.literal('session:attach'),
   sessionId: SessionIdSchema,
   cols: v.number(),
@@ -80,14 +95,14 @@ const SessionResumeSchema = v.object({
   repoName: v.optional(v.string()),
 });
 
-export const SessionDoneSchema = v.object({
+const SessionDoneSchema = v.object({
   type: v.literal('session:done'),
   sessionId: SessionIdSchema,
   exitCode: v.number(),
   timestamp: v.number(),
 });
 
-export const SessionDeregisterSchema = v.object({
+const SessionDeregisterSchema = v.object({
   type: v.literal('session:deregister'),
   sessionId: SessionIdSchema,
 });
@@ -111,12 +126,12 @@ export type SessionToDaemon = v.InferOutput<typeof SessionToDaemonSchema>;
 
 // ── Daemon → Session ──
 
-export const SessionRegisteredSchema = v.object({
+const SessionRegisteredSchema = v.object({
   type: v.literal('session:registered'),
   sessionId: SessionIdSchema,
 });
 
-export const SessionErrorResponseSchema = v.object({
+const SessionErrorResponseSchema = v.object({
   type: v.literal('session:error-response'),
   sessionId: SessionIdSchema,
   error: v.string(),
@@ -135,7 +150,7 @@ const SessionTerminalResizeSchema = v.object({
   rows: v.number(),
 });
 
-export const SessionSpawnedSchema = v.object({
+const SessionSpawnedSchema = v.object({
   type: v.literal('session:spawned'),
   sessionId: SessionIdSchema,
   pid: v.number(),
@@ -156,13 +171,13 @@ const SessionPtyResizedSchema = v.object({
   ptyRows: v.number(),
 });
 
-export const SessionPtyOutputSchema = v.object({
+const SessionPtyOutputSchema = v.object({
   type: v.literal('session:pty-output'),
   sessionId: SessionIdSchema,
   data: v.string(),
 });
 
-export const SessionPtyExitedSchema = v.object({
+const SessionPtyExitedSchema = v.object({
   type: v.literal('session:pty-exited'),
   sessionId: SessionIdSchema,
   exitCode: v.number(),

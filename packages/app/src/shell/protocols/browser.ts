@@ -1,7 +1,7 @@
 import * as v from 'valibot';
 import { AgentTypeSchema } from '#shared/kernel/session/agent-type';
-import { SessionIdSchema } from '#shared/kernel/session/session-id';
 import { TerminalChunkSchema } from '#shared/kernel/session/terminal-chunk';
+import { SessionOutputSchema, SessionSpawnFailedSchema } from './ipc';
 
 const DaemonHelloSchema = v.object({
   type: v.literal('daemon:hello'),
@@ -80,21 +80,6 @@ const DaemonSyncSchema = v.object({
   sessions: v.array(DaemonSyncSessionSchema),
 });
 
-export const SessionOutputSchema = v.object({
-  type: v.literal('session:output'),
-  sessionId: SessionIdSchema,
-  data: v.string(),
-  chunkType: v.picklist(['text', 'thinking', 'tool_use', 'tool_result', 'status', 'error']),
-  timestamp: v.number(),
-});
-
-export const SessionSpawnFailedSchema = v.object({
-  type: v.literal('session:spawn-failed'),
-  sessionId: SessionIdSchema,
-  error: v.string(),
-  timestamp: v.number(),
-});
-
 export const ShellEventSchema = v.variant('type', [
   DaemonHelloSchema,
   CommandOutputSchema,
@@ -107,7 +92,6 @@ export const ShellEventSchema = v.variant('type', [
   SessionSpawnFailedSchema,
 ]);
 
-// Migrated from ws-schemas.ts — browser→daemon command
 export const CommandRequestSchema = v.object({
   type: v.literal('command:request'),
   id: v.string(),

@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import * as v from 'valibot';
-import {
-  CommandOutputSchema,
-  CommandRequestSchema,
-  SessionOutputSchema,
-  ShellEventSchema,
-} from '../events';
+import { CommandOutputSchema, CommandRequestSchema, ShellEventSchema } from '../browser';
 
 describe('CommandOutputSchema', () => {
   it('parses stdout event', () => {
@@ -17,19 +12,6 @@ describe('CommandOutputSchema', () => {
       timestamp: 1234567890,
     });
     expect(result.stream).toBe('stdout');
-  });
-});
-
-describe('SessionOutputSchema', () => {
-  it('parses session output with branded sessionId', () => {
-    const result = v.parse(SessionOutputSchema, {
-      type: 'session:output',
-      sessionId: 'abc-123',
-      data: 'some output',
-      chunkType: 'text',
-      timestamp: 1234567890,
-    });
-    expect(result.chunkType).toBe('text');
   });
 });
 

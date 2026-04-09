@@ -1,11 +1,11 @@
 import { Effect, Layer } from 'effect';
 import * as v from 'valibot';
-import { SessionToDaemonSchema } from '#shared/kernel/shell/ipc';
 import {
   type IpcConnection,
   IpcServer,
   type IpcServerShape,
 } from '#shell/application/ports/out/ipc-server.port';
+import { SessionToDaemonSchema } from '#shell/protocols/ipc';
 
 interface ConnectionState {
   readonly id: string;

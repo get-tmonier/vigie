@@ -1,9 +1,9 @@
 import type { Socket } from 'bun';
 import { Deferred, Duration, Effect, Exit } from 'effect';
 import * as v from 'valibot';
-import { type DaemonToSession, DaemonToSessionSchema } from '#shared/kernel/shell/ipc';
 import type { IpcClientShape } from '#shell/application/ports/in/ipc-client.port';
 import { IpcConnectionError } from '#shell/domain/errors';
+import { type DaemonToSession, DaemonToSessionSchema } from '#shell/protocols/ipc';
 
 export function createUnixSocketClient(): IpcClientShape {
   let socket: Socket<unknown> | null = null;
