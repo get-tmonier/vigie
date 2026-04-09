@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import * as v from 'valibot';
-import { CommandOutputSchema, CommandRequestSchema, ShellEventSchema } from '../browser';
+import { CommandOutputSchema, CommandRequestSchema } from '../browser';
 
 describe('CommandOutputSchema', () => {
   it('parses stdout event', () => {
@@ -33,12 +33,5 @@ describe('CommandRequestSchema', () => {
       command: 'pwd',
     });
     expect(result.cwd).toBeUndefined();
-  });
-});
-
-describe('ShellEventSchema', () => {
-  it('dispatches on type discriminant', () => {
-    const result = v.parse(ShellEventSchema, { type: 'pong' });
-    expect(result.type).toBe('pong');
   });
 });

@@ -1,14 +1,4 @@
 import * as v from 'valibot';
-import { AgentTypeSchema } from '#shared/kernel/session/agent-type';
-import { TerminalChunkSchema } from '#shared/kernel/session/terminal-chunk';
-import { SessionOutputSchema, SessionSpawnFailedSchema } from './ipc';
-
-const DaemonHelloSchema = v.object({
-  type: v.literal('daemon:hello'),
-  hostname: v.string(),
-  pid: v.number(),
-  version: v.string(),
-});
 
 export const CommandOutputSchema = v.object({
   type: v.literal('command:output'),
@@ -34,63 +24,6 @@ export const CommandErrorSchema = v.object({
   timestamp: v.number(),
 });
 export type CommandErrorEvent = v.InferOutput<typeof CommandErrorSchema>;
-
-const PongSchema = v.object({
-  type: v.literal('pong'),
-});
-
-const FsListDirResponseSchema = v.object({
-  type: v.literal('fs:list-dir-response'),
-  requestId: v.string(),
-  entries: v.array(
-    v.object({
-      name: v.string(),
-      isDirectory: v.boolean(),
-    })
-  ),
-  error: v.optional(v.string()),
-});
-
-const DaemonSyncSessionSchema = v.object({
-  sessionId: v.string(),
-  agentType: AgentTypeSchema,
-  mode: v.optional(v.picklist(['prompt', 'interactive']), 'prompt'),
-  cwd: v.string(),
-  gitBranch: v.optional(v.string()),
-  repoName: v.optional(v.string()),
-  startedAt: v.number(),
-  status: v.picklist(['active', 'ended', 'error']),
-  exitCode: v.optional(v.number()),
-  agentSessionId: v.optional(v.string()),
-  resumable: v.boolean(),
-  terminalChunks: v.array(TerminalChunkSchema),
-  inputHistory: v.optional(
-    v.array(
-      v.object({
-        text: v.string(),
-        source: v.picklist(['cli', 'browser']),
-        timestamp: v.number(),
-      })
-    )
-  ),
-});
-
-const DaemonSyncSchema = v.object({
-  type: v.literal('daemon:sync'),
-  sessions: v.array(DaemonSyncSessionSchema),
-});
-
-export const ShellEventSchema = v.variant('type', [
-  DaemonHelloSchema,
-  CommandOutputSchema,
-  CommandDoneSchema,
-  CommandErrorSchema,
-  PongSchema,
-  FsListDirResponseSchema,
-  DaemonSyncSchema,
-  SessionOutputSchema,
-  SessionSpawnFailedSchema,
-]);
 
 export const CommandRequestSchema = v.object({
   type: v.literal('command:request'),
