@@ -81,7 +81,7 @@ function useSessionEvents(dispatch: AppDispatch) {
   }, [dispatch]);
 }
 
-function DashboardAppInner() {
+function SessionDashboardInner() {
   const dispatch = useDispatch<AppDispatch>();
   const sessions = useSelector((s: RootState) => s.sessions.sessions);
   const selectedId = useSelector((s: RootState) => s.sessions.selectedId);
@@ -269,10 +269,10 @@ function SessionContent({ session }: { session: AgentSession }) {
   return <InteractiveTerminal sessionId={session.id} readOnly />;
 }
 
-export function DashboardApp() {
+export function SessionDashboard() {
   return (
     <Provider store={store}>
-      <DashboardAppInner />
+      <SessionDashboardInner />
     </Provider>
   );
 }
