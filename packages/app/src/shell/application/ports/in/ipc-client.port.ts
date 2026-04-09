@@ -1,3 +1,5 @@
+// IPC client used by CLI commands to talk to the running daemon over a Unix socket.
+// Sends typed SessionToDaemon messages and waits for typed DaemonToSession responses.
 import type { Effect } from 'effect';
 import type { IpcConnectionError } from '#shell/domain/errors';
 import type { DaemonToSession, SessionToDaemon } from '#shell/protocols/ipc';

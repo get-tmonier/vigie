@@ -1,3 +1,5 @@
+// In-memory store for Session domain entities. Provides CRUD and query helpers
+// (active sessions, recently ended, orphan cleanup). Backed by SQLite in production.
 import { ServiceMap } from 'effect';
 import type { Session } from '#modules/agent-session/domain/session';
 import type { AgentType } from '#shared/kernel/session/agent-type';

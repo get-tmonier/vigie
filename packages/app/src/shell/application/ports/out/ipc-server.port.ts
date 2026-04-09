@@ -1,3 +1,5 @@
+// Unix socket IPC server running inside the daemon.
+// Accepts CLI client connections, routes incoming SessionToDaemon messages, and pushes replies back.
 import type { Effect } from 'effect';
 import { ServiceMap } from 'effect';
 import type { SessionToDaemon } from '#shell/protocols/ipc';

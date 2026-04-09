@@ -1,3 +1,5 @@
+// In-memory pub/sub for live raw PTY output per session.
+// Fans terminal bytes out to active browser WebSocket viewers in real time.
 import type { Effect } from 'effect';
 import { ServiceMap } from 'effect';
 import type { SessionId } from '#shared/kernel/session/session-id';

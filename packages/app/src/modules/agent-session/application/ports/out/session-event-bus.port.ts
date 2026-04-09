@@ -1,3 +1,5 @@
+// Typed domain event bus for session lifecycle events (started, ended, etc.).
+// Consumers (HTTP layer, CLI) subscribe to react to state transitions, not to raw output.
 import type { Effect } from 'effect';
 import { ServiceMap } from 'effect';
 import type { SessionEvent } from '#shared/kernel/session/events';

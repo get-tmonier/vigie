@@ -1,3 +1,5 @@
+// Manages live PTY process instances: spawn/kill, I/O, and viewer channel multiplexing
+// for both the vigie CLI client (attach) and browser WebSocket viewers.
 import type { Effect } from 'effect';
 import type { AgentRunnerError } from '#modules/agent-session/domain/errors';
 import type { SessionId } from '#shared/kernel/session/session-id';

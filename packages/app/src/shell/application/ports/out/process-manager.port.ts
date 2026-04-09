@@ -1,3 +1,5 @@
+// Controls the vigie daemon process lifecycle (start, stop, status).
+// Used by CLI commands (`vigie daemon start/stop/status`) — not by the daemon itself.
 import type { Effect } from 'effect';
 import type { DaemonInfo } from '#shell/domain/daemon-info';
 import type {

@@ -1,3 +1,5 @@
+// Persistent log of terminal output chunks and user input history (backed by SQLite).
+// Used for session replay and history — distinct from SessionOutput which is live/in-memory only.
 import { ServiceMap } from 'effect';
 import type { SessionId } from '#shared/kernel/session/session-id';
 
