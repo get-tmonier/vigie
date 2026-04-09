@@ -33,7 +33,7 @@ The freelance portfolio (`tmonier.com`) is a separate repo: `get-tmonier/landing
   - **AgentProcess** — spawns and manages agent sessions via PTY (Claude, aider, codex, generic); `SessionFeed` streams live output to browser viewers; `SessionLog` persists terminal output to SQLite
   - **SQLite database** at `~/.vigie/data.db` — sessions, terminal chunks, input history
   - **Unix socket IPC** at `~/.vigie/daemon.sock` — CLI-to-daemon communication
-  - Agent-agnostic design: `AgentAdapter` port + `AgentRegistry` defines how to spawn any CLI agent
+  - Agent-agnostic design: `AgentAdapter` port + `AgentCatalog` defines how to spawn any CLI agent
 - **Frontend:** React SSR rendered by the daemon, with Vite-bundled client islands for interactivity
 - **No auth required** — everything runs on localhost
 - **No external database** — SQLite only
@@ -137,8 +137,8 @@ The **domain layer and ports are agent-agnostic** — `AgentAdapter` port, `Agen
 
 | What to change | Location | Notes |
 |---|---|---|
-| CLI command | `src/modules/session/infrastructure/adapters/in/commands/` | `vigie claude` is Claude-specific — add `vigie opencode` or generalize to `vigie run --agent <name>` |
-| Prompt-mode runner | `src/modules/session/infrastructure/adapters/out/agents/claude-runner.adapter.ts` | The only `AgentRunnerShape` impl — new agents need their own runner |
-| Session resume | `src/modules/session/infrastructure/adapters/in/commands/session-resume.command.ts` | Rejects non-Claude + hardcodes `~/.claude/` paths — use `AgentAdapter.canResume` instead |
-| IPC schema | `src/modules/daemon/infrastructure/adapters/ipc-schemas.ts` | `agentType` is a closed `picklist` — extend or change to `v.string()` |
-| Agent adapter | `src/modules/session/infrastructure/adapters/out/agents/` | One file per agent (e.g. `opencode.adapter.ts`), registered in `agent-registry.ts` |
+| CLI command | `src/modules/agent-session/infrastructure/adapters/in/commands/` | `vigie claude` is Claude-specific — add `vigie opencode` or generalize to `vigie run --agent <name>` |
+| Prompt-mode runner | `src/modules/agent-session/infrastructure/adapters/out/agents/claude-runner.adapter.ts` | The only `AgentRunnerShape` impl — new agents need their own runner |
+| Session resume | `src/modules/agent-session/infrastructure/adapters/in/commands/session-resume.command.ts` | Rejects non-Claude + hardcodes `~/.claude/` paths — use `AgentAdapter.canResume` + `AgentAdapter.isResumable` instead |
+| IPC schema | `src/shell/infrastructure/adapters/ipc-schemas.ts` | `agentType` is a closed `picklist` — extend or change to `v.string()` |
+| Agent adapter | `src/modules/agent-session/infrastructure/adapters/out/agents/` | One file per agent (e.g. `opencode.adapter.ts`), registered in `agent-catalog.ts` |
