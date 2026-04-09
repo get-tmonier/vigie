@@ -1,5 +1,6 @@
 import { ServiceMap } from 'effect';
 import type { Session } from '#modules/agent-session/domain/session';
+import type { AgentType } from '#shared/kernel/session/agent-type';
 import type { SessionId } from '#shared/kernel/session/session-id';
 
 export interface ResumableSessionInfo {
@@ -7,6 +8,7 @@ export interface ResumableSessionInfo {
   readonly agentSessionId: string;
   readonly cwd: string;
   readonly resumable: boolean;
+  readonly agentType: AgentType;
 }
 
 export interface SessionStoreShape {

@@ -1,13 +1,19 @@
 import { describe, expect, it } from 'bun:test';
-import type { ResumabilityCheckerShape } from '#modules/agent-session/application/ports/out/resumability-checker.port';
+import type { AgentCatalogShape } from '#modules/agent-session/application/ports/out/agent-adapter.port';
 import { createCheckResumabilityUseCase } from '#modules/agent-session/application/use-cases/check-resumability.use-case';
 import { Session } from '#modules/agent-session/domain/session';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 import { makeSessionEventBus, makeSessionRepo } from './test-helpers';
 
-function makeResumabilityChecker(resumable = false): ResumabilityCheckerShape {
+function makeAgentCatalog(resumable = false): AgentCatalogShape {
   return {
-    isResumable: () => resumable,
+    resolve: (_agentType) => ({
+      agentType: 'claude',
+      canResume: true,
+      detectSessionId: false,
+      buildSpawnArgs: () => ({ command: 'claude', args: [] }),
+      isResumable: () => resumable,
+    }),
   };
 }
 
@@ -22,7 +28,7 @@ describe('CheckResumabilityUseCase.checkResumableForAll', () => {
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(true),
+      agentCatalog: makeAgentCatalog(true),
       eventPublisher,
     });
 
@@ -45,7 +51,7 @@ describe('CheckResumabilityUseCase.checkResumableForAll', () => {
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(false),
+      agentCatalog: makeAgentCatalog(false),
       eventPublisher,
     });
 
@@ -67,7 +73,7 @@ describe('CheckResumabilityUseCase.checkResumableForAll', () => {
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(true),
+      agentCatalog: makeAgentCatalog(true),
       eventPublisher,
     });
 
@@ -88,7 +94,7 @@ describe('CheckResumabilityUseCase.checkResumableForAll', () => {
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(true),
+      agentCatalog: makeAgentCatalog(true),
       eventPublisher,
     });
 
@@ -113,13 +119,14 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
       agentSessionId: 'agent-abc',
       cwd: '/tmp',
       resumable: false,
+      agentType: 'claude',
     });
 
     const eventPublisher = makeSessionEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(true),
+      agentCatalog: makeAgentCatalog(true),
       eventPublisher,
     });
 
@@ -142,13 +149,14 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
       agentSessionId: 'agent-abc',
       cwd: '/tmp',
       resumable: false, // matches checker result of false
+      agentType: 'claude',
     });
 
     const eventPublisher = makeSessionEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(false),
+      agentCatalog: makeAgentCatalog(false),
       eventPublisher,
     });
 
@@ -173,13 +181,14 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
       agentSessionId: 'agent-ended',
       cwd: '/tmp',
       resumable: false,
+      agentType: 'claude',
     });
 
     const eventPublisher = makeSessionEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(true),
+      agentCatalog: makeAgentCatalog(true),
       eventPublisher,
     });
 
@@ -203,13 +212,14 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
       agentSessionId: 'agent-ended',
       cwd: '/tmp',
       resumable: false,
+      agentType: 'claude',
     });
 
     const eventPublisher = makeSessionEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(false),
+      agentCatalog: makeAgentCatalog(false),
       eventPublisher,
     });
 
@@ -238,7 +248,7 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(false),
+      agentCatalog: makeAgentCatalog(false),
       eventPublisher: makeSessionEventBus(),
     });
 
@@ -261,13 +271,14 @@ describe('CheckResumabilityUseCase.checkResumableForActive', () => {
       agentSessionId: 'agent-ended',
       cwd: '/tmp',
       resumable: true,
+      agentType: 'claude',
     });
 
     const eventPublisher = makeSessionEventBus();
 
     const useCase = createCheckResumabilityUseCase({
       sessionRepo,
-      resumabilityChecker: makeResumabilityChecker(true),
+      agentCatalog: makeAgentCatalog(true),
       eventPublisher,
     });
 

@@ -9,7 +9,7 @@ import {
 import { Session } from '#modules/agent-session/domain/session';
 import type { SessionStatus } from '#modules/agent-session/domain/session-status';
 import { VigiDatabase } from '#shared/db/database';
-import { AgentTypeSchema } from '#shared/kernel/session/agent-type';
+import { type AgentType, AgentTypeSchema } from '#shared/kernel/session/agent-type';
 import type { SessionId } from '#shared/kernel/session/session-id';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 
@@ -94,14 +94,21 @@ function createSqliteSessionRepository(db: Database): SessionStoreShape {
     findActiveWithAgentId(): ResumableSessionInfo[] {
       const rows = db
         .prepare(
-          "SELECT id, agent_session_id, cwd, resumable FROM sessions WHERE status = 'active' AND agent_session_id IS NOT NULL"
+          "SELECT id, agent_session_id, cwd, resumable, agent_type FROM sessions WHERE status = 'active' AND agent_session_id IS NOT NULL"
         )
-        .all() as Array<{ id: string; agent_session_id: string; cwd: string; resumable: number }>;
+        .all() as Array<{
+        id: string;
+        agent_session_id: string;
+        cwd: string;
+        resumable: number;
+        agent_type: string;
+      }>;
       return rows.map((r) => ({
         id: makeSessionId(r.id),
         agentSessionId: r.agent_session_id,
         cwd: r.cwd,
         resumable: r.resumable === 1,
+        agentType: r.agent_type as AgentType,
       }));
     },
 
@@ -109,19 +116,21 @@ function createSqliteSessionRepository(db: Database): SessionStoreShape {
       const cutoff = Date.now() - withinMs;
       const rows = db
         .prepare(
-          "SELECT id, agent_session_id, cwd, resumable FROM sessions WHERE status = 'ended' AND agent_session_id IS NOT NULL AND ended_at > $cutoff AND resumable = 0"
+          "SELECT id, agent_session_id, cwd, resumable, agent_type FROM sessions WHERE status = 'ended' AND agent_session_id IS NOT NULL AND ended_at > $cutoff AND resumable = 0"
         )
         .all({ $cutoff: cutoff }) as Array<{
         id: string;
         agent_session_id: string;
         cwd: string;
         resumable: number;
+        agent_type: string;
       }>;
       return rows.map((r) => ({
         id: makeSessionId(r.id),
         agentSessionId: r.agent_session_id,
         cwd: r.cwd,
         resumable: r.resumable === 1,
+        agentType: r.agent_type as AgentType,
       }));
     },
 

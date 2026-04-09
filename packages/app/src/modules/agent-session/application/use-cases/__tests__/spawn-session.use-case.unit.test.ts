@@ -21,6 +21,7 @@ function makeAgentCatalog(canResume = false, detectSessionId = false): AgentCata
         command: 'claude',
         args: opts?.resume ? ['--resume', opts.agentSessionId ?? ''] : [],
       }),
+      isResumable: () => false,
     }),
   };
 }

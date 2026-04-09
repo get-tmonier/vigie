@@ -9,6 +9,7 @@ export interface AgentAdapter {
     command: string;
     args: string[];
   };
+  isResumable(agentSessionId: string, cwd: string): boolean;
 }
 
 export interface AgentCatalogShape {
