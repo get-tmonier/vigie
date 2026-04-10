@@ -17,6 +17,7 @@ import { createSpawnSessionUseCase } from '#modules/agent-session/application/us
 import { AgentCatalogLive } from '#modules/agent-session/infrastructure/adapters/out/agents/agent-registry';
 import { createBunPtySpawnFn } from '#modules/agent-session/infrastructure/adapters/out/bun-pty-spawner';
 import { SqliteSessionRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-session-repository';
+import { SqliteStructuredEventRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-structured-event-repository';
 import { SqliteTerminalRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-terminal-repository';
 import { SessionOutputLive } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
 import { createPtyManager } from '#modules/agent-session/infrastructure/pty-manager';
@@ -45,7 +46,8 @@ const AgentSessionInfraLive = Layer.mergeAll(
   AgentCatalogLive,
   SessionOutputLive,
   SqliteSessionRepositoryLive,
-  SqliteTerminalRepositoryLive
+  SqliteTerminalRepositoryLive,
+  SqliteStructuredEventRepositoryLive
 );
 
 export const AgentSessionLive = Layer.effect(AgentSession)(

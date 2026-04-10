@@ -154,6 +154,13 @@ export const StructuredEventSchema = v.variant('type', [
   TurnCompletedSchema,
 ]);
 
+export type TextDelta = v.InferOutput<typeof TextDeltaSchema>;
+export type ToolCall = v.InferOutput<typeof ToolCallSchema>;
+export type CostUpdate = v.InferOutput<typeof CostUpdateSchema>;
+export type SubagentSpawn = v.InferOutput<typeof SubagentSpawnSchema>;
+export type TurnStarted = v.InferOutput<typeof TurnStartedSchema>;
+export type TurnCompleted = v.InferOutput<typeof TurnCompletedSchema>;
+
 export const SessionEventSchema = v.variant('type', [
   SessionStartedSchema,
   SessionEndedSchema,
