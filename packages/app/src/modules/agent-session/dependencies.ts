@@ -15,6 +15,7 @@ import { createSessionLifecycleUseCase } from '#modules/agent-session/applicatio
 import { createSessionQueriesUseCase } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import { createSpawnSessionUseCase } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
 import { AgentCatalogLive } from '#modules/agent-session/infrastructure/adapters/out/agents/agent-registry';
+import { spawnStructured } from '#modules/agent-session/infrastructure/adapters/out/agents/claude-sdk.adapter';
 import { createBunPtySpawnFn } from '#modules/agent-session/infrastructure/adapters/out/bun-pty-spawner';
 import { SqliteSessionRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-session-repository';
 import { SqliteStructuredEventRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-structured-event-repository';
@@ -30,6 +31,7 @@ export interface AgentSessionServices {
   checkResumability: ReturnType<typeof createCheckResumabilityUseCase>;
   ptyManager: AgentProcessShape;
   terminalSubs: SessionOutputShape;
+  spawnStructured: typeof spawnStructured;
   startupOps: {
     cleanupOrphanedSessions: () => void;
     pruneOldSessions: () => void;
@@ -135,6 +137,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
       checkResumability,
       ptyManager,
       terminalSubs,
+      spawnStructured,
       startupOps,
     };
   })

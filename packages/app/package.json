@@ -35,6 +35,7 @@
     "check-cycles": "skott --showCircularDependencies --displayMode raw --exitCodeOnCircularDependencies 1 --tsconfig tsconfig.json --no-trackTypeOnlyDependencies --fileExtensions .ts,.tsx --cwd src"
   },
   "dependencies": {
+    "@anthropic-ai/claude-code": "2.1.89",
     "@effect/platform-bun": "4.0.0-beta.43",
     "@nanostores/react": "1.1.0",
     "@xterm/headless": "6.0.0",

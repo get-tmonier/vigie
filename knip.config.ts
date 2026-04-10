@@ -17,6 +17,7 @@ export default {
       entry: ['src/pages/client-entry.tsx', 'src/daemon.ts'],
       project: ['src/**/*.{ts,tsx}'],
       ignoreDependencies: [
+        '@anthropic-ai/claude-code',
         '@fontsource-variable/dm-sans',
         '@fontsource/instrument-serif',
         '@fontsource/jetbrains-mono',
