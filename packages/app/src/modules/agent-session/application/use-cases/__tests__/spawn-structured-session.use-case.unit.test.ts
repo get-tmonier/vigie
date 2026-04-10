@@ -63,8 +63,8 @@ describe('SpawnStructuredSession', () => {
 
     const session = sessionRepo.findById(result.sessionId);
     expect(session).not.toBeNull();
-    expect(session!.sessionType).toBe('structured');
-    expect(session!.autoAdvance).toBe(false);
+    expect(session?.sessionType).toBe('structured');
+    expect(session?.autoAdvance).toBe(false);
   });
 
   it('persists structured events from stream', async () => {
