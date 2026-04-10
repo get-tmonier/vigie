@@ -72,7 +72,7 @@ function createSqliteTerminalRepository(db: Database): SessionLogShape {
 
 export const SqliteTerminalRepositoryLive = Layer.effect(SessionLog)(
   Effect.gen(function* () {
-    const db = yield* VigiDatabase;
-    return createSqliteTerminalRepository(db);
+    const { sqlite } = yield* VigiDatabase;
+    return createSqliteTerminalRepository(sqlite);
   })
 );

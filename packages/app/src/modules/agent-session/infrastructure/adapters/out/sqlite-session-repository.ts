@@ -183,7 +183,7 @@ function createSqliteSessionRepository(db: Database): SessionStoreShape {
 
 export const SqliteSessionRepositoryLive = Layer.effect(SessionStore)(
   Effect.gen(function* () {
-    const db = yield* VigiDatabase;
-    return createSqliteSessionRepository(db);
+    const { sqlite } = yield* VigiDatabase;
+    return createSqliteSessionRepository(sqlite);
   })
 );

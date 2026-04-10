@@ -1,15 +1,18 @@
 import { Database } from 'bun:sqlite';
 import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
+import { Kysely } from 'kysely';
 import { SessionStore } from '#modules/agent-session/application/ports/out/session-store.port';
 import { Session } from '#modules/agent-session/domain/session';
 import { SqliteSessionRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-session-repository';
-import { VigiDatabase } from '#shared/db/database';
+import { VigiDatabase, type VigiDatabaseServices } from '#shared/db/database';
+import { createBunSqliteDialect } from '#shared/db/dialect';
+import type { VigiDatabaseSchema } from '#shared/db/schema';
 import { SessionId } from '#shared/kernel/session/session-id';
 
-function makeTestDb(): Database {
-  const db = new Database(':memory:');
-  db.exec(`
+function makeTestDb(): VigiDatabaseServices {
+  const sqlite = new Database(':memory:');
+  sqlite.exec(`
     CREATE TABLE IF NOT EXISTS sessions (
       id TEXT PRIMARY KEY,
       agent_type TEXT NOT NULL,
@@ -40,7 +43,8 @@ function makeTestDb(): Database {
       timestamp INTEGER NOT NULL
     );
   `);
-  return db;
+  const kysely = new Kysely<VigiDatabaseSchema>({ dialect: createBunSqliteDialect(sqlite) });
+  return { sqlite, kysely };
 }
 
 const TestDatabaseLayer = Layer.sync(VigiDatabase)(() => makeTestDb());
