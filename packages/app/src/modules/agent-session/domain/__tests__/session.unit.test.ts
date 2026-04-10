@@ -242,4 +242,121 @@ describe('Session.reactivate', () => {
     const events = session.pullEvents();
     expect(events.some((e) => e.type === 'session:started')).toBe(true);
   });
+
+  it('transitions paused → active', () => {
+    const session = makeActiveSession();
+    session.markPaused();
+    session.pullEvents();
+    session.reactivate();
+    expect(session.status).toBe('active');
+  });
+});
+
+describe('Session.markPaused', () => {
+  it('transitions active → paused', () => {
+    const session = makeActiveSession();
+    session.markPaused();
+    expect(session.status).toBe('paused');
+  });
+
+  it('emits session:ended event with resumable=true', () => {
+    const session = makeActiveSession();
+    session.pullEvents();
+    session.markPaused();
+    const events = session.pullEvents();
+    expect(events).toHaveLength(1);
+    expect(events[0].type).toBe('session:ended');
+    if (events[0].type === 'session:ended') {
+      expect(events[0].resumable).toBe(true);
+      expect(events[0].exitCode).toBe(0);
+    }
+  });
+});
+
+describe('Session.markAbandoned', () => {
+  it('transitions active → abandoned', () => {
+    const session = makeActiveSession();
+    session.markAbandoned();
+    expect(session.status).toBe('abandoned');
+  });
+
+  it('sets endedAt', () => {
+    const session = makeActiveSession();
+    session.markAbandoned();
+    expect(session.endedAt).toBeDefined();
+  });
+
+  it('emits session:ended event with exitCode=-2 and resumable=false', () => {
+    const session = makeActiveSession();
+    session.pullEvents();
+    session.markAbandoned();
+    const events = session.pullEvents();
+    expect(events).toHaveLength(1);
+    expect(events[0].type).toBe('session:ended');
+    if (events[0].type === 'session:ended') {
+      expect(events[0].exitCode).toBe(-2);
+      expect(events[0].resumable).toBe(false);
+    }
+  });
+});
+
+describe('Session.markKilled', () => {
+  it('transitions active → killed', () => {
+    const session = makeActiveSession();
+    session.markKilled();
+    expect(session.status).toBe('killed');
+  });
+
+  it('emits session:ended event with exitCode=-3', () => {
+    const session = makeActiveSession();
+    session.pullEvents();
+    session.markKilled();
+    const events = session.pullEvents();
+    expect(events).toHaveLength(1);
+    expect(events[0].type).toBe('session:ended');
+    if (events[0].type === 'session:ended') {
+      expect(events[0].exitCode).toBe(-3);
+      expect(events[0].resumable).toBe(false);
+    }
+  });
+});
+
+describe('Session.archive', () => {
+  it('transitions ended → archived', () => {
+    const session = makeActiveSession();
+    session.markEnded(0, false);
+    session.archive();
+    expect(session.status).toBe('archived');
+  });
+
+  it('throws CannotDeleteActiveSessionError from active status', () => {
+    const session = makeActiveSession();
+    expect(() => session.archive()).toThrow(CannotDeleteActiveSessionError);
+  });
+
+  it('throws CannotDeleteActiveSessionError from paused status', () => {
+    const session = makeActiveSession();
+    session.markPaused();
+    expect(() => session.archive()).toThrow(CannotDeleteActiveSessionError);
+  });
+});
+
+describe('Session.canDelete (extended)', () => {
+  it('canDelete is false when paused', () => {
+    const session = makeActiveSession();
+    session.markPaused();
+    expect(session.canDelete).toBe(false);
+  });
+
+  it('canDelete is true when abandoned', () => {
+    const session = makeActiveSession();
+    session.markAbandoned();
+    expect(session.canDelete).toBe(true);
+  });
+
+  it('canDelete is true when killed', () => {
+    const session = makeActiveSession();
+    session.markKilled();
+    expect(session.canDelete).toBe(true);
+  });
 });

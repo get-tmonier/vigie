@@ -158,7 +158,7 @@ export class Session {
   }
 
   get canDelete(): boolean {
-    return this._status !== 'active';
+    return this._status !== 'active' && this._status !== 'paused';
   }
 
   markActive(): void {
@@ -192,6 +192,48 @@ export class Session {
       error,
       timestamp: this._endedAt,
     });
+  }
+
+  markPaused(): void {
+    this.transitionTo('paused');
+    this._events.push({
+      type: 'session:ended',
+      sessionId: this.id,
+      exitCode: 0,
+      resumable: true,
+      timestamp: Date.now(),
+    });
+  }
+
+  markAbandoned(): void {
+    this.transitionTo('abandoned');
+    this._endedAt = Date.now();
+    this._events.push({
+      type: 'session:ended',
+      sessionId: this.id,
+      exitCode: -2,
+      resumable: false,
+      timestamp: this._endedAt,
+    });
+  }
+
+  markKilled(): void {
+    this.transitionTo('killed');
+    this._endedAt = Date.now();
+    this._events.push({
+      type: 'session:ended',
+      sessionId: this.id,
+      exitCode: -3,
+      resumable: false,
+      timestamp: this._endedAt,
+    });
+  }
+
+  archive(): void {
+    if (this.isActive || this._status === 'paused') {
+      throw new CannotDeleteActiveSessionError({ sessionId: this.id });
+    }
+    this.transitionTo('archived');
   }
 
   reactivate(): void {
