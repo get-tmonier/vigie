@@ -1,4 +1,5 @@
 import { createRoot } from 'react-dom/client';
+import { KanbanBoard } from '#modules/agent-session/infrastructure/adapters/in/ui/kanban/KanbanBoard.island';
 import { SessionDetail } from '#modules/agent-session/infrastructure/adapters/in/ui/SessionDetail.island';
 import { SessionList } from '#modules/agent-session/infrastructure/adapters/in/ui/SessionList.island';
 import { SpawnSessionFormIsland } from '#modules/agent-session/infrastructure/adapters/in/ui/SpawnSessionForm.island';
@@ -15,3 +16,6 @@ if (el2) createRoot(el2).render(<SessionDetail />);
 
 const el3 = document.getElementById('spawn-form-app');
 if (el3) createRoot(el3).render(<SpawnSessionFormIsland />);
+
+const el4 = document.getElementById('kanban-board-app');
+if (el4) createRoot(el4).render(<KanbanBoard />);
