@@ -11,6 +11,8 @@ interface SessionLifecycleDeps {
   eventPublisher: SessionEventBusShape;
 }
 
+export type SessionLifecycleShape = ReturnType<typeof createSessionLifecycleUseCase>;
+
 export function createSessionLifecycleUseCase(deps: SessionLifecycleDeps) {
   const { sessionRepo, agentCatalog, eventPublisher } = deps;
 
@@ -65,6 +67,22 @@ export function createSessionLifecycleUseCase(deps: SessionLifecycleDeps) {
         sessionRepo.save(session);
         fireAndForget(publishEvents(session.pullEvents()));
       }
+    },
+
+    markAbandoned(sessionId: SessionId): void {
+      const session = sessionRepo.findById(sessionId);
+      if (!session) return;
+      session.markAbandoned();
+      sessionRepo.save(session);
+      fireAndForget(publishEvents(session.pullEvents()));
+    },
+
+    archive(sessionId: SessionId): void {
+      const session = sessionRepo.findById(sessionId);
+      if (!session) return;
+      session.archive();
+      sessionRepo.save(session);
+      fireAndForget(publishEvents(session.pullEvents()));
     },
   };
 }

@@ -36,3 +36,14 @@ export const SpawnSessionRequestSchema = v.object({
   cols: v.optional(v.number()),
   rows: v.optional(v.number()),
 });
+
+export const SpawnStructuredRequestSchema = v.object({
+  agentType: v.optional(AgentTypeSchema),
+  cwd: v.optional(v.string()),
+  prompt: v.string(),
+  autoAdvance: v.optional(v.boolean()),
+});
+
+export const SendPromptRequestSchema = v.object({
+  prompt: v.string(),
+});

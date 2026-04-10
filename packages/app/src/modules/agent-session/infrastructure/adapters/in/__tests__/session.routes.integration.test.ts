@@ -2,9 +2,12 @@ import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
 import * as HttpRouter from 'effect/unstable/http/HttpRouter';
 import type { AgentProcessShape } from '#modules/agent-session/application/ports/out/agent-process.port';
+import type { StructuredEventStoreShape } from '#modules/agent-session/application/ports/out/structured-event-store.port';
 import type { SessionCleanupShape } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
+import type { SessionLifecycleShape } from '#modules/agent-session/application/use-cases/session-lifecycle.use-case';
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import type { SpawnSessionShape } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
+import type { SpawnStructuredSessionShape } from '#modules/agent-session/application/use-cases/spawn-structured-session.use-case';
 import { Session } from '#modules/agent-session/domain/session';
 import { SessionId } from '#shared/kernel/session/session-id';
 import { createSessionApiRoutes } from '../session.api-routes';
@@ -62,14 +65,47 @@ const fakePtyManager: AgentProcessShape = {
   clearConnection: () => {},
 };
 
+const fakeSpawnStructuredSession: SpawnStructuredSessionShape = {
+  spawn: (_props) => Effect.succeed({ sessionId: SessionId('structured-session-id') }),
+  sendPrompt: (_sessionId, _prompt) => Effect.void,
+};
+
+const fakeSessionLifecycle: SessionLifecycleShape = {
+  markEnded: () => {},
+  markError: () => {},
+  setAgentSessionId: () => {},
+  deregister: () => {},
+  markAbandoned: () => {},
+  archive: () => {},
+};
+
+const fakeStructuredEventStore: StructuredEventStoreShape = {
+  insertTurn: () => {},
+  completeTurn: () => {},
+  insertTextDelta: () => {},
+  insertToolCall: () => {},
+  updateToolCall: () => {},
+  insertCostUpdate: () => {},
+  insertSubagentSpawn: () => {},
+  getTurns: () => [],
+  getToolCalls: () => [],
+  getCostUpdates: () => [],
+  getTextDeltas: () => [],
+  getSubagentSpawns: () => [],
+  getSessionTotalCost: () => 0,
+};
+
 // --- Helper to build test handler ---
 
 function buildHandler(sessions: Session[] = []) {
   const deps = {
     spawnSession: fakeSpawnSession,
+    spawnStructuredSession: fakeSpawnStructuredSession,
     sessionCleanup: fakeSessionCleanup,
     sessionQueries: fakeSessionQueries(sessions),
+    sessionLifecycle: fakeSessionLifecycle,
     ptyManager: fakePtyManager,
+    structuredEventStore: fakeStructuredEventStore,
   };
   const routes = createSessionApiRoutes(deps);
   const appLayer = Layer.mergeAll(HttpRouter.layer, HttpRouter.addAll(routes));

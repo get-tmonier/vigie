@@ -7,19 +7,29 @@ import * as HttpServerResponse from 'effect/unstable/http/HttpServerResponse';
 import type * as Socket from 'effect/unstable/socket/Socket';
 import * as v from 'valibot';
 import type { AgentProcessShape } from '#modules/agent-session/application/ports/out/agent-process.port';
+import type { StructuredEventStoreShape } from '#modules/agent-session/application/ports/out/structured-event-store.port';
 import type { SessionCleanupShape } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
+import type { SessionLifecycleShape } from '#modules/agent-session/application/use-cases/session-lifecycle.use-case';
 import type { SessionQueriesShape } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import type { SpawnSessionShape } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
-import { SpawnSessionRequestSchema } from '#modules/agent-session/infrastructure/adapters/in/session.dto';
+import type { SpawnStructuredSessionShape } from '#modules/agent-session/application/use-cases/spawn-structured-session.use-case';
+import {
+  SendPromptRequestSchema,
+  SpawnSessionRequestSchema,
+  SpawnStructuredRequestSchema,
+} from '#modules/agent-session/infrastructure/adapters/in/session.dto';
 import { sessionToDTO } from '#modules/agent-session/infrastructure/adapters/in/session.mapper';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 import { expandPath } from '#shared/lib/path';
 
 type SessionApiRouteDeps = {
   spawnSession: SpawnSessionShape;
+  spawnStructuredSession: SpawnStructuredSessionShape;
   sessionCleanup: SessionCleanupShape;
   sessionQueries: SessionQueriesShape;
+  sessionLifecycle: SessionLifecycleShape;
   ptyManager: AgentProcessShape;
+  structuredEventStore: StructuredEventStoreShape;
 };
 
 type RouteError = HttpServerError.HttpServerError | Socket.SocketError | Cause.UnknownError;
@@ -64,7 +74,15 @@ const jsonRoute = <E>(
 export function createSessionApiRoutes(
   deps: SessionApiRouteDeps
 ): HttpRouter.Route<RouteError, never>[] {
-  const { spawnSession, sessionCleanup, sessionQueries, ptyManager } = deps;
+  const {
+    spawnSession,
+    spawnStructuredSession,
+    sessionCleanup,
+    sessionQueries,
+    sessionLifecycle,
+    ptyManager,
+    structuredEventStore,
+  } = deps;
 
   return [
     HttpRouter.route(
@@ -197,6 +215,141 @@ export function createSessionApiRoutes(
       Effect.sync(() => {
         ptyManager.killAll();
         return HttpServerResponse.jsonUnsafe({ killedCount: -1 });
+      })
+    ),
+
+    jsonRoute(
+      'POST',
+      '/api/sessions/structured',
+      Effect.gen(function* () {
+        const request = yield* HttpServerRequest.HttpServerRequest;
+        const raw = yield* request.json;
+        const parsed = v.safeParse(SpawnStructuredRequestSchema, raw);
+        if (!parsed.success) {
+          return HttpServerResponse.jsonUnsafe({ error: 'Invalid request body' }, { status: 400 });
+        }
+        const body = parsed.output;
+        const result = yield* spawnStructuredSession.spawn({
+          agentType: body.agentType ?? 'claude',
+          cwd: expandPath(body.cwd ?? '~'),
+          prompt: body.prompt,
+          autoAdvance: body.autoAdvance ?? false,
+        });
+        return HttpServerResponse.jsonUnsafe({ sessionId: result.sessionId });
+      })
+    ),
+
+    jsonRoute(
+      'POST',
+      '/api/sessions/:id/prompt',
+      Effect.gen(function* () {
+        const { id: rawSessionId } = yield* HttpRouter.params;
+        if (!rawSessionId) {
+          return HttpServerResponse.jsonUnsafe({ error: 'Missing session ID' }, { status: 400 });
+        }
+        const sessionId = makeSessionId(rawSessionId);
+        const request = yield* HttpServerRequest.HttpServerRequest;
+        const raw = yield* request.json;
+        const parsed = v.safeParse(SendPromptRequestSchema, raw);
+        if (!parsed.success) {
+          return HttpServerResponse.jsonUnsafe({ error: 'Invalid request body' }, { status: 400 });
+        }
+        yield* spawnStructuredSession.sendPrompt(sessionId, parsed.output.prompt);
+        return HttpServerResponse.jsonUnsafe({ ok: true });
+      })
+    ),
+
+    HttpRouter.route(
+      'POST',
+      '/api/sessions/:id/pause',
+      Effect.gen(function* () {
+        const { id: rawSessionId } = yield* HttpRouter.params;
+        if (!rawSessionId) {
+          return HttpServerResponse.jsonUnsafe({ error: 'Missing session ID' }, { status: 400 });
+        }
+        const sessionId = makeSessionId(rawSessionId);
+        const pid = ptyManager.getActivePid(sessionId);
+        if (pid === null) {
+          return HttpServerResponse.jsonUnsafe(
+            { error: 'Session not found or not active' },
+            { status: 404 }
+          );
+        }
+        ptyManager.kill(sessionId);
+        return HttpServerResponse.jsonUnsafe({ ok: true });
+      })
+    ),
+
+    HttpRouter.route(
+      'POST',
+      '/api/sessions/:id/abandon',
+      Effect.gen(function* () {
+        const { id: rawSessionId } = yield* HttpRouter.params;
+        if (!rawSessionId) {
+          return HttpServerResponse.jsonUnsafe({ error: 'Missing session ID' }, { status: 400 });
+        }
+        const sessionId = makeSessionId(rawSessionId);
+        const session = sessionQueries.findById(sessionId);
+        if (!session) {
+          return HttpServerResponse.jsonUnsafe({ error: 'Session not found' }, { status: 404 });
+        }
+        sessionLifecycle.markAbandoned(sessionId);
+        return HttpServerResponse.jsonUnsafe({ ok: true });
+      })
+    ),
+
+    HttpRouter.route(
+      'POST',
+      '/api/sessions/:id/archive',
+      Effect.gen(function* () {
+        const { id: rawSessionId } = yield* HttpRouter.params;
+        if (!rawSessionId) {
+          return HttpServerResponse.jsonUnsafe({ error: 'Missing session ID' }, { status: 400 });
+        }
+        const sessionId = makeSessionId(rawSessionId);
+        const session = sessionQueries.findById(sessionId);
+        if (!session) {
+          return HttpServerResponse.jsonUnsafe({ error: 'Session not found' }, { status: 404 });
+        }
+        sessionLifecycle.archive(sessionId);
+        return HttpServerResponse.jsonUnsafe({ ok: true });
+      })
+    ),
+
+    HttpRouter.route(
+      'GET',
+      '/api/sessions/:id/events',
+      Effect.gen(function* () {
+        const { id: rawSessionId } = yield* HttpRouter.params;
+        if (!rawSessionId) {
+          return HttpServerResponse.jsonUnsafe({ error: 'Missing session ID' }, { status: 400 });
+        }
+        const sessionId = makeSessionId(rawSessionId);
+        const session = sessionQueries.findById(sessionId);
+        if (!session) {
+          return HttpServerResponse.jsonUnsafe({ error: 'Session not found' }, { status: 404 });
+        }
+        const toolCalls = structuredEventStore.getToolCalls(sessionId);
+        const costUpdates = structuredEventStore.getCostUpdates(sessionId);
+        return HttpServerResponse.jsonUnsafe({ toolCalls, costUpdates });
+      })
+    ),
+
+    HttpRouter.route(
+      'GET',
+      '/api/sessions/:id/turns',
+      Effect.gen(function* () {
+        const { id: rawSessionId } = yield* HttpRouter.params;
+        if (!rawSessionId) {
+          return HttpServerResponse.jsonUnsafe({ error: 'Missing session ID' }, { status: 400 });
+        }
+        const sessionId = makeSessionId(rawSessionId);
+        const session = sessionQueries.findById(sessionId);
+        if (!session) {
+          return HttpServerResponse.jsonUnsafe({ error: 'Session not found' }, { status: 404 });
+        }
+        const turns = structuredEventStore.getTurns(sessionId);
+        return HttpServerResponse.jsonUnsafe({ turns });
       })
     ),
   ];

@@ -32,9 +32,12 @@ export const runDaemon = Effect.gen(function* () {
 
   const apiRoutes = createSessionApiRoutes({
     spawnSession: agentSession.spawnSession,
+    spawnStructuredSession: agentSession.spawnStructuredSession,
     sessionCleanup: agentSession.sessionCleanup,
     sessionQueries: agentSession.sessionQueries,
+    sessionLifecycle: agentSession.sessionLifecycle,
     ptyManager: agentSession.ptyManager,
+    structuredEventStore: agentSession.structuredEventStore,
   });
 
   const dashboardRoutes = createDashboardRoutes({

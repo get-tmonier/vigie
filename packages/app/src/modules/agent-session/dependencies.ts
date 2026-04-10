@@ -9,6 +9,7 @@ import {
   type SessionOutputShape,
 } from '#modules/agent-session/application/ports/out/session-output.port';
 import { SessionStore } from '#modules/agent-session/application/ports/out/session-store.port';
+import type { StructuredEventStoreShape } from '#modules/agent-session/application/ports/out/structured-event-store.port';
 import { StructuredEventStore } from '#modules/agent-session/application/ports/out/structured-event-store.port';
 import { createCheckResumabilityUseCase } from '#modules/agent-session/application/use-cases/check-resumability.use-case';
 import { createSessionCleanupUseCase } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
@@ -36,6 +37,7 @@ export interface AgentSessionServices {
   terminalSubs: SessionOutputShape;
   spawnStructured: typeof spawnStructured;
   spawnStructuredSession: SpawnStructuredSessionShape;
+  structuredEventStore: StructuredEventStoreShape;
   startupOps: {
     cleanupOrphanedSessions: () => void;
     pruneOldSessions: () => void;
@@ -151,6 +153,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
       terminalSubs,
       spawnStructured,
       spawnStructuredSession,
+      structuredEventStore,
       startupOps,
     };
   })
