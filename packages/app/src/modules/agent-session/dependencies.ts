@@ -9,14 +9,20 @@ import {
   type SessionOutputShape,
 } from '#modules/agent-session/application/ports/out/session-output.port';
 import { SessionStore } from '#modules/agent-session/application/ports/out/session-store.port';
+import type { StructuredEventStoreShape } from '#modules/agent-session/application/ports/out/structured-event-store.port';
+import { StructuredEventStore } from '#modules/agent-session/application/ports/out/structured-event-store.port';
 import { createCheckResumabilityUseCase } from '#modules/agent-session/application/use-cases/check-resumability.use-case';
 import { createSessionCleanupUseCase } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
 import { createSessionLifecycleUseCase } from '#modules/agent-session/application/use-cases/session-lifecycle.use-case';
 import { createSessionQueriesUseCase } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import { createSpawnSessionUseCase } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
+import type { SpawnStructuredSessionShape } from '#modules/agent-session/application/use-cases/spawn-structured-session.use-case';
+import { createSpawnStructuredSessionUseCase } from '#modules/agent-session/application/use-cases/spawn-structured-session.use-case';
 import { AgentCatalogLive } from '#modules/agent-session/infrastructure/adapters/out/agents/agent-registry';
+import { spawnStructured } from '#modules/agent-session/infrastructure/adapters/out/agents/claude-sdk.adapter';
 import { createBunPtySpawnFn } from '#modules/agent-session/infrastructure/adapters/out/bun-pty-spawner';
 import { SqliteSessionRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-session-repository';
+import { SqliteStructuredEventRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-structured-event-repository';
 import { SqliteTerminalRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-terminal-repository';
 import { SessionOutputLive } from '#modules/agent-session/infrastructure/adapters/out/terminal-subscribers';
 import { createPtyManager } from '#modules/agent-session/infrastructure/pty-manager';
@@ -29,6 +35,9 @@ export interface AgentSessionServices {
   checkResumability: ReturnType<typeof createCheckResumabilityUseCase>;
   ptyManager: AgentProcessShape;
   terminalSubs: SessionOutputShape;
+  spawnStructured: typeof spawnStructured;
+  spawnStructuredSession: SpawnStructuredSessionShape;
+  structuredEventStore: StructuredEventStoreShape;
   startupOps: {
     cleanupOrphanedSessions: () => void;
     pruneOldSessions: () => void;
@@ -45,7 +54,8 @@ const AgentSessionInfraLive = Layer.mergeAll(
   AgentCatalogLive,
   SessionOutputLive,
   SqliteSessionRepositoryLive,
-  SqliteTerminalRepositoryLive
+  SqliteTerminalRepositoryLive,
+  SqliteStructuredEventRepositoryLive
 );
 
 export const AgentSessionLive = Layer.effect(AgentSession)(
@@ -56,6 +66,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
     const eventPublisher = yield* SessionEventBus;
     const terminalSubs = yield* SessionOutput;
     const cliChannel = yield* CliChannel;
+    const structuredEventStore = yield* StructuredEventStore;
 
     const sessionLifecycle = createSessionLifecycleUseCase({
       sessionRepo: sessionStore,
@@ -118,6 +129,13 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
       terminalRepo: sessionLog,
     });
 
+    const spawnStructuredSession = createSpawnStructuredSessionUseCase({
+      sessionRepo: sessionStore,
+      eventPublisher,
+      structuredEventStore,
+      spawnStructuredFn: spawnStructured,
+    });
+
     const startupOps = {
       cleanupOrphanedSessions: () => sessionStore.markOrphanedEnded(),
       pruneOldSessions: () => sessionStore.pruneOld(),
@@ -133,6 +151,9 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
       checkResumability,
       ptyManager,
       terminalSubs,
+      spawnStructured,
+      spawnStructuredSession,
+      structuredEventStore,
       startupOps,
     };
   })

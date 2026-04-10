@@ -1,17 +1,16 @@
 import { createRoot } from 'react-dom/client';
-import { SessionDetail } from '#modules/agent-session/infrastructure/adapters/in/ui/SessionDetail.island';
-import { SessionList } from '#modules/agent-session/infrastructure/adapters/in/ui/SessionList.island';
+import { KanbanBoard } from '#modules/agent-session/infrastructure/adapters/in/ui/kanban/KanbanBoard.island';
 import { SpawnSessionFormIsland } from '#modules/agent-session/infrastructure/adapters/in/ui/SpawnSessionForm.island';
+import { SessionDetailV2 } from '#modules/agent-session/infrastructure/adapters/in/ui/session-detail/SessionDetailV2.island';
 import { init } from '#modules/agent-session/infrastructure/adapters/in/ui/ws-sync';
 import '#shared/styles/global.css';
 
+function mount(id: string, component: React.ReactNode): void {
+  const el = document.getElementById(id);
+  if (el) createRoot(el).render(component);
+}
+
 init();
-
-const el1 = document.getElementById('session-list-app');
-if (el1) createRoot(el1).render(<SessionList />);
-
-const el2 = document.getElementById('session-detail-app');
-if (el2) createRoot(el2).render(<SessionDetail />);
-
-const el3 = document.getElementById('spawn-form-app');
-if (el3) createRoot(el3).render(<SpawnSessionFormIsland />);
+mount('kanban-board-app', <KanbanBoard />);
+mount('session-detail-v2-app', <SessionDetailV2 />);
+mount('spawn-form-app', <SpawnSessionFormIsland />);

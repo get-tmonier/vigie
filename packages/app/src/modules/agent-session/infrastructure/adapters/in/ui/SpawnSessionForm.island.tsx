@@ -17,6 +17,9 @@ export function SpawnSessionFormIsland() {
   const [spawning, setSpawning] = useState(false);
   const [editing, setEditing] = useState(false);
   const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
+  const [sessionType, setSessionType] = useState<'structured' | 'interactive'>('structured');
+  const [prompt, setPrompt] = useState('');
+  const [autoAdvance, setAutoAdvance] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -148,16 +151,31 @@ export function SpawnSessionFormIsland() {
     setEditing(false);
     setSuggestions([]);
     try {
-      const res = await fetch('/api/sessions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ agentType, cwd: value }),
-      });
-      const data = (await res.json()) as { sessionId?: string };
-      if (data.sessionId) {
-        setValue(defaultCwd);
-        $selectedId.set(data.sessionId);
-        history.pushState(null, '', `/?session=${data.sessionId}`);
+      if (sessionType === 'structured') {
+        const res = await fetch('/api/sessions/structured', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ agentType, cwd: value, prompt, autoAdvance }),
+        });
+        const data = (await res.json()) as { sessionId?: string };
+        if (data.sessionId) {
+          setValue(defaultCwd);
+          setPrompt('');
+          $selectedId.set(data.sessionId);
+          history.pushState(null, '', `/?session=${data.sessionId}`);
+        }
+      } else {
+        const res = await fetch('/api/sessions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ agentType, cwd: value }),
+        });
+        const data = (await res.json()) as { sessionId?: string };
+        if (data.sessionId) {
+          setValue(defaultCwd);
+          $selectedId.set(data.sessionId);
+          history.pushState(null, '', `/?session=${data.sessionId}`);
+        }
       }
     } catch {
       /* WS will update */
@@ -276,13 +294,69 @@ export function SpawnSessionFormIsland() {
         </ul>
       )}
 
+      {/* Session type toggle */}
+      <div className="flex gap-1">
+        <button
+          type="button"
+          onClick={() => setSessionType('structured')}
+          className={cn(
+            'flex-1 py-1 text-xs rounded font-mono',
+            sessionType === 'structured'
+              ? 'bg-vigie-400/20 text-vigie-400 border border-vigie-400/30'
+              : 'bg-navy-800 text-cream-200/60 border border-navy-700'
+          )}
+        >
+          Structured
+        </button>
+        <button
+          type="button"
+          onClick={() => setSessionType('interactive')}
+          className={cn(
+            'flex-1 py-1 text-xs rounded font-mono',
+            sessionType === 'interactive'
+              ? 'bg-vigie-400/20 text-vigie-400 border border-vigie-400/30'
+              : 'bg-navy-800 text-cream-200/60 border border-navy-700'
+          )}
+        >
+          Interactive
+        </button>
+      </div>
+
+      {/* Prompt textarea (structured only) */}
+      {sessionType === 'structured' && (
+        <textarea
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="Enter prompt for the agent..."
+          rows={3}
+          className="w-full px-2 py-1.5 font-mono text-xs bg-navy-800 text-cream-50 border border-navy-700 rounded focus:outline-none focus:border-vigie-400/50 resize-none"
+        />
+      )}
+
+      {/* Auto-advance toggle (structured only) */}
+      {sessionType === 'structured' && (
+        <label className="flex items-center gap-2 text-xs text-cream-200/60">
+          <input
+            type="checkbox"
+            checked={autoAdvance}
+            onChange={(e) => setAutoAdvance(e.target.checked)}
+            className="accent-vigie-400"
+          />
+          Auto-advance (autonomous mode)
+        </label>
+      )}
+
       <button
         type="button"
         onClick={handleSubmit}
-        disabled={spawning}
+        disabled={spawning || (sessionType === 'structured' && !prompt.trim())}
         className="w-full py-1.5 font-mono text-xs bg-vigie-400 text-navy-900 rounded hover:bg-vigie-500 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {spawning ? 'Starting…' : '+ New session'}
+        {spawning
+          ? 'Starting…'
+          : sessionType === 'structured'
+            ? '+ New structured session'
+            : '+ New session'}
       </button>
     </div>
   );

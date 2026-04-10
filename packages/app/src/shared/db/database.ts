@@ -1,66 +1,37 @@
 import { Database } from 'bun:sqlite';
 import { Layer, ServiceMap } from 'effect';
+import { Kysely } from 'kysely';
+import { createBunSqliteDialect } from './dialect';
+import { runMigrations } from './migrator';
+import type { VigiDatabaseSchema } from './schema';
 
-const SCHEMA = `
-CREATE TABLE IF NOT EXISTS sessions (
-  id TEXT PRIMARY KEY,
-  agent_type TEXT NOT NULL,
-  mode TEXT NOT NULL DEFAULT 'prompt',
-  cwd TEXT NOT NULL,
-  git_branch TEXT,
-  git_remote_url TEXT,
-  repo_name TEXT,
-  started_at INTEGER NOT NULL,
-  ended_at INTEGER,
-  status TEXT NOT NULL DEFAULT 'active',
-  exit_code INTEGER
-);
+// Import migrations to register them
+import './migrations/001-initial-schema';
 
-CREATE TABLE IF NOT EXISTS terminal_chunks (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  session_id TEXT NOT NULL REFERENCES sessions(id),
-  data TEXT NOT NULL,
-  timestamp INTEGER NOT NULL,
-  seq INTEGER NOT NULL
-);
+export type VigiKysely = Kysely<VigiDatabaseSchema>;
 
-CREATE INDEX IF NOT EXISTS idx_terminal_session_seq ON terminal_chunks(session_id, seq);
-
-CREATE TABLE IF NOT EXISTS input_history (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  session_id TEXT NOT NULL REFERENCES sessions(id),
-  text TEXT NOT NULL,
-  source TEXT NOT NULL DEFAULT 'cli',
-  timestamp INTEGER NOT NULL
-);
-
-CREATE INDEX IF NOT EXISTS idx_input_history_session ON input_history(session_id, timestamp);
-
-CREATE TABLE IF NOT EXISTS event_queue (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  payload TEXT NOT NULL,
-  created_at INTEGER NOT NULL
-);
-`;
-
-function openDatabase(path: string): Database {
-  const db = new Database(path);
-  db.run('PRAGMA journal_mode = WAL');
-  db.run('PRAGMA synchronous = NORMAL');
-  db.exec(SCHEMA);
-  try {
-    db.run('ALTER TABLE sessions RENAME COLUMN claude_session_id TO agent_session_id');
-  } catch {}
-  try {
-    db.run('ALTER TABLE sessions ADD COLUMN agent_session_id TEXT');
-  } catch {}
-  try {
-    db.run('ALTER TABLE sessions ADD COLUMN resumable INTEGER NOT NULL DEFAULT 0');
-  } catch {}
-  return db;
+export interface VigiDatabaseServices {
+  readonly sqlite: Database;
+  readonly kysely: VigiKysely;
 }
 
-export class VigiDatabase extends ServiceMap.Service<VigiDatabase, Database>()('@vigie/Database') {}
+export class VigiDatabase extends ServiceMap.Service<VigiDatabase, VigiDatabaseServices>()(
+  '@vigie/Database'
+) {}
+
+function openDatabase(path: string): VigiDatabaseServices {
+  const sqlite = new Database(path);
+  sqlite.run('PRAGMA journal_mode = WAL');
+  sqlite.run('PRAGMA synchronous = NORMAL');
+
+  const kysely = new Kysely<VigiDatabaseSchema>({
+    dialect: createBunSqliteDialect(sqlite),
+  });
+
+  runMigrations(kysely, sqlite);
+
+  return { sqlite, kysely };
+}
 
 export const makeDatabaseLayer = (dbFile: string) =>
   Layer.sync(VigiDatabase)(() => openDatabase(dbFile));

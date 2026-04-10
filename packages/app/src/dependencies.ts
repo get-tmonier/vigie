@@ -2,7 +2,9 @@ import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { Effect, Layer } from 'effect';
+import { SessionEventBus } from '#modules/agent-session/application/ports/out/session-event-bus.port';
 import { AgentSession, AgentSessionLive } from '#modules/agent-session/dependencies';
+import { createHookRoutes } from '#modules/agent-session/infrastructure/adapters/in/hooks.routes';
 import { createSessionApiRoutes } from '#modules/agent-session/infrastructure/adapters/in/session.api-routes';
 import { createTerminalRoutes } from '#modules/agent-session/infrastructure/adapters/in/terminal.routes';
 import { SessionEventBusLive } from '#modules/agent-session/infrastructure/adapters/out/session-event-bus.adapter';
@@ -29,12 +31,16 @@ export const AppLive = Layer.mergeAll(
 export const runDaemon = Effect.gen(function* () {
   const agentSession = yield* AgentSession;
   const browserEventBus = yield* BrowserEventBus;
+  const sessionEventBus = yield* SessionEventBus;
 
   const apiRoutes = createSessionApiRoutes({
     spawnSession: agentSession.spawnSession,
+    spawnStructuredSession: agentSession.spawnStructuredSession,
     sessionCleanup: agentSession.sessionCleanup,
     sessionQueries: agentSession.sessionQueries,
+    sessionLifecycle: agentSession.sessionLifecycle,
     ptyManager: agentSession.ptyManager,
+    structuredEventStore: agentSession.structuredEventStore,
   });
 
   const dashboardRoutes = createDashboardRoutes({
@@ -58,8 +64,20 @@ export const runDaemon = Effect.gen(function* () {
   ];
   const clientDistPath = clientDistCandidates.find((p) => existsSync(p));
 
+  const hookRoutes = createHookRoutes({
+    sessionQueries: agentSession.sessionQueries,
+    eventPublisher: sessionEventBus,
+    structuredEventStore: agentSession.structuredEventStore,
+  });
+
   const appRoutes = createRoutesLayer({
-    appRoutes: [...apiRoutes, ...dashboardRoutes, ...eventsRoutes, ...terminalRoutes],
+    appRoutes: [
+      ...apiRoutes,
+      ...dashboardRoutes,
+      ...eventsRoutes,
+      ...terminalRoutes,
+      ...hookRoutes,
+    ],
     clientDistPath,
   });
 

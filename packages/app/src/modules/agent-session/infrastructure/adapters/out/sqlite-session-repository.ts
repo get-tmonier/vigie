@@ -27,6 +27,10 @@ interface SessionRow {
   exit_code: number | null;
   agent_session_id: string | null;
   resumable: number;
+  session_type: string | null;
+  auto_advance: number | null;
+  current_turn_index: number | null;
+  total_cost_usd: number | null;
 }
 
 function rowToSession(row: SessionRow): Session {
@@ -44,19 +48,27 @@ function rowToSession(row: SessionRow): Session {
     agentSessionId: row.agent_session_id ?? undefined,
     resumable: row.resumable === 1,
     mode: row.mode,
+    sessionType: row.session_type ?? 'interactive',
+    autoAdvance: row.auto_advance === 1,
+    currentTurnIndex: row.current_turn_index ?? 0,
+    totalCostUsd: row.total_cost_usd ?? 0,
   });
 }
 
 function createSqliteSessionRepository(db: Database): SessionStoreShape {
   const upsertStmt = db.prepare(`
-    INSERT INTO sessions (id, agent_type, mode, cwd, git_branch, git_remote_url, repo_name, started_at, ended_at, status, exit_code, agent_session_id, resumable)
-    VALUES ($id, $agent_type, $mode, $cwd, $git_branch, $git_remote_url, $repo_name, $started_at, $ended_at, $status, $exit_code, $agent_session_id, $resumable)
+    INSERT INTO sessions (id, agent_type, mode, cwd, git_branch, git_remote_url, repo_name, started_at, ended_at, status, exit_code, agent_session_id, resumable, session_type, auto_advance, current_turn_index, total_cost_usd)
+    VALUES ($id, $agent_type, $mode, $cwd, $git_branch, $git_remote_url, $repo_name, $started_at, $ended_at, $status, $exit_code, $agent_session_id, $resumable, $session_type, $auto_advance, $current_turn_index, $total_cost_usd)
     ON CONFLICT(id) DO UPDATE SET
       status = excluded.status,
       ended_at = excluded.ended_at,
       exit_code = excluded.exit_code,
       agent_session_id = excluded.agent_session_id,
-      resumable = excluded.resumable
+      resumable = excluded.resumable,
+      session_type = excluded.session_type,
+      auto_advance = excluded.auto_advance,
+      current_turn_index = excluded.current_turn_index,
+      total_cost_usd = excluded.total_cost_usd
   `);
 
   const findByIdStmt = db.prepare('SELECT * FROM sessions WHERE id = $id');
@@ -149,6 +161,10 @@ function createSqliteSessionRepository(db: Database): SessionStoreShape {
         $exit_code: session.exitCode ?? null,
         $agent_session_id: session.agentSessionId ?? null,
         $resumable: session.resumable ? 1 : 0,
+        $session_type: session.sessionType,
+        $auto_advance: session.autoAdvance ? 1 : 0,
+        $current_turn_index: session.currentTurnIndex,
+        $total_cost_usd: session.totalCostUsd,
       });
     },
 
@@ -183,7 +199,7 @@ function createSqliteSessionRepository(db: Database): SessionStoreShape {
 
 export const SqliteSessionRepositoryLive = Layer.effect(SessionStore)(
   Effect.gen(function* () {
-    const db = yield* VigiDatabase;
-    return createSqliteSessionRepository(db);
+    const { sqlite } = yield* VigiDatabase;
+    return createSqliteSessionRepository(sqlite);
   })
 );

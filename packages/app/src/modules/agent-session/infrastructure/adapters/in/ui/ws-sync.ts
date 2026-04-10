@@ -1,8 +1,11 @@
+import * as v from 'valibot';
 import type { AgentSession } from '#modules/agent-session/infrastructure/adapters/in/session.dto';
-import type { SessionEvent } from '#shared/kernel/session/events';
-import { $homedir, $selectedId, $sessions } from './store';
-
-type WsMessage = { type: 'snapshot'; sessions: AgentSession[] } | SessionEvent;
+import {
+  type SessionEvent,
+  SessionEventSchema,
+  type StructuredEvent,
+} from '#shared/kernel/session/events';
+import { $homedir, $selectedId, $sessions, addEventToFeed } from './store';
 
 function pickId(sessions: AgentSession[], currentId: string | null): string | null {
   if (currentId !== null && sessions.some((s) => s.id === currentId)) return currentId;
@@ -10,60 +13,119 @@ function pickId(sessions: AgentSession[], currentId: string | null): string | nu
 }
 
 export function applyWsMessage(raw: string): void {
-  let msg: WsMessage;
+  let parsed: unknown;
   try {
-    msg = JSON.parse(raw) as WsMessage;
+    parsed = JSON.parse(raw);
   } catch {
     return;
   }
 
-  if (msg.type === 'snapshot') {
-    const incoming = (msg as Extract<WsMessage, { type: 'snapshot' }>).sessions;
+  // Handle snapshot (not a SessionEvent)
+  if (
+    typeof parsed === 'object' &&
+    parsed !== null &&
+    (parsed as { type: string }).type === 'snapshot'
+  ) {
+    const incoming = (parsed as { sessions: AgentSession[] }).sessions;
     $sessions.set(incoming);
     $selectedId.set(pickId(incoming, $selectedId.get()));
-  } else if (msg.type === 'session:started') {
-    fetch('/api/sessions')
-      .then((r) => r.json() as Promise<{ sessions: AgentSession[] }>)
-      .then(({ sessions }) => {
-        $sessions.set(sessions);
-        $selectedId.set(pickId(sessions, $selectedId.get()));
-      })
-      .catch(() => {});
-  } else if (msg.type === 'session:ended') {
-    const e = msg as Extract<SessionEvent, { type: 'session:ended' }>;
-    $sessions.set(
-      $sessions.get().map((s) =>
-        s.id === e.sessionId
-          ? {
-              ...s,
-              status: 'ended' as const,
-              resumable: e.resumable,
-              ...(e.exitCode !== undefined ? { exitCode: e.exitCode } : {}),
-            }
-          : s
-      )
-    );
-  } else if (msg.type === 'session:deleted') {
-    const e = msg as Extract<SessionEvent, { type: 'session:deleted' }>;
-    const remaining = $sessions.get().filter((s) => s.id !== e.sessionId);
-    $sessions.set(remaining);
-    if ($selectedId.get() === e.sessionId) {
-      $selectedId.set(pickId(remaining, null));
+    return;
+  }
+
+  // Inject timestamp default for schema validation (browser events may omit it)
+  const withTimestamp =
+    typeof parsed === 'object' && parsed !== null && !('timestamp' in parsed)
+      ? { ...(parsed as Record<string, unknown>), timestamp: 0 }
+      : parsed;
+
+  // Validate against SessionEvent schema
+  const result = v.safeParse(SessionEventSchema, withTimestamp);
+  if (!result.success) return;
+
+  const event = result.output;
+  applyLifecycleEvent(event);
+  applyStructuredEvent(event);
+}
+
+function applyLifecycleEvent(event: SessionEvent): void {
+  switch (event.type) {
+    case 'session:started':
+      fetch('/api/sessions')
+        .then((r) => r.json() as Promise<{ sessions: AgentSession[] }>)
+        .then(({ sessions }) => {
+          $sessions.set(sessions);
+          $selectedId.set(pickId(sessions, $selectedId.get()));
+        })
+        .catch(() => {});
+      break;
+
+    case 'session:ended':
+      $sessions.set(
+        $sessions.get().map((s) =>
+          s.id === event.sessionId
+            ? {
+                ...s,
+                status: 'ended' as const,
+                resumable: event.resumable,
+                exitCode: event.exitCode,
+              }
+            : s
+        )
+      );
+      break;
+
+    case 'session:deleted': {
+      const remaining = $sessions.get().filter((s) => s.id !== event.sessionId);
+      $sessions.set(remaining);
+      if ($selectedId.get() === event.sessionId) $selectedId.set(pickId(remaining, null));
+      break;
     }
-  } else if (msg.type === 'sessions:cleared') {
-    const all = $sessions.get();
-    const active = all.filter((s) => s.status === 'active');
-    const removedIds = new Set(all.filter((s) => s.status !== 'active').map((s) => s.id));
-    $sessions.set(active);
-    const sel = $selectedId.get();
-    if (sel !== null && removedIds.has(sel)) {
-      $selectedId.set(active[0]?.id ?? null);
+
+    case 'sessions:cleared': {
+      const all = $sessions.get();
+      const active = all.filter((s) => s.status === 'active');
+      const removedIds = new Set(all.filter((s) => s.status !== 'active').map((s) => s.id));
+      $sessions.set(active);
+      const sel = $selectedId.get();
+      if (sel !== null && removedIds.has(sel)) {
+        $selectedId.set(active[0]?.id ?? null);
+      }
+      break;
     }
-  } else if (msg.type === 'session:resumable-changed') {
-    const e = msg as Extract<SessionEvent, { type: 'session:resumable-changed' }>;
-    $sessions.set(
-      $sessions.get().map((s) => (s.id === e.sessionId ? { ...s, resumable: e.resumable } : s))
-    );
+
+    case 'session:resumable-changed':
+      $sessions.set(
+        $sessions
+          .get()
+          .map((s) => (s.id === event.sessionId ? { ...s, resumable: event.resumable } : s))
+      );
+      break;
+  }
+}
+
+function applyStructuredEvent(event: SessionEvent): void {
+  if (
+    event.type === 'agent:text-delta' ||
+    event.type === 'agent:tool-call' ||
+    event.type === 'agent:cost-update' ||
+    event.type === 'agent:subagent-spawn' ||
+    event.type === 'agent:turn-started' ||
+    event.type === 'agent:turn-completed'
+  ) {
+    addEventToFeed(event.sessionId, event as StructuredEvent);
+
+    // Update session cost in local state
+    if (event.type === 'agent:cost-update') {
+      $sessions.set(
+        $sessions
+          .get()
+          .map((s) =>
+            s.id === event.sessionId
+              ? { ...s, totalCostUsd: (s.totalCostUsd ?? 0) + event.totalCostUsd }
+              : s
+          )
+      );
+    }
   }
 }
 

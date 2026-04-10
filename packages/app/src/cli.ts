@@ -11,6 +11,11 @@ import {
   daemonStatusCommand,
   daemonStopCommand,
 } from '#shell/infrastructure/adapters/in/commands/daemon.command';
+import {
+  hooksInstallCommand,
+  hooksStatusCommand,
+  hooksUninstallCommand,
+} from '#shell/infrastructure/adapters/in/commands/hooks.command';
 import { openCommand } from '#shell/infrastructure/adapters/in/commands/open.command';
 import { sessionAttachCommand } from '#shell/infrastructure/adapters/in/commands/session-attach.command';
 import { sessionListCommand } from '#shell/infrastructure/adapters/in/commands/session-list.command';
@@ -103,6 +108,25 @@ const session = Command.make('session').pipe(
   Command.withSubcommands([sessionList, sessionAttach, sessionResume])
 );
 
+// ── Hooks subcommands ──
+
+const hooksStatus = Command.make('status', {}, () => hooksStatusCommand()).pipe(
+  Command.withDescription('Show vigie hook installation status')
+);
+
+const hooksInstall = Command.make('install', {}, () => hooksInstallCommand()).pipe(
+  Command.withDescription('Install vigie hooks into Claude Code settings')
+);
+
+const hooksUninstall = Command.make('uninstall', {}, () => hooksUninstallCommand()).pipe(
+  Command.withDescription('Remove vigie hooks from Claude Code settings')
+);
+
+const hooks = Command.make('hooks').pipe(
+  Command.withDescription('Manage vigie hooks in Claude Code settings'),
+  Command.withSubcommands([hooksStatus, hooksInstall, hooksUninstall])
+);
+
 // ── Open command ──
 
 const open = Command.make('open', {}, () => openCommand()).pipe(
@@ -130,9 +154,12 @@ const app = Command.make('vigie', {}, () =>
       '  session attach --id  Attach to an active interactive session',
       '  session resume --id  Resume an ended Claude session',
       '  open                 Open the dashboard in your browser',
+      '  hooks status         Show vigie hook installation status',
+      '  hooks install        Install vigie hooks into Claude Code settings',
+      '  hooks uninstall      Remove vigie hooks from Claude Code settings',
     ].join('\n')
   )
-).pipe(Command.withSubcommands([daemon, claude, session, open]));
+).pipe(Command.withSubcommands([daemon, claude, session, open, hooks]));
 
 // ── Run ──
 

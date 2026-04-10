@@ -61,7 +61,7 @@ export function createRunDaemon(deps: RunDaemonDeps) {
         yield* Effect.logInfo('[daemon] Shutting down...');
         yield* Fiber.interrupt(pruneFiber);
         yield* Fiber.interrupt(resumableFiber);
-        db.close();
+        db.sqlite.close();
         cleanup(config);
       })
     );

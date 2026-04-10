@@ -1,14 +1,17 @@
 import { Database } from 'bun:sqlite';
 import { describe, expect, it } from 'bun:test';
 import { Effect, Layer } from 'effect';
+import { Kysely } from 'kysely';
 import { SessionLog } from '#modules/agent-session/application/ports/out/session-log.port';
 import { SqliteTerminalRepositoryLive } from '#modules/agent-session/infrastructure/adapters/out/sqlite-terminal-repository';
-import { VigiDatabase } from '#shared/db/database';
+import { VigiDatabase, type VigiDatabaseServices } from '#shared/db/database';
+import { createBunSqliteDialect } from '#shared/db/dialect';
+import type { VigiDatabaseSchema } from '#shared/db/schema';
 import { SessionId as makeSessionId } from '#shared/kernel/session/session-id';
 
-function makeTestDb(): Database {
-  const db = new Database(':memory:');
-  db.exec(`
+function makeTestDb(): VigiDatabaseServices {
+  const sqlite = new Database(':memory:');
+  sqlite.exec(`
     CREATE TABLE IF NOT EXISTS sessions (
       id TEXT PRIMARY KEY,
       agent_type TEXT NOT NULL,
@@ -40,10 +43,11 @@ function makeTestDb(): Database {
     );
   `);
   // Insert a seed session so foreign key constraints are satisfied
-  db.run(
+  sqlite.run(
     `INSERT INTO sessions (id, agent_type, mode, cwd, started_at, status) VALUES ('session-1', 'claude', 'interactive', '/tmp/test', ${Date.now()}, 'active')`
   );
-  return db;
+  const kysely = new Kysely<VigiDatabaseSchema>({ dialect: createBunSqliteDialect(sqlite) });
+  return { sqlite, kysely };
 }
 
 const TestDatabaseLayer = Layer.sync(VigiDatabase)(() => makeTestDb());
