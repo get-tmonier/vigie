@@ -9,11 +9,14 @@ import {
   type SessionOutputShape,
 } from '#modules/agent-session/application/ports/out/session-output.port';
 import { SessionStore } from '#modules/agent-session/application/ports/out/session-store.port';
+import { StructuredEventStore } from '#modules/agent-session/application/ports/out/structured-event-store.port';
 import { createCheckResumabilityUseCase } from '#modules/agent-session/application/use-cases/check-resumability.use-case';
 import { createSessionCleanupUseCase } from '#modules/agent-session/application/use-cases/session-cleanup.use-case';
 import { createSessionLifecycleUseCase } from '#modules/agent-session/application/use-cases/session-lifecycle.use-case';
 import { createSessionQueriesUseCase } from '#modules/agent-session/application/use-cases/session-queries.use-case';
 import { createSpawnSessionUseCase } from '#modules/agent-session/application/use-cases/spawn-session.use-case';
+import type { SpawnStructuredSessionShape } from '#modules/agent-session/application/use-cases/spawn-structured-session.use-case';
+import { createSpawnStructuredSessionUseCase } from '#modules/agent-session/application/use-cases/spawn-structured-session.use-case';
 import { AgentCatalogLive } from '#modules/agent-session/infrastructure/adapters/out/agents/agent-registry';
 import { spawnStructured } from '#modules/agent-session/infrastructure/adapters/out/agents/claude-sdk.adapter';
 import { createBunPtySpawnFn } from '#modules/agent-session/infrastructure/adapters/out/bun-pty-spawner';
@@ -32,6 +35,7 @@ export interface AgentSessionServices {
   ptyManager: AgentProcessShape;
   terminalSubs: SessionOutputShape;
   spawnStructured: typeof spawnStructured;
+  spawnStructuredSession: SpawnStructuredSessionShape;
   startupOps: {
     cleanupOrphanedSessions: () => void;
     pruneOldSessions: () => void;
@@ -60,6 +64,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
     const eventPublisher = yield* SessionEventBus;
     const terminalSubs = yield* SessionOutput;
     const cliChannel = yield* CliChannel;
+    const structuredEventStore = yield* StructuredEventStore;
 
     const sessionLifecycle = createSessionLifecycleUseCase({
       sessionRepo: sessionStore,
@@ -122,6 +127,13 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
       terminalRepo: sessionLog,
     });
 
+    const spawnStructuredSession = createSpawnStructuredSessionUseCase({
+      sessionRepo: sessionStore,
+      eventPublisher,
+      structuredEventStore,
+      spawnStructuredFn: spawnStructured,
+    });
+
     const startupOps = {
       cleanupOrphanedSessions: () => sessionStore.markOrphanedEnded(),
       pruneOldSessions: () => sessionStore.pruneOld(),
@@ -138,6 +150,7 @@ export const AgentSessionLive = Layer.effect(AgentSession)(
       ptyManager,
       terminalSubs,
       spawnStructured,
+      spawnStructuredSession,
       startupOps,
     };
   })
