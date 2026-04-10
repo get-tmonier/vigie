@@ -3,6 +3,7 @@ import { KanbanBoard } from '#modules/agent-session/infrastructure/adapters/in/u
 import { SessionDetail } from '#modules/agent-session/infrastructure/adapters/in/ui/SessionDetail.island';
 import { SessionList } from '#modules/agent-session/infrastructure/adapters/in/ui/SessionList.island';
 import { SpawnSessionFormIsland } from '#modules/agent-session/infrastructure/adapters/in/ui/SpawnSessionForm.island';
+import { SessionDetailV2 } from '#modules/agent-session/infrastructure/adapters/in/ui/session-detail/SessionDetailV2.island';
 import { init } from '#modules/agent-session/infrastructure/adapters/in/ui/ws-sync';
 import '#shared/styles/global.css';
 
@@ -19,3 +20,6 @@ if (el3) createRoot(el3).render(<SpawnSessionFormIsland />);
 
 const el4 = document.getElementById('kanban-board-app');
 if (el4) createRoot(el4).render(<KanbanBoard />);
+
+const el5 = document.getElementById('session-detail-v2-app');
+if (el5) createRoot(el5).render(<SessionDetailV2 />);

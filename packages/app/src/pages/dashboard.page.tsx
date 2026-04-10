@@ -34,6 +34,7 @@ function DashboardPage({ sessions, homedir }: { sessions: AgentSession[]; homedi
           <>
             <div id="kanban-board-app" className="flex-1 flex flex-col min-h-0" />
             <div id="session-detail-app" className="flex-1 flex flex-col min-h-0" />
+            <div id="session-detail-v2-app" className="flex-1 flex flex-col min-h-0" />
           </>
         }
       />
