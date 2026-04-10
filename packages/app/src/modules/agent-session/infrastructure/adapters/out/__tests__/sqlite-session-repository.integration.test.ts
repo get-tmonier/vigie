@@ -26,7 +26,11 @@ function makeTestDb(): VigiDatabaseServices {
       status TEXT NOT NULL DEFAULT 'active',
       exit_code INTEGER,
       agent_session_id TEXT,
-      resumable INTEGER NOT NULL DEFAULT 0
+      resumable INTEGER NOT NULL DEFAULT 0,
+      session_type TEXT NOT NULL DEFAULT 'interactive',
+      auto_advance INTEGER NOT NULL DEFAULT 0,
+      current_turn_index INTEGER NOT NULL DEFAULT 0,
+      total_cost_usd REAL NOT NULL DEFAULT 0
     );
     CREATE TABLE IF NOT EXISTS terminal_chunks (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

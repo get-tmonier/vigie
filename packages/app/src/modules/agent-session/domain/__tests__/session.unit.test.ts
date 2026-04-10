@@ -341,6 +341,47 @@ describe('Session.archive', () => {
   });
 });
 
+describe('Session structured fields', () => {
+  it('defaults to interactive sessionType', () => {
+    const session = Session.create({ agentType: 'claude', cwd: '/tmp' });
+    expect(session.sessionType).toBe('interactive');
+  });
+
+  it('can be created as structured', () => {
+    const session = Session.create({
+      agentType: 'claude',
+      cwd: '/tmp',
+      sessionType: 'structured',
+    });
+    expect(session.sessionType).toBe('structured');
+  });
+
+  it('defaults autoAdvance to false', () => {
+    const session = Session.create({ agentType: 'claude', cwd: '/tmp' });
+    expect(session.autoAdvance).toBe(false);
+  });
+
+  it('tracks currentTurnIndex', () => {
+    const session = Session.create({
+      agentType: 'claude',
+      cwd: '/tmp',
+      sessionType: 'structured',
+    });
+    expect(session.currentTurnIndex).toBe(0);
+    session.advanceTurn();
+    expect(session.currentTurnIndex).toBe(1);
+  });
+
+  it('accumulates totalCostUsd', () => {
+    const session = Session.create({ agentType: 'claude', cwd: '/tmp' });
+    expect(session.totalCostUsd).toBe(0);
+    session.addCost(0.05);
+    expect(session.totalCostUsd).toBe(0.05);
+    session.addCost(0.03);
+    expect(session.totalCostUsd).toBeCloseTo(0.08);
+  });
+});
+
 describe('Session.canDelete (extended)', () => {
   it('canDelete is false when paused', () => {
     const session = makeActiveSession();

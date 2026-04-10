@@ -23,6 +23,10 @@ export const AgentSessionSchema = v.object({
   exitCode: v.optional(v.number()),
   agentSessionId: v.optional(v.string()),
   resumable: v.optional(v.boolean()),
+  sessionType: v.optional(v.picklist(['structured', 'interactive'])),
+  autoAdvance: v.optional(v.boolean()),
+  currentTurnIndex: v.optional(v.number()),
+  totalCostUsd: v.optional(v.number()),
 });
 export type AgentSession = v.InferOutput<typeof AgentSessionSchema>;
 

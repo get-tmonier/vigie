@@ -15,5 +15,9 @@ export function sessionToDTO(session: Session): AgentSession {
     exitCode: session.exitCode,
     agentSessionId: session.agentSessionId,
     resumable: session.resumable,
+    sessionType: session.sessionType,
+    autoAdvance: session.autoAdvance,
+    currentTurnIndex: session.currentTurnIndex,
+    totalCostUsd: session.totalCostUsd,
   };
 }

@@ -17,6 +17,8 @@ interface CreateSessionProps {
   readonly gitRemoteUrl?: string;
   readonly repoName?: string;
   readonly mode?: 'prompt' | 'interactive';
+  readonly sessionType?: 'structured' | 'interactive';
+  readonly autoAdvance?: boolean;
 }
 
 interface ReconstitutedSessionProps {
@@ -33,6 +35,10 @@ interface ReconstitutedSessionProps {
   readonly agentSessionId?: string;
   readonly resumable: boolean;
   readonly mode?: string;
+  readonly sessionType?: string;
+  readonly autoAdvance?: boolean;
+  readonly currentTurnIndex?: number;
+  readonly totalCostUsd?: number;
 }
 
 export class Session {
@@ -44,12 +50,16 @@ export class Session {
   readonly repoName?: string;
   readonly startedAt: number;
   readonly mode: string;
+  readonly sessionType: 'structured' | 'interactive';
+  readonly autoAdvance: boolean;
 
   private _status: SessionStatus;
   private _agentSessionId?: string;
   private _resumable: boolean;
   private _exitCode?: number;
   private _endedAt?: number;
+  private _currentTurnIndex: number;
+  private _totalCostUsd: number;
   private readonly _events: SessionLifecycleEvent[] = [];
 
   private constructor(props: {
@@ -66,6 +76,10 @@ export class Session {
     exitCode?: number;
     endedAt?: number;
     mode: string;
+    sessionType: 'structured' | 'interactive';
+    autoAdvance: boolean;
+    currentTurnIndex: number;
+    totalCostUsd: number;
   }) {
     this.id = props.id;
     this.agentType = props.agentType;
@@ -75,11 +89,15 @@ export class Session {
     this.repoName = props.repoName;
     this.startedAt = props.startedAt;
     this.mode = props.mode;
+    this.sessionType = props.sessionType;
+    this.autoAdvance = props.autoAdvance;
     this._status = props.status;
     this._agentSessionId = props.agentSessionId;
     this._resumable = props.resumable;
     this._exitCode = props.exitCode;
     this._endedAt = props.endedAt;
+    this._currentTurnIndex = props.currentTurnIndex;
+    this._totalCostUsd = props.totalCostUsd;
   }
 
   static create(props: CreateSessionProps): Session {
@@ -95,6 +113,10 @@ export class Session {
       status: 'active',
       resumable: false,
       mode: props.mode ?? 'prompt',
+      sessionType: props.sessionType ?? 'interactive',
+      autoAdvance: props.autoAdvance ?? false,
+      currentTurnIndex: 0,
+      totalCostUsd: 0,
     });
 
     session._events.push({
@@ -126,6 +148,10 @@ export class Session {
       exitCode: props.exitCode,
       endedAt: props.endedAt,
       mode: props.mode ?? 'prompt',
+      sessionType: (props.sessionType as 'structured' | 'interactive') ?? 'interactive',
+      autoAdvance: props.autoAdvance ?? false,
+      currentTurnIndex: props.currentTurnIndex ?? 0,
+      totalCostUsd: props.totalCostUsd ?? 0,
     });
   }
 
@@ -151,6 +177,22 @@ export class Session {
 
   get endedAt(): number | undefined {
     return this._endedAt;
+  }
+
+  get currentTurnIndex(): number {
+    return this._currentTurnIndex;
+  }
+
+  get totalCostUsd(): number {
+    return this._totalCostUsd;
+  }
+
+  advanceTurn(): void {
+    this._currentTurnIndex++;
+  }
+
+  addCost(usd: number): void {
+    this._totalCostUsd += usd;
   }
 
   get canResume(): boolean {
